@@ -1,0 +1,174 @@
+[
+  {
+    "id": "js.map.double",
+    "track": "javascript",
+    "group": "Array transforms",
+    "concept": "map doubles each element",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[1, 2, 3].map(x => x * 2)",
+    "expected": "[2, 4, 6]"
+  },
+  {
+    "id": "js.filter.evens",
+    "track": "javascript",
+    "group": "Array transforms",
+    "concept": "filter keeps matching elements",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[1, 2, 3, 4, 5, 6].filter(x => x % 2 === 0)",
+    "expected": "[2, 4, 6]",
+    "prereqs": ["js.map.double"]
+  },
+  {
+    "id": "js.reduce.sum",
+    "track": "javascript",
+    "group": "Array transforms",
+    "concept": "reduce folds to a single value",
+    "kind": "predict",
+    "prompt": "What number does this reduce to?",
+    "snippet": "[1, 2, 3, 4].reduce((acc, x) => acc + x, 0)",
+    "expected": "10",
+    "prereqs": ["js.filter.evens"]
+  },
+  {
+    "id": "js.find.first",
+    "track": "javascript",
+    "group": "Array search",
+    "concept": "find returns first match",
+    "kind": "predict",
+    "prompt": "What does find return here?",
+    "snippet": "[5, 12, 8, 130, 44].find(n => n > 10)",
+    "expected": "12"
+  },
+  {
+    "id": "js.every.positive",
+    "track": "javascript",
+    "group": "Array search",
+    "concept": "every checks all elements",
+    "kind": "predict",
+    "prompt": "Does every element satisfy the predicate?",
+    "snippet": "[1, 2, 3].every(n => n > 0) && [1, -2, 3].some(n => n < 0)",
+    "expected": "true",
+    "prereqs": ["js.find.first"]
+  },
+  {
+    "id": "js.slice.subarray",
+    "track": "javascript",
+    "group": "Array transforms",
+    "concept": "slice takes [start, end)",
+    "kind": "predict",
+    "prompt": "What subarray does slice produce (end is exclusive)?",
+    "snippet": "[1, 2, 3, 4, 5].slice(1, 3)",
+    "expected": "[2, 3]"
+  },
+  {
+    "id": "js.sort.comparator",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "numeric sort needs a comparator",
+    "kind": "predict",
+    "prompt": "With a numeric comparator, what is the sorted order?",
+    "snippet": "[10, 1, 2, 20].sort((a, b) => a - b)",
+    "expected": "[1, 2, 10, 20]"
+  },
+  {
+    "id": "js.spread.concat",
+    "track": "javascript",
+    "group": "Spread & destructuring",
+    "concept": "spread merges arrays",
+    "kind": "predict",
+    "prompt": "What array results from spreading both?",
+    "snippet": "[...[1, 2], ...[3, 4]]",
+    "expected": "[1, 2, 3, 4]"
+  },
+  {
+    "id": "js.set.dedupe",
+    "track": "javascript",
+    "group": "Map & Set",
+    "concept": "Set removes duplicates",
+    "kind": "predict",
+    "prompt": "What does spreading a Set of these values give?",
+    "snippet": "[...new Set([1, 1, 2, 3, 3, 3])]",
+    "expected": "[1, 2, 3]",
+    "prereqs": ["js.spread.concat"]
+  },
+  {
+    "id": "js.mathmax.spread",
+    "track": "javascript",
+    "group": "Spread & destructuring",
+    "concept": "Math.max over an array via spread",
+    "kind": "predict",
+    "prompt": "What is the maximum?",
+    "snippet": "Math.max(...[3, 7, 2, 9, 4])",
+    "expected": "9",
+    "prereqs": ["js.spread.concat"]
+  },
+  {
+    "id": "js.split.join",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "split then join re-glues with a new separator",
+    "kind": "predict",
+    "prompt": "What string results?",
+    "snippet": "\"a,b,c\".split(\",\").join(\"-\")",
+    "expected": "a-b-c"
+  },
+  {
+    "id": "js.template.literal",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "template literals interpolate expressions",
+    "kind": "predict",
+    "prompt": "What string does this template produce?",
+    "snippet": "const n = 3; `n squared is ${n * n}`",
+    "expected": "n squared is 9"
+  },
+  {
+    "id": "js.entries.format",
+    "track": "javascript",
+    "group": "Objects",
+    "concept": "Object.entries + destructuring",
+    "kind": "predict",
+    "prompt": "What string results from formatting the entries?",
+    "snippet": "Object.entries({ a: 1, b: 2 }).map(([k, v]) => `${k}=${v}`).join(\",\")",
+    "expected": "a=1,b=2",
+    "prereqs": ["js.template.literal"]
+  },
+  {
+    "id": "js.fromentries.build",
+    "track": "javascript",
+    "group": "Objects",
+    "concept": "Object.fromEntries builds an object",
+    "kind": "write",
+    "prompt": "Write `toObject(pairs)` that turns an array of [key, value] pairs into an object.",
+    "starter": "function toObject(pairs) {\n  // your code here\n}",
+    "solution": "function toObject(pairs) {\n  return Object.fromEntries(pairs);\n}",
+    "tests": "const o = toObject([['a', 1], ['b', 2]]);\nif (o.a !== 1 || o.b !== 2 || Object.keys(o).length !== 2) throw new Error('expected {a:1, b:2}, got ' + JSON.stringify(o));\nif (JSON.stringify(toObject([])) !== '{}') throw new Error('empty pairs should give {}');",
+    "prereqs": ["js.entries.format"]
+  },
+  {
+    "id": "js.destructure.swap",
+    "track": "javascript",
+    "group": "Spread & destructuring",
+    "concept": "array destructuring to swap",
+    "kind": "write",
+    "prompt": "Write `swap([a, b])` that returns a new array with the two elements swapped, using destructuring.",
+    "starter": "function swap(pair) {\n  // your code here\n}",
+    "solution": "function swap([a, b]) {\n  return [b, a];\n}",
+    "tests": "if (JSON.stringify(swap([1, 2])) !== '[2,1]') throw new Error('swap([1,2]) should be [2,1]');\nif (JSON.stringify(swap(['x', 'y'])) !== '[\"y\",\"x\"]') throw new Error('swap([x,y]) should be [y,x]');",
+    "prereqs": ["js.spread.concat"]
+  },
+  {
+    "id": "js.map.counts",
+    "track": "javascript",
+    "group": "Map & Set",
+    "concept": "frequency Map of counts",
+    "kind": "write",
+    "prompt": "Write `counts(arr)` that returns a Map from each element to how many times it appears.",
+    "starter": "function counts(arr) {\n  // your code here\n}",
+    "solution": "function counts(arr) {\n  const m = new Map();\n  for (const x of arr) m.set(x, (m.get(x) || 0) + 1);\n  return m;\n}",
+    "tests": "const c = counts(['a', 'b', 'a', 'c', 'a', 'b']);\nif (!(c instanceof Map)) throw new Error('should return a Map');\nif (c.get('a') !== 3 || c.get('b') !== 2 || c.get('c') !== 1) throw new Error('wrong counts: ' + JSON.stringify([...c]));\nif (c.size !== 3) throw new Error('expected 3 distinct keys');",
+    "prereqs": ["js.set.dedupe"]
+  }
+]

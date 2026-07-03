@@ -1,0 +1,96 @@
+// Shared inline-style tokens. Kept tiny and dependency-free (no CSS framework);
+// the MVP favours a clean monospace-forward look.
+
+import type { CSSProperties } from 'react';
+
+export const theme = {
+  bg: '#0f1117',
+  panel: '#171a23',
+  panelAlt: '#1e222d',
+  border: '#2a2f3a',
+  text: '#e6e9ef',
+  muted: '#8b93a7',
+  accent: '#7aa2f7',
+  good: '#7ee787',
+  bad: '#ff7b72',
+  mono: "'SFMono-Regular', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace",
+  sans: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+};
+
+export const styles: Record<string, CSSProperties> = {
+  page: {
+    minHeight: '100vh',
+    background: theme.bg,
+    color: theme.text,
+    fontFamily: theme.sans,
+    padding: '2rem 1rem',
+  },
+  shell: { maxWidth: 720, margin: '0 auto' },
+  h1: { fontSize: '1.5rem', margin: '0 0 0.25rem', letterSpacing: '-0.02em' },
+  tagline: { color: theme.muted, margin: '0 0 1.5rem', fontSize: '0.9rem' },
+  panel: {
+    background: theme.panel,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 12,
+    padding: '1.25rem',
+  },
+  row: { display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' },
+  btn: {
+    background: theme.accent,
+    color: '#0b0e14',
+    border: 'none',
+    borderRadius: 8,
+    padding: '0.55rem 1rem',
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  btnGhost: {
+    background: 'transparent',
+    color: theme.text,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 8,
+    padding: '0.55rem 1rem',
+    fontSize: '0.9rem',
+    cursor: 'pointer',
+  },
+  editor: {
+    width: '100%',
+    boxSizing: 'border-box',
+    background: theme.panelAlt,
+    color: theme.text,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 8,
+    padding: '0.75rem',
+    fontFamily: theme.mono,
+    fontSize: '0.85rem',
+    lineHeight: 1.5,
+    resize: 'vertical',
+  },
+  code: {
+    display: 'block',
+    whiteSpace: 'pre-wrap',
+    background: theme.panelAlt,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 8,
+    padding: '0.75rem',
+    fontFamily: theme.mono,
+    fontSize: '0.85rem',
+    lineHeight: 1.5,
+    margin: 0,
+  },
+  label: {
+    fontSize: '0.7rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+    color: theme.muted,
+    margin: '0 0 0.4rem',
+  },
+  pill: {
+    fontSize: '0.7rem',
+    padding: '0.15rem 0.5rem',
+    borderRadius: 999,
+    border: `1px solid ${theme.border}`,
+    color: theme.muted,
+  },
+};

@@ -1,0 +1,96 @@
+[
+  {
+    "id": "py.twopointers.reverse",
+    "track": "python",
+    "group": "Two pointers",
+    "concept": "two pointers converging from both ends",
+    "kind": "write",
+    "prompt": "Write `is_palindrome(s)` using two pointers (one from the start, one from the end) that move toward each other. Return True if `s` reads the same forwards and backwards. Do not use slicing.",
+    "starter": "def is_palindrome(s):\n    # your code here\n    ...\n",
+    "solution": "def is_palindrome(s):\n    lo, hi = 0, len(s) - 1\n    while lo < hi:\n        if s[lo] != s[hi]:\n            return False\n        lo += 1\n        hi -= 1\n    return True\n",
+    "tests": "assert is_palindrome('racecar') is True\nassert is_palindrome('abba') is True\nassert is_palindrome('abc') is False\nassert is_palindrome('') is True\nassert is_palindrome('a') is True\n"
+  },
+  {
+    "id": "py.twopointers.sortedpair",
+    "track": "python",
+    "group": "Two pointers",
+    "concept": "two pointers for a target pair in a sorted list",
+    "kind": "write",
+    "prompt": "Given a list `nums` sorted ascending, write `two_sum_sorted(nums, target)` that returns a tuple of the two 0-based indices whose values add to `target`, or None if none exist. Use two pointers: move `lo` up when the sum is too small, `hi` down when too big.",
+    "starter": "def two_sum_sorted(nums, target):\n    # your code here\n    ...\n",
+    "solution": "def two_sum_sorted(nums, target):\n    lo, hi = 0, len(nums) - 1\n    while lo < hi:\n        total = nums[lo] + nums[hi]\n        if total == target:\n            return (lo, hi)\n        if total < target:\n            lo += 1\n        else:\n            hi -= 1\n    return None\n",
+    "tests": "assert two_sum_sorted([1, 2, 4, 7, 11], 15) == (2, 4)\nassert two_sum_sorted([1, 2, 3, 4], 7) == (2, 3)\nassert two_sum_sorted([1, 2, 3], 100) is None\nassert two_sum_sorted([], 0) is None\nassert two_sum_sorted([2, 4], 6) == (0, 1)\n",
+    "prereqs": ["py.twopointers.reverse"]
+  },
+  {
+    "id": "py.sliding.maxsum",
+    "track": "python",
+    "group": "Sliding window",
+    "concept": "fixed-size sliding window max sum",
+    "kind": "write",
+    "prompt": "Write `max_sum_k(nums, k)` returning the maximum sum of any contiguous window of exactly `k` elements. Compute the first window's sum, then slide by adding the entering element and subtracting the leaving one (O(n), no nested loops). Assume 1 <= k <= len(nums).",
+    "starter": "def max_sum_k(nums, k):\n    # your code here\n    ...\n",
+    "solution": "def max_sum_k(nums, k):\n    window = sum(nums[:k])\n    best = window\n    for i in range(k, len(nums)):\n        window += nums[i] - nums[i - k]\n        if window > best:\n            best = window\n    return best\n",
+    "tests": "assert max_sum_k([2, 1, 5, 1, 3, 2], 3) == 9\nassert max_sum_k([1, 2, 3, 4], 2) == 7\nassert max_sum_k([5], 1) == 5\nassert max_sum_k([-1, -2, -3], 2) == -3\n",
+    "prereqs": ["py.twopointers.sortedpair"]
+  },
+  {
+    "id": "py.bisect.insertpoint",
+    "track": "python",
+    "group": "Binary search",
+    "concept": "bisect for the insertion index",
+    "kind": "predict",
+    "prompt": "bisect_left returns the leftmost index where the value could be inserted to keep the list sorted. For a value already present, it points at the first equal element. What does this evaluate to?",
+    "snippet": "import bisect\nbisect.bisect_left([1, 3, 3, 5, 7], 3)",
+    "expected": "1",
+    "prereqs": ["py.sorted.key"]
+  },
+  {
+    "id": "py.bisect.manual",
+    "track": "python",
+    "group": "Binary search",
+    "concept": "manual binary search insertion point",
+    "kind": "write",
+    "prompt": "Without using the bisect module, write `search_insert(nums, target)` returning the index where `target` is, or where it would be inserted to keep `nums` (sorted ascending) sorted. Use a manual binary search with lo/hi bounds.",
+    "starter": "def search_insert(nums, target):\n    # your code here\n    ...\n",
+    "solution": "def search_insert(nums, target):\n    lo, hi = 0, len(nums)\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n",
+    "tests": "assert search_insert([1, 3, 5, 6], 5) == 2\nassert search_insert([1, 3, 5, 6], 2) == 1\nassert search_insert([1, 3, 5, 6], 7) == 4\nassert search_insert([1, 3, 5, 6], 0) == 0\nassert search_insert([], 3) == 0\nassert search_insert([1, 3, 3, 3, 5], 3) == 1\n",
+    "prereqs": ["py.bisect.insertpoint"]
+  },
+  {
+    "id": "py.freqmap.firstunique",
+    "track": "python",
+    "group": "Frequency maps",
+    "concept": "frequency map to find the first non-repeating element",
+    "kind": "write",
+    "prompt": "Write `first_unique(s)` returning the first character in `s` that appears exactly once, or None if every character repeats. Build a frequency map in one pass, then scan the string in order.",
+    "starter": "def first_unique(s):\n    # your code here\n    ...\n",
+    "solution": "from collections import Counter\n\ndef first_unique(s):\n    counts = Counter(s)\n    for c in s:\n        if counts[c] == 1:\n            return c\n    return None\n",
+    "tests": "assert first_unique('leetcode') == 'l'\nassert first_unique('aabbcc') is None\nassert first_unique('loveleetcode') == 'v'\nassert first_unique('') is None\nassert first_unique('x') == 'x'\n",
+    "prereqs": ["py.counter.freq"]
+  },
+  {
+    "id": "py.freqmap.dedup",
+    "track": "python",
+    "group": "Frequency maps",
+    "concept": "seen-set dedup preserving order",
+    "kind": "write",
+    "prompt": "Write `dedup(items)` returning a list with duplicates removed but the first occurrence of each value kept in its original order. Track what you've seen with a set.",
+    "starter": "def dedup(items):\n    # your code here\n    ...\n",
+    "solution": "def dedup(items):\n    seen = set()\n    result = []\n    for x in items:\n        if x not in seen:\n            seen.add(x)\n            result.append(x)\n    return result\n",
+    "tests": "assert dedup([1, 1, 2, 3, 2, 1]) == [1, 2, 3]\nassert dedup([]) == []\nassert dedup(['a', 'b', 'a', 'c']) == ['a', 'b', 'c']\nassert dedup([5, 5, 5]) == [5]\n",
+    "prereqs": ["py.freqmap.firstunique"]
+  },
+  {
+    "id": "py.prefixsum.range",
+    "track": "python",
+    "group": "Prefix sums",
+    "concept": "prefix sums for O(1) range queries",
+    "kind": "write",
+    "prompt": "Write `range_sum(nums, i, j)` returning the sum of nums[i..j] inclusive. First build a prefix-sum array `pre` where pre[k] is the sum of the first k elements (pre[0] == 0), then answer with a single subtraction pre[j+1] - pre[i].",
+    "starter": "def range_sum(nums, i, j):\n    # build prefix sums, then subtract\n    ...\n",
+    "solution": "def range_sum(nums, i, j):\n    pre = [0]\n    for n in nums:\n        pre.append(pre[-1] + n)\n    return pre[j + 1] - pre[i]\n",
+    "tests": "assert range_sum([1, 2, 3, 4, 5], 1, 3) == 9\nassert range_sum([1, 2, 3, 4, 5], 0, 4) == 15\nassert range_sum([1, 2, 3, 4, 5], 2, 2) == 3\nassert range_sum([-1, -1, -1], 0, 2) == -3\n",
+    "prereqs": ["py.sliding.maxsum"]
+  }
+]

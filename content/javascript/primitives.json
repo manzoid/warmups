@@ -1,0 +1,62 @@
+[
+  {
+    "id": "js.freqmap.first-unique",
+    "track": "javascript",
+    "group": "Problem-solving primitives",
+    "concept": "frequency Map: first non-repeating",
+    "kind": "write",
+    "prompt": "Write `firstUnique(s)` that returns the index of the first character in the string that appears exactly once, or -1 if there is none. Use a frequency Map.",
+    "starter": "function firstUnique(s) {\n  // your code here\n}",
+    "solution": "function firstUnique(s) {\n  const m = new Map();\n  for (const c of s) m.set(c, (m.get(c) || 0) + 1);\n  for (let i = 0; i < s.length; i++) {\n    if (m.get(s[i]) === 1) return i;\n  }\n  return -1;\n}",
+    "tests": "if (firstUnique('leetcode') !== 0) throw new Error('leetcode -> 0');\nif (firstUnique('loveleetcode') !== 2) throw new Error('loveleetcode -> 2');\nif (firstUnique('aabb') !== -1) throw new Error('aabb -> -1');\nif (firstUnique('') !== -1) throw new Error('empty -> -1');",
+    "prereqs": ["js.map.counts"]
+  },
+  {
+    "id": "js.twopointers.two-sum-sorted",
+    "track": "javascript",
+    "group": "Problem-solving primitives",
+    "concept": "two pointers on a sorted array",
+    "kind": "write",
+    "prompt": "Given a sorted array `nums` and a `target`, write `twoSum(nums, target)` returning `[i, j]` (i < j) of two elements that sum to target, or `[]` if none. Use two pointers from both ends.",
+    "starter": "function twoSum(nums, target) {\n  // your code here\n}",
+    "solution": "function twoSum(nums, target) {\n  let i = 0, j = nums.length - 1;\n  while (i < j) {\n    const s = nums[i] + nums[j];\n    if (s === target) return [i, j];\n    if (s < target) i++;\n    else j--;\n  }\n  return [];\n}",
+    "tests": "if (JSON.stringify(twoSum([1, 2, 4, 11, 15], 15)) !== '[2,3]') throw new Error('sum 15 -> [2,3]');\nif (JSON.stringify(twoSum([1, 2, 4, 11, 15], 3)) !== '[0,1]') throw new Error('sum 3 -> [0,1]');\nif (JSON.stringify(twoSum([1, 2, 4], 100)) !== '[]') throw new Error('no pair -> []');",
+    "prereqs": ["js.sort.comparator"]
+  },
+  {
+    "id": "js.slidingwindow.max-sum-k",
+    "track": "javascript",
+    "group": "Problem-solving primitives",
+    "concept": "sliding window: max sum of size k",
+    "kind": "write",
+    "prompt": "Write `maxSumK(arr, k)` returning the maximum sum of any contiguous subarray of length k. Slide the window instead of recomputing each sum.",
+    "starter": "function maxSumK(arr, k) {\n  // your code here\n}",
+    "solution": "function maxSumK(arr, k) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += arr[i];\n  let best = s;\n  for (let i = k; i < arr.length; i++) {\n    s += arr[i] - arr[i - k];\n    best = Math.max(best, s);\n  }\n  return best;\n}",
+    "tests": "if (maxSumK([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error('expected 9');\nif (maxSumK([1, 2, 3], 3) !== 6) throw new Error('whole array -> 6');\nif (maxSumK([4, -1, 2, 1], 2) !== 3) throw new Error('expected 3');",
+    "prereqs": ["js.mathmax.spread"]
+  },
+  {
+    "id": "js.binarysearch.insertion-point",
+    "track": "javascript",
+    "group": "Problem-solving primitives",
+    "concept": "binary search: lower-bound insertion index",
+    "kind": "write",
+    "prompt": "Write `insertPos(arr, target)` for a sorted `arr`: return the leftmost index where `target` could be inserted to keep it sorted (the lower bound). Use binary search — do not scan linearly.",
+    "starter": "function insertPos(arr, target) {\n  // your code here\n}",
+    "solution": "function insertPos(arr, target) {\n  let lo = 0, hi = arr.length;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid;\n  }\n  return lo;\n}",
+    "tests": "if (insertPos([1, 3, 5, 6], 5) !== 2) throw new Error('5 -> 2');\nif (insertPos([1, 3, 5, 6], 2) !== 1) throw new Error('2 -> 1');\nif (insertPos([1, 3, 5, 6], 7) !== 4) throw new Error('7 -> 4');\nif (insertPos([1, 3, 5, 6], 0) !== 0) throw new Error('0 -> 0');\nif (insertPos([], 1) !== 0) throw new Error('empty -> 0');",
+    "prereqs": ["js.sort.comparator"]
+  },
+  {
+    "id": "js.prefixsum.range",
+    "track": "javascript",
+    "group": "Problem-solving primitives",
+    "concept": "prefix sums for range queries",
+    "kind": "write",
+    "prompt": "Write `rangeSums(arr, queries)` where each query is `[l, r]` (inclusive). Return an array of the sum of arr[l..r] for each query. Build a prefix-sum array once, then answer each query in O(1).",
+    "starter": "function rangeSums(arr, queries) {\n  // your code here\n}",
+    "solution": "function rangeSums(arr, queries) {\n  const pre = [0];\n  for (let i = 0; i < arr.length; i++) pre.push(pre[i] + arr[i]);\n  return queries.map(([l, r]) => pre[r + 1] - pre[l]);\n}",
+    "tests": "const out = rangeSums([1, 2, 3, 4, 5], [[0, 2], [1, 3], [0, 4], [2, 2]]);\nif (JSON.stringify(out) !== '[6,9,15,3]') throw new Error('got ' + JSON.stringify(out));\nif (JSON.stringify(rangeSums([10], [[0, 0]])) !== '[10]') throw new Error('single -> [10]');",
+    "prereqs": ["js.reduce.sum"]
+  }
+]
