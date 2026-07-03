@@ -1,0 +1,3 @@
+# warmups
+
+warmups is an open-source, local-first spaced-repetition kata app for getting fast and automatic at Python and JavaScript/TypeScript language fluency and a reverse-engineered set of problem-solving primitives. It runs entirely in your browser as a static site with no backend and no accounts: Python exercises execute in-browser via Pyodide, JavaScript/TypeScript exercises run in a Web Worker, and your progress is scheduled with an FSRS spaced-repetition algorithm and persisted to localStorage — so you can drill small "predict the value" and "write the code" problems every day until the fundamentals become reflexive.

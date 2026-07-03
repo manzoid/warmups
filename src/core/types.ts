@@ -1,0 +1,20 @@
+export type Track = 'python' | 'javascript';
+export type ExerciseKind = 'predict' | 'write';
+export interface Exercise {
+  id: string;            // unique, e.g. "py.counter.freq"
+  track: Track;
+  group: string;         // concept group, e.g. "Dicts & counting"
+  concept: string;       // short label, e.g. "Counter for frequencies"
+  kind: ExerciseKind;
+  prompt: string;        // what to do (plain text / light markdown)
+  // kind === 'predict': user types the value that snippet evaluates to
+  snippet?: string;      // code whose resulting value the learner predicts
+  expected?: string;     // canonical expected value, as a string (e.g. "[2, 4, 6]")
+  // kind === 'write': user writes/completes code; tests decide pass/fail
+  starter?: string;      // pre-filled editor content
+  solution?: string;     // reference solution (hidden; used only for content validation)
+  tests?: string;        // appended after the user's code; must throw/assert on failure
+  prereqs?: string[];    // exercise ids that should be learned first
+}
+export interface RunResult { passed: boolean; actual?: string; error?: string; }
+export interface Runner { track: Track; run(userCode: string, ex: Exercise): Promise<RunResult>; }
