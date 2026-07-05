@@ -351,7 +351,12 @@ function HintLadder({
 
       {open.visualize && (
         <div style={{ marginTop: '1rem' }}>
-          <Visualizer track={ex.track} code={input} title={ex.concept} />
+          {/* Predict: trace the snippet the learner mis-traced. Write: their own code. */}
+          <Visualizer
+            track={ex.track}
+            code={ex.kind === 'write' ? input : ex.snippet ?? input}
+            title={ex.concept}
+          />
         </div>
       )}
 

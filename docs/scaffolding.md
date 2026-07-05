@@ -93,42 +93,40 @@ observe directly).
 
 ### codeviz integration (rung 3)
 
-This rung is built for Python and reuses codeviz's pieces with no codeviz-side
-changes and no Python Tutor stopgap. The "Visualize my run" button traces the
-learner's **own submitted code**, not a fixed authored snippet, and renders it
-inline. See `src/ui/Visualizer.tsx`, `src/runners/pytrace.ts`, and
-`src/ui/renderTrace.ts`.
+This rung uses a **locally-running codeviz** as-is, for both tracks. The
+"Visualize my run" button sends the learner's **own submitted code** (for a
+predict item, the snippet they mis-traced) to codeviz and shows the step-through
+inline. See `src/ui/Visualizer.tsx` and `src/ui/codevizApi.ts`; the codeviz side
+is the `codeviz api` server (`serve_api` in codeviz's `server.py`).
 
-- codeviz's viewer renders a **single self-contained, offline HTML page**
-  (step-through code, stack frames, heap objects, reference arrows). The trace
-  JSON is injected into the page by string replacement (the `__TRACE_JSON__` and
-  `__TITLE__` markers), with no runtime network use, so it drops into an
-  `<iframe srcdoc>` directly.
-- **Python live path (built).** warmups already loads Pyodide to grade Python, so
-  the tracer runs there too: it drops the vendored Online Python Tutor tracer
-  (`pg_logger.py` + `pg_encoder.py`) onto Pyodide's virtual filesystem and drives
-  it exactly like codeviz's `python_backend` does,
-  `exec_script_str_local(code, None, False, False, finalizer)`, with a finalizer
-  that captures `{code, trace}`. The resulting OPT-format trace JSON is injected
-  into the viewer template and shown in a sandboxed `<iframe>`. The tracer is pure
-  stdlib and Pyodide-safe (its `import resource` is optional and the `setrlimit`
-  path is skipped when security checks are disabled).
-- **JavaScript live tracing is the next increment.** For now the rung shows an
-  honest note for the JS track instead of faking a visualization; codeviz's
-  JS/TS backend is the intended source when it is wired up.
+- **How it flows.** warmups `POST`s `{code, lang}` to `http://127.0.0.1:8930/trace`.
+  codeviz traces it with its real Python or JavaScript backend and returns a
+  **single self-contained, offline HTML page** (step-through code, stack frames,
+  heap objects, reference arrows). warmups drops that HTML into a sandboxed
+  `<iframe srcdoc>` (`sandbox="allow-scripts"`). CORS is open on the codeviz side
+  so the static page can call it.
+- **Both languages work now**, because codeviz already has mature Python (OPT
+  `pg_logger`) and JavaScript (Node V8 Inspector) tracers. This is the whole
+  reason for the local-process model: no in-browser JS tracer to build.
+- **The core loop stays in-browser and offline.** Running and grading exercises
+  still happen entirely in the browser (Pyodide / the worker); only this
+  visualization rung needs codeviz. If codeviz is not running, the rung shows how
+  to start it (`uv tool install git+https://github.com/manzoid/codeviz` then
+  `codeviz api`) instead of failing.
 
-Why runtime-in-Pyodide rather than build-time prerender: it visualizes the
-learner's actual submission (the thing they are stuck on), reuses the Pyodide
-runtime already loaded for grading, and keeps warmups backend-free and offline
-with no external service. The alternative, calling a local codeviz process or
-server at runtime, would break the no-backend model.
+Why a local process rather than in-browser tracing: it reuses codeviz's existing,
+faithful tracers for **both** languages (an in-browser JS tracer is a real
+project), and the learner's code stays on their machine (sent only to
+`127.0.0.1`). The trade-off is a companion install + a running process, so
+visualization is not a pure static-site feature the way grading is. An earlier
+in-browser Python path (pg_logger under Pyodide) was retired in favor of this
+single, consistent path for both tracks.
 
-**Vendored assets.** The tracer and renderer are copied into
-`src/vendor/codeviz/` (`pg_logger.py`, `pg_encoder.py`, `viewer_template.html`)
-and imported at build time as raw strings via Vite `?raw`. They are copies, not a
-dependency: update codeviz and re-copy rather than editing them in place (see
-`src/vendor/codeviz/NOTICE` for attribution). Repo:
-https://github.com/manzoid/codeviz (also cloned locally at ../codeviz).
+**Caveat (mixed content).** If warmups is ever served over https, browsers may
+block its calls to the `http://127.0.0.1` codeviz API. warmups is local-first and
+normally served over http (dev/preview), where this is a non-issue; run it
+locally to visualize. codeviz repo: https://github.com/manzoid/codeviz (also
+cloned locally at ../codeviz).
 
 ## Fade is the same ladder with a moving entry point
 

@@ -9,8 +9,8 @@
 // them the same way. No bundler, no test runner, no network.
 //
 // Covered here:
-//   - renderTrace.traceToSrcdoc: injects an OPT-format trace JSON into codeviz's
-//     offline viewer template and leaves no unfilled markers behind.
+//   - codevizApi.traceRequest: builds the POST /trace request (url + body) with
+//     the right language extension per track.
 //   - walkthroughPrompt.buildWalkthroughPrompt: embeds the exercise prompt and
 //     the learner's attempt, and never leaks the canonical answer
 //     (ex.expected / ex.solution) into the tutor prompt.
@@ -78,31 +78,18 @@ function check(cond, msg) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. renderTrace.traceToSrcdoc
+// 1. codevizApi.traceRequest — the request sent to a local `codeviz api`
 // ---------------------------------------------------------------------------
 
-const { traceToSrcdoc } = loadTs(join(ROOT, 'src/ui/renderTrace.ts'));
+const { traceRequest, CODEVIZ_API_BASE } = loadTs(join(ROOT, 'src/ui/codevizApi.ts'));
 
-// A sample OPT-shaped trace. It contains a `</script>` sequence and a `$&` so we
-// also confirm the </ escaping and the literal $-sequence injection.
-const sampleTrace = JSON.stringify({
-  code: 'x = 1\nprint("</script> $& done")\n',
-  trace: [
-    { line: 1, event: 'step_line', func_name: '<module>', globals: {}, ordered_globals: [], stack_to_render: [], heap: {}, stdout: '' },
-    { line: 2, event: 'step_line', func_name: '<module>', globals: { x: 1 }, ordered_globals: ['x'], stack_to_render: [], heap: {}, stdout: '' },
-  ],
-});
-
-console.log('traceToSrcdoc:');
-const html = traceToSrcdoc(sampleTrace, 'Warmup <b>&"\'</b>');
-const injected = sampleTrace.replace(/<\//g, '<\\/');
-check(html.includes(injected), 'the (</-escaped) trace JSON is present in the output');
-check(!html.includes('__TRACE_JSON__'), 'no leftover __TRACE_JSON__ marker');
-check(!html.includes('__TITLE__'), 'no leftover __TITLE__ marker');
-check(!html.includes('</script> $& done'), 'raw </ sequence was escaped, not left intact');
-check(html.includes('$& done'), 'literal $-sequence in the trace survived injection');
-check(html.includes('Warmup &lt;b&gt;&amp;&quot;&#39;&lt;/b&gt;'), 'title is HTML-escaped');
-check(/<html[\s>]/i.test(html) && html.includes('const DATA ='), 'output is the full viewer document');
+console.log('traceRequest:');
+const pyReq = traceRequest('xs = [1, 2]\n', 'python');
+check(pyReq.url === `${CODEVIZ_API_BASE}/trace`, 'posts to <base>/trace');
+check(JSON.parse(pyReq.body).lang === '.py', 'python → lang .py');
+check(JSON.parse(pyReq.body).code === 'xs = [1, 2]\n', 'carries the code verbatim');
+const jsReq = traceRequest('const xs = [1, 2];\n', 'javascript');
+check(JSON.parse(jsReq.body).lang === '.js', 'javascript → lang .js');
 
 // ---------------------------------------------------------------------------
 // 2. walkthroughPrompt.buildWalkthroughPrompt
@@ -188,4 +175,4 @@ if (failures) {
   console.error(`\n${failures} scaffold test(s) failed.`);
   process.exit(1);
 }
-console.log('\nOK: scaffold helpers (traceToSrcdoc, buildWalkthroughPrompt, gradeFor) pass.');
+console.log('\nOK: scaffold helpers (traceRequest, buildWalkthroughPrompt, gradeFor) pass.');

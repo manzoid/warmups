@@ -11,7 +11,7 @@
     "validate": "node scripts/validate-content.mjs",
     "test:scaffold": "node scripts/test-scaffold.mjs",
     "test:pytrace": "node scripts/test-pytrace.mjs",
-    "test": "node scripts/test-scaffold.mjs && node scripts/selftest-rendertrace.mjs && node scripts/test-pytrace.mjs"
+    "test": "node scripts/test-scaffold.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.4",

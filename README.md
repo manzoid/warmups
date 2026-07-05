@@ -18,6 +18,17 @@ Grade yourself by submitting: a pass schedules the card further out, a fail brin
 
 > The first Python submission downloads the Pyodide runtime from a CDN (a few MB), so give it a moment. JavaScript/TypeScript runs immediately in a Web Worker.
 
+## Visualize a run (optional)
+
+When you're stuck, the "Visualize my run" hint steps through your own code (frames, heap, arrows) using [codeviz](https://github.com/manzoid/codeviz). Running and grading exercises never need it — only this one feature does. Start codeviz alongside warmups:
+
+```bash
+uv tool install git+https://github.com/manzoid/codeviz   # once
+codeviz api                                              # serves http://127.0.0.1:8930
+```
+
+warmups calls that local API and shows the step-through inline; it works for both Python and JavaScript. If codeviz isn't running, the hint just tells you how to start it. (Run warmups over http, i.e. `npm run dev`/`preview`; a page served over https may block calls to the local http API.)
+
 ## How it works
 
 - **Vite + React + TypeScript**, built as a fully static site (`npm run build` → `dist/`).
@@ -32,7 +43,7 @@ npm run dev        # dev server
 npm run build      # production static build → dist/
 npm run preview    # preview the production build
 npm run typecheck  # tsc --noEmit
-npm run test       # vitest (unit tests)
+npm run test       # dep-free node tests for the scaffolding helpers
 npm run validate   # execute EVERY content exercise and assert it's correct
 ```
 

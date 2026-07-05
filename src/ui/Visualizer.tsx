@@ -1,17 +1,16 @@
 // "Visualize my run" hint rung.
 //
-// Python: traces the learner's own submitted code through the vendored Online
-// Python Tutor tracer (runners/pytrace) and renders the resulting trace in a
-// sandboxed <iframe srcdoc> using codeviz's offline viewer (ui/renderTrace).
-//
-// JavaScript: live JS tracing isn't wired up yet, so this shows an honest note
-// rather than faking a visualization.
+// Traces the code through a locally-running codeviz (`codeviz api`) and shows the
+// resulting step-through in a sandboxed <iframe>. Works for both tracks, since
+// codeviz has real Python and JavaScript tracers. If codeviz isn't running, this
+// shows how to start it rather than failing silently. Grading never needs it.
 
 import { useEffect, useState } from 'react';
 import type { Track } from '../core/types';
-import { tracePython } from '../runners/pytrace';
-import { traceToSrcdoc } from './renderTrace';
+import { traceViaCodeviz, CodevizUnavailable, CODEVIZ_API_BASE } from './codevizApi';
 import { styles, theme } from './styles';
+
+type State = 'loading' | 'ok' | 'down' | 'error';
 
 export function Visualizer({
   track,
@@ -22,49 +21,44 @@ export function Visualizer({
   code: string;
   title: string;
 }) {
-  if (track === 'javascript') {
-    return (
-      <p style={{ ...styles.tagline, margin: 0 }}>
-        Live JS visualization is coming; showing the reference snippet is the
-        best we can do for now, so this step is skipped for JavaScript.
-      </p>
-    );
-  }
-  return <PythonVisualizer code={code} title={title} />;
-}
-
-function PythonVisualizer({ code, title }: { code: string; title: string }) {
-  const [srcdoc, setSrcdoc] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [srcdoc, setSrcdoc] = useState<string>('');
+  const [state, setState] = useState<State>('loading');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
-    setSrcdoc(null);
-    setError(null);
+    setState('loading');
+    setSrcdoc('');
+    setError('');
     (async () => {
       try {
-        const traceJson = await tracePython(code);
+        const html = await traceViaCodeviz(code, track);
         if (cancelled) return;
-        setSrcdoc(traceToSrcdoc(traceJson, title));
+        setSrcdoc(html);
+        setState('ok');
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : String(err));
+        if (err instanceof CodevizUnavailable) {
+          setState('down');
+        } else {
+          setError(err instanceof Error ? err.message : String(err));
+          setState('error');
+        }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [code, title]);
+  }, [code, track]);
 
-  if (error) {
-    return (
-      <pre style={{ ...styles.code, borderColor: theme.bad }}>{error}</pre>
-    );
+  if (state === 'loading') {
+    return <p style={{ ...styles.tagline, margin: 0 }}>Tracing your run…</p>;
   }
-  if (srcdoc === null) {
-    return (
-      <p style={{ ...styles.tagline, margin: 0 }}>Tracing your run…</p>
-    );
+  if (state === 'down') {
+    return <CodevizDown />;
+  }
+  if (state === 'error') {
+    return <pre style={{ ...styles.code, borderColor: theme.bad }}>{error}</pre>;
   }
   return (
     <iframe
@@ -79,6 +73,22 @@ function PythonVisualizer({ code, title }: { code: string; title: string }) {
         background: '#fff',
       }}
     />
+  );
+}
+
+function CodevizDown() {
+  return (
+    <div style={{ ...styles.code, borderColor: theme.border }}>
+      <p style={{ margin: '0 0 6px' }}>Visualization needs codeviz running locally.</p>
+      <p style={{ margin: '0 0 6px', color: theme.muted }}>Install once, then start it:</p>
+      <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+        uv tool install git+https://github.com/manzoid/codeviz{'\n'}codeviz api
+      </pre>
+      <p style={{ margin: '8px 0 0', color: theme.muted, fontSize: '0.85rem' }}>
+        Listening on {CODEVIZ_API_BASE}. Running and grading exercises works
+        without it; only this visualization needs it.
+      </p>
+    </div>
   );
 }
 
