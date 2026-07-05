@@ -12,6 +12,7 @@ import {
 import { exercisesForTrack } from './ui/content';
 import { pickNext, computeCounts, RUNNERS, type NextPick } from './ui/session';
 import { styles, theme } from './ui/styles';
+import { CodeEditor } from './ui/Editor';
 
 const TRACK_LABELS: Record<Track, string> = {
   python: 'Python',
@@ -241,12 +242,11 @@ function ExerciseView({
       {ex.kind === 'write' && (
         <>
           <p style={styles.label}>Your code</p>
-          <textarea
-            style={styles.editor}
+          <CodeEditor
+            language={ex.track}
             value={input}
-            onChange={(e) => onInput(e.target.value)}
-            rows={Math.max(8, input.split('\n').length + 1)}
-            spellCheck={false}
+            onChange={onInput}
+            onSubmit={!graded ? onSubmit : undefined}
             autoFocus
           />
         </>

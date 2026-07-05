@@ -156,26 +156,40 @@ async function runPredict(
   ex: Exercise,
 ): Promise<RunResult> {
   const expected = ex.expected ?? '';
-  let actual: string | undefined;
+  const groundTruth = ex.snippet ?? expected;
 
-  // Optionally evaluate the snippet to compute/confirm the canonical value.
-  if (ex.snippet) {
-    const ns = freshNamespace(py);
-    try {
-      // Evaluate the snippet as an expression and repr() its value.
-      const src = `__wu_val = (\n${ex.snippet}\n)\nrepr(__wu_val)`;
-      const reprd = await py.runPythonAsync(src, { globals: ns });
-      actual = typeof reprd === 'string' ? reprd : String(reprd);
-    } catch {
-      // Snippet may not be a bare expression; leave actual undefined and grade
-      // purely on the learner's typed answer vs expected.
-      actual = undefined;
-    } finally {
-      ns.destroy();
-    }
+  // Grade by VALUE, not by string: evaluate the ground-truth expression and the
+  // learner's typed answer, then compare with Python `==`. So `{'a':1,'b':2}`
+  // and `{'a': 1, 'b': 2}` are equal, and dict/set order doesn't matter — while
+  // strings that legitimately contain spaces still compare correctly.
+  const ns = freshNamespace(py);
+  try {
+    const src = `
+import json as __wu_json
+__wu_actual = (
+${groundTruth}
+)
+try:
+    __wu_user = eval(${JSON.stringify(userAnswer)})
+    __wu_passed = bool(__wu_user == __wu_actual)
+except Exception:
+    __wu_passed = False
+__wu_json.dumps({"passed": __wu_passed, "actual": repr(__wu_actual)})
+`;
+    const out = await py.runPythonAsync(src, { globals: ns });
+    const parsed = JSON.parse(typeof out === 'string' ? out : String(out)) as {
+      passed: boolean;
+      actual: string;
+    };
+    // Lenient fallback: accept if the normalized strings also match.
+    const passed = parsed.passed || predictPasses(userAnswer, expected);
+    return { passed, actual: parsed.actual };
+  } catch {
+    // If evaluation machinery failed, fall back to a normalized string compare.
+    return { passed: predictPasses(userAnswer, expected), actual: undefined };
+  } finally {
+    ns.destroy();
   }
-
-  return { passed: predictPasses(userAnswer, expected), actual };
 }
 
 function formatError(err: unknown): string {

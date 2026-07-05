@@ -83,6 +83,32 @@ function formatLogArg(a: unknown): string {
   return typeof a === 'string' ? a : stringifyValue(a);
 }
 
+/** Structural equality for value-based `predict` grading (primitives, arrays, plain objects, Map, Set). */
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((v, i) => deepEqual(v, (b as unknown[])[i]));
+  }
+  if (a instanceof Map || b instanceof Map) {
+    if (!(a instanceof Map) || !(b instanceof Map) || a.size !== b.size) return false;
+    for (const [k, v] of a) if (!b.has(k) || !deepEqual(v, b.get(k))) return false;
+    return true;
+  }
+  if (a instanceof Set || b instanceof Set) {
+    if (!(a instanceof Set) || !(b instanceof Set) || a.size !== b.size) return false;
+    for (const v of a) if (!b.has(v)) return false;
+    return true;
+  }
+  const ao = a as Record<string, unknown>;
+  const bo = b as Record<string, unknown>;
+  const ak = Object.keys(ao);
+  const bk = Object.keys(bo);
+  if (ak.length !== bk.length) return false;
+  return ak.every((k) => Object.prototype.hasOwnProperty.call(bo, k) && deepEqual(ao[k], bo[k]));
+}
+
 /**
  * Grade one exercise against the learner's input.
  *  - 'write':  run userCode + ex.tests; pass = nothing thrown. console.* captured.
@@ -91,18 +117,32 @@ function formatLogArg(a: unknown): string {
  */
 export async function runExercise(ex: Exercise, userCode: string): Promise<RunResult> {
   if (ex.kind === 'predict') {
-    const passed =
-      normalizeAnswer(userCode) === normalizeAnswer(ex.expected ?? '');
+    // Grade by VALUE, not string: eval the snippet (ground truth) and the
+    // learner's answer, then deep-compare — so `{'a':1,'b':2}` == `{'a': 1, 'b': 2}`
+    // and array/object spacing never matters, while strings with spaces still
+    // compare correctly. Fall back to a normalized-string compare.
     let actual: string | undefined;
+    let actualValue: unknown;
+    let haveActual = false;
     try {
-      // Indirect eval returns the completion value of the last expression, so a
-      // snippet that is a bare expression (or ends in one) yields its value.
       const js = transformCode(ex.snippet ?? '');
-      const value = ex.snippet ? (0, eval)(js) : undefined;
-      actual = stringifyValue(value);
+      actualValue = ex.snippet ? (0, eval)(js) : undefined;
+      haveActual = Boolean(ex.snippet);
+      actual = stringifyValue(actualValue);
     } catch {
-      // A snippet that fails to evaluate doesn't affect grading — leave actual unset.
       actual = undefined;
+    }
+    let passed = false;
+    if (haveActual) {
+      try {
+        const userValue = (0, eval)('(' + userCode + ')');
+        passed = deepEqual(userValue, actualValue);
+      } catch {
+        passed = false;
+      }
+    }
+    if (!passed && normalizeAnswer(userCode) === normalizeAnswer(ex.expected ?? '')) {
+      passed = true;
     }
     return { passed, actual };
   }
