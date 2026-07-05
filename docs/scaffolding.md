@@ -62,9 +62,9 @@ concrete. Rungs, each tagged with the mode it targets and its scheduling cost:
 1. **Cue**: name the pattern or the first step. Retrieval blip / "where do I
    start." Small penalty.
 2. **One relevant syntax or fact.** Syntax gap. Small penalty.
-3. **Execution visualization** (codeviz, or a Python Tutor deep link as the cheap
-   first version). Trace and intrinsic-load gaps, especially predicts and the
-   loop / pointer / window units. Medium penalty.
+3. **Execution visualization** (codeviz). Trace and intrinsic-load gaps,
+   especially predicts and the loop / pointer / window units. Medium penalty.
+   See the codeviz integration note below.
 4. **AI Socratic walkthrough** (prompt handoff to the user's own coding agent).
    Schema and strategy gaps, adaptive to the person. Medium-large penalty.
 5. **Faded solution, then full solution.** Deep schema gap. Largest penalty, a
@@ -90,6 +90,30 @@ Anything past a light cue marks the item assisted and schedules it as a lapse, s
 the spaced-repetition loop stays honest regardless of which rung was used
 (including the external AI walkthrough and the visualizer, which the app cannot
 observe directly).
+
+### codeviz integration (rung 3)
+
+codeviz already has everything this rung needs, so there is nothing to build on
+the codeviz side and no need for a Python Tutor stopgap:
+
+- It renders a **single self-contained, offline HTML page** (step-through code,
+  stack frames, heap objects, reference arrows). The trace JSON is inlined into
+  the page (`render_html`), with no runtime network use, so it drops into an
+  `<iframe>` directly.
+- It traces an **inline snippet** with `codeviz --code "<source>" --lang .py|.js|.ts
+  -o out.html` (programmatic entry `trace_code(code, ext)`), so an exercise's
+  snippet can be visualized as-is.
+- **Python and JavaScript/TypeScript are the fully-local, no-Docker backends** —
+  exactly warmups' two tracks. No container dependency for our use.
+
+The fit for a static, local-first site is **build-time prerender**: exercise
+snippets are known authored content, so run codeviz over each snippet during the
+warmups build, bundle the resulting self-contained HTML, and `<iframe>` it in the
+visualization rung. This keeps warmups backend-free and offline, works for both
+tracks in-house, and avoids any external service. (The alternative, calling a
+local codeviz process or server at runtime, would break the no-backend model, so
+prefer prerender.) Repo: https://github.com/manzoid/codeviz (also cloned locally
+at ../codeviz).
 
 ## Fade is the same ladder with a moving entry point
 
@@ -145,8 +169,10 @@ variety, and the predict-to-write ramp handled at the curriculum level.
    worst current gap where a stuck write has no escape).
 2. The cue / syntax rungs (1 and 2) plus ladder-depth to FSRS-grade mapping (turns
    the reveal into a real ladder and upgrades the scheduler signal).
-3. Execution visualization rung: Python Tutor deep link first, embedded codeviz
-   later (pending a web-embeddable codeviz build).
+3. Execution visualization rung: prerender each snippet with codeviz at build
+   time and iframe the self-contained HTML (no Python Tutor stopgap needed;
+   codeviz already renders offline HTML and traces inline snippets for both
+   tracks). See the codeviz integration note above.
 4. AI Socratic walkthrough rung: a copyable, well-tuned prompt handoff.
 5. Mastery-based advancement + the predict-to-write ramp.
 6. Variety pass on the content for transfer.
