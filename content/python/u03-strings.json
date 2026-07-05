@@ -1,0 +1,475 @@
+[
+  {
+    "id": "py.u03.charloop.index",
+    "track": "python",
+    "group": "Strings",
+    "concept": "char-by-char via index",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"hello\"\nout = []\nfor i in range(len(s)):\n    out.append(s[i])\nout",
+    "expected": "['h', 'e', 'l', 'l', 'o']",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.charloop.forc",
+    "track": "python",
+    "group": "Strings",
+    "concept": "iterate chars directly",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"banana\"\nn = 0\nfor c in s:\n    if c in \"aeiou\":\n        n += 1\nn",
+    "expected": "3",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.ord.basics",
+    "track": "python",
+    "group": "Strings",
+    "concept": "ord / chr both ways",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[ord('a'), chr(98), ord('A')]",
+    "expected": "[97, 'b', 65]",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.ord.index",
+    "track": "python",
+    "group": "Strings",
+    "concept": "letter to 0..25 index",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "c = 'e'\nord(c) - ord('a')",
+    "expected": "4",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.freq.build",
+    "track": "python",
+    "group": "Strings",
+    "concept": "char frequency via dict",
+    "kind": "write",
+    "prompt": "Write `char_freq(s)` returning a dict that maps each character in `s` to the number of times it appears.",
+    "starter": "def char_freq(s):\n    # your code here\n    pass",
+    "solution": "def char_freq(s):\n    counts = {}\n    for c in s:\n        counts[c] = counts.get(c, 0) + 1\n    return counts",
+    "tests": "assert char_freq(\"aab\") == {\"a\": 2, \"b\": 1}, char_freq(\"aab\")\nassert char_freq(\"\") == {}, char_freq(\"\")\nassert char_freq(\"xxx\") == {\"x\": 3}, char_freq(\"xxx\")",
+    "prereqs": [
+      "py.u03.charloop.forc"
+    ]
+  },
+  {
+    "id": "py.u03.count.vowels",
+    "track": "python",
+    "group": "Strings",
+    "concept": "count matching chars",
+    "kind": "write",
+    "prompt": "Write `count_vowels(s)` returning the number of characters in `s` that are one of a, e, i, o, u (lowercase only).",
+    "starter": "def count_vowels(s):\n    # your code here\n    pass",
+    "solution": "def count_vowels(s):\n    n = 0\n    for c in s:\n        if c in \"aeiou\":\n            n += 1\n    return n",
+    "tests": "assert count_vowels(\"banana\") == 3\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
+    "prereqs": [
+      "py.u03.charloop.forc"
+    ]
+  },
+  {
+    "id": "py.u03.enumerate.pairs",
+    "track": "python",
+    "group": "Strings",
+    "concept": "enumerate index+char",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"ab\"\nlist(enumerate(s))",
+    "expected": "[(0, 'a'), (1, 'b')]",
+    "prereqs": [
+      "py.u03.charloop.index"
+    ]
+  },
+  {
+    "id": "py.u03.enumerate.firstvowel",
+    "track": "python",
+    "group": "Strings",
+    "concept": "first match index via enumerate",
+    "kind": "write",
+    "prompt": "Write `first_vowel_index(s)` returning the index of the first vowel (a, e, i, o, u) in `s`, or -1 if there is none.",
+    "starter": "def first_vowel_index(s):\n    # your code here\n    pass",
+    "solution": "def first_vowel_index(s):\n    for i, c in enumerate(s):\n        if c in \"aeiou\":\n            return i\n    return -1",
+    "tests": "assert first_vowel_index(\"xyzapple\") == 3\nassert first_vowel_index(\"aeiou\") == 0\nassert first_vowel_index(\"bcd\") == -1\nassert first_vowel_index(\"\") == -1",
+    "prereqs": [
+      "py.u03.enumerate.pairs",
+      "py.u03.count.vowels"
+    ]
+  },
+  {
+    "id": "py.u03.classify.range",
+    "track": "python",
+    "group": "Strings",
+    "concept": "digit check via range compare",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "c = '7'\n'0' <= c <= '9'",
+    "expected": "True",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.classify.digitval",
+    "track": "python",
+    "group": "Strings",
+    "concept": "digit char to int value",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "c = '7'\nord(c) - ord('0')",
+    "expected": "7",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.classify.count",
+    "track": "python",
+    "group": "Strings",
+    "concept": "count digits by hand",
+    "kind": "write",
+    "prompt": "Write `count_digits(s)` returning how many characters of `s` are digits 0-9. Do not use `str.isdigit`.",
+    "starter": "def count_digits(s):\n    # your code here\n    pass",
+    "solution": "def count_digits(s):\n    n = 0\n    for c in s:\n        if '0' <= c <= '9':\n            n += 1\n    return n",
+    "tests": "assert count_digits(\"a1b2c3\") == 3\nassert count_digits(\"abc\") == 0\nassert count_digits(\"2024\") == 4",
+    "prereqs": [
+      "py.u03.classify.range"
+    ]
+  },
+  {
+    "id": "py.u03.classify.digitsum",
+    "track": "python",
+    "group": "Strings",
+    "concept": "sum digit values",
+    "kind": "write",
+    "prompt": "Write `digit_sum(s)` returning the sum of the numeric values of the digit characters in `s`; ignore non-digit characters. Do not use `int`.",
+    "starter": "def digit_sum(s):\n    # your code here\n    pass",
+    "solution": "def digit_sum(s):\n    total = 0\n    for c in s:\n        if '0' <= c <= '9':\n            total += ord(c) - ord('0')\n    return total",
+    "tests": "assert digit_sum(\"a1b2c3\") == 6\nassert digit_sum(\"abc\") == 0\nassert digit_sum(\"111\") == 3",
+    "prereqs": [
+      "py.u03.classify.digitval"
+    ]
+  },
+  {
+    "id": "py.u03.classify.isalnum",
+    "track": "python",
+    "group": "Strings",
+    "concept": "isalnum / isdigit builtins",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[\"a1\".isalnum(), \" \".isalnum(), \"7\".isdigit()]",
+    "expected": "[True, False, True]",
+    "prereqs": [
+      "py.u03.classify.range"
+    ]
+  },
+  {
+    "id": "py.u03.build.parts",
+    "track": "python",
+    "group": "Strings",
+    "concept": "accumulate parts then join",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "parts = []\nfor c in \"abc\":\n    parts.append(c.upper())\n\"\".join(parts)",
+    "expected": "'ABC'",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.build.joinsep",
+    "track": "python",
+    "group": "Strings",
+    "concept": "join with separator",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\"-\".join([\"a\", \"b\", \"c\"])",
+    "expected": "'a-b-c'",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.build.filter",
+    "track": "python",
+    "group": "Strings",
+    "concept": "filter chars into new string",
+    "kind": "write",
+    "prompt": "Write `only_letters(s)` returning a new string containing only the alphabetic characters of `s`, in order.",
+    "starter": "def only_letters(s):\n    # your code here\n    pass",
+    "solution": "def only_letters(s):\n    parts = []\n    for c in s:\n        if ('a' <= c <= 'z') or ('A' <= c <= 'Z'):\n            parts.append(c)\n    return \"\".join(parts)",
+    "tests": "assert only_letters(\"a1b2c3\") == \"abc\"\nassert only_letters(\"Hello, World!\") == \"HelloWorld\"\nassert only_letters(\"123\") == \"\"",
+    "prereqs": [
+      "py.u03.build.parts"
+    ]
+  },
+  {
+    "id": "py.u03.build.caesar",
+    "track": "python",
+    "group": "Strings",
+    "concept": "transform each char",
+    "kind": "write",
+    "prompt": "Write `shift_letters(s, k)` returning `s` with each lowercase letter advanced `k` positions in the alphabet, wrapping from z back to a. Leave every other character unchanged.",
+    "starter": "def shift_letters(s, k):\n    # your code here\n    pass",
+    "solution": "def shift_letters(s, k):\n    parts = []\n    for c in s:\n        if 'a' <= c <= 'z':\n            idx = (ord(c) - ord('a') + k) % 26\n            parts.append(chr(ord('a') + idx))\n        else:\n            parts.append(c)\n    return \"\".join(parts)",
+    "tests": "assert shift_letters(\"abc\", 1) == \"bcd\"\nassert shift_letters(\"xyz\", 3) == \"abc\"\nassert shift_letters(\"hello, world\", 0) == \"hello, world\"\nassert shift_letters(\"a b\", 1) == \"b c\"",
+    "prereqs": [
+      "py.u03.build.parts"
+    ]
+  },
+  {
+    "id": "py.u03.build.comprehension",
+    "track": "python",
+    "group": "Strings",
+    "concept": "join over a generator",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\"\".join(c.upper() for c in \"abc\")",
+    "expected": "'ABC'",
+    "prereqs": [
+      "py.u03.build.parts"
+    ]
+  },
+  {
+    "id": "py.u03.reverse.range",
+    "track": "python",
+    "group": "Strings",
+    "concept": "reverse-index loop",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"abc\"\nout = \"\"\nfor i in range(len(s)-1, -1, -1):\n    out += s[i]\nout",
+    "expected": "'cba'",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.reverse.loop",
+    "track": "python",
+    "group": "Strings",
+    "concept": "reverse via reverse-index loop",
+    "kind": "write",
+    "prompt": "Write `reverse(s)` returning the characters of `s` in opposite order. Do not use slicing or `reversed`.",
+    "starter": "def reverse(s):\n    # your code here\n    pass",
+    "solution": "def reverse(s):\n    out = \"\"\n    for i in range(len(s) - 1, -1, -1):\n        out += s[i]\n    return out",
+    "tests": "assert reverse(\"abc\") == \"cba\"\nassert reverse(\"\") == \"\"\nassert reverse(\"a\") == \"a\"\nassert reverse(\"hello\") == \"olleh\"",
+    "prereqs": [
+      "py.u03.reverse.range"
+    ]
+  },
+  {
+    "id": "py.u03.reverse.slice",
+    "track": "python",
+    "group": "Strings",
+    "concept": "reverse via slice",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\"hello\"[::-1]",
+    "expected": "'olleh'",
+    "prereqs": [
+      "py.u03.reverse.loop"
+    ]
+  },
+  {
+    "id": "py.u03.palindrome.mirror",
+    "track": "python",
+    "group": "Strings",
+    "concept": "mirror index n-1-i",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"abba\"\nn = len(s)\n[s[i] == s[n-1-i] for i in range(n//2)]",
+    "expected": "[True, True]",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.palindrome.twopointer",
+    "track": "python",
+    "group": "Strings",
+    "concept": "palindrome via converging pointers",
+    "kind": "write",
+    "prompt": "Write `is_palindrome(s)` returning True if `s` reads the same forwards and backwards. Use two pointers converging from the ends; do not use slicing.",
+    "starter": "def is_palindrome(s):\n    # your code here\n    pass",
+    "solution": "def is_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        if s[i] != s[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
+    "tests": "assert is_palindrome(\"racecar\") == True\nassert is_palindrome(\"abba\") == True\nassert is_palindrome(\"abc\") == False\nassert is_palindrome(\"\") == True\nassert is_palindrome(\"a\") == True",
+    "prereqs": [
+      "py.u03.palindrome.mirror"
+    ]
+  },
+  {
+    "id": "py.u03.palindrome.slice",
+    "track": "python",
+    "group": "Strings",
+    "concept": "palindrome via slice compare",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"racecar\"\ns == s[::-1]",
+    "expected": "True",
+    "prereqs": [
+      "py.u03.reverse.slice",
+      "py.u03.palindrome.twopointer"
+    ]
+  },
+  {
+    "id": "py.u03.palindrome.alnum",
+    "track": "python",
+    "group": "Strings",
+    "concept": "palindrome skipping non-alnum",
+    "kind": "write",
+    "prompt": "Write `is_clean_palindrome(s)` returning True if `s` is a palindrome when considering only alphanumeric characters and ignoring case. Use two pointers that skip non-alphanumeric characters.",
+    "starter": "def is_clean_palindrome(s):\n    # your code here\n    pass",
+    "solution": "def is_clean_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        while i < j and not s[i].isalnum():\n            i += 1\n        while i < j and not s[j].isalnum():\n            j -= 1\n        if s[i].lower() != s[j].lower():\n            return False\n        i += 1\n        j -= 1\n    return True",
+    "tests": "assert is_clean_palindrome(\"A man, a plan, a canal: Panama\") == True\nassert is_clean_palindrome(\"race a car\") == False\nassert is_clean_palindrome(\"\") == True\nassert is_clean_palindrome(\".,\") == True\nassert is_clean_palindrome(\"Ab_a\") == True",
+    "prereqs": [
+      "py.u03.palindrome.twopointer",
+      "py.u03.classify.isalnum"
+    ]
+  },
+  {
+    "id": "py.u03.find.builtin",
+    "track": "python",
+    "group": "Strings",
+    "concept": "find returns index or -1",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[\"hello\".find(\"ll\"), \"hello\".find(\"z\")]",
+    "expected": "[2, -1]",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.slice.extract",
+    "track": "python",
+    "group": "Strings",
+    "concept": "slice is end-exclusive",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"abcdef\"\n[s[1:4], s[4:100]]",
+    "expected": "['bcd', 'ef']",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.slice.stripends",
+    "track": "python",
+    "group": "Strings",
+    "concept": "drop first and last char",
+    "kind": "write",
+    "prompt": "Write `strip_ends(s)` returning `s` without its first and last characters. Return `\\\"\\\"` for strings of length 0 or 1.",
+    "starter": "def strip_ends(s):\n    # your code here\n    pass",
+    "solution": "def strip_ends(s):\n    if len(s) <= 1:\n        return \"\"\n    return s[1:-1]",
+    "tests": "assert strip_ends(\"hello\") == \"ell\"\nassert strip_ends(\"ab\") == \"\"\nassert strip_ends(\"a\") == \"\"\nassert strip_ends(\"\") == \"\"\nassert strip_ends(\"abcde\") == \"bcd\"",
+    "prereqs": [
+      "py.u03.slice.extract"
+    ]
+  },
+  {
+    "id": "py.u03.find.membership",
+    "track": "python",
+    "group": "Strings",
+    "concept": "membership with in",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[\"ell\" in \"hello\", \"z\" in \"hello\"]",
+    "expected": "[True, False]",
+    "prereqs": [
+      "py.u03.find.builtin"
+    ]
+  },
+  {
+    "id": "py.u03.find.scan",
+    "track": "python",
+    "group": "Strings",
+    "concept": "naive substring search",
+    "kind": "write",
+    "prompt": "Write `my_find(s, p)` returning the index of the first occurrence of `p` in `s`, or -1 if `p` does not occur. Do not use `str.find`, `str.index`, or the `in` operator.",
+    "starter": "def my_find(s, p):\n    # your code here\n    pass",
+    "solution": "def my_find(s, p):\n    n, m = len(s), len(p)\n    for i in range(n - m + 1):\n        k = 0\n        while k < m and s[i + k] == p[k]:\n            k += 1\n        if k == m:\n            return i\n    return -1",
+    "tests": "assert my_find(\"hello\", \"ll\") == 2\nassert my_find(\"hello\", \"z\") == -1\nassert my_find(\"hello\", \"\") == 0\nassert my_find(\"aaa\", \"aa\") == 0\nassert my_find(\"abcabc\", \"cab\") == 2",
+    "prereqs": [
+      "py.u03.charloop.index"
+    ]
+  },
+  {
+    "id": "py.u03.myjoin.write",
+    "track": "python",
+    "group": "Strings",
+    "concept": "join fencepost",
+    "kind": "write",
+    "prompt": "Write `my_join(parts, sep)` returning the strings in `parts` concatenated with `sep` between adjacent items (no trailing separator). Return the empty string for an empty list. Do not use `str.join`.",
+    "starter": "def my_join(parts, sep):\n    # your code here\n    pass",
+    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out",
+    "tests": "assert my_join([], \"-\") == \"\"\nassert my_join([\"a\"], \"-\") == \"a\"\nassert my_join([\"a\", \"b\", \"c\"], \"-\") == \"a-b-c\"\nassert my_join([\"x\", \"y\"], \"\") == \"xy\"",
+    "prereqs": []
+  },
+  {
+    "id": "py.u03.myjoin.edge",
+    "track": "python",
+    "group": "Strings",
+    "concept": "join edge cases",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\n[my_join([], \"-\"), my_join([\"a\"], \"-\")]",
+    "expected": "['', 'a']",
+    "prereqs": [
+      "py.u03.myjoin.write"
+    ]
+  },
+  {
+    "id": "py.u03.mysplit.write",
+    "track": "python",
+    "group": "Strings",
+    "concept": "split with trailing flush",
+    "kind": "write",
+    "prompt": "Write `my_split(s, sep)` where `sep` is a single character: return the list of substrings of `s` separated by `sep`. Adjacent separators produce empty strings, and splitting the empty string returns a list with one empty string. Do not use `str.split`.",
+    "starter": "def my_split(s, sep):\n    # your code here\n    pass",
+    "solution": "def my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out",
+    "tests": "assert my_split(\"a,b,c\", \",\") == [\"a\", \"b\", \"c\"]\nassert my_split(\"a,,b\", \",\") == [\"a\", \"\", \"b\"]\nassert my_split(\"\", \",\") == [\"\"]\nassert my_split(\"abc\", \",\") == [\"abc\"]\nassert my_split(\",x\", \",\") == [\"\", \"x\"]",
+    "prereqs": [
+      "py.u03.myjoin.write"
+    ]
+  },
+  {
+    "id": "py.u03.mysplit.edge",
+    "track": "python",
+    "group": "Strings",
+    "concept": "split edge cases",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\n[my_split(\"a,,b\", \",\"), my_split(\"\", \",\")]",
+    "expected": "[['a', '', 'b'], ['']]",
+    "prereqs": [
+      "py.u03.mysplit.write"
+    ]
+  },
+  {
+    "id": "py.u03.splitjoin.roundtrip",
+    "track": "python",
+    "group": "Strings",
+    "concept": "split/join round-trip",
+    "kind": "write",
+    "prompt": "Given `my_join` and `my_split` from earlier, write `round_trips(s, sep)` returning True if `my_join(my_split(s, sep), sep) == s`. `sep` is a single character.",
+    "starter": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    # your code here\n    pass",
+    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    return my_join(my_split(s, sep), sep) == s",
+    "tests": "assert round_trips(\"a,b,c\", \",\") == True\nassert round_trips(\"a,,b\", \",\") == True\nassert round_trips(\"\", \",\") == True\nassert round_trips(\"no-seps-here\", \",\") == True",
+    "prereqs": [
+      "py.u03.myjoin.write",
+      "py.u03.mysplit.write"
+    ]
+  },
+  {
+    "id": "py.u03.sugar.splitjoin",
+    "track": "python",
+    "group": "Strings",
+    "concept": "str.split / str.join builtins",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\",\".join(\"a,b,c\".split(\",\"))",
+    "expected": "'a,b,c'",
+    "prereqs": [
+      "py.u03.mysplit.write",
+      "py.u03.myjoin.write"
+    ]
+  },
+  {
+    "id": "py.u03.sugar.fstring",
+    "track": "python",
+    "group": "Strings",
+    "concept": "f-string interpolation",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "name = \"Tom\"\nf\"hi {name} {1+2}\"",
+    "expected": "'hi Tom 3'",
+    "prereqs": []
+  }
+]
