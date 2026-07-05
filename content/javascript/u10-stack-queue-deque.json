@@ -1,6 +1,8 @@
 [
   {
     "id": "js.u10.stack.next-free",
+    "cue": "Trace `top` as each post-increment write runs.",
+    "syntax": "a[i++] post-increment",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "top counts items = next free slot",
@@ -12,6 +14,8 @@
   },
   {
     "id": "js.u10.stack.top-index",
+    "cue": "Count the writes, then step back one for the top slot.",
+    "syntax": "top - 1 index",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "top element sits at top-1",
@@ -23,6 +27,8 @@
   },
   {
     "id": "js.u10.stack.peek-raw",
+    "cue": "Fill the array, then read the slot just below `top`.",
+    "syntax": "a[top - 1] indexing",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "peek reads a[top-1]",
@@ -34,6 +40,8 @@
   },
   {
     "id": "js.u10.stack.pop-raw",
+    "cue": "Pre-decrement `top` first, then read that slot.",
+    "syntax": "a[--top] pre-decrement",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "pop decrements first, then reads",
@@ -45,6 +53,8 @@
   },
   {
     "id": "js.u10.stack.pop-offbyone",
+    "cue": "Compare reading at top-1 against pre-decrementing top.",
+    "syntax": "--top vs top - 1",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "read a[top-1] and a[--top] hit the same slot",
@@ -56,6 +66,8 @@
   },
   {
     "id": "js.u10.build.push",
+    "cue": "Store at the current `top`, then advance it.",
+    "syntax": "index++ post-increment",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "push writes then advances top",
@@ -68,6 +80,8 @@
   },
   {
     "id": "js.u10.build.peek",
+    "cue": "Return the element one below `top`, leaving `top` alone.",
+    "syntax": "a[top - 1] indexing",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "peek reads without moving top",
@@ -80,6 +94,8 @@
   },
   {
     "id": "js.u10.build.pop",
+    "cue": "Step `top` back, then return what sits there.",
+    "syntax": "a[--top] pre-decrement",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "pop steps top back then returns the slot",
@@ -92,6 +108,8 @@
   },
   {
     "id": "js.u10.build.pop-guard",
+    "cue": "Guard the empty case before stepping `top` back.",
+    "syntax": "top === 0 guard",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "empty guard prevents underflow",
@@ -104,6 +122,8 @@
   },
   {
     "id": "js.u10.build.push-guard",
+    "cue": "Reject when the buffer is full before writing; else write and advance.",
+    "syntax": "top === cap guard",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "full guard prevents overflow",
@@ -116,6 +136,8 @@
   },
   {
     "id": "js.u10.stack.peek-js",
+    "cue": "Read the last element by index.",
+    "syntax": "a[a.length - 1]",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "array-as-stack peek is a[length-1]",
@@ -127,6 +149,8 @@
   },
   {
     "id": "js.u10.stack.pop-empty-js",
+    "cue": "Recall what popping an empty array yields.",
+    "syntax": "Array.prototype.pop()",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "Array.pop on empty returns undefined",
@@ -138,6 +162,8 @@
   },
   {
     "id": "js.u10.valid-parens",
+    "cue": "Push openers; on a closer, the stack top must be its match.",
+    "syntax": "array push/pop as a stack",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "match brackets with a stack",
@@ -150,6 +176,8 @@
   },
   {
     "id": "js.u10.nge",
+    "cue": "Keep a stack of unresolved indices; a larger value resolves them.",
+    "syntax": "while (st.length) st.pop()",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "next greater element via monotonic stack",
@@ -162,6 +190,8 @@
   },
   {
     "id": "js.u10.queue.count",
+    "cue": "Dequeue once, then measure tail minus head.",
+    "syntax": "tail - head count",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "naive queue count is tail-head",
@@ -173,6 +203,8 @@
   },
   {
     "id": "js.u10.queue.wrap",
+    "cue": "Wrap the write index with modulo capacity.",
+    "syntax": "(head + size) % cap",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "circular write index wraps modulo capacity",
@@ -184,6 +216,8 @@
   },
   {
     "id": "js.u10.build.enqueue",
+    "cue": "Write at the wrapped tail position, then grow `size`.",
+    "syntax": "(head + size) % cap",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "ring buffer enqueue at (head+size)%cap",
@@ -196,6 +230,8 @@
   },
   {
     "id": "js.u10.build.dequeue",
+    "cue": "Read at `head`, advance it modulo capacity, shrink `size`.",
+    "syntax": "(head + 1) % cap",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "ring buffer dequeue advances head modulo cap",
@@ -208,6 +244,8 @@
   },
   {
     "id": "js.u10.queue.shift",
+    "cue": "Remove the front element and see what remains.",
+    "syntax": "Array.prototype.shift()",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "Array.shift removes the front element",
@@ -219,6 +257,8 @@
   },
   {
     "id": "js.u10.queue.head-pointer",
+    "cue": "Read via a head index that post-increments each time.",
+    "syntax": "q[head++]",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "dequeue via a head index instead of shift",
@@ -230,6 +270,8 @@
   },
   {
     "id": "js.u10.bfs-order",
+    "cue": "Enqueue the start, mark seen at enqueue, drain with a head index.",
+    "syntax": "Set.has / Set.add",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "BFS visit order with a queue and seen set",
@@ -242,6 +284,8 @@
   },
   {
     "id": "js.u10.deque.front-push-index",
+    "cue": "Step the index back one, wrapping past zero.",
+    "syntax": "(head - 1 + n) % n",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "front push moves head backward modulo cap",
@@ -253,6 +297,8 @@
   },
   {
     "id": "js.u10.build.push-front",
+    "cue": "Back `head` up one slot with wrap, store there, grow `size`.",
+    "syntax": "(head - 1 + cap) % cap",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "deque front push steps head back",
@@ -265,6 +311,8 @@
   },
   {
     "id": "js.u10.build.pop-back",
+    "cue": "Shrink `size` first, then read the slot it now points at.",
+    "syntax": "(head + size) % cap",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "deque back pop reads (head+size)%cap after shrinking",
@@ -277,6 +325,8 @@
   },
   {
     "id": "js.u10.maxwin",
+    "cue": "Keep indices with decreasing values; drop the front when it leaves the window.",
+    "syntax": "d[0] front, d[d.length - 1] back",
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "sliding window maximum via monotonic deque",

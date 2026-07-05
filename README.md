@@ -1,6 +1,6 @@
 # warmups
 
-warmups is an open-source, **local-first** spaced-repetition kata app for getting fast and automatic at Python and JavaScript/TypeScript language fluency and a small set of reverse-engineered problem-solving primitives. It runs entirely in your browser as a static site with no backend and no accounts: Python exercises execute in-browser via [Pyodide](https://pyodide.org/), JavaScript/TypeScript exercises run in a Web Worker, and your progress is scheduled with the [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) spaced-repetition algorithm and persisted to `localStorage` — so you can drill small "predict the value" and "write the code" problems every day until the fundamentals become reflexive.
+warmups is an open-source, **local-first** spaced-repetition kata app for getting fast and automatic at Python and JavaScript language fluency and a small set of reverse-engineered problem-solving primitives. It runs entirely in your browser as a static site with no backend and no accounts: Python exercises execute in-browser via [Pyodide](https://pyodide.org/), JavaScript exercises run in a Web Worker, and your progress is scheduled with the [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) spaced-repetition algorithm and persisted to `localStorage` — so you can drill small "predict the value" and "write the code" problems every day until the fundamentals become reflexive. (TypeScript syntax is accepted in the JavaScript track, but types are not taught or checked yet.)
 
 ## Run it
 
@@ -9,14 +9,14 @@ npm install
 npm run dev      # start the Vite dev server (http://localhost:5173)
 ```
 
-Then open the app, pick a track (Python or JavaScript/TypeScript), and start a session.
+Then open the app, pick a track (Python or JavaScript), and start a session.
 
 - **Predict** exercises show a code snippet; you type the value it evaluates to.
 - **Write** exercises give you a seeded editor; your code is run against hidden tests.
 
 Grade yourself by submitting: a pass schedules the card further out, a fail brings it back soon. Progress (due / new / learned) lives only in your browser.
 
-> The first Python submission downloads the Pyodide runtime from a CDN (a few MB), so give it a moment. JavaScript/TypeScript runs immediately in a Web Worker.
+> The first Python submission downloads the Pyodide runtime from a CDN (a few MB), so give it a moment. JavaScript runs immediately in a Web Worker.
 
 ## Visualize a run (optional)
 
@@ -34,7 +34,7 @@ warmups calls that local API and shows the step-through inline; it works for bot
 - **Vite + React + TypeScript**, built as a fully static site (`npm run build` → `dist/`).
 - **Exercises are open content** — plain JSON under [`content/`](./content), validated by a shared [zod](https://zod.dev) schema (`src/core/schema.ts`) and loaded via a Vite glob import. Add your own by dropping a JSON file in `content/python/` or `content/javascript/`.
 - **Runners** execute learner code in isolation: `src/runners/python.ts` (Pyodide, fresh namespace per run) and `src/runners/javascript.ts` (a per-run Web Worker with a hard timeout; TypeScript stripped by [sucrase](https://github.com/alangpierce/sucrase)).
-- **Scheduling** is a thin `ts-fsrs` wrapper (`src/core/srs.ts`) with a two-button *again / good* flow; state is persisted by `src/core/storage.ts`.
+- **Scheduling** is a thin `ts-fsrs` wrapper (`src/core/srs.ts`) with a three-grade *again / hard / good* flow derived from how far you descended the hint ladder; state is persisted by `src/core/storage.ts`.
 
 ## Scripts
 

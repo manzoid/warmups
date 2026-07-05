@@ -188,6 +188,32 @@ async function main() {
     }
   }
 
+  // Structural: hint rungs (cue/syntax), if present, must be non-empty and
+  // must not leak the answer. For predict, neither may equal `expected`; for
+  // write, neither may contain `solution` as a substring.
+  for (const { ex, file } of all) {
+    const where = `${ex.id} (${relative(ROOT, file)})`;
+    for (const rung of ['cue', 'syntax']) {
+      const hint = ex[rung];
+      if (hint === undefined) continue;
+      if (typeof hint !== 'string' || hint.trim() === '') {
+        failures.push(`${where}: ${rung} must be a non-empty string`);
+        continue;
+      }
+      if (ex.kind === 'predict' && normalize(hint) === normalize(ex.expected ?? '')) {
+        failures.push(`${where}: ${rung} leaks the answer (equals "expected")`);
+      }
+      if (
+        ex.kind === 'write' &&
+        typeof ex.solution === 'string' &&
+        ex.solution.length > 0 &&
+        hint.includes(ex.solution)
+      ) {
+        failures.push(`${where}: ${rung} leaks the answer (contains "solution")`);
+      }
+    }
+  }
+
   // Execution.
   for (const { ex, file } of all) {
     const where = `${ex.id} (${relative(ROOT, file)})`;

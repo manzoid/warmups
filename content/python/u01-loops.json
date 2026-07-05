@@ -8,7 +8,9 @@
     "prompt": "What is the value of `total`?",
     "snippet": "a = [3, 1, 4, 1, 5]\ntotal = 0\nfor x in a:\n    total += x\ntotal",
     "expected": "14",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Walk the loop and track `total`.",
+    "syntax": "+= adds in place"
   },
   {
     "id": "py.u01.accumulate.sum",
@@ -20,7 +22,11 @@
     "starter": "def my_sum(a):\n    # your code here\n    pass",
     "solution": "def my_sum(a):\n    total = 0\n    for x in a:\n        total += x\n    return total",
     "tests": "assert my_sum([]) == 0, my_sum([])\nassert my_sum([5]) == 5, my_sum([5])\nassert my_sum([3, 1, 4, 1, 5]) == 14, my_sum([3, 1, 4, 1, 5])\nassert my_sum([-2, 2, -3]) == -3, my_sum([-2, 2, -3])",
-    "prereqs": ["py.u01.accumulate.sum.predict"]
+    "prereqs": [
+      "py.u01.accumulate.sum.predict"
+    ],
+    "cue": "Fold with a running total that starts at 0.",
+    "syntax": "+= accumulates"
   },
   {
     "id": "py.u01.accumulate.product.predict",
@@ -31,7 +37,11 @@
     "prompt": "What is the value of `p`?",
     "snippet": "a = [2, 3, 4]\np = 1\nfor x in a:\n    p *= x\np",
     "expected": "24",
-    "prereqs": ["py.u01.accumulate.sum.predict"]
+    "prereqs": [
+      "py.u01.accumulate.sum.predict"
+    ],
+    "cue": "Trace the running product as the loop runs.",
+    "syntax": "*= multiplies in place"
   },
   {
     "id": "py.u01.accumulate.product",
@@ -43,7 +53,11 @@
     "starter": "def my_product(a):\n    # your code here\n    pass",
     "solution": "def my_product(a):\n    p = 1\n    for x in a:\n        p *= x\n    return p",
     "tests": "assert my_product([]) == 1, my_product([])\nassert my_product([5]) == 5, my_product([5])\nassert my_product([2, 3, 4]) == 24, my_product([2, 3, 4])\nassert my_product([0, 9]) == 0, my_product([0, 9])",
-    "prereqs": ["py.u01.accumulate.product.predict"]
+    "prereqs": [
+      "py.u01.accumulate.product.predict"
+    ],
+    "cue": "Fold with a running product; the identity is 1.",
+    "syntax": "*= accumulates"
   },
   {
     "id": "py.u01.accumulate.sum-builtin",
@@ -54,7 +68,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "sum([3, 1, 4, 1, 5], 100)",
     "expected": "114",
-    "prereqs": ["py.u01.accumulate.sum"]
+    "prereqs": [
+      "py.u01.accumulate.sum"
+    ],
+    "cue": "Recall what the second argument to `sum` does.",
+    "syntax": "sum(iterable, start)"
   },
   {
     "id": "py.u01.extreme.max.predict",
@@ -65,7 +83,11 @@
     "prompt": "What is the value of `best`?",
     "snippet": "a = [3, 7, 2, 9, 4]\nbest = a[0]\nfor x in a[1:]:\n    if x > best:\n        best = x\nbest",
     "expected": "9",
-    "prereqs": ["py.u01.accumulate.sum.predict"]
+    "prereqs": [
+      "py.u01.accumulate.sum.predict"
+    ],
+    "cue": "Track the best-so-far as you scan.",
+    "syntax": "x > best comparison"
   },
   {
     "id": "py.u01.extreme.max",
@@ -77,7 +99,11 @@
     "starter": "def my_max(a):\n    # your code here\n    pass",
     "solution": "def my_max(a):\n    best = a[0]\n    for x in a[1:]:\n        if x > best:\n            best = x\n    return best",
     "tests": "assert my_max([5]) == 5, my_max([5])\nassert my_max([3, 7, 2, 9, 4]) == 9, my_max([3, 7, 2, 9, 4])\nassert my_max([-1, -9, -3]) == -1, my_max([-1, -9, -3])",
-    "prereqs": ["py.u01.extreme.max.predict"]
+    "prereqs": [
+      "py.u01.extreme.max.predict"
+    ],
+    "cue": "Seed from the first element, then compare-and-keep.",
+    "syntax": "a[1:] slices off the first"
   },
   {
     "id": "py.u01.extreme.min",
@@ -89,7 +115,11 @@
     "starter": "def my_min(a):\n    # your code here\n    pass",
     "solution": "def my_min(a):\n    best = a[0]\n    for x in a[1:]:\n        if x < best:\n            best = x\n    return best",
     "tests": "assert my_min([5]) == 5, my_min([5])\nassert my_min([3, 7, 2, 9, 4]) == 2, my_min([3, 7, 2, 9, 4])\nassert my_min([-1, -9, -3]) == -9, my_min([-1, -9, -3])",
-    "prereqs": ["py.u01.extreme.max"]
+    "prereqs": [
+      "py.u01.extreme.max"
+    ],
+    "cue": "Like max, but flip the comparison.",
+    "syntax": "x < best comparison"
   },
   {
     "id": "py.u01.extreme.argmax.predict",
@@ -100,7 +130,11 @@
     "prompt": "What is the value of `mi`?",
     "snippet": "a = [3, 7, 2, 9, 4]\nmi = 0\nfor i in range(1, len(a)):\n    if a[i] > a[mi]:\n        mi = i\nmi",
     "expected": "3",
-    "prereqs": ["py.u01.extreme.max.predict"]
+    "prereqs": [
+      "py.u01.extreme.max.predict"
+    ],
+    "cue": "Track the index of the best-so-far, not the value.",
+    "syntax": "range(1, len(a))"
   },
   {
     "id": "py.u01.extreme.argmax",
@@ -112,7 +146,12 @@
     "starter": "def argmax(a):\n    # your code here\n    pass",
     "solution": "def argmax(a):\n    mi = 0\n    for i in range(1, len(a)):\n        if a[i] > a[mi]:\n            mi = i\n    return mi",
     "tests": "assert argmax([5]) == 0, argmax([5])\nassert argmax([3, 7, 2, 9, 4]) == 3, argmax([3, 7, 2, 9, 4])\nassert argmax([4, 4, 2]) == 0, argmax([4, 4, 2])",
-    "prereqs": ["py.u01.extreme.argmax.predict", "py.u01.extreme.max"]
+    "prereqs": [
+      "py.u01.extreme.argmax.predict",
+      "py.u01.extreme.max"
+    ],
+    "cue": "Keep an index and compare `a[i]` against the kept one.",
+    "syntax": "range(1, len(a))"
   },
   {
     "id": "py.u01.extreme.argmax-key",
@@ -123,7 +162,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [3, 7, 2, 9, 4]\nmax(range(len(a)), key=lambda i: a[i])",
     "expected": "3",
-    "prereqs": ["py.u01.extreme.argmax"]
+    "prereqs": [
+      "py.u01.extreme.argmax"
+    ],
+    "cue": "Read what `key` maximizes over the index range.",
+    "syntax": "max(iterable, key=func)"
   },
   {
     "id": "py.u01.count.predicate.predict",
@@ -134,7 +177,9 @@
     "prompt": "What is the value of `c`?",
     "snippet": "a = [1, 5, 2, 8, 3, 9]\nc = 0\nfor x in a:\n    if x > 3:\n        c += 1\nc",
     "expected": "3",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Tally a counter as the loop tests each element.",
+    "syntax": "counter += 1"
   },
   {
     "id": "py.u01.count.predicate",
@@ -146,7 +191,11 @@
     "starter": "def count_greater(a, t):\n    # your code here\n    pass",
     "solution": "def count_greater(a, t):\n    c = 0\n    for x in a:\n        if x > t:\n            c += 1\n    return c",
     "tests": "assert count_greater([], 0) == 0, count_greater([], 0)\nassert count_greater([1, 5, 2, 8, 3, 9], 3) == 3, count_greater([1, 5, 2, 8, 3, 9], 3)\nassert count_greater([1, 2], 5) == 0, count_greater([1, 2], 5)",
-    "prereqs": ["py.u01.count.predicate.predict"]
+    "prereqs": [
+      "py.u01.count.predicate.predict"
+    ],
+    "cue": "Bump a counter each time the test passes.",
+    "syntax": "> comparison"
   },
   {
     "id": "py.u01.count.sugar",
@@ -157,7 +206,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 5, 2, 8, 3, 9]\nsum(x > 3 for x in a)",
     "expected": "3",
-    "prereqs": ["py.u01.count.predicate"]
+    "prereqs": [
+      "py.u01.count.predicate"
+    ],
+    "cue": "A boolean counts as 0 or 1 when summed.",
+    "syntax": "sum(bool for x in xs)"
   },
   {
     "id": "py.u01.neighbor.rises.predict",
@@ -168,7 +221,9 @@
     "prompt": "What is the value of `asc`?",
     "snippet": "a = [1, 3, 2, 4, 4, 5]\nasc = 0\nfor i in range(1, len(a)):\n    if a[i] > a[i-1]:\n        asc += 1\nasc",
     "expected": "3",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Compare each element to the previous one.",
+    "syntax": "a[i-1] previous element"
   },
   {
     "id": "py.u01.neighbor.is-sorted",
@@ -180,7 +235,11 @@
     "starter": "def is_sorted(a):\n    # your code here\n    pass",
     "solution": "def is_sorted(a):\n    for i in range(1, len(a)):\n        if a[i] < a[i-1]:\n            return False\n    return True",
     "tests": "assert is_sorted([]) == True, is_sorted([])\nassert is_sorted([5]) == True, is_sorted([5])\nassert is_sorted([1, 2, 2, 3]) == True, is_sorted([1, 2, 2, 3])\nassert is_sorted([1, 3, 2]) == False, is_sorted([1, 3, 2])",
-    "prereqs": ["py.u01.neighbor.rises.predict"]
+    "prereqs": [
+      "py.u01.neighbor.rises.predict"
+    ],
+    "cue": "Bail on the first out-of-order adjacent pair.",
+    "syntax": "range(1, len(a))"
   },
   {
     "id": "py.u01.neighbor.diffs",
@@ -192,7 +251,11 @@
     "starter": "def diffs(a):\n    # your code here\n    pass",
     "solution": "def diffs(a):\n    out = []\n    for i in range(1, len(a)):\n        out.append(a[i] - a[i-1])\n    return out",
     "tests": "assert diffs([]) == [], diffs([])\nassert diffs([5]) == [], diffs([5])\nassert diffs([10, 20, 30]) == [10, 10], diffs([10, 20, 30])\nassert diffs([3, 1]) == [-2], diffs([3, 1])",
-    "prereqs": ["py.u01.neighbor.rises.predict"]
+    "prereqs": [
+      "py.u01.neighbor.rises.predict"
+    ],
+    "cue": "Append each adjacent difference; result is one shorter.",
+    "syntax": "a[i] - a[i-1]"
   },
   {
     "id": "py.u01.neighbor.zip.predict",
@@ -203,7 +266,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30]\n[cur - prev for prev, cur in zip(a, a[1:])]",
     "expected": "[10, 10]",
-    "prereqs": ["py.u01.neighbor.rises.predict"]
+    "prereqs": [
+      "py.u01.neighbor.rises.predict"
+    ],
+    "cue": "zip pairs each element with the next.",
+    "syntax": "zip(a, a[1:])"
   },
   {
     "id": "py.u01.offset.compare.predict",
@@ -214,7 +281,11 @@
     "prompt": "What is the value of `c`?",
     "snippet": "a = [1, 2, 3, 4, 5]\nc = 0\nfor i in range(len(a) - 2):\n    if a[i+2] > a[i]:\n        c += 1\nc",
     "expected": "3",
-    "prereqs": ["py.u01.neighbor.rises.predict"]
+    "prereqs": [
+      "py.u01.neighbor.rises.predict"
+    ],
+    "cue": "Compare each element with the one two positions ahead.",
+    "syntax": "a[i+2] fixed offset"
   },
   {
     "id": "py.u01.offset.kapart",
@@ -226,7 +297,11 @@
     "starter": "def has_equal_k_apart(a, k):\n    # your code here\n    pass",
     "solution": "def has_equal_k_apart(a, k):\n    for i in range(len(a) - k):\n        if a[i] == a[i+k]:\n            return True\n    return False",
     "tests": "assert has_equal_k_apart([1, 2, 1], 2) == True, has_equal_k_apart([1, 2, 1], 2)\nassert has_equal_k_apart([1, 2, 3], 1) == False, has_equal_k_apart([1, 2, 3], 1)\nassert has_equal_k_apart([1, 1], 1) == True, has_equal_k_apart([1, 1], 1)\nassert has_equal_k_apart([1, 2, 3], 5) == False, has_equal_k_apart([1, 2, 3], 5)",
-    "prereqs": ["py.u01.offset.compare.predict"]
+    "prereqs": [
+      "py.u01.offset.compare.predict"
+    ],
+    "cue": "Scan indices where `i+k` stays in range.",
+    "syntax": "range(len(a) - k)"
   },
   {
     "id": "py.u01.map.square.predict",
@@ -237,7 +312,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "a = [1, 2, 3, 4]\nout = []\nfor x in a:\n    out.append(x * x)\nout",
     "expected": "[1, 4, 9, 16]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the list being built by append.",
+    "syntax": "list.append(value)"
   },
   {
     "id": "py.u01.map.square",
@@ -249,7 +326,11 @@
     "starter": "def squares(a):\n    # your code here\n    pass",
     "solution": "def squares(a):\n    out = []\n    for x in a:\n        out.append(x * x)\n    return out",
     "tests": "assert squares([]) == [], squares([])\nassert squares([1, 2, 3, 4]) == [1, 4, 9, 16], squares([1, 2, 3, 4])\nassert squares([-2]) == [4], squares([-2])",
-    "prereqs": ["py.u01.map.square.predict"]
+    "prereqs": [
+      "py.u01.map.square.predict"
+    ],
+    "cue": "Build a fresh list, appending each transformed element.",
+    "syntax": "list.append(value)"
   },
   {
     "id": "py.u01.map.strlen",
@@ -261,7 +342,11 @@
     "starter": "def lengths(words):\n    # your code here\n    pass",
     "solution": "def lengths(words):\n    out = []\n    for w in words:\n        out.append(len(w))\n    return out",
     "tests": "assert lengths([]) == [], lengths([])\nassert lengths(['a', 'bb', 'ccc']) == [1, 2, 3], lengths(['a', 'bb', 'ccc'])\nassert lengths(['', 'xy']) == [0, 2], lengths(['', 'xy'])",
-    "prereqs": ["py.u01.map.square"]
+    "prereqs": [
+      "py.u01.map.square"
+    ],
+    "cue": "Append the size of each string in turn.",
+    "syntax": "len(s)"
   },
   {
     "id": "py.u01.map.comprehension.predict",
@@ -272,7 +357,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[x * x for x in [1, 2, 3, 4]]",
     "expected": "[1, 4, 9, 16]",
-    "prereqs": ["py.u01.map.square"]
+    "prereqs": [
+      "py.u01.map.square"
+    ],
+    "cue": "Read the comprehension as build-and-append inlined.",
+    "syntax": "[f(x) for x in xs]"
   },
   {
     "id": "py.u01.filter.evens.predict",
@@ -283,7 +372,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "a = [1, 2, 3, 4, 5, 6]\nout = []\nfor x in a:\n    if x % 2 == 0:\n        out.append(x)\nout",
     "expected": "[2, 4, 6]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the list, appending only when the test holds.",
+    "syntax": "% remainder"
   },
   {
     "id": "py.u01.filter.evens",
@@ -295,7 +386,11 @@
     "starter": "def keep_even(a):\n    # your code here\n    pass",
     "solution": "def keep_even(a):\n    out = []\n    for x in a:\n        if x % 2 == 0:\n            out.append(x)\n    return out",
     "tests": "assert keep_even([]) == [], keep_even([])\nassert keep_even([1, 2, 3, 4, 5, 6]) == [2, 4, 6], keep_even([1, 2, 3, 4, 5, 6])\nassert keep_even([1, 3]) == [], keep_even([1, 3])",
-    "prereqs": ["py.u01.filter.evens.predict"]
+    "prereqs": [
+      "py.u01.filter.evens.predict"
+    ],
+    "cue": "Append only elements passing the even test.",
+    "syntax": "x % 2 == 0"
   },
   {
     "id": "py.u01.filter.comprehension.predict",
@@ -306,7 +401,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[x for x in [1, 2, 3, 4, 5, 6] if x % 2 == 0]",
     "expected": "[2, 4, 6]",
-    "prereqs": ["py.u01.filter.evens"]
+    "prereqs": [
+      "py.u01.filter.evens"
+    ],
+    "cue": "Read the trailing `if` as the filter.",
+    "syntax": "[x for x in xs if cond]"
   },
   {
     "id": "py.u01.condaccum.sumeven.predict",
@@ -317,7 +416,12 @@
     "prompt": "What is the value of `s`?",
     "snippet": "a = [1, 2, 3, 4, 5, 6]\ns = 0\nfor x in a:\n    if x % 2 == 0:\n        s += x\ns",
     "expected": "12",
-    "prereqs": ["py.u01.accumulate.sum.predict", "py.u01.filter.evens.predict"]
+    "prereqs": [
+      "py.u01.accumulate.sum.predict",
+      "py.u01.filter.evens.predict"
+    ],
+    "cue": "Trace the total, adding only elements that pass the test.",
+    "syntax": "if inside the loop"
   },
   {
     "id": "py.u01.condaccum.sumeven",
@@ -329,7 +433,13 @@
     "starter": "def sum_even(a):\n    # your code here\n    pass",
     "solution": "def sum_even(a):\n    s = 0\n    for x in a:\n        if x % 2 == 0:\n            s += x\n    return s",
     "tests": "assert sum_even([]) == 0, sum_even([])\nassert sum_even([1, 2, 3, 4, 5, 6]) == 12, sum_even([1, 2, 3, 4, 5, 6])\nassert sum_even([1, 3]) == 0, sum_even([1, 3])",
-    "prereqs": ["py.u01.condaccum.sumeven.predict", "py.u01.filter.evens", "py.u01.accumulate.sum"]
+    "prereqs": [
+      "py.u01.condaccum.sumeven.predict",
+      "py.u01.filter.evens",
+      "py.u01.accumulate.sum"
+    ],
+    "cue": "Combine a filter test with a running total.",
+    "syntax": "x % 2 == 0"
   },
   {
     "id": "py.u01.condaccum.sugar",
@@ -340,7 +450,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "sum(x for x in [1, 2, 3, 4, 5, 6] if x % 2 == 0)",
     "expected": "12",
-    "prereqs": ["py.u01.condaccum.sumeven"]
+    "prereqs": [
+      "py.u01.condaccum.sumeven"
+    ],
+    "cue": "Read the generator's `if` as the filter before summing.",
+    "syntax": "sum(x for x in xs if cond)"
   },
   {
     "id": "py.u01.flatten.raw.predict",
@@ -351,7 +465,9 @@
     "prompt": "What is the value of `flat`?",
     "snippet": "ll = [[1, 2], [3], [4, 5, 6]]\nflat = []\nfor sub in ll:\n    for x in sub:\n        flat.append(x)\nflat",
     "expected": "[1, 2, 3, 4, 5, 6]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the outer-then-inner loop appending each element.",
+    "syntax": "nested for-loops"
   },
   {
     "id": "py.u01.flatten.raw",
@@ -363,7 +479,11 @@
     "starter": "def flatten(ll):\n    # your code here\n    pass",
     "solution": "def flatten(ll):\n    flat = []\n    for sub in ll:\n        for x in sub:\n            flat.append(x)\n    return flat",
     "tests": "assert flatten([]) == [], flatten([])\nassert flatten([[1, 2], [3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6], flatten([[1, 2], [3], [4, 5, 6]])\nassert flatten([[], [1]]) == [1], flatten([[], [1]])",
-    "prereqs": ["py.u01.flatten.raw.predict"]
+    "prereqs": [
+      "py.u01.flatten.raw.predict"
+    ],
+    "cue": "Loop the sublists, then loop each sublist's elements.",
+    "syntax": "nested for-loops"
   },
   {
     "id": "py.u01.flatten.comprehension.predict",
@@ -374,7 +494,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[x for sub in [[1, 2], [3], [4, 5, 6]] for x in sub]",
     "expected": "[1, 2, 3, 4, 5, 6]",
-    "prereqs": ["py.u01.flatten.raw"]
+    "prereqs": [
+      "py.u01.flatten.raw"
+    ],
+    "cue": "The two `for` clauses read outer-first, like nested loops.",
+    "syntax": "[x for sub in ll for x in sub]"
   },
   {
     "id": "py.u01.parallel.dot.predict",
@@ -385,7 +509,9 @@
     "prompt": "What is the value of `s`?",
     "snippet": "a = [1, 2, 3]\nb = [4, 5, 6]\ns = 0\nfor i in range(len(a)):\n    s += a[i] * b[i]\ns",
     "expected": "32",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the total, multiplying paired elements by index.",
+    "syntax": "range(len(a))"
   },
   {
     "id": "py.u01.parallel.dot",
@@ -397,7 +523,11 @@
     "starter": "def dot(a, b):\n    # your code here\n    pass",
     "solution": "def dot(a, b):\n    s = 0\n    for i in range(len(a)):\n        s += a[i] * b[i]\n    return s",
     "tests": "assert dot([], []) == 0, dot([], [])\nassert dot([1, 2, 3], [4, 5, 6]) == 32, dot([1, 2, 3], [4, 5, 6])\nassert dot([2], [3]) == 6, dot([2], [3])",
-    "prereqs": ["py.u01.parallel.dot.predict"]
+    "prereqs": [
+      "py.u01.parallel.dot.predict"
+    ],
+    "cue": "Walk one index across both lists, summing products.",
+    "syntax": "a[i] * b[i]"
   },
   {
     "id": "py.u01.parallel.add",
@@ -409,7 +539,11 @@
     "starter": "def add_lists(a, b):\n    # your code here\n    pass",
     "solution": "def add_lists(a, b):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i] + b[i])\n    return out",
     "tests": "assert add_lists([], []) == [], add_lists([], [])\nassert add_lists([1, 2, 3], [4, 5, 6]) == [5, 7, 9], add_lists([1, 2, 3], [4, 5, 6])\nassert add_lists([10], [-1]) == [9], add_lists([10], [-1])",
-    "prereqs": ["py.u01.parallel.dot.predict"]
+    "prereqs": [
+      "py.u01.parallel.dot.predict"
+    ],
+    "cue": "Walk one index across both lists, appending sums.",
+    "syntax": "a[i] + b[i]"
   },
   {
     "id": "py.u01.parallel.zip.predict",
@@ -420,7 +554,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3]\nb = [4, 5, 6]\nsum(x * y for x, y in zip(a, b))",
     "expected": "32",
-    "prereqs": ["py.u01.parallel.dot"]
+    "prereqs": [
+      "py.u01.parallel.dot"
+    ],
+    "cue": "zip pairs elements from both lists position by position.",
+    "syntax": "zip(a, b)"
   },
   {
     "id": "py.u01.parallel.interleave",
@@ -432,7 +570,11 @@
     "starter": "def interleave(a, b):\n    # your code here\n    pass",
     "solution": "def interleave(a, b):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i])\n        out.append(b[i])\n    return out",
     "tests": "assert interleave([], []) == [], interleave([], [])\nassert interleave([1, 2, 3], [4, 5, 6]) == [1, 4, 2, 5, 3, 6], interleave([1, 2, 3], [4, 5, 6])\nassert interleave([1], [2]) == [1, 2], interleave([1], [2])",
-    "prereqs": ["py.u01.parallel.dot"]
+    "prereqs": [
+      "py.u01.parallel.dot"
+    ],
+    "cue": "At each index, take from a, then from b.",
+    "syntax": "list.append twice per index"
   },
   {
     "id": "py.u01.enumerate.predict",
@@ -443,7 +585,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = ['a', 'b', 'c']\n[(i, x) for i, x in enumerate(a)]",
     "expected": "[(0, 'a'), (1, 'b'), (2, 'c')]",
-    "prereqs": ["py.u01.parallel.dot.predict"]
+    "prereqs": [
+      "py.u01.parallel.dot.predict"
+    ],
+    "cue": "enumerate yields index-value pairs.",
+    "syntax": "enumerate(a)"
   },
   {
     "id": "py.u01.enumerate.start.predict",
@@ -454,7 +600,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = ['a', 'b', 'c']\n[(i, x) for i, x in enumerate(a, 1)]",
     "expected": "[(1, 'a'), (2, 'b'), (3, 'c')]",
-    "prereqs": ["py.u01.enumerate.predict"]
+    "prereqs": [
+      "py.u01.enumerate.predict"
+    ],
+    "cue": "The second argument shifts the starting index.",
+    "syntax": "enumerate(a, start)"
   },
   {
     "id": "py.u01.reverse.raw.predict",
@@ -465,7 +615,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "a = [1, 2, 3, 4]\nout = []\nfor i in range(len(a) - 1, -1, -1):\n    out.append(a[i])\nout",
     "expected": "[4, 3, 2, 1]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the index counting down from the last position.",
+    "syntax": "range(len(a)-1, -1, -1)"
   },
   {
     "id": "py.u01.reverse.raw",
@@ -477,7 +629,11 @@
     "starter": "def reverse_list(a):\n    # your code here\n    pass",
     "solution": "def reverse_list(a):\n    out = []\n    for i in range(len(a) - 1, -1, -1):\n        out.append(a[i])\n    return out",
     "tests": "assert reverse_list([]) == [], reverse_list([])\nassert reverse_list([7]) == [7], reverse_list([7])\nassert reverse_list([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_list([1, 2, 3, 4])",
-    "prereqs": ["py.u01.reverse.raw.predict"]
+    "prereqs": [
+      "py.u01.reverse.raw.predict"
+    ],
+    "cue": "Loop indices from last to first, appending each.",
+    "syntax": "range(start, stop, step) with negative step"
   },
   {
     "id": "py.u01.reverse.sugar.predict",
@@ -488,7 +644,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "list(reversed([1, 2, 3, 4]))",
     "expected": "[4, 3, 2, 1]",
-    "prereqs": ["py.u01.reverse.raw"]
+    "prereqs": [
+      "py.u01.reverse.raw"
+    ],
+    "cue": "Recall the built-in that iterates back to front.",
+    "syntax": "reversed(seq)"
   },
   {
     "id": "py.u01.anyall.any.predict",
@@ -499,7 +659,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3, 8, 4]\nany(x > 5 for x in a)",
     "expected": "True",
-    "prereqs": ["py.u01.count.predicate.predict"]
+    "prereqs": [
+      "py.u01.count.predicate.predict"
+    ],
+    "cue": "any stops at the first element passing the test.",
+    "syntax": "any(cond for x in xs)"
   },
   {
     "id": "py.u01.anyall.all.predict",
@@ -510,7 +674,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "all(x > 0 for x in [])",
     "expected": "True",
-    "prereqs": ["py.u01.anyall.any.predict"]
+    "prereqs": [
+      "py.u01.anyall.any.predict"
+    ],
+    "cue": "Consider what all returns over an empty iterable.",
+    "syntax": "all(cond for x in xs)"
   },
   {
     "id": "py.u01.fencepost.windows.predict",
@@ -521,7 +689,9 @@
     "prompt": "What is the value of `count`?",
     "snippet": "a = [1, 2, 3, 4, 5]\nk = 3\ncount = 0\nfor i in range(len(a) - k + 1):\n    count += 1\ncount",
     "expected": "3",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Count how many length-k windows fit.",
+    "syntax": "range(len(a) - k + 1)"
   },
   {
     "id": "py.u01.fencepost.windowsums",
@@ -533,6 +703,11 @@
     "starter": "def window_sums(a, k):\n    # your code here\n    pass",
     "solution": "def window_sums(a, k):\n    out = []\n    for i in range(len(a) - k + 1):\n        total = 0\n        for j in range(i, i + k):\n            total += a[j]\n        out.append(total)\n    return out",
     "tests": "assert window_sums([1, 2, 3, 4, 5], 3) == [6, 9, 12], window_sums([1, 2, 3, 4, 5], 3)\nassert window_sums([1, 2, 3], 3) == [6], window_sums([1, 2, 3], 3)\nassert window_sums([5], 1) == [5], window_sums([5], 1)\nassert window_sums([1, 2], 3) == [], window_sums([1, 2], 3)",
-    "prereqs": ["py.u01.fencepost.windows.predict", "py.u01.accumulate.sum"]
+    "prereqs": [
+      "py.u01.fencepost.windows.predict",
+      "py.u01.accumulate.sum"
+    ],
+    "cue": "For each window start, sum its k elements.",
+    "syntax": "range(len(a) - k + 1)"
   }
 ]

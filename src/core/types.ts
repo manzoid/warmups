@@ -7,6 +7,10 @@ export interface Exercise {
   concept: string;       // short label, e.g. "Counter for frequencies"
   kind: ExerciseKind;
   prompt: string;        // what to do (plain text / light markdown)
+  // Optional hint-ladder rungs (lower rungs of docs/scaffolding.md). Shown as
+  // early, cheap help before the deeper visualize/walkthrough/reveal rungs.
+  cue?: string;          // rung 1: a nudge toward the idea; must not give the answer
+  syntax?: string;       // rung 2: a syntax reminder; must not give the answer
   // kind === 'predict': user types the value that snippet evaluates to
   snippet?: string;      // code whose resulting value the learner predicts
   expected?: string;     // canonical expected value, as a string (e.g. "[2, 4, 6]")

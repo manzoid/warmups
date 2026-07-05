@@ -8,7 +8,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"aabbbc\"\ncount = [0] * 256\nfor c in s:\n    count[ord(c)] += 1\n[count[ord('a')], count[ord('b')], count[ord('c')]]",
     "expected": "[2, 3, 1]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the loop filling count, then read the three ord() slots.",
+    "syntax": "ord(c) as a list index"
   },
   {
     "id": "py.u04.freq.raw.predict",
@@ -19,7 +21,11 @@
     "prompt": "What is the value of `freq`?",
     "snippet": "s = \"banana\"\nfreq = {}\nfor ch in s:\n    if ch in freq:\n        freq[ch] += 1\n    else:\n        freq[ch] = 1\nfreq",
     "expected": "{'b': 1, 'a': 3, 'n': 2}",
-    "prereqs": ["py.u04.direct-address.count"]
+    "prereqs": [
+      "py.u04.direct-address.count"
+    ],
+    "cue": "Step through the string, updating each character's tally.",
+    "syntax": "if key in dict / else"
   },
   {
     "id": "py.u04.freq.raw.write",
@@ -31,7 +37,11 @@
     "starter": "def char_frequency(s):\n    # your code here\n    pass",
     "solution": "def char_frequency(s):\n    freq = {}\n    for ch in s:\n        if ch in freq:\n            freq[ch] += 1\n        else:\n            freq[ch] = 1\n    return freq",
     "tests": "assert char_frequency(\"aabbbc\") == {'a': 2, 'b': 3, 'c': 1}, char_frequency(\"aabbbc\")\nassert char_frequency(\"\") == {}, char_frequency(\"\")\nassert char_frequency(\"z\") == {'z': 1}, char_frequency(\"z\")",
-    "prereqs": ["py.u04.freq.raw.predict"]
+    "prereqs": [
+      "py.u04.freq.raw.predict"
+    ],
+    "cue": "Loop the string; branch on whether the char is already a key.",
+    "syntax": "dict[k] increment"
   },
   {
     "id": "py.u04.freq.get.predict",
@@ -42,7 +52,11 @@
     "prompt": "What is the value of `freq`?",
     "snippet": "s = \"abcab\"\nfreq = {}\nfor ch in s:\n    freq[ch] = freq.get(ch, 0) + 1\nfreq",
     "expected": "{'a': 2, 'b': 2, 'c': 1}",
-    "prereqs": ["py.u04.freq.raw.write"]
+    "prereqs": [
+      "py.u04.freq.raw.write"
+    ],
+    "cue": "Trace how .get supplies a default before adding one.",
+    "syntax": "dict.get(key, 0)"
   },
   {
     "id": "py.u04.freq.defaultdict.predict",
@@ -53,7 +67,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "from collections import defaultdict\nfreq = defaultdict(int)\nfor ch in \"mississippi\":\n    freq[ch] += 1\ndict(freq)",
     "expected": "{'m': 1, 'i': 4, 's': 4, 'p': 2}",
-    "prereqs": ["py.u04.freq.get.predict"]
+    "prereqs": [
+      "py.u04.freq.get.predict"
+    ],
+    "cue": "Walk the loop; missing keys auto-start at zero.",
+    "syntax": "defaultdict(int)"
   },
   {
     "id": "py.u04.freq.counter.mostcommon",
@@ -64,7 +82,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "from collections import Counter\nCounter(\"aabbbc\").most_common(2)",
     "expected": "[('b', 3), ('a', 2)]",
-    "prereqs": ["py.u04.freq.defaultdict.predict"]
+    "prereqs": [
+      "py.u04.freq.defaultdict.predict"
+    ],
+    "cue": "Count the letters, then take the top pairs by frequency.",
+    "syntax": "Counter(...).most_common(n)"
   },
   {
     "id": "py.u04.freq.counter.sorted",
@@ -75,7 +97,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "from collections import Counter\nsorted(Counter(\"aabbbc\").items())",
     "expected": "[('a', 2), ('b', 3), ('c', 1)]",
-    "prereqs": ["py.u04.freq.counter.mostcommon"]
+    "prereqs": [
+      "py.u04.freq.counter.mostcommon"
+    ],
+    "cue": "Count the letters, then order the (key, count) pairs.",
+    "syntax": "tuples sort by first element"
   },
   {
     "id": "py.u04.build.hash",
@@ -87,7 +113,11 @@
     "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        # your code here\n        pass",
     "solution": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for ch in key:\n            h = h * 31 + ord(ch)\n        return h % self.size",
     "tests": "m = HashMap(8)\nh = m._hash(\"tea\")\nassert isinstance(h, int), h\nassert 0 <= h < 8, h\nassert m._hash(\"tea\") == m._hash(\"tea\"), \"must be deterministic\"",
-    "prereqs": ["py.u04.direct-address.count"]
+    "prereqs": [
+      "py.u04.direct-address.count"
+    ],
+    "cue": "Accumulate a rolling hash over the chars, then fold into range.",
+    "syntax": "% self.size"
   },
   {
     "id": "py.u04.build.put",
@@ -99,7 +129,11 @@
     "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for ch in key:\n            h = h * 31 + ord(ch)\n        return h % self.size\n\n    def put(self, key, val):\n        # your code here\n        pass",
     "solution": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for ch in key:\n            h = h * 31 + ord(ch)\n        return h % self.size\n\n    def put(self, key, val):\n        bucket = self.buckets[self._hash(key)]\n        for pair in bucket:\n            if pair[0] == key:\n                pair[1] = val\n                return\n        bucket.append([key, val])",
     "tests": "m = HashMap(8)\nm.put(\"a\", 1)\nm.put(\"b\", 2)\npairs = [p for bucket in m.buckets for p in bucket]\nassert [\"a\", 1] in pairs, pairs\nassert [\"b\", 2] in pairs, pairs\nm.put(\"a\", 9)\npairs = [p for bucket in m.buckets for p in bucket]\nassert [\"a\", 9] in pairs, pairs\nassert [\"a\", 1] not in pairs, pairs\nassert sum(len(b) for b in m.buckets) == 2, \"update must not add a new pair\"",
-    "prereqs": ["py.u04.build.hash"]
+    "prereqs": [
+      "py.u04.build.hash"
+    ],
+    "cue": "Hash to a bucket, scan for the key, then update or append.",
+    "syntax": "list.append([key, val])"
   },
   {
     "id": "py.u04.build.get",
@@ -111,7 +145,11 @@
     "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for ch in key:\n            h = h * 31 + ord(ch)\n        return h % self.size\n\n    def put(self, key, val):\n        bucket = self.buckets[self._hash(key)]\n        for pair in bucket:\n            if pair[0] == key:\n                pair[1] = val\n                return\n        bucket.append([key, val])\n\n    def get(self, key):\n        # your code here\n        pass",
     "solution": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for ch in key:\n            h = h * 31 + ord(ch)\n        return h % self.size\n\n    def put(self, key, val):\n        bucket = self.buckets[self._hash(key)]\n        for pair in bucket:\n            if pair[0] == key:\n                pair[1] = val\n                return\n        bucket.append([key, val])\n\n    def get(self, key):\n        bucket = self.buckets[self._hash(key)]\n        for pair in bucket:\n            if pair[0] == key:\n                return pair[1]\n        return None",
     "tests": "m = HashMap(8)\nm.put(\"x\", 10)\nm.put(\"y\", 20)\nassert m.get(\"x\") == 10, m.get(\"x\")\nassert m.get(\"y\") == 20, m.get(\"y\")\nm.put(\"x\", 99)\nassert m.get(\"x\") == 99, m.get(\"x\")\nassert m.get(\"absent\") is None, m.get(\"absent\")",
-    "prereqs": ["py.u04.build.put"]
+    "prereqs": [
+      "py.u04.build.put"
+    ],
+    "cue": "Hash to the bucket, then linear-scan pairs by full key.",
+    "syntax": "return inside loop, else None"
   },
   {
     "id": "py.u04.two-sum.predict",
@@ -122,7 +160,11 @@
     "prompt": "What is the value of `result`?",
     "snippet": "nums = [2, 7, 11, 15]\ntarget = 9\nseen = {}\nresult = None\nfor i, x in enumerate(nums):\n    if target - x in seen:\n        result = (seen[target - x], i)\n        break\n    seen[x] = i\nresult",
     "expected": "(0, 1)",
-    "prereqs": ["py.u04.freq.raw.write"]
+    "prereqs": [
+      "py.u04.freq.raw.write"
+    ],
+    "cue": "Track seen values; check for each complement as you go.",
+    "syntax": "(target - x) in seen"
   },
   {
     "id": "py.u04.two-sum.write",
@@ -134,7 +176,11 @@
     "starter": "def two_sum(nums, target):\n    # your code here\n    pass",
     "solution": "def two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return None",
     "tests": "assert two_sum([2, 7, 11, 15], 9) == [0, 1], two_sum([2, 7, 11, 15], 9)\nassert two_sum([3, 2, 4], 6) == [1, 2], two_sum([3, 2, 4], 6)\nassert two_sum([3, 3], 6) == [0, 1], two_sum([3, 3], 6)\nassert two_sum([1, 2], 10) is None, two_sum([1, 2], 10)",
-    "prereqs": ["py.u04.two-sum.predict"]
+    "prereqs": [
+      "py.u04.two-sum.predict"
+    ],
+    "cue": "One pass storing value to index; look up the complement first.",
+    "syntax": "enumerate(nums)"
   },
   {
     "id": "py.u04.groupby.setdefault.predict",
@@ -145,7 +191,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "words = [\"eat\", \"tea\", \"tan\", \"ate\"]\ngroups = {}\nfor w in words:\n    key = \"\".join(sorted(w))\n    groups.setdefault(key, []).append(w)\n[groups[k] for k in sorted(groups)]",
     "expected": "[['eat', 'tea', 'ate'], ['tan']]",
-    "prereqs": ["py.u04.freq.raw.write"]
+    "prereqs": [
+      "py.u04.freq.raw.write"
+    ],
+    "cue": "Group words by a sorted-letters key, then read in key order.",
+    "syntax": "dict.setdefault(key, [])"
   },
   {
     "id": "py.u04.groupby.write",
@@ -157,7 +207,11 @@
     "starter": "def group_anagrams(words):\n    # your code here\n    pass",
     "solution": "def group_anagrams(words):\n    groups = {}\n    for w in words:\n        key = \"\".join(sorted(w))\n        groups.setdefault(key, []).append(w)\n    return list(groups.values())",
     "tests": "assert group_anagrams([\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"]) == [[\"eat\", \"tea\", \"ate\"], [\"tan\", \"nat\"], [\"bat\"]], group_anagrams([\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"])\nassert group_anagrams([]) == [], group_anagrams([])\nassert group_anagrams([\"a\"]) == [[\"a\"]], group_anagrams([\"a\"])",
-    "prereqs": ["py.u04.groupby.setdefault.predict"]
+    "prereqs": [
+      "py.u04.groupby.setdefault.predict"
+    ],
+    "cue": "Bucket each word under its sorted-letters signature.",
+    "syntax": "\"\".join(sorted(w))"
   },
   {
     "id": "py.u04.first-unique.predict",
@@ -168,7 +222,11 @@
     "prompt": "What is the value of `result`?",
     "snippet": "from collections import Counter\ns = \"loveleetcode\"\ncnt = Counter(s)\nresult = -1\nfor i, ch in enumerate(s):\n    if cnt[ch] == 1:\n        result = i\n        break\nresult",
     "expected": "2",
-    "prereqs": ["py.u04.freq.counter.mostcommon"]
+    "prereqs": [
+      "py.u04.freq.counter.mostcommon"
+    ],
+    "cue": "Count all chars first, then scan for the first with count one.",
+    "syntax": "Counter lookup cnt[ch]"
   },
   {
     "id": "py.u04.first-unique.write",
@@ -180,7 +238,11 @@
     "starter": "def first_uniq_char(s):\n    # your code here\n    pass",
     "solution": "def first_uniq_char(s):\n    from collections import Counter\n    cnt = Counter(s)\n    for i, ch in enumerate(s):\n        if cnt[ch] == 1:\n            return i\n    return -1",
     "tests": "assert first_uniq_char(\"leetcode\") == 0, first_uniq_char(\"leetcode\")\nassert first_uniq_char(\"loveleetcode\") == 2, first_uniq_char(\"loveleetcode\")\nassert first_uniq_char(\"aabb\") == -1, first_uniq_char(\"aabb\")\nassert first_uniq_char(\"\") == -1, first_uniq_char(\"\")",
-    "prereqs": ["py.u04.first-unique.predict"]
+    "prereqs": [
+      "py.u04.first-unique.predict"
+    ],
+    "cue": "Precount, then walk indices returning the first singleton.",
+    "syntax": "enumerate(s)"
   },
   {
     "id": "py.u04.index-map.write",
@@ -192,7 +254,11 @@
     "starter": "def index_map(nums):\n    # your code here\n    pass",
     "solution": "def index_map(nums):\n    pos = {}\n    for i, v in enumerate(nums):\n        pos[v] = i\n    return pos",
     "tests": "assert index_map([10, 20, 30]) == {10: 0, 20: 1, 30: 2}, index_map([10, 20, 30])\nassert index_map([5, 3, 5]) == {5: 2, 3: 1}, index_map([5, 3, 5])\nassert index_map([]) == {}, index_map([])",
-    "prereqs": ["py.u04.freq.raw.write"]
+    "prereqs": [
+      "py.u04.freq.raw.write"
+    ],
+    "cue": "Map each value to its index; later writes overwrite earlier.",
+    "syntax": "dict[value] = index"
   },
   {
     "id": "py.u04.index-map.comprehension.predict",
@@ -203,7 +269,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "nums = [10, 20, 30, 40]\npos = {v: i for i, v in enumerate(nums)}\npos[30]",
     "expected": "2",
-    "prereqs": ["py.u04.index-map.write"]
+    "prereqs": [
+      "py.u04.index-map.write"
+    ],
+    "cue": "Build the value-to-index map, then look up one key.",
+    "syntax": "{v: i for i, v in enumerate(xs)}"
   },
   {
     "id": "py.u04.index-map.dup.predict",
@@ -214,7 +284,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "nums = [5, 3, 5, 7]\npos = {v: i for i, v in enumerate(nums)}\npos[5]",
     "expected": "2",
-    "prereqs": ["py.u04.index-map.comprehension.predict"]
+    "prereqs": [
+      "py.u04.index-map.comprehension.predict"
+    ],
+    "cue": "Trace which index wins when a value repeats.",
+    "syntax": "last assignment wins per key"
   },
   {
     "id": "py.u04.seen.dedup.predict",
@@ -225,7 +299,11 @@
     "prompt": "What is the value of `out`?",
     "snippet": "arr = [3, 1, 3, 2, 1]\nseen = set()\nout = []\nfor x in arr:\n    if x not in seen:\n        seen.add(x)\n        out.append(x)\nout",
     "expected": "[3, 1, 2]",
-    "prereqs": ["py.u04.freq.raw.write"]
+    "prereqs": [
+      "py.u04.freq.raw.write"
+    ],
+    "cue": "Keep a seen-set; append only first sightings.",
+    "syntax": "x not in seen"
   },
   {
     "id": "py.u04.seen.dedup.write",
@@ -237,7 +315,11 @@
     "starter": "def dedup(arr):\n    # your code here\n    pass",
     "solution": "def dedup(arr):\n    seen = set()\n    out = []\n    for x in arr:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out",
     "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == [], dedup([])\nassert dedup([1, 1, 1]) == [1], dedup([1, 1, 1])",
-    "prereqs": ["py.u04.seen.dedup.predict"]
+    "prereqs": [
+      "py.u04.seen.dedup.predict"
+    ],
+    "cue": "Track seen values in a set; append first occurrences in order.",
+    "syntax": "set.add(x)"
   },
   {
     "id": "py.u04.contains-dup.predict",
@@ -248,7 +330,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "arr = [1, 2, 3, 1]\nlen(set(arr)) != len(arr)",
     "expected": "True",
-    "prereqs": ["py.u04.seen.dedup.write"]
+    "prereqs": [
+      "py.u04.seen.dedup.write"
+    ],
+    "cue": "Compare the unique count against the total length.",
+    "syntax": "len(set(xs)) vs len(xs)"
   },
   {
     "id": "py.u04.seen.set-sorted.predict",
@@ -259,6 +345,10 @@
     "prompt": "What does this evaluate to?",
     "snippet": "arr = [3, 1, 2, 3, 1]\nsorted(set(arr))",
     "expected": "[1, 2, 3]",
-    "prereqs": ["py.u04.contains-dup.predict"]
+    "prereqs": [
+      "py.u04.contains-dup.predict"
+    ],
+    "cue": "Drop duplicates with a set, then order the result.",
+    "syntax": "sorted(set(xs))"
   }
 ]

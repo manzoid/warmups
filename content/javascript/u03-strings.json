@@ -8,7 +8,9 @@
     "prompt": "What is the value of `c`?",
     "snippet": "const s = \"warmup\";\nconst c = s[3];\nc",
     "expected": "m",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Index into the string from position zero.",
+    "syntax": "s[i] one-char access"
   },
   {
     "id": "js.u03.charcode.at",
@@ -19,7 +21,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"A\".charCodeAt(0)",
     "expected": "65",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Read the code point of the character.",
+    "syntax": "str.charCodeAt(i)"
   },
   {
     "id": "js.u03.fromcharcode",
@@ -30,7 +34,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "String.fromCharCode(66)",
     "expected": "B",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Map the code point back to a character.",
+    "syntax": "String.fromCharCode(n)"
   },
   {
     "id": "js.u03.char.arith",
@@ -41,7 +47,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"e\".charCodeAt(0) - \"a\".charCodeAt(0)",
     "expected": "4",
-    "prereqs": ["js.u03.charcode.at"]
+    "prereqs": [
+      "js.u03.charcode.at"
+    ],
+    "cue": "Subtract the two code points for the offset.",
+    "syntax": "charCodeAt(0) difference"
   },
   {
     "id": "js.u03.forof.collect",
@@ -52,7 +62,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const s = \"cat\";\nconst out = [];\nfor (const c of s) {\n  out.push(c);\n}\nout",
     "expected": "[\"c\", \"a\", \"t\"]",
-    "prereqs": ["js.u03.index.char"]
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Walk each char and track the array.",
+    "syntax": "for (const c of s)"
   },
   {
     "id": "js.u03.count.char",
@@ -64,7 +78,11 @@
     "starter": "function countChar(s, ch) {\n  // your code here\n}",
     "solution": "function countChar(s, ch) {\n  let n = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (s[i] === ch) n++;\n  }\n  return n;\n}",
     "tests": "if (countChar(\"banana\", \"a\") !== 3) throw new Error(\"banana/a\");\nif (countChar(\"\", \"a\") !== 0) throw new Error(\"empty\");\nif (countChar(\"abc\", \"z\") !== 0) throw new Error(\"absent\");",
-    "prereqs": ["js.u03.index.char"]
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Scan with an index and tally matches.",
+    "syntax": "for (let i = 0; i < s.length; i++)"
   },
   {
     "id": "js.u03.freq",
@@ -76,7 +94,11 @@
     "starter": "function charFreq(s) {\n  // your code here\n}",
     "solution": "function charFreq(s) {\n  const freq = {};\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    freq[c] = (freq[c] || 0) + 1;\n  }\n  return freq;\n}",
     "tests": "if (JSON.stringify(charFreq(\"aab\")) !== JSON.stringify({ a: 2, b: 1 })) throw new Error(\"aab\");\nif (JSON.stringify(charFreq(\"\")) !== JSON.stringify({})) throw new Error(\"empty\");",
-    "prereqs": ["js.u03.count.char"]
+    "prereqs": [
+      "js.u03.count.char"
+    ],
+    "cue": "Tally each char into a plain object.",
+    "syntax": "obj[c] = (obj[c] || 0) + 1"
   },
   {
     "id": "js.u03.classify.digit",
@@ -87,7 +109,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const c = \"7\";\nc >= \"0\" && c <= \"9\"",
     "expected": "true",
-    "prereqs": ["js.u03.index.char"]
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Compare the char against the digit range.",
+    "syntax": "c >= '0' && c <= '9'"
   },
   {
     "id": "js.u03.classify.regex",
@@ -98,7 +124,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "/[a-z]/i.test(\"G\")",
     "expected": "true",
-    "prereqs": ["js.u03.classify.digit"]
+    "prereqs": [
+      "js.u03.classify.digit"
+    ],
+    "cue": "Match the char against a letter pattern.",
+    "syntax": "/[a-z]/i.test(c)"
   },
   {
     "id": "js.u03.digit.value",
@@ -109,7 +139,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"7\".charCodeAt(0) - \"0\".charCodeAt(0)",
     "expected": "7",
-    "prereqs": ["js.u03.char.arith"]
+    "prereqs": [
+      "js.u03.char.arith"
+    ],
+    "cue": "Subtract the zero code point.",
+    "syntax": "charCodeAt(0) - '0'.charCodeAt(0)"
   },
   {
     "id": "js.u03.count.digits",
@@ -121,7 +155,12 @@
     "starter": "function countDigits(s) {\n  // your code here\n}",
     "solution": "function countDigits(s) {\n  let n = 0;\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"0\" && c <= \"9\") n++;\n  }\n  return n;\n}",
     "tests": "if (countDigits(\"a1b2c3\") !== 3) throw new Error(\"mixed\");\nif (countDigits(\"abc\") !== 0) throw new Error(\"none\");\nif (countDigits(\"\") !== 0) throw new Error(\"empty\");",
-    "prereqs": ["js.u03.count.char", "js.u03.classify.digit"]
+    "prereqs": [
+      "js.u03.count.char",
+      "js.u03.classify.digit"
+    ],
+    "cue": "Range-check each char while scanning.",
+    "syntax": "c >= '0' && c <= '9'"
   },
   {
     "id": "js.u03.to.int",
@@ -133,7 +172,11 @@
     "starter": "function toInt(s) {\n  // your code here\n}",
     "solution": "function toInt(s) {\n  let n = 0;\n  for (let i = 0; i < s.length; i++) {\n    n = n * 10 + (s.charCodeAt(i) - \"0\".charCodeAt(0));\n  }\n  return n;\n}",
     "tests": "if (toInt(\"123\") !== 123) throw new Error(\"123\");\nif (toInt(\"0\") !== 0) throw new Error(\"0\");\nif (toInt(\"7\") !== 7) throw new Error(\"7\");\nif (toInt(\"1000\") !== 1000) throw new Error(\"1000\");",
-    "prereqs": ["js.u03.digit.value"]
+    "prereqs": [
+      "js.u03.digit.value"
+    ],
+    "cue": "Fold digits left to right into a running total.",
+    "syntax": "n * 10 + digit"
   },
   {
     "id": "js.u03.build.push.join",
@@ -144,7 +187,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const parts = [];\nfor (const c of \"abc\") {\n  parts.push(c + \"!\");\n}\nparts.join(\"\")",
     "expected": "a!b!c!",
-    "prereqs": ["js.u03.forof.collect"]
+    "prereqs": [
+      "js.u03.forof.collect"
+    ],
+    "cue": "Trace what each iteration pushes, then join.",
+    "syntax": "arr.join('')"
   },
   {
     "id": "js.u03.build.concat",
@@ -155,7 +202,11 @@
     "prompt": "What is the value of `out`?",
     "snippet": "let out = \"\";\nfor (const c of \"xyz\") {\n  out = c + out;\n}\nout",
     "expected": "zyx",
-    "prereqs": ["js.u03.build.push.join"]
+    "prereqs": [
+      "js.u03.build.push.join"
+    ],
+    "cue": "Track where each new char lands in the accumulator.",
+    "syntax": "c + out prepend"
   },
   {
     "id": "js.u03.repeat.each",
@@ -167,7 +218,11 @@
     "starter": "function repeatEach(s) {\n  // your code here\n}",
     "solution": "function repeatEach(s) {\n  const parts = [];\n  for (const c of s) {\n    parts.push(c + c);\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (repeatEach(\"ab\") !== \"aabb\") throw new Error(\"ab\");\nif (repeatEach(\"\") !== \"\") throw new Error(\"empty\");\nif (repeatEach(\"x\") !== \"xx\") throw new Error(\"x\");",
-    "prereqs": ["js.u03.build.push.join"]
+    "prereqs": [
+      "js.u03.build.push.join"
+    ],
+    "cue": "Emit each char twice while building.",
+    "syntax": "Array push + join('')"
   },
   {
     "id": "js.u03.keep.digits",
@@ -179,7 +234,12 @@
     "starter": "function keepDigits(s) {\n  // your code here\n}",
     "solution": "function keepDigits(s) {\n  const parts = [];\n  for (const c of s) {\n    if (c >= \"0\" && c <= \"9\") parts.push(c);\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (keepDigits(\"a1b2\") !== \"12\") throw new Error(\"a1b2\");\nif (keepDigits(\"abc\") !== \"\") throw new Error(\"none\");\nif (keepDigits(\"90210\") !== \"90210\") throw new Error(\"all\");",
-    "prereqs": ["js.u03.build.push.join", "js.u03.classify.digit"]
+    "prereqs": [
+      "js.u03.build.push.join",
+      "js.u03.classify.digit"
+    ],
+    "cue": "Filter chars by range, then join.",
+    "syntax": "Array push + join('')"
   },
   {
     "id": "js.u03.shout",
@@ -191,7 +251,13 @@
     "starter": "function shout(s) {\n  // your code here\n}",
     "solution": "function shout(s) {\n  const parts = [];\n  for (const c of s) {\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (shout(\"hi!\") !== \"HI!\") throw new Error(\"hi!\");\nif (shout(\"aB3\") !== \"AB3\") throw new Error(\"aB3\");\nif (shout(\"\") !== \"\") throw new Error(\"empty\");",
-    "prereqs": ["js.u03.build.push.join", "js.u03.fromcharcode", "js.u03.char.arith"]
+    "prereqs": [
+      "js.u03.build.push.join",
+      "js.u03.fromcharcode",
+      "js.u03.char.arith"
+    ],
+    "cue": "Shift lowercase letters by the case offset.",
+    "syntax": "String.fromCharCode(code - 32)"
   },
   {
     "id": "js.u03.template",
@@ -202,7 +268,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "`hi ${\"Tom\"} ${1 + 2}`",
     "expected": "hi Tom 3",
-    "prereqs": ["js.u03.build.push.join"]
+    "prereqs": [
+      "js.u03.build.push.join"
+    ],
+    "cue": "Substitute each placeholder, then read the result.",
+    "syntax": "`${expr}` interpolation"
   },
   {
     "id": "js.u03.reverse.loop",
@@ -214,7 +284,11 @@
     "starter": "function reverseStr(s) {\n  // your code here\n}",
     "solution": "function reverseStr(s) {\n  let out = \"\";\n  for (let i = s.length - 1; i >= 0; i--) {\n    out += s[i];\n  }\n  return out;\n}",
     "tests": "if (reverseStr(\"hello\") !== \"olleh\") throw new Error(\"hello\");\nif (reverseStr(\"\") !== \"\") throw new Error(\"empty\");\nif (reverseStr(\"a\") !== \"a\") throw new Error(\"a\");",
-    "prereqs": ["js.u03.index.char"]
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Walk indices from the end down to zero.",
+    "syntax": "for (let i = s.length - 1; i >= 0; i--)"
   },
   {
     "id": "js.u03.reverse.sugar",
@@ -225,7 +299,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[...\"hello\"].reverse().join(\"\")",
     "expected": "olleh",
-    "prereqs": ["js.u03.reverse.loop"]
+    "prereqs": [
+      "js.u03.reverse.loop"
+    ],
+    "cue": "Spread to an array, reverse, rejoin.",
+    "syntax": "[...s].reverse().join('')"
   },
   {
     "id": "js.u03.palindrome.two",
@@ -237,7 +315,11 @@
     "starter": "function isPalindrome(s) {\n  // your code here\n}",
     "solution": "function isPalindrome(s) {\n  let i = 0;\n  let j = s.length - 1;\n  while (i < j) {\n    if (s[i] !== s[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}",
     "tests": "if (isPalindrome(\"level\") !== true) throw new Error(\"level\");\nif (isPalindrome(\"abca\") !== false) throw new Error(\"abca\");\nif (isPalindrome(\"\") !== true) throw new Error(\"empty\");\nif (isPalindrome(\"a\") !== true) throw new Error(\"a\");\nif (isPalindrome(\"abba\") !== true) throw new Error(\"abba\");",
-    "prereqs": ["js.u03.index.char"]
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Two pointers converging from both ends.",
+    "syntax": "while (i < j)"
   },
   {
     "id": "js.u03.palindrome.sugar",
@@ -248,7 +330,12 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const s = \"level\";\ns === [...s].reverse().join(\"\")",
     "expected": "true",
-    "prereqs": ["js.u03.palindrome.two", "js.u03.reverse.sugar"]
+    "prereqs": [
+      "js.u03.palindrome.two",
+      "js.u03.reverse.sugar"
+    ],
+    "cue": "Reverse a copy and compare to the original.",
+    "syntax": "s === [...s].reverse().join('')"
   },
   {
     "id": "js.u03.indexof",
@@ -259,7 +346,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"hello world\".indexOf(\"o\")",
     "expected": "4",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Find the first position of the char.",
+    "syntax": "str.indexOf(sub)"
   },
   {
     "id": "js.u03.indexof.absent",
@@ -270,7 +359,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"abc\".indexOf(\"z\")",
     "expected": "-1",
-    "prereqs": ["js.u03.indexof"]
+    "prereqs": [
+      "js.u03.indexof"
+    ],
+    "cue": "Recall what indexOf returns when nothing matches.",
+    "syntax": "str.indexOf(sub)"
   },
   {
     "id": "js.u03.slice",
@@ -281,7 +374,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"hello\".slice(1, 4)",
     "expected": "ell",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Take the range with the end excluded.",
+    "syntax": "str.slice(start, end)"
   },
   {
     "id": "js.u03.includes",
@@ -292,7 +387,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"teamwork\".includes(\"work\")",
     "expected": "true",
-    "prereqs": ["js.u03.indexof"]
+    "prereqs": [
+      "js.u03.indexof"
+    ],
+    "cue": "Test whether the substring appears.",
+    "syntax": "str.includes(sub)"
   },
   {
     "id": "js.u03.my.indexof",
@@ -304,7 +403,12 @@
     "starter": "function myIndexOf(s, p) {\n  // your code here\n}",
     "solution": "function myIndexOf(s, p) {\n  for (let i = 0; i + p.length <= s.length; i++) {\n    let k = 0;\n    while (k < p.length && s[i + k] === p[k]) k++;\n    if (k === p.length) return i;\n  }\n  return -1;\n}",
     "tests": "if (myIndexOf(\"hello\", \"ll\") !== 2) throw new Error(\"ll\");\nif (myIndexOf(\"abc\", \"z\") !== -1) throw new Error(\"absent\");\nif (myIndexOf(\"aaa\", \"aa\") !== 0) throw new Error(\"aa\");\nif (myIndexOf(\"abc\", \"\") !== 0) throw new Error(\"empty pattern\");\nif (myIndexOf(\"abc\", \"c\") !== 2) throw new Error(\"last\");",
-    "prereqs": ["js.u03.index.char", "js.u03.indexof"]
+    "prereqs": [
+      "js.u03.index.char",
+      "js.u03.indexof"
+    ],
+    "cue": "At each start position, scan the pattern for a full match.",
+    "syntax": "nested loop over s and p"
   },
   {
     "id": "js.u03.split.native",
@@ -315,7 +419,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"a,,b\".split(\",\")",
     "expected": "[\"a\", \"\", \"b\"]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the fields the separator carves out, empties included.",
+    "syntax": "str.split(sep)"
   },
   {
     "id": "js.u03.myjoin.build",
@@ -327,7 +433,11 @@
     "starter": "function myJoin(parts, sep) {\n  // your code here\n}",
     "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}",
     "tests": "if (myJoin([], \"-\") !== \"\") throw new Error(\"empty\");\nif (myJoin([\"a\"], \"-\") !== \"a\") throw new Error(\"one\");\nif (myJoin([\"a\", \"b\", \"c\"], \"-\") !== \"a-b-c\") throw new Error(\"three\");",
-    "prereqs": ["js.u03.build.push.join"]
+    "prereqs": [
+      "js.u03.build.push.join"
+    ],
+    "cue": "Seed with the first element, then prefix the separator to the rest.",
+    "syntax": "out += sep + parts[i]"
   },
   {
     "id": "js.u03.mysplit.build",
@@ -339,7 +449,11 @@
     "starter": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  // your code here\n}",
     "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}",
     "tests": "if (JSON.stringify(mySplit(\"a,,b\", \",\")) !== JSON.stringify([\"a\", \"\", \"b\"])) throw new Error(\"gaps\");\nif (JSON.stringify(mySplit(\"\", \",\")) !== JSON.stringify([\"\"])) throw new Error(\"empty\");\nif (JSON.stringify(mySplit(\"a,b,c\", \",\")) !== JSON.stringify([\"a\", \"b\", \"c\"])) throw new Error(\"three\");",
-    "prereqs": ["js.u03.myjoin.build"]
+    "prereqs": [
+      "js.u03.myjoin.build"
+    ],
+    "cue": "Accumulate a field char by char, flushing on the separator.",
+    "syntax": "push cur, then reset cur = ''"
   },
   {
     "id": "js.u03.roundtrip",
@@ -351,6 +465,10 @@
     "starter": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  // your code here\n}",
     "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  return myJoin(mySplit(s, sep), sep);\n}",
     "tests": "if (roundTrip(\"a,b,c\", \",\") !== \"a,b,c\") throw new Error(\"abc\");\nif (roundTrip(\"a,,b\", \",\") !== \"a,,b\") throw new Error(\"gaps\");\nif (roundTrip(\"\", \",\") !== \"\") throw new Error(\"empty\");\nif (roundTrip(\"hello\", \",\") !== \"hello\") throw new Error(\"no sep\");",
-    "prereqs": ["js.u03.mysplit.build"]
+    "prereqs": [
+      "js.u03.mysplit.build"
+    ],
+    "cue": "Feed the split result straight into the join.",
+    "syntax": "f(g(x)) composition"
   }
 ]

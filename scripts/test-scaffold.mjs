@@ -14,7 +14,8 @@
 //   - walkthroughPrompt.buildWalkthroughPrompt: embeds the exercise prompt and
 //     the learner's attempt, and never leaks the canonical answer
 //     (ex.expected / ex.solution) into the tutor prompt.
-//   - srs.gradeFor: an assisted attempt is a lapse ('again') even when it passed.
+//   - srs.gradeFor: the deepest hint-ladder rung reached maps to a three-grade
+//     FSRS signal (good / hard / again).
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -140,7 +141,7 @@ const emptyOut = buildWalkthroughPrompt(predictEx, '   ');
 check(/has not written anything yet/.test(emptyOut), 'handles an empty attempt gracefully');
 
 // ---------------------------------------------------------------------------
-// 3. srs.gradeFor — assisted attempts are lapses
+// 3. srs.gradeFor — ladder depth → three-grade FSRS signal
 // ---------------------------------------------------------------------------
 //
 // srs.ts imports 'ts-fsrs' (a real npm dep, resolvable by plain node), so load
@@ -164,10 +165,18 @@ const nodeRequire = createRequire(import.meta.url);
 const { gradeFor } = loadTsWithNodeRequire(join(ROOT, 'src/core/srs.ts'));
 
 console.log('gradeFor:');
-check(gradeFor({ passed: true, assisted: false }) === 'good', 'unassisted pass → good');
-check(gradeFor({ passed: false, assisted: false }) === 'again', 'unassisted fail → again');
-check(gradeFor({ passed: true, assisted: true }) === 'again', 'assisted pass → again (still a lapse)');
-check(gradeFor({ passed: false, assisted: true }) === 'again', 'assisted fail → again');
+// passed, no hint (rung 0) → good.
+check(gradeFor({ passed: true, deepestRung: 0 }) === 'good', 'pass, rung 0 (attempt) → good');
+// passed, cue/syntax (rungs 1-2) → hard: a nudge, repeats sooner but not a lapse.
+check(gradeFor({ passed: true, deepestRung: 1 }) === 'hard', 'pass, rung 1 (cue) → hard');
+check(gradeFor({ passed: true, deepestRung: 2 }) === 'hard', 'pass, rung 2 (syntax) → hard');
+// passed, visualize/walkthrough/reveal (rungs 3-5) → again: a lapse.
+check(gradeFor({ passed: true, deepestRung: 3 }) === 'again', 'pass, rung 3 (visualize) → again (lapse)');
+check(gradeFor({ passed: true, deepestRung: 4 }) === 'again', 'pass, rung 4 (walkthrough) → again (lapse)');
+check(gradeFor({ passed: true, deepestRung: 5 }) === 'again', 'pass, rung 5 (reveal) → again (lapse)');
+// any fail → again regardless of rung.
+check(gradeFor({ passed: false, deepestRung: 0 }) === 'again', 'fail, rung 0 → again');
+check(gradeFor({ passed: false, deepestRung: 2 }) === 'again', 'fail, rung 2 → again');
 
 // ---------------------------------------------------------------------------
 

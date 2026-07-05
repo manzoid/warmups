@@ -8,7 +8,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30, None, None]\ntop = 3\na[top - 1]",
     "expected": "30",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Read the slot one below the top pointer.",
+    "syntax": "a[i - 1] indexing"
   },
   {
     "id": "py.u10.stack.push",
@@ -20,7 +22,11 @@
     "starter": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        # your code here\n        pass",
     "solution": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1",
     "tests": "s = Stack(5)\ns.push(1); s.push(2); s.push(3)\nassert s.top == 3, s.top\nassert s.a[0:3] == [1, 2, 3], s.a[0:3]",
-    "prereqs": ["py.u10.stack.topindex.predict"]
+    "prereqs": [
+      "py.u10.stack.topindex.predict"
+    ],
+    "cue": "Store the value in the top slot, then advance the pointer.",
+    "syntax": "a[i] = x assignment"
   },
   {
     "id": "py.u10.stack.peek.predict",
@@ -31,7 +37,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [None] * 5\ntop = 0\nfor x in (1, 2, 3):\n    a[top] = x\n    top += 1\na[top - 1]",
     "expected": "3",
-    "prereqs": ["py.u10.stack.push"]
+    "prereqs": [
+      "py.u10.stack.push"
+    ],
+    "cue": "Run the loop to fill the array, then read the last slot written.",
+    "syntax": "a[top - 1] indexing"
   },
   {
     "id": "py.u10.stack.peek",
@@ -43,7 +53,11 @@
     "starter": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        # your code here\n        pass",
     "solution": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        return self.a[self.top - 1]",
     "tests": "s = Stack(5)\ns.push(1); s.push(2); s.push(3)\nassert s.peek() == 3, s.peek()\nassert s.top == 3, s.top",
-    "prereqs": ["py.u10.stack.push"]
+    "prereqs": [
+      "py.u10.stack.push"
+    ],
+    "cue": "Return the last slot written without moving the pointer.",
+    "syntax": "a[i - 1] indexing"
   },
   {
     "id": "py.u10.stack.pop.offbyone.predict",
@@ -54,7 +68,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [None] * 5\ntop = 0\nfor x in (1, 2, 3):\n    a[top] = x\n    top += 1\ntop -= 1\nv = a[top]\n(v, top)",
     "expected": "(3, 2)",
-    "prereqs": ["py.u10.stack.peek"]
+    "prereqs": [
+      "py.u10.stack.peek"
+    ],
+    "cue": "Step the counter back first, then read that slot; report both.",
+    "syntax": "(v, top) tuple"
   },
   {
     "id": "py.u10.stack.pop",
@@ -66,7 +84,11 @@
     "starter": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        return self.a[self.top - 1]\n\n    def pop(self):\n        # your code here\n        pass",
     "solution": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        return self.a[self.top - 1]\n\n    def pop(self):\n        self.top -= 1\n        return self.a[self.top]",
     "tests": "s = Stack(5)\ns.push(1); s.push(2); s.push(3)\nassert s.pop() == 3, 'pop'\nassert s.top == 2, s.top\nassert s.pop() == 2\nassert s.peek() == 1",
-    "prereqs": ["py.u10.stack.peek"]
+    "prereqs": [
+      "py.u10.stack.peek"
+    ],
+    "cue": "Move the pointer back, then read and return that slot.",
+    "syntax": "top -= 1 decrement"
   },
   {
     "id": "py.u10.stack.guards",
@@ -78,7 +100,11 @@
     "starter": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        return self.a[self.top - 1]\n\n    def pop(self):\n        self.top -= 1\n        return self.a[self.top]\n\n    def is_empty(self):\n        # your code here\n        pass\n\n    def is_full(self):\n        # your code here\n        pass",
     "solution": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1\n\n    def peek(self):\n        return self.a[self.top - 1]\n\n    def pop(self):\n        self.top -= 1\n        return self.a[self.top]\n\n    def is_empty(self):\n        return self.top == 0\n\n    def is_full(self):\n        return self.top == len(self.a)",
     "tests": "s = Stack(2)\nassert s.is_empty() is True\nassert s.is_full() is False\ns.push(1); s.push(2)\nassert s.is_full() is True\nassert s.is_empty() is False",
-    "prereqs": ["py.u10.stack.pop"]
+    "prereqs": [
+      "py.u10.stack.pop"
+    ],
+    "cue": "Compare the pointer against 0 and against the array length.",
+    "syntax": "len(self.a)"
   },
   {
     "id": "py.u10.stack.list.predict",
@@ -89,7 +115,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "st = []\nst.append(1)\nst.append(2)\nst.append(3)\nst.pop()\nst[-1]",
     "expected": "2",
-    "prereqs": ["py.u10.stack.pop"]
+    "prereqs": [
+      "py.u10.stack.pop"
+    ],
+    "cue": "Trace the appends and one pop, then read the last item.",
+    "syntax": "list[-1] last element"
   },
   {
     "id": "py.u10.stack.rpn.write",
@@ -101,7 +131,11 @@
     "starter": "def eval_rpn(tokens):\n    # your code here\n    pass",
     "solution": "def eval_rpn(tokens):\n    st = []\n    for t in tokens:\n        if t in ('+', '-', '*', '/'):\n            b = st.pop()\n            a = st.pop()\n            if t == '+': st.append(a + b)\n            elif t == '-': st.append(a - b)\n            elif t == '*': st.append(a * b)\n            else: st.append(int(a / b))\n        else:\n            st.append(int(t))\n    return st.pop()",
     "tests": "assert eval_rpn(['2','1','+','3','*']) == 9, eval_rpn(['2','1','+','3','*'])\nassert eval_rpn(['4','13','5','/','+']) == 6\nassert eval_rpn(['5']) == 5",
-    "prereqs": ["py.u10.stack.list.predict"]
+    "prereqs": [
+      "py.u10.stack.list.predict"
+    ],
+    "cue": "Scan tokens; on an operator pop two operands and push the result.",
+    "syntax": "list.pop() / list.append(x)"
   },
   {
     "id": "py.u10.parens.predict",
@@ -112,7 +146,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for c in s:\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st\n[valid('()[]{}'), valid('([)]'), valid('(')]",
     "expected": "[True, False, False]",
-    "prereqs": ["py.u10.stack.list.predict"]
+    "prereqs": [
+      "py.u10.stack.list.predict"
+    ],
+    "cue": "For each string, trace a stack of openers checked against closers.",
+    "syntax": "dict[key] lookup"
   },
   {
     "id": "py.u10.parens.write",
@@ -124,7 +162,11 @@
     "starter": "def valid(s):\n    # your code here\n    pass",
     "solution": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for c in s:\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st",
     "tests": "assert valid('()[]{}') is True\nassert valid('([)]') is False\nassert valid('(') is False\nassert valid('') is True\nassert valid(']') is False",
-    "prereqs": ["py.u10.parens.predict"]
+    "prereqs": [
+      "py.u10.parens.predict"
+    ],
+    "cue": "Push openers; on each closer verify it matches the top.",
+    "syntax": "c in dict membership"
   },
   {
     "id": "py.u10.nge.predict",
@@ -135,7 +177,11 @@
     "prompt": "What is the value of `res`?",
     "snippet": "nums = [2, 1, 2]\nres = [-1] * len(nums)\nst = []\nfor i, x in enumerate(nums):\n    while st and nums[st[-1]] < x:\n        res[st.pop()] = x\n    st.append(i)\nres",
     "expected": "[-1, 2, -1]",
-    "prereqs": ["py.u10.stack.list.predict"]
+    "prereqs": [
+      "py.u10.stack.list.predict"
+    ],
+    "cue": "Walk the indices, resolving pending ones when a bigger value arrives.",
+    "syntax": "while st and ... loop"
   },
   {
     "id": "py.u10.nge.write",
@@ -147,7 +193,11 @@
     "starter": "def nge(nums):\n    # your code here\n    pass",
     "solution": "def nge(nums):\n    res = [-1] * len(nums)\n    st = []\n    for i, x in enumerate(nums):\n        while st and nums[st[-1]] < x:\n            res[st.pop()] = x\n        st.append(i)\n    return res",
     "tests": "assert nge([2,1,2,4,3]) == [4, 2, 4, -1, -1], nge([2,1,2,4,3])\nassert nge([1,2,3]) == [2, 3, -1]\nassert nge([3,2,1]) == [-1, -1, -1]",
-    "prereqs": ["py.u10.nge.predict"]
+    "prereqs": [
+      "py.u10.nge.predict"
+    ],
+    "cue": "Hold a stack of unresolved indices; a larger element settles them.",
+    "syntax": "enumerate(nums)"
   },
   {
     "id": "py.u10.nge.enumerate.predict",
@@ -158,7 +208,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "list(enumerate(['a', 'b', 'c']))",
     "expected": "[(0, 'a'), (1, 'b'), (2, 'c')]",
-    "prereqs": ["py.u10.nge.write"]
+    "prereqs": [
+      "py.u10.nge.write"
+    ],
+    "cue": "Pair each item with its position, counting from 0.",
+    "syntax": "enumerate(iterable)"
   },
   {
     "id": "py.u10.queue.count.predict",
@@ -169,7 +223,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "head = 1\ntail = 4\ntail - head",
     "expected": "3",
-    "prereqs": ["py.u10.stack.guards"]
+    "prereqs": [
+      "py.u10.stack.guards"
+    ],
+    "cue": "Take the difference of the two pointers.",
+    "syntax": "- subtraction"
   },
   {
     "id": "py.u10.queue.wrap.predict",
@@ -180,7 +238,11 @@
     "prompt": "What is the value of `a`?",
     "snippet": "n = 3\na = [None] * n\nhead = 0\nsize = 0\nfor x in (10, 20, 30):\n    a[(head + size) % n] = x\n    size += 1\nv = a[head]\nhead = (head + 1) % n\nsize -= 1\na[(head + size) % n] = 40\nsize += 1\na",
     "expected": "[40, 20, 30]",
-    "prereqs": ["py.u10.queue.count.predict"]
+    "prereqs": [
+      "py.u10.queue.count.predict"
+    ],
+    "cue": "Trace the ring: three enqueues, one dequeue, one more enqueue, watching wraparound.",
+    "syntax": "(i) % n modulo"
   },
   {
     "id": "py.u10.queue.enqueue",
@@ -192,7 +254,11 @@
     "starter": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        # your code here\n        pass",
     "solution": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1",
     "tests": "q = Queue(3)\nq.enqueue(10); q.enqueue(20)\nassert q.size == 2, q.size\nassert q.a[0] == 10 and q.a[1] == 20",
-    "prereqs": ["py.u10.queue.wrap.predict"]
+    "prereqs": [
+      "py.u10.queue.wrap.predict"
+    ],
+    "cue": "Write at the wrapped tail position, then grow the size.",
+    "syntax": "(head + size) % n modulo"
   },
   {
     "id": "py.u10.queue.dequeue",
@@ -204,7 +270,11 @@
     "starter": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def dequeue(self):\n        # your code here\n        pass",
     "solution": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def dequeue(self):\n        v = self.a[self.head]\n        self.head = (self.head + 1) % self.n\n        self.size -= 1\n        return v",
     "tests": "q = Queue(3)\nq.enqueue(10); q.enqueue(20); q.enqueue(30)\nassert q.dequeue() == 10\nassert q.head == 1 and q.size == 2\nq.enqueue(40)\nassert q.a[0] == 40\nassert q.dequeue() == 20",
-    "prereqs": ["py.u10.queue.enqueue"]
+    "prereqs": [
+      "py.u10.queue.enqueue"
+    ],
+    "cue": "Read at head, advance head with wraparound, shrink size, return the value.",
+    "syntax": "(head + 1) % n modulo"
   },
   {
     "id": "py.u10.queue.builtin.predict",
@@ -215,7 +285,11 @@
     "prompt": "What is the value of `out`?",
     "snippet": "from collections import deque\nq = deque(['a', 'b', 'c'])\nout = [q.popleft(), q.popleft()]\nout",
     "expected": "['a', 'b']",
-    "prereqs": ["py.u10.queue.dequeue"]
+    "prereqs": [
+      "py.u10.queue.dequeue"
+    ],
+    "cue": "Remove from the front twice, collecting each removed item.",
+    "syntax": "deque.popleft()"
   },
   {
     "id": "py.u10.deque.appendleft",
@@ -227,7 +301,11 @@
     "starter": "class Deque:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def append(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def popleft(self):\n        v = self.a[self.head]\n        self.head = (self.head + 1) % self.n\n        self.size -= 1\n        return v\n\n    def appendleft(self, x):\n        # your code here\n        pass",
     "solution": "class Deque:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def append(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def popleft(self):\n        v = self.a[self.head]\n        self.head = (self.head + 1) % self.n\n        self.size -= 1\n        return v\n\n    def appendleft(self, x):\n        self.head = (self.head - 1 + self.n) % self.n\n        self.a[self.head] = x\n        self.size += 1",
     "tests": "d = Deque(4)\nd.append(2); d.append(3)\nd.appendleft(1); d.appendleft(0)\nassert d.size == 4\nassert d.popleft() == 0\nassert d.popleft() == 1\nassert d.popleft() == 2",
-    "prereqs": ["py.u10.queue.dequeue"]
+    "prereqs": [
+      "py.u10.queue.dequeue"
+    ],
+    "cue": "Step head backward with wraparound, store there, grow the size.",
+    "syntax": "(head - 1 + n) % n modulo"
   },
   {
     "id": "py.u10.deque.pop",
@@ -239,7 +317,11 @@
     "starter": "class Deque:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def append(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def popleft(self):\n        v = self.a[self.head]\n        self.head = (self.head + 1) % self.n\n        self.size -= 1\n        return v\n\n    def appendleft(self, x):\n        self.head = (self.head - 1 + self.n) % self.n\n        self.a[self.head] = x\n        self.size += 1\n\n    def pop(self):\n        # your code here\n        pass",
     "solution": "class Deque:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def append(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1\n\n    def popleft(self):\n        v = self.a[self.head]\n        self.head = (self.head + 1) % self.n\n        self.size -= 1\n        return v\n\n    def appendleft(self, x):\n        self.head = (self.head - 1 + self.n) % self.n\n        self.a[self.head] = x\n        self.size += 1\n\n    def pop(self):\n        self.size -= 1\n        return self.a[(self.head + self.size) % self.n]",
     "tests": "d = Deque(4)\nd.append(1); d.append(2); d.append(3)\nassert d.pop() == 3\nassert d.pop() == 2\nd.appendleft(0)\nassert d.pop() == 1\nassert d.popleft() == 0",
-    "prereqs": ["py.u10.deque.appendleft"]
+    "prereqs": [
+      "py.u10.deque.appendleft"
+    ],
+    "cue": "Shrink the size first, then read the slot now at the back.",
+    "syntax": "(head + size) % n modulo"
   },
   {
     "id": "py.u10.deque.builtin.predict",
@@ -250,7 +332,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "from collections import deque\nd = deque([1, 2, 3])\nd.appendleft(0)\nd.pop()\nlist(d)",
     "expected": "[0, 1, 2]",
-    "prereqs": ["py.u10.deque.pop"]
+    "prereqs": [
+      "py.u10.deque.pop"
+    ],
+    "cue": "Push one value on the front, remove one from the back, then list what remains.",
+    "syntax": "deque.appendleft(x) / deque.pop()"
   },
   {
     "id": "py.u10.bfs.write",
@@ -262,7 +348,11 @@
     "starter": "from collections import deque\n\ndef bfs_order(graph, start):\n    # your code here\n    pass",
     "solution": "from collections import deque\n\ndef bfs_order(graph, start):\n    q = deque([start])\n    seen = {start}\n    order = []\n    while q:\n        node = q.popleft()\n        order.append(node)\n        for nb in graph[node]:\n            if nb not in seen:\n                seen.add(nb)\n                q.append(nb)\n    return order",
     "tests": "g = {0:[1,2], 1:[2], 2:[0,3], 3:[3]}\nassert bfs_order(g, 0) == [0, 1, 2, 3], bfs_order(g, 0)\ng2 = {'a':['b','c'], 'b':[], 'c':['a']}\nassert bfs_order(g2, 'a') == ['a', 'b', 'c']",
-    "prereqs": ["py.u10.deque.builtin.predict"]
+    "prereqs": [
+      "py.u10.deque.builtin.predict"
+    ],
+    "cue": "Pop from the front, record it, enqueue unseen neighbors; mark seen on enqueue.",
+    "syntax": "deque.popleft() / set.add(x)"
   },
   {
     "id": "py.u10.maxwin.predict",
@@ -273,7 +363,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "from collections import deque\nnums = [1, 3, -1]\nd = deque()\nfor i, x in enumerate(nums):\n    while d and nums[d[-1]] <= x:\n        d.pop()\n    d.append(i)\nlist(d)",
     "expected": "[1, 2]",
-    "prereqs": ["py.u10.deque.builtin.predict"]
+    "prereqs": [
+      "py.u10.deque.builtin.predict"
+    ],
+    "cue": "Keep a decreasing deque of indices, dropping smaller tails as you scan.",
+    "syntax": "deque.pop() from the back"
   },
   {
     "id": "py.u10.maxwin.write",
@@ -285,6 +379,10 @@
     "starter": "from collections import deque\n\ndef maxwin(nums, k):\n    # your code here\n    pass",
     "solution": "from collections import deque\n\ndef maxwin(nums, k):\n    d = deque()\n    out = []\n    for i, x in enumerate(nums):\n        while d and nums[d[-1]] <= x:\n            d.pop()\n        d.append(i)\n        if d[0] <= i - k:\n            d.popleft()\n        if i >= k - 1:\n            out.append(nums[d[0]])\n    return out",
     "tests": "assert maxwin([1,3,-1,-3,5,3,6,7], 3) == [3, 3, 5, 5, 6, 7], maxwin([1,3,-1,-3,5,3,6,7], 3)\nassert maxwin([1], 1) == [1]\nassert maxwin([9,8,7], 2) == [9, 8]",
-    "prereqs": ["py.u10.maxwin.predict"]
+    "prereqs": [
+      "py.u10.maxwin.predict"
+    ],
+    "cue": "Maintain a monotonic deque of indices; drop the front once it leaves the window.",
+    "syntax": "deque[0] front index"
   }
 ]

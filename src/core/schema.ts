@@ -11,6 +11,9 @@ export const ExerciseSchema = z.object({
   concept: z.string().min(1),
   kind: ExerciseKindSchema,
   prompt: z.string().min(1),
+  // optional hint-ladder rungs
+  cue: z.string().optional(),
+  syntax: z.string().optional(),
   // kind === 'predict'
   snippet: z.string().optional(),
   expected: z.string().optional(),

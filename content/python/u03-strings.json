@@ -8,7 +8,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"hello\"\nout = []\nfor i in range(len(s)):\n    out.append(s[i])\nout",
     "expected": "['h', 'e', 'l', 'l', 'o']",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the loop, appending one character per index.",
+    "syntax": "s[i] indexing"
   },
   {
     "id": "py.u03.charloop.forc",
@@ -19,7 +21,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"banana\"\nn = 0\nfor c in s:\n    if c in \"aeiou\":\n        n += 1\nn",
     "expected": "3",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Walk the string and count characters that meet the test.",
+    "syntax": "c in \"aeiou\" membership"
   },
   {
     "id": "py.u03.ord.basics",
@@ -30,7 +34,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[ord('a'), chr(98), ord('A')]",
     "expected": "[97, 'b', 65]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Apply each conversion, noting which direction it goes.",
+    "syntax": "ord(ch) / chr(n)"
   },
   {
     "id": "py.u03.ord.index",
@@ -41,7 +47,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "c = 'e'\nord(c) - ord('a')",
     "expected": "4",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Subtract the code point of the base letter.",
+    "syntax": "ord() code points"
   },
   {
     "id": "py.u03.freq.build",
@@ -55,7 +63,9 @@
     "tests": "assert char_freq(\"aab\") == {\"a\": 2, \"b\": 1}, char_freq(\"aab\")\nassert char_freq(\"\") == {}, char_freq(\"\")\nassert char_freq(\"xxx\") == {\"x\": 3}, char_freq(\"xxx\")",
     "prereqs": [
       "py.u03.charloop.forc"
-    ]
+    ],
+    "cue": "One pass, bump a running count per character.",
+    "syntax": "dict.get(key, 0)"
   },
   {
     "id": "py.u03.count.vowels",
@@ -69,7 +79,9 @@
     "tests": "assert count_vowels(\"banana\") == 3\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
     "prereqs": [
       "py.u03.charloop.forc"
-    ]
+    ],
+    "cue": "Loop once, increment when the character is a vowel.",
+    "syntax": "in for membership"
   },
   {
     "id": "py.u03.enumerate.pairs",
@@ -82,7 +94,9 @@
     "expected": "[(0, 'a'), (1, 'b')]",
     "prereqs": [
       "py.u03.charloop.index"
-    ]
+    ],
+    "cue": "enumerate pairs each index with its character.",
+    "syntax": "enumerate(seq)"
   },
   {
     "id": "py.u03.enumerate.firstvowel",
@@ -97,7 +111,9 @@
     "prereqs": [
       "py.u03.enumerate.pairs",
       "py.u03.count.vowels"
-    ]
+    ],
+    "cue": "Scan with index and return as soon as you hit a vowel.",
+    "syntax": "enumerate(seq) -> (i, item)"
   },
   {
     "id": "py.u03.classify.range",
@@ -108,7 +124,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "c = '7'\n'0' <= c <= '9'",
     "expected": "True",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Compare the character against the digit-range bounds.",
+    "syntax": "chained comparison a <= x <= b"
   },
   {
     "id": "py.u03.classify.digitval",
@@ -119,7 +137,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "c = '7'\nord(c) - ord('0')",
     "expected": "7",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Subtract the code point of '0'.",
+    "syntax": "ord() code points"
   },
   {
     "id": "py.u03.classify.count",
@@ -133,7 +153,9 @@
     "tests": "assert count_digits(\"a1b2c3\") == 3\nassert count_digits(\"abc\") == 0\nassert count_digits(\"2024\") == 4",
     "prereqs": [
       "py.u03.classify.range"
-    ]
+    ],
+    "cue": "One pass, count characters that fall in the digit range.",
+    "syntax": "chained comparison a <= x <= b"
   },
   {
     "id": "py.u03.classify.digitsum",
@@ -147,7 +169,9 @@
     "tests": "assert digit_sum(\"a1b2c3\") == 6\nassert digit_sum(\"abc\") == 0\nassert digit_sum(\"111\") == 3",
     "prereqs": [
       "py.u03.classify.digitval"
-    ]
+    ],
+    "cue": "Add each digit's numeric value as you scan.",
+    "syntax": "ord() difference from '0'"
   },
   {
     "id": "py.u03.classify.isalnum",
@@ -160,7 +184,9 @@
     "expected": "[True, False, True]",
     "prereqs": [
       "py.u03.classify.range"
-    ]
+    ],
+    "cue": "Apply each test method to its own string.",
+    "syntax": "str.isalnum() / str.isdigit()"
   },
   {
     "id": "py.u03.build.parts",
@@ -171,7 +197,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "parts = []\nfor c in \"abc\":\n    parts.append(c.upper())\n\"\".join(parts)",
     "expected": "'ABC'",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Collect transformed characters, then join them.",
+    "syntax": "\"\".join(parts)"
   },
   {
     "id": "py.u03.build.joinsep",
@@ -182,7 +210,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"-\".join([\"a\", \"b\", \"c\"])",
     "expected": "'a-b-c'",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Place the separator between adjacent items only.",
+    "syntax": "sep.join(list)"
   },
   {
     "id": "py.u03.build.filter",
@@ -196,7 +226,9 @@
     "tests": "assert only_letters(\"a1b2c3\") == \"abc\"\nassert only_letters(\"Hello, World!\") == \"HelloWorld\"\nassert only_letters(\"123\") == \"\"",
     "prereqs": [
       "py.u03.build.parts"
-    ]
+    ],
+    "cue": "Keep alphabetic characters, drop the rest, then join.",
+    "syntax": "\"\".join(collected)"
   },
   {
     "id": "py.u03.build.caesar",
@@ -210,7 +242,9 @@
     "tests": "assert shift_letters(\"abc\", 1) == \"bcd\"\nassert shift_letters(\"xyz\", 3) == \"abc\"\nassert shift_letters(\"hello, world\", 0) == \"hello, world\"\nassert shift_letters(\"a b\", 1) == \"b c\"",
     "prereqs": [
       "py.u03.build.parts"
-    ]
+    ],
+    "cue": "Map each lowercase letter to a 0-25 index, shift, wrap, convert back.",
+    "syntax": "% 26 wraps the alphabet"
   },
   {
     "id": "py.u03.build.comprehension",
@@ -223,7 +257,9 @@
     "expected": "'ABC'",
     "prereqs": [
       "py.u03.build.parts"
-    ]
+    ],
+    "cue": "Join runs directly over the generated characters.",
+    "syntax": "\"\".join(gen expr)"
   },
   {
     "id": "py.u03.reverse.range",
@@ -234,7 +270,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"abc\"\nout = \"\"\nfor i in range(len(s)-1, -1, -1):\n    out += s[i]\nout",
     "expected": "'cba'",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Trace the countdown loop, appending each character.",
+    "syntax": "range(stop, -1, -1) counts down"
   },
   {
     "id": "py.u03.reverse.loop",
@@ -248,7 +286,9 @@
     "tests": "assert reverse(\"abc\") == \"cba\"\nassert reverse(\"\") == \"\"\nassert reverse(\"a\") == \"a\"\nassert reverse(\"hello\") == \"olleh\"",
     "prereqs": [
       "py.u03.reverse.range"
-    ]
+    ],
+    "cue": "Build the result by indexing from the last character to the first.",
+    "syntax": "range(stop, -1, -1) counts down"
   },
   {
     "id": "py.u03.reverse.slice",
@@ -261,7 +301,9 @@
     "expected": "'olleh'",
     "prereqs": [
       "py.u03.reverse.loop"
-    ]
+    ],
+    "cue": "A negative-step slice reverses the sequence.",
+    "syntax": "s[::-1]"
   },
   {
     "id": "py.u03.palindrome.mirror",
@@ -272,7 +314,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"abba\"\nn = len(s)\n[s[i] == s[n-1-i] for i in range(n//2)]",
     "expected": "[True, True]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Compare each front character with its mirror from the back.",
+    "syntax": "s[n-1-i] mirror index"
   },
   {
     "id": "py.u03.palindrome.twopointer",
@@ -286,7 +330,9 @@
     "tests": "assert is_palindrome(\"racecar\") == True\nassert is_palindrome(\"abba\") == True\nassert is_palindrome(\"abc\") == False\nassert is_palindrome(\"\") == True\nassert is_palindrome(\"a\") == True",
     "prereqs": [
       "py.u03.palindrome.mirror"
-    ]
+    ],
+    "cue": "Two pointers from both ends, stepping inward while they match.",
+    "syntax": "converging while-loop with two indices"
   },
   {
     "id": "py.u03.palindrome.slice",
@@ -300,7 +346,9 @@
     "prereqs": [
       "py.u03.reverse.slice",
       "py.u03.palindrome.twopointer"
-    ]
+    ],
+    "cue": "Compare the string against its reverse.",
+    "syntax": "s[::-1] reversal"
   },
   {
     "id": "py.u03.palindrome.alnum",
@@ -315,7 +363,9 @@
     "prereqs": [
       "py.u03.palindrome.twopointer",
       "py.u03.classify.isalnum"
-    ]
+    ],
+    "cue": "Two pointers, but skip non-alphanumeric characters and ignore case before comparing.",
+    "syntax": "str.isalnum() / str.lower()"
   },
   {
     "id": "py.u03.find.builtin",
@@ -326,7 +376,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[\"hello\".find(\"ll\"), \"hello\".find(\"z\")]",
     "expected": "[2, -1]",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "find reports a position, or a sentinel when absent.",
+    "syntax": "str.find(sub)"
   },
   {
     "id": "py.u03.slice.extract",
@@ -337,7 +389,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"abcdef\"\n[s[1:4], s[4:100]]",
     "expected": "['bcd', 'ef']",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Slices stop before the end index and clamp past the length.",
+    "syntax": "s[i:j] end-exclusive"
   },
   {
     "id": "py.u03.slice.stripends",
@@ -351,7 +405,9 @@
     "tests": "assert strip_ends(\"hello\") == \"ell\"\nassert strip_ends(\"ab\") == \"\"\nassert strip_ends(\"a\") == \"\"\nassert strip_ends(\"\") == \"\"\nassert strip_ends(\"abcde\") == \"bcd\"",
     "prereqs": [
       "py.u03.slice.extract"
-    ]
+    ],
+    "cue": "Slice off the first and last, but guard the short cases.",
+    "syntax": "negative indices in slices"
   },
   {
     "id": "py.u03.find.membership",
@@ -364,7 +420,9 @@
     "expected": "[True, False]",
     "prereqs": [
       "py.u03.find.builtin"
-    ]
+    ],
+    "cue": "in tests whether one string occurs inside another.",
+    "syntax": "sub in s"
   },
   {
     "id": "py.u03.find.scan",
@@ -378,7 +436,9 @@
     "tests": "assert my_find(\"hello\", \"ll\") == 2\nassert my_find(\"hello\", \"z\") == -1\nassert my_find(\"hello\", \"\") == 0\nassert my_find(\"aaa\", \"aa\") == 0\nassert my_find(\"abcabc\", \"cab\") == 2",
     "prereqs": [
       "py.u03.charloop.index"
-    ]
+    ],
+    "cue": "Try each start position, comparing the pattern character by character.",
+    "syntax": "nested loop over start offsets"
   },
   {
     "id": "py.u03.myjoin.write",
@@ -390,7 +450,9 @@
     "starter": "def my_join(parts, sep):\n    # your code here\n    pass",
     "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out",
     "tests": "assert my_join([], \"-\") == \"\"\nassert my_join([\"a\"], \"-\") == \"a\"\nassert my_join([\"a\", \"b\", \"c\"], \"-\") == \"a-b-c\"\nassert my_join([\"x\", \"y\"], \"\") == \"xy\"",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Seed with the first item, then prepend the separator before each remaining one.",
+    "syntax": "list[1:] tail slice"
   },
   {
     "id": "py.u03.myjoin.edge",
@@ -403,7 +465,9 @@
     "expected": "['', 'a']",
     "prereqs": [
       "py.u03.myjoin.write"
-    ]
+    ],
+    "cue": "Trace the two calls, watching the empty-list guard.",
+    "syntax": "not list -> empty test"
   },
   {
     "id": "py.u03.mysplit.write",
@@ -417,7 +481,9 @@
     "tests": "assert my_split(\"a,b,c\", \",\") == [\"a\", \"b\", \"c\"]\nassert my_split(\"a,,b\", \",\") == [\"a\", \"\", \"b\"]\nassert my_split(\"\", \",\") == [\"\"]\nassert my_split(\"abc\", \",\") == [\"abc\"]\nassert my_split(\",x\", \",\") == [\"\", \"x\"]",
     "prereqs": [
       "py.u03.myjoin.write"
-    ]
+    ],
+    "cue": "Accumulate into a buffer, flush on each separator, then flush the last piece.",
+    "syntax": "+= builds the current piece"
   },
   {
     "id": "py.u03.mysplit.edge",
@@ -430,7 +496,9 @@
     "expected": "[['a', '', 'b'], ['']]",
     "prereqs": [
       "py.u03.mysplit.write"
-    ]
+    ],
+    "cue": "Trace the buffer flushes, including the trailing append.",
+    "syntax": "list.append(cur)"
   },
   {
     "id": "py.u03.splitjoin.roundtrip",
@@ -445,7 +513,9 @@
     "prereqs": [
       "py.u03.myjoin.write",
       "py.u03.mysplit.write"
-    ]
+    ],
+    "cue": "Split then join, and check you recovered the original.",
+    "syntax": "compose the two helpers"
   },
   {
     "id": "py.u03.sugar.splitjoin",
@@ -459,7 +529,9 @@
     "prereqs": [
       "py.u03.mysplit.write",
       "py.u03.myjoin.write"
-    ]
+    ],
+    "cue": "Split into pieces, then join them back with the same separator.",
+    "syntax": "str.split(sep) / sep.join(list)"
   },
   {
     "id": "py.u03.sugar.fstring",
@@ -470,6 +542,8 @@
     "prompt": "What does this evaluate to?",
     "snippet": "name = \"Tom\"\nf\"hi {name} {1+2}\"",
     "expected": "'hi Tom 3'",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Each brace evaluates and interpolates its expression.",
+    "syntax": "f\"{expr}\""
   }
 ]

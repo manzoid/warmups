@@ -8,7 +8,9 @@
     "prompt": "What is the value of `total`?",
     "snippet": "a = [4, 8, 15, 16]\ni = 0\ntotal = 0\nwhile i < len(a):\n    total += a[i]\n    i += 1\ntotal",
     "expected": "43",
-    "prereqs": []
+    "prereqs": [],
+    "cue": "Walk the index across the list, adding each element to total.",
+    "syntax": "a[i] index access"
   },
   {
     "id": "py.u07.manual-advance.write",
@@ -20,7 +22,11 @@
     "starter": "def total(a):\n    # your code here\n    pass",
     "solution": "def total(a):\n    i = 0\n    s = 0\n    while i < len(a):\n        s += a[i]\n        i += 1\n    return s",
     "tests": "assert total([4, 8, 15, 16]) == 43, total([4, 8, 15, 16])\nassert total([]) == 0, total([])\nassert total([5]) == 5, total([5])",
-    "prereqs": ["py.u07.manual-advance.predict"]
+    "prereqs": [
+      "py.u07.manual-advance.predict"
+    ],
+    "cue": "Keep a running sum and advance an index yourself.",
+    "syntax": "while i < len(a)"
   },
   {
     "id": "py.u07.stride.predict",
@@ -31,7 +37,11 @@
     "prompt": "What is the value of `picked`?",
     "snippet": "a = [10, 20, 30, 40, 50]\ni = 0\npicked = []\nwhile i < len(a):\n    picked.append(a[i])\n    i += 2\npicked",
     "expected": "[10, 30, 50]",
-    "prereqs": ["py.u07.manual-advance.write"]
+    "prereqs": [
+      "py.u07.manual-advance.write"
+    ],
+    "cue": "Trace which indices the cursor lands on as it jumps.",
+    "syntax": "i += 2"
   },
   {
     "id": "py.u07.stride.write",
@@ -43,7 +53,11 @@
     "starter": "def every_other(a):\n    # your code here\n    pass",
     "solution": "def every_other(a):\n    i = 0\n    out = []\n    while i < len(a):\n        out.append(a[i])\n        i += 2\n    return out",
     "tests": "assert every_other([10, 20, 30, 40, 50]) == [10, 30, 50], every_other([10, 20, 30, 40, 50])\nassert every_other([]) == [], every_other([])\nassert every_other([1]) == [1], every_other([1])\nassert every_other([1, 2]) == [1], every_other([1, 2])",
-    "prereqs": ["py.u07.stride.predict"]
+    "prereqs": [
+      "py.u07.stride.predict"
+    ],
+    "cue": "Start at 0 and step the index forward by two each pass.",
+    "syntax": "list.append(x)"
   },
   {
     "id": "py.u07.stride.slice-sugar",
@@ -54,7 +68,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30, 40, 50]\na[::2]",
     "expected": "[10, 30, 50]",
-    "prereqs": ["py.u07.stride.write"]
+    "prereqs": [
+      "py.u07.stride.write"
+    ],
+    "cue": "Read the step field of the slice.",
+    "syntax": "a[start:stop:step]"
   },
   {
     "id": "py.u07.skip-prefix.predict",
@@ -65,7 +83,11 @@
     "prompt": "What is the value of `i`?",
     "snippet": "s = '   hi'\ni = 0\nwhile i < len(s) and s[i] == ' ':\n    i += 1\ni",
     "expected": "3",
-    "prereqs": ["py.u07.manual-advance.write"]
+    "prereqs": [
+      "py.u07.manual-advance.write"
+    ],
+    "cue": "Advance while the current char is a space; stop at the first non-space.",
+    "syntax": "s[i] == char"
   },
   {
     "id": "py.u07.skip-prefix.write",
@@ -77,7 +99,11 @@
     "starter": "def first_nonzero_index(a):\n    # your code here\n    pass",
     "solution": "def first_nonzero_index(a):\n    i = 0\n    while i < len(a) and a[i] == 0:\n        i += 1\n    return i",
     "tests": "assert first_nonzero_index([0, 0, 5, 0]) == 2, first_nonzero_index([0, 0, 5, 0])\nassert first_nonzero_index([0, 0, 0]) == 3, first_nonzero_index([0, 0, 0])\nassert first_nonzero_index([9]) == 0, first_nonzero_index([9])\nassert first_nonzero_index([]) == 0, first_nonzero_index([])",
-    "prereqs": ["py.u07.skip-prefix.predict"]
+    "prereqs": [
+      "py.u07.skip-prefix.predict"
+    ],
+    "cue": "Advance an index while the element is zero.",
+    "syntax": "and short-circuit evaluation"
   },
   {
     "id": "py.u07.skip-prefix.lstrip-sugar",
@@ -88,7 +114,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = '   hi there'\ns.lstrip()",
     "expected": "'hi there'",
-    "prereqs": ["py.u07.skip-prefix.write"]
+    "prereqs": [
+      "py.u07.skip-prefix.write"
+    ],
+    "cue": "Which end does lstrip trim?",
+    "syntax": "str.lstrip()"
   },
   {
     "id": "py.u07.skip-run.predict",
@@ -99,7 +129,11 @@
     "prompt": "What is the value of `j`?",
     "snippet": "a = [1, 1, 1, 2, 2, 3]\ni = 0\nj = i\nwhile j < len(a) and a[j] == a[i]:\n    j += 1\nj",
     "expected": "3",
-    "prereqs": ["py.u07.skip-prefix.predict"]
+    "prereqs": [
+      "py.u07.skip-prefix.predict"
+    ],
+    "cue": "Advance j while it matches a[i]; note where it stops.",
+    "syntax": "a[j] == a[i]"
   },
   {
     "id": "py.u07.skip-run.write",
@@ -111,7 +145,11 @@
     "starter": "def count_runs(a):\n    # your code here\n    pass",
     "solution": "def count_runs(a):\n    i = 0\n    runs = 0\n    while i < len(a):\n        j = i\n        while j < len(a) and a[j] == a[i]:\n            j += 1\n        runs += 1\n        i = j\n    return runs",
     "tests": "assert count_runs([1, 1, 1, 2, 2, 3]) == 3, count_runs([1, 1, 1, 2, 2, 3])\nassert count_runs([]) == 0, count_runs([])\nassert count_runs([5]) == 1, count_runs([5])\nassert count_runs([1, 2, 1]) == 3, count_runs([1, 2, 1])\nassert count_runs([7, 7]) == 1, count_runs([7, 7])",
-    "prereqs": ["py.u07.skip-run.predict"]
+    "prereqs": [
+      "py.u07.skip-run.predict"
+    ],
+    "cue": "Outer loop opens each run; inner loop skips to the run end.",
+    "syntax": "nested while loops"
   },
   {
     "id": "py.u07.compact.predict",
@@ -122,7 +160,11 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a = [0, 3, 0, 5, 7, 0]\nw = 0\nfor i in range(len(a)):\n    if a[i] != 0:\n        a[w] = a[i]\n        w += 1\ndel a[w:]\na",
     "expected": "[3, 5, 7]",
-    "prereqs": ["py.u07.manual-advance.write"]
+    "prereqs": [
+      "py.u07.manual-advance.write"
+    ],
+    "cue": "Track the write index as nonzero values are copied forward.",
+    "syntax": "del a[w:] truncates"
   },
   {
     "id": "py.u07.compact.write",
@@ -134,7 +176,11 @@
     "starter": "def remove_value(a, val):\n    # your code here\n    pass",
     "solution": "def remove_value(a, val):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != val:\n            a[w] = a[i]\n            w += 1\n    del a[w:]\n    return w",
     "tests": "a = [3, 2, 2, 3]\nn = remove_value(a, 3)\nassert n == 2 and a == [2, 2], (n, a)\na = [0, 1, 2, 2, 3, 0, 4, 2]\nn = remove_value(a, 2)\nassert n == 5 and a == [0, 1, 3, 0, 4], (n, a)\na = []\nassert remove_value(a, 1) == 0 and a == [], a",
-    "prereqs": ["py.u07.compact.predict"]
+    "prereqs": [
+      "py.u07.compact.predict"
+    ],
+    "cue": "Copy kept elements to a write index, then trim the tail.",
+    "syntax": "del a[w:] truncates"
   },
   {
     "id": "py.u07.compact.comprehension-sugar",
@@ -145,7 +191,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 3, 0, 5, 7, 0]\n[x for x in a if x != 0]",
     "expected": "[3, 5, 7]",
-    "prereqs": ["py.u07.compact.write"]
+    "prereqs": [
+      "py.u07.compact.write"
+    ],
+    "cue": "Which elements does the filter keep?",
+    "syntax": "[x for x in a if cond]"
   },
   {
     "id": "py.u07.find-next.predict",
@@ -156,7 +206,11 @@
     "prompt": "What is the value of `i`?",
     "snippet": "a = [4, 5, 6, 5, 7]\ntarget = 5\ni = 0\nwhile i < len(a) and a[i] != target:\n    i += 1\ni",
     "expected": "1",
-    "prereqs": ["py.u07.skip-prefix.predict"]
+    "prereqs": [
+      "py.u07.skip-prefix.predict"
+    ],
+    "cue": "Advance until the element equals target; report where it stops.",
+    "syntax": "a[i] != target"
   },
   {
     "id": "py.u07.find-next.write",
@@ -168,7 +222,11 @@
     "starter": "def index_of(a, target):\n    # your code here\n    pass",
     "solution": "def index_of(a, target):\n    i = 0\n    while i < len(a) and a[i] != target:\n        i += 1\n    return i if i < len(a) else -1",
     "tests": "assert index_of([4, 5, 6, 5, 7], 5) == 1, index_of([4, 5, 6, 5, 7], 5)\nassert index_of([1, 2, 3], 9) == -1, index_of([1, 2, 3], 9)\nassert index_of([], 1) == -1, index_of([], 1)\nassert index_of([7], 7) == 0, index_of([7], 7)",
-    "prereqs": ["py.u07.find-next.predict"]
+    "prereqs": [
+      "py.u07.find-next.predict"
+    ],
+    "cue": "Scan with an index until you hit target, else fall off the end.",
+    "syntax": "x if cond else y"
   },
   {
     "id": "py.u07.find-next.index-sugar",
@@ -179,7 +237,11 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [4, 5, 6, 5, 7]\na.index(5)",
     "expected": "1",
-    "prereqs": ["py.u07.find-next.write"]
+    "prereqs": [
+      "py.u07.find-next.write"
+    ],
+    "cue": "Recall what list.index returns for the first match.",
+    "syntax": "list.index(x)"
   },
   {
     "id": "py.u07.merge.predict",
@@ -190,7 +252,11 @@
     "prompt": "What is the value of `out`?",
     "snippet": "A = [1, 3, 5]\nB = [2, 4, 6]\ni = j = 0\nout = []\nwhile i < len(A) and j < len(B):\n    if A[i] <= B[j]:\n        out.append(A[i])\n        i += 1\n    else:\n        out.append(B[j])\n        j += 1\nout += A[i:]\nout += B[j:]\nout",
     "expected": "[1, 2, 3, 4, 5, 6]",
-    "prereqs": ["py.u07.manual-advance.write"]
+    "prereqs": [
+      "py.u07.manual-advance.write"
+    ],
+    "cue": "Compare the heads of A and B, take the smaller, advance that cursor.",
+    "syntax": "A[i:] tail slice"
   },
   {
     "id": "py.u07.merge.write",
@@ -202,7 +268,11 @@
     "starter": "def merge(A, B):\n    # your code here\n    pass",
     "solution": "def merge(A, B):\n    i = j = 0\n    out = []\n    while i < len(A) and j < len(B):\n        if A[i] <= B[j]:\n            out.append(A[i])\n            i += 1\n        else:\n            out.append(B[j])\n            j += 1\n    out += A[i:]\n    out += B[j:]\n    return out",
     "tests": "assert merge([1, 3, 5], [2, 4, 6]) == [1, 2, 3, 4, 5, 6], merge([1, 3, 5], [2, 4, 6])\nassert merge([], [1, 2]) == [1, 2], merge([], [1, 2])\nassert merge([1, 2], []) == [1, 2], merge([1, 2], [])\nassert merge([1, 1], [1, 1]) == [1, 1, 1, 1], merge([1, 1], [1, 1])\nassert merge([], []) == [], merge([], [])",
-    "prereqs": ["py.u07.merge.predict"]
+    "prereqs": [
+      "py.u07.merge.predict"
+    ],
+    "cue": "Two cursors: take the smaller head each step, then append the remainder.",
+    "syntax": "out += A[i:]"
   },
   {
     "id": "py.u07.rle.predict",
@@ -213,7 +283,11 @@
     "prompt": "What is the value of `res`?",
     "snippet": "s = 'aaabbc'\ni = 0\nres = ''\nwhile i < len(s):\n    j = i\n    while j < len(s) and s[j] == s[i]:\n        j += 1\n    res += s[i] + str(j - i)\n    i = j\nres",
     "expected": "'a3b2c1'",
-    "prereqs": ["py.u07.skip-run.write"]
+    "prereqs": [
+      "py.u07.skip-run.write"
+    ],
+    "cue": "Skip each run, then emit its char and length.",
+    "syntax": "str(count)"
   },
   {
     "id": "py.u07.rle.write",
@@ -225,7 +299,11 @@
     "starter": "def rle(s):\n    # your code here\n    pass",
     "solution": "def rle(s):\n    i = 0\n    res = ''\n    while i < len(s):\n        j = i\n        while j < len(s) and s[j] == s[i]:\n            j += 1\n        res += s[i] + str(j - i)\n        i = j\n    return res",
     "tests": "assert rle('aaabbc') == 'a3b2c1', rle('aaabbc')\nassert rle('') == '', rle('')\nassert rle('x') == 'x1', rle('x')\nassert rle('aab') == 'a2b1', rle('aab')",
-    "prereqs": ["py.u07.rle.predict"]
+    "prereqs": [
+      "py.u07.rle.predict"
+    ],
+    "cue": "For each run, find its end, then append the char and its count.",
+    "syntax": "str(count) to stringify"
   },
   {
     "id": "py.u07.move-zeros.predict",
@@ -236,7 +314,11 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a = [0, 1, 0, 3, 12]\nw = 0\nfor i in range(len(a)):\n    if a[i] != 0:\n        a[w], a[i] = a[i], a[w]\n        w += 1\na",
     "expected": "[1, 3, 12, 0, 0]",
-    "prereqs": ["py.u07.compact.write"]
+    "prereqs": [
+      "py.u07.compact.write"
+    ],
+    "cue": "Track the write index as nonzeros swap toward the front.",
+    "syntax": "a[w], a[i] = a[i], a[w]"
   },
   {
     "id": "py.u07.move-zeros.write",
@@ -248,6 +330,10 @@
     "starter": "def move_zeros(a):\n    # your code here\n    pass",
     "solution": "def move_zeros(a):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != 0:\n            a[w], a[i] = a[i], a[w]\n            w += 1\n    return a",
     "tests": "assert move_zeros([0, 1, 0, 3, 12]) == [1, 3, 12, 0, 0], move_zeros([0, 1, 0, 3, 12])\nassert move_zeros([0, 0, 0]) == [0, 0, 0], move_zeros([0, 0, 0])\nassert move_zeros([1, 2, 3]) == [1, 2, 3], move_zeros([1, 2, 3])\nassert move_zeros([]) == [], move_zeros([])",
-    "prereqs": ["py.u07.move-zeros.predict"]
+    "prereqs": [
+      "py.u07.move-zeros.predict"
+    ],
+    "cue": "Swap each nonzero forward to a trailing write index.",
+    "syntax": "tuple swap x, y = y, x"
   }
 ]

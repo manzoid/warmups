@@ -18,7 +18,7 @@ import { buildWalkthroughPrompt } from './ui/walkthroughPrompt';
 
 const TRACK_LABELS: Record<Track, string> = {
   python: 'Python',
-  javascript: 'JavaScript / TypeScript',
+  javascript: 'JavaScript',
 };
 
 export default function App() {
@@ -33,12 +33,13 @@ export default function App() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState<RunResult | null>(null);
   const [running, setRunning] = useState(false);
-  // Whether the learner leaned on any hint rung for the current exercise. An
-  // assisted attempt is scheduled as a lapse regardless of pass (see grade()).
-  const [assisted, setAssisted] = useState(false);
+  // The deepest hint-ladder rung the learner reached for the current exercise
+  // (0 = attempt-only, 1 = cue, 2 = syntax, 3 = visualize, 4 = walkthrough,
+  // 5 = reveal). Feeds the fine-grained grade in grade()/submit().
+  const [maxRung, setMaxRung] = useState(0);
   // The card as it stood when the current exercise was picked. Grading always
-  // derives from this base so re-grading (e.g. after a hint marks the attempt
-  // assisted) replaces the schedule instead of compounding it.
+  // derives from this base so re-grading (e.g. after a deeper hint changes the
+  // rung) replaces the schedule instead of compounding it.
   const baseCard = useRef<Card | null>(null);
 
   const exercises = useMemo(
@@ -62,7 +63,7 @@ export default function App() {
       const next = pickNext(exs, progress.current, now);
       setResult(null);
       setRunning(false);
-      setAssisted(false);
+      setMaxRung(0);
       if (next) {
         if (next.isNew) {
           markIntroduced(progress.current, next.exercise.id);
@@ -85,13 +86,14 @@ export default function App() {
     advance(exercisesForTrack(t));
   };
 
-  // Schedule the current card from its base state. An assisted attempt is a
-  // lapse ('again') no matter what; otherwise pass → 'good', fail → 'again'.
+  // Schedule the current card from its base state. The grade is derived from
+  // how far the learner descended the hint ladder: attempt-only pass → 'good',
+  // cue/syntax → 'hard', anything deeper (or a fail) → 'again' (a lapse).
   const grade = useCallback(
-    (exId: string, passed: boolean, wasAssisted: boolean) => {
+    (exId: string, passed: boolean, deepestRung: number) => {
       const now = new Date();
       const base = baseCard.current ?? getCard(progress.current, exId) ?? newCard(now);
-      const rating = gradeFor({ passed, assisted: wasAssisted });
+      const rating = gradeFor({ passed, deepestRung });
       putCard(progress.current, exId, review(base, rating, now));
       persist();
     },
@@ -108,18 +110,24 @@ export default function App() {
     } catch (err) {
       res = { passed: false, error: err instanceof Error ? err.message : String(err) };
     }
-    grade(ex.id, res.passed, assisted);
+    grade(ex.id, res.passed, maxRung);
     setResult(res);
     setRunning(false);
-  }, [track, pick, input, assisted, grade]);
+  }, [track, pick, input, maxRung, grade]);
 
-  // Opening any hint rung marks the attempt assisted and (if already graded)
-  // re-schedules it as a lapse. Idempotent: once assisted, further hints no-op.
-  const useHint = useCallback(() => {
-    if (assisted || !pick) return;
-    setAssisted(true);
-    if (result) grade(pick.exercise.id, result.passed, true);
-  }, [assisted, pick, result, grade]);
+  // Opening a hint rung records it as the deepest reached and (if already
+  // graded) re-schedules from the base card at the new depth. Only a rung
+  // deeper than the current max changes anything; shallower rungs no-op.
+  const useHint = useCallback(
+    (rung: number) => {
+      if (!pick) return;
+      const next = Math.max(maxRung, rung);
+      if (next === maxRung) return;
+      setMaxRung(next);
+      if (result) grade(pick.exercise.id, result.passed, next);
+    },
+    [maxRung, pick, result, grade],
+  );
 
   const counts = useMemo(
     () => (track ? computeCounts(exercises, progress.current, new Date()) : null),
@@ -162,7 +170,7 @@ export default function App() {
                 onInput={setInput}
                 running={running}
                 result={result}
-                assisted={assisted}
+                maxRung={maxRung}
                 onUseHint={useHint}
                 onSubmit={submit}
                 onNext={() => advance(exercises)}
@@ -190,7 +198,10 @@ function TrackPicker({ onPick }: { onPick: (t: Track) => void }) {
       </div>
       <p style={{ ...styles.tagline, margin: '1rem 0 0' }}>
         Python runs in-browser via Pyodide (first run downloads the runtime).
-        JavaScript/TypeScript runs in a Web Worker.
+        JavaScript runs in a Web Worker.
+      </p>
+      <p style={{ ...styles.tagline, margin: '0.4rem 0 0', fontSize: '0.8rem' }}>
+        TypeScript syntax is accepted, but types are not taught or checked yet.
       </p>
     </div>
   );
@@ -221,7 +232,7 @@ function ExerciseView({
   onInput,
   running,
   result,
-  assisted,
+  maxRung,
   onUseHint,
   onSubmit,
   onNext,
@@ -231,8 +242,8 @@ function ExerciseView({
   onInput: (s: string) => void;
   running: boolean;
   result: RunResult | null;
-  assisted: boolean;
-  onUseHint: () => void;
+  maxRung: number;
+  onUseHint: (rung: number) => void;
   onSubmit: () => void;
   onNext: () => void;
 }) {
@@ -297,30 +308,41 @@ function ExerciseView({
         )}
       </div>
 
-      {result && <ResultView result={result} assisted={assisted} />}
+      {result && <ResultView result={result} maxRung={maxRung} />}
 
       {graded && (
-        <HintLadder ex={ex} input={input} assisted={assisted} onUse={onUseHint} />
+        <HintLadder ex={ex} input={input} maxRung={maxRung} onUse={onUseHint} />
       )}
     </div>
   );
 }
 
+// Hint-ladder rung levels, ascending in help and scheduling cost. Cue/syntax
+// (1-2) are light nudges graded 'hard'; visualize/walkthrough/reveal (3-5)
+// count as a lapse. See docs/scaffolding.md.
+const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as const;
+
 function HintLadder({
   ex,
   input,
-  assisted,
+  maxRung,
   onUse,
 }: {
   ex: Exercise;
   input: string;
-  assisted: boolean;
-  onUse: () => void;
+  maxRung: number;
+  onUse: (rung: number) => void;
 }) {
-  const [open, setOpen] = useState({ visualize: false, reveal: false, walkthrough: false });
-  const toggle = (key: keyof typeof open) => {
+  const [open, setOpen] = useState({
+    cue: false,
+    syntax: false,
+    visualize: false,
+    walkthrough: false,
+    reveal: false,
+  });
+  const toggle = (key: keyof typeof open, rung: number) => {
     const willOpen = !open[key];
-    if (willOpen) onUse();
+    if (willOpen) onUse(rung);
     setOpen((o) => ({ ...o, [key]: willOpen }));
   };
 
@@ -331,23 +353,51 @@ function HintLadder({
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
       <div style={{ ...styles.row, justifyContent: 'space-between' }}>
         <p style={{ ...styles.label, margin: 0 }}>Need a hand?</p>
-        {assisted && (
+        {maxRung >= RUNG.visualize ? (
           <span style={{ ...styles.pill, color: theme.bad, borderColor: theme.bad }}>
             assisted — counts as a lapse
           </span>
-        )}
+        ) : maxRung >= RUNG.cue ? (
+          <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
+            hinted — repeats sooner
+          </span>
+        ) : null}
       </div>
       <div style={{ ...styles.row, marginTop: '0.6rem' }}>
-        <button style={styles.btnGhost} onClick={() => toggle('visualize')}>
+        {ex.cue && (
+          <button style={styles.btnGhost} onClick={() => toggle('cue', RUNG.cue)}>
+            {open.cue ? 'Hide cue' : 'Cue'}
+          </button>
+        )}
+        {ex.syntax && (
+          <button style={styles.btnGhost} onClick={() => toggle('syntax', RUNG.syntax)}>
+            {open.syntax ? 'Hide syntax' : 'Syntax'}
+          </button>
+        )}
+        <button style={styles.btnGhost} onClick={() => toggle('visualize', RUNG.visualize)}>
           {open.visualize ? 'Hide visualization' : 'Visualize my run'}
         </button>
-        <button style={styles.btnGhost} onClick={() => toggle('reveal')}>
-          {open.reveal ? 'Hide answer' : 'Reveal answer'}
-        </button>
-        <button style={styles.btnGhost} onClick={() => toggle('walkthrough')}>
+        <button style={styles.btnGhost} onClick={() => toggle('walkthrough', RUNG.walkthrough)}>
           {open.walkthrough ? 'Hide walkthrough' : 'Get a walkthrough'}
         </button>
+        <button style={styles.btnGhost} onClick={() => toggle('reveal', RUNG.reveal)}>
+          {open.reveal ? 'Hide answer' : 'Reveal answer'}
+        </button>
       </div>
+
+      {open.cue && ex.cue && (
+        <div style={{ marginTop: '1rem' }}>
+          <p style={styles.label}>Cue</p>
+          <p style={{ ...styles.tagline, margin: 0, color: theme.text }}>{ex.cue}</p>
+        </div>
+      )}
+
+      {open.syntax && ex.syntax && (
+        <div style={{ marginTop: '1rem' }}>
+          <p style={styles.label}>Syntax</p>
+          <pre style={styles.code}>{ex.syntax}</pre>
+        </div>
+      )}
 
       {open.visualize && (
         <div style={{ marginTop: '1rem' }}>
@@ -409,15 +459,24 @@ function WalkthroughBox({ prompt }: { prompt: string }) {
   );
 }
 
-function ResultView({ result, assisted }: { result: RunResult; assisted: boolean }) {
-  const color = result.passed && !assisted ? theme.good : theme.bad;
-  const label = assisted
-    ? result.passed
-      ? '✓ Pass, but assisted — will repeat soon'
-      : '✗ Fail — will repeat soon'
-    : result.passed
-      ? '✓ Pass — scheduled further out'
-      : '✗ Fail — will repeat soon';
+function ResultView({ result, maxRung }: { result: RunResult; maxRung: number }) {
+  // Mirror gradeFor: unassisted pass → good, cue/syntax pass → hard,
+  // deeper pass or any fail → again (a lapse).
+  let color: string;
+  let label: string;
+  if (!result.passed) {
+    color = theme.bad;
+    label = '✗ Fail — will repeat soon';
+  } else if (maxRung >= 3) {
+    color = theme.bad;
+    label = '✓ Pass, but assisted — will repeat soon';
+  } else if (maxRung >= 1) {
+    color = theme.accent;
+    label = '✓ Pass with a hint — repeats sooner';
+  } else {
+    color = theme.good;
+    label = '✓ Pass — scheduled further out';
+  }
   return (
     <div style={{ marginTop: '1rem' }}>
       <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>

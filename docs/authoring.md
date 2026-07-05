@@ -22,6 +22,8 @@ exercise for real). Read this whole file before writing any content.
   "concept": "sum via accumulator",  // short label; the idiom name lives HERE
   "kind": "predict",                 // "predict" | "write"
   "prompt": "...",                   // terse; see rules
+  "cue": "...",                      // optional rung-1 hint; see "Hints" below
+  "syntax": "...",                   // optional rung-2 hint; see "Hints" below
   // predict:
   "snippet": "...",                  // code whose FINAL expression is evaluated
   "expected": "...",                 // rendered value; see rendering rules
@@ -63,6 +65,27 @@ Bad (over-coaching):
 
 Good:
 > "What does this evaluate to?"
+
+## Hints (cue / syntax)
+
+Both fields are optional. They surface as the two shallowest rungs of the hint
+ladder (`docs/scaffolding.md`): the learner opens them before the heavier
+visualize / walkthrough / reveal rungs, and reaching only these grades the item
+`hard` (repeats sooner) rather than a full lapse. Author them only where a small
+nudge is the likely unblocker; leave them out otherwise.
+
+- `cue` (rung 1): name the pattern, where to start, or the first move. Never the
+  value, never the full solution. It answers "what kind of thing is this?", not
+  "what is the answer?". E.g. "This is a running total — one accumulator updated
+  each pass," not "add the evens."
+- `syntax` (rung 2): ONE relevant built-in, operator, or idiom the learner may be
+  reaching for, not the answer. E.g. "`dict.get(k, default)`" or "`enumerate(xs,
+  start=1)`" — the tool, not how to assemble it into the solution.
+
+Keep both terse (a phrase or one short line). Neither may contain `ex.expected`
+(the predict value) or `ex.solution` (the write answer), in whole or in part;
+that would collapse the ladder. When in doubt, make the cue vaguer and the syntax
+narrower.
 
 ## predict — how `expected` is rendered
 

@@ -1,6 +1,8 @@
 [
   {
     "id": "py.u08.converge.reverse.predict",
+    "cue": "Trace lo and hi swapping and stepping toward the middle.",
+    "syntax": "a[i], a[j] = a[j], a[i] swap",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: reverse in place",
@@ -12,6 +14,8 @@
   },
   {
     "id": "py.u08.converge.reverse",
+    "cue": "Two pointers from both ends; swap, then step inward.",
+    "syntax": "a[i], a[j] = a[j], a[i] swap",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: reverse in place",
@@ -24,6 +28,8 @@
   },
   {
     "id": "py.u08.converge.palindrome.predict",
+    "cue": "Compare the two ends inward until the pointers meet.",
+    "syntax": "s[i] != s[j] comparison",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: palindrome check",
@@ -35,6 +41,8 @@
   },
   {
     "id": "py.u08.converge.palindrome.edges",
+    "cue": "Check each call; empty and single-char inputs never enter the loop.",
+    "syntax": "len(s) length",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: palindrome edge cases",
@@ -46,6 +54,8 @@
   },
   {
     "id": "py.u08.converge.palindrome",
+    "cue": "Two pointers from each end; bail out on the first mismatch.",
+    "syntax": "s[i] == s[j] comparison",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: palindrome check",
@@ -58,6 +68,8 @@
   },
   {
     "id": "py.u08.pairsum.predict",
+    "cue": "Track the running sum; step the end that pushes it toward the goal.",
+    "syntax": "(i, j) index tuple",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: pair-sum in sorted array",
@@ -69,6 +81,8 @@
   },
   {
     "id": "py.u08.pairsum",
+    "cue": "Two pointers on the sorted array; shrink from the end the sum overshoots.",
+    "syntax": "a[lo] + a[hi] running sum",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: pair-sum in sorted array",
@@ -81,6 +95,8 @@
   },
   {
     "id": "py.u08.maxarea.predict",
+    "cue": "Track the best area while advancing the shorter side inward.",
+    "syntax": "min(a, b) and max(a, b)",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: container with most water",
@@ -92,6 +108,8 @@
   },
   {
     "id": "py.u08.maxarea",
+    "cue": "Two pointers at the ends; move whichever height is smaller.",
+    "syntax": "min(a, b) picks the limiting height",
     "track": "python",
     "group": "Two pointers",
     "concept": "opposite ends converge: container with most water",
@@ -104,6 +122,8 @@
   },
   {
     "id": "py.u08.squares.predict",
+    "cue": "Compare magnitudes at both ends; fill the result from the back.",
+    "syntax": "abs(x) magnitude",
     "track": "python",
     "group": "Two pointers",
     "concept": "merge into a third array: squares of a sorted array",
@@ -115,6 +135,8 @@
   },
   {
     "id": "py.u08.squares",
+    "cue": "Bigger magnitude at an end gives the next-largest square; write backward.",
+    "syntax": "range(stop, -1, -1) counts down",
     "track": "python",
     "group": "Two pointers",
     "concept": "merge into a third array: squares of a sorted array",
@@ -127,6 +149,8 @@
   },
   {
     "id": "py.u08.compaction.dupes.predict",
+    "cue": "Follow the write index; it advances only on a new value.",
+    "syntax": "a[:w] slice",
     "track": "python",
     "group": "Two pointers",
     "concept": "read/write compaction: remove duplicates",
@@ -138,6 +162,8 @@
   },
   {
     "id": "py.u08.compaction.dupes",
+    "cue": "Read pointer scans; write pointer places each first-seen value up front.",
+    "syntax": "a[w] = a[r] overwrite",
     "track": "python",
     "group": "Two pointers",
     "concept": "read/write compaction: remove duplicates",
@@ -150,6 +176,8 @@
   },
   {
     "id": "py.u08.compaction.element",
+    "cue": "Read pointer scans; copy forward only values that aren't the target.",
+    "syntax": "!= inequality test",
     "track": "python",
     "group": "Two pointers",
     "concept": "read/write compaction: remove element",
@@ -162,6 +190,8 @@
   },
   {
     "id": "py.u08.compaction.zeroes",
+    "cue": "Pack the non-zeros to the front, then zero-fill the tail.",
+    "syntax": "range(w, len(a)) for the tail",
     "track": "python",
     "group": "Two pointers",
     "concept": "read/write compaction: move zeroes",
@@ -174,6 +204,8 @@
   },
   {
     "id": "py.u08.fastslow.cycle.predict",
+    "cue": "Step slow by one and fast by two; watch whether they collide.",
+    "syntax": "nxt[nxt[i]] double step",
     "track": "python",
     "group": "Two pointers",
     "concept": "fast/slow: cycle detection",
@@ -185,6 +217,8 @@
   },
   {
     "id": "py.u08.fastslow.cycle",
+    "cue": "Slow +1, fast +2; equal pointers mean a loop.",
+    "syntax": "nxt[nxt[fast]] jumps two",
     "track": "python",
     "group": "Two pointers",
     "concept": "fast/slow: cycle detection",
@@ -197,6 +231,8 @@
   },
   {
     "id": "py.u08.fastslow.middle.predict",
+    "cue": "Step slow once and fast twice until fast falls off the end.",
+    "syntax": "nxt[nxt[i]] chained indexing",
     "track": "python",
     "group": "Two pointers",
     "concept": "fast/slow: midpoint of a list",
@@ -208,6 +244,8 @@
   },
   {
     "id": "py.u08.fastslow.middle",
+    "cue": "When fast reaches the end, slow has landed on the middle.",
+    "syntax": "slow = fast = start multiple assignment",
     "track": "python",
     "group": "Two pointers",
     "concept": "fast/slow: midpoint of a list",
@@ -220,6 +258,8 @@
   },
   {
     "id": "py.u08.fastslow.nth.predict",
+    "cue": "Give fast an n-step lead, then move both until fast hits the end.",
+    "syntax": "for _ in range(n) advances the lead",
     "track": "python",
     "group": "Two pointers",
     "concept": "fast/slow: gap of n, node before nth-from-end",
@@ -231,6 +271,8 @@
   },
   {
     "id": "py.u08.fixone.threesum.predict",
+    "cue": "For each fixed first element, converge two pointers over the rest.",
+    "syntax": "list.sort() in place",
     "track": "python",
     "group": "Two pointers",
     "concept": "fix-one + converge: 3sum",
@@ -242,6 +284,8 @@
   },
   {
     "id": "py.u08.fixone.threesum",
+    "cue": "Sort, fix index i, converge two pointers on the remainder, skip repeats.",
+    "syntax": "a.sort() then inner two-pointer scan",
     "track": "python",
     "group": "Two pointers",
     "concept": "fix-one + converge: 3sum",

@@ -1,8 +1,10 @@
 # Scaffolding & remediation design
 
 How warmups should help a learner who is stuck, grounded in learning theory. This
-is a design reference, not yet built. The companion `authoring.md` covers how
-individual exercises are written; this covers what happens around them.
+is the design reference; the build-order section at the end tracks what has
+shipped (the hint ladder, ladder-depth grading, and mastery-based advancement are
+in). The companion `authoring.md` covers how individual exercises are written;
+this covers what happens around them.
 
 ## The one frame: a desirable-difficulty thermostat
 
@@ -77,19 +79,22 @@ The rung a learner reaches is at once:
 1. The minimal-scaffold dosing (least help first, escalate only if still stuck).
 2. The diagnosis of which failure mode they were in (the rung that unblocks them
    names the gap).
-3. The fine-grained grade signal FSRS is currently missing. Today grading is
-   binary pass/fail collapsed to good/again; FSRS has four grades. Map ladder
-   depth onto them: solved at rung 0 to good/easy, rungs 1 to 2 to hard, rungs 3
-   to 4 to again-ish, rung 5 to lapse. Add time-to-solve as a tiebreak. This
-   closes the "we underuse FSRS's grades" gap for free, with no separate
-   self-rating screen.
+3. The fine-grained grade signal for FSRS. **BUILT** (`gradeFor` in
+   `src/core/srs.ts`): the deepest rung reached maps onto three grades — solved
+   at rung 0 → good, rungs 1 to 2 (cue/syntax) → hard, rungs 3 to 5 (visualize,
+   walkthrough, reveal) or any fail → again. This replaced the old binary
+   pass/fail-to-good/again collapse and closes the "we underuse FSRS's grades"
+   gap with no separate self-rating screen. (A distinct easy grade and a
+   time-to-solve tiebreak remain possible later refinements.)
 
 ### Honesty rule
 
-Anything past a light cue marks the item assisted and schedules it as a lapse, so
-the spaced-repetition loop stays honest regardless of which rung was used
-(including the external AI walkthrough and the visualizer, which the app cannot
-observe directly).
+The rung reached always costs something, so the spaced-repetition loop stays
+honest regardless of which rung was used (including the external AI walkthrough
+and the visualizer, which the app cannot observe directly). As built: a
+cue/syntax rung (1 to 2) drops the grade to hard, so the item repeats sooner
+without a full lapse; anything deeper (visualize, walkthrough, reveal) schedules
+it as a lapse (again), the same as a fail.
 
 ### codeviz integration (rung 3)
 
@@ -179,15 +184,21 @@ variety, and the predict-to-write ramp handled at the curriculum level.
 ## Build order (when we act on this)
 
 1. Reveal-answer as a miss (the rung-5 base case; smallest change, closes the
-   worst current gap where a stuck write has no escape).
+   worst current gap where a stuck write has no escape). **BUILT.**
 2. The cue / syntax rungs (1 and 2) plus ladder-depth to FSRS-grade mapping (turns
-   the reveal into a real ladder and upgrades the scheduler signal).
+   the reveal into a real ladder and upgrades the scheduler signal). **BUILT.**
+   The optional `cue`/`syntax` fields on an exercise surface as the two shallow
+   rungs; the deepest rung reached maps to a three-grade FSRS signal
+   (good / hard / again) via `gradeFor` in `src/core/srs.ts`.
 3. Execution visualization rung: **Python path done** — trace the learner's own
    submitted code with the vendored codeviz tracer inside the Pyodide runtime
    already used for grading, and iframe the self-contained offline HTML. JS live
    tracing is the next increment. See the codeviz integration note above.
-4. AI Socratic walkthrough rung: a copyable, well-tuned prompt handoff.
-5. Mastery-based advancement + the predict-to-write ramp.
+4. AI Socratic walkthrough rung: a copyable, well-tuned prompt handoff. **BUILT**
+   (`src/ui/walkthroughPrompt.ts`).
+5. Mastery-based advancement (**BUILT** — `learnedEnough` in `src/ui/session.ts`
+   gates prereqs on a card that has actually been scheduled out of the New state,
+   not merely introduced) + the predict-to-write ramp (still pending).
 6. Variety pass on the content for transfer.
 7. Only then, if data warrants: adaptive entry-rung by card state, and anything
    heavier.

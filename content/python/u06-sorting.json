@@ -1,6 +1,8 @@
 [
   {
     "id": "py.u06.swap.predict",
+    "cue": "Track the temp holder and each slot as the three assignments run.",
+    "syntax": "a[i] = a[j] index assignment",
     "track": "python",
     "group": "Sorting",
     "concept": "swap two array slots via temp",
@@ -12,6 +14,8 @@
   },
   {
     "id": "py.u06.minscan.write",
+    "cue": "Hold a running best index and compare each later element against it.",
+    "syntax": "range(i + 1, len(a))",
     "track": "python",
     "group": "Sorting",
     "concept": "index of minimum in a suffix",
@@ -24,6 +28,8 @@
   },
   {
     "id": "py.u06.selection.write",
+    "cue": "For each position, find the min of the rest and swap it into place.",
+    "syntax": "a[i], a[m] = a[m], a[i] swap",
     "track": "python",
     "group": "Sorting",
     "concept": "selection sort",
@@ -36,6 +42,8 @@
   },
   {
     "id": "py.u06.selection.pass.predict",
+    "cue": "Scan for the min index, then apply the final swap into slot i.",
+    "syntax": "a[i], a[m] = a[m], a[i] swap",
     "track": "python",
     "group": "Sorting",
     "concept": "one selection-sort pass",
@@ -47,6 +55,8 @@
   },
   {
     "id": "py.u06.insertion.write",
+    "cue": "Take each element as a key and shift larger ones right to open its spot.",
+    "syntax": "while j >= 0 and a[j] > key",
     "track": "python",
     "group": "Sorting",
     "concept": "insertion sort",
@@ -59,6 +69,8 @@
   },
   {
     "id": "py.u06.insertion.shifts.predict",
+    "cue": "Count each inner-loop step as the key settles into place.",
+    "syntax": "shifts += 1 accumulator",
     "track": "python",
     "group": "Sorting",
     "concept": "insertion shift count on near-sorted input",
@@ -70,6 +82,8 @@
   },
   {
     "id": "py.u06.merge.two.predict",
+    "cue": "Advance whichever pointer holds the smaller front, then drain the tails.",
+    "syntax": "res.extend(L[i:]) drains a tail",
     "track": "python",
     "group": "Sorting",
     "concept": "merge two sorted lists (two-pointer walk)",
@@ -81,6 +95,8 @@
   },
   {
     "id": "py.u06.merge.write",
+    "cue": "Compare the two fronts, take the smaller, then drain both tails.",
+    "syntax": "list.extend(iterable)",
     "track": "python",
     "group": "Sorting",
     "concept": "stable merge of two sorted lists",
@@ -93,6 +109,8 @@
   },
   {
     "id": "py.u06.mergesort.write",
+    "cue": "Split in half, recurse on each half, then merge the sorted results.",
+    "syntax": "len(a) // 2 midpoint",
     "track": "python",
     "group": "Sorting",
     "concept": "merge sort",
@@ -105,6 +123,8 @@
   },
   {
     "id": "py.u06.partition.write",
+    "cue": "Keep a boundary index and swap any element below the pivot into the low region.",
+    "syntax": "range(lo, hi)",
     "track": "python",
     "group": "Sorting",
     "concept": "Lomuto partition",
@@ -117,6 +137,8 @@
   },
   {
     "id": "py.u06.partition.predict",
+    "cue": "Walk the scan, swapping smaller elements down, then place the pivot last.",
+    "syntax": "a[i], a[j] = a[j], a[i] swap",
     "track": "python",
     "group": "Sorting",
     "concept": "state after one Lomuto partition",
@@ -128,6 +150,8 @@
   },
   {
     "id": "py.u06.quicksort.write",
+    "cue": "Partition around a pivot, then recurse on the two sides that exclude it.",
+    "syntax": "lo < hi base-case guard",
     "track": "python",
     "group": "Sorting",
     "concept": "quicksort",
@@ -140,6 +164,8 @@
   },
   {
     "id": "py.u06.sorted.builtin.predict",
+    "cue": "Ask whether sorted() mutates the original or hands back a new list.",
+    "syntax": "sorted(iterable)",
     "track": "python",
     "group": "Sorting",
     "concept": "sorted() returns a new list",
@@ -151,6 +177,8 @@
   },
   {
     "id": "py.u06.stability.predict",
+    "cue": "Sort on the first field and watch how equal keys keep their input order.",
+    "syntax": "key=lambda p: p[0]",
     "track": "python",
     "group": "Sorting",
     "concept": "stable sort keeps equal keys in order",
@@ -162,6 +190,8 @@
   },
   {
     "id": "py.u06.sweep.dup.predict",
+    "cue": "After sorting, check whether any element matches the one before it.",
+    "syntax": "a[i] == a[i - 1] neighbor compare",
     "track": "python",
     "group": "Sorting",
     "concept": "sort then sweep neighbors for a duplicate",
@@ -173,6 +203,8 @@
   },
   {
     "id": "py.u06.sweep.dup.write",
+    "cue": "Sort a copy, then compare each element with its predecessor.",
+    "syntax": "sorted(a) returns a new list",
     "track": "python",
     "group": "Sorting",
     "concept": "sort-then-sweep duplicate detection",
@@ -185,6 +217,8 @@
   },
   {
     "id": "py.u06.twopointer.predict",
+    "cue": "Move the low or high pointer based on how the pair sum compares to the target.",
+    "syntax": "i, j = 0, len(a) - 1",
     "track": "python",
     "group": "Sorting",
     "concept": "sort then converge two pointers to a target sum",
@@ -196,6 +230,8 @@
   },
   {
     "id": "py.u06.twopointer.write",
+    "cue": "Sort first, then converge two pointers from the ends toward the target.",
+    "syntax": "a[i] + a[j] pair sum",
     "track": "python",
     "group": "Sorting",
     "concept": "two-sum on sorted input via two pointers",
@@ -208,6 +244,8 @@
   },
   {
     "id": "py.u06.sortkey.len.predict",
+    "cue": "Order the words by the value the key function returns for each.",
+    "syntax": "sorted(xs, key=len)",
     "track": "python",
     "group": "Sorting",
     "concept": "sort by a derived key",
@@ -219,6 +257,8 @@
   },
   {
     "id": "py.u06.sortkey.tuple.predict",
+    "cue": "Order by the first tuple field, with the second breaking ties.",
+    "syntax": "key=lambda x: (x[1], x[0])",
     "track": "python",
     "group": "Sorting",
     "concept": "multi-key sort via tuple key",
@@ -230,6 +270,8 @@
   },
   {
     "id": "py.u06.sortkey.write",
+    "cue": "Sort by a key that negates the score and keeps name ascending.",
+    "syntax": "-x[1] negates for descending",
     "track": "python",
     "group": "Sorting",
     "concept": "rank by descending score then name",
@@ -242,6 +284,8 @@
   },
   {
     "id": "py.u06.sort.inplace.predict",
+    "cue": "Recall what list.sort() gives back versus what it does to the list.",
+    "syntax": "list.sort() sorts in place",
     "track": "python",
     "group": "Sorting",
     "concept": "list.sort() sorts in place and returns None",
@@ -253,6 +297,8 @@
   },
   {
     "id": "py.u06.sorted.reverse.predict",
+    "cue": "Apply an ascending sort, then flip the direction.",
+    "syntax": "sorted(xs, reverse=True)",
     "track": "python",
     "group": "Sorting",
     "concept": "descending sort with reverse=True",

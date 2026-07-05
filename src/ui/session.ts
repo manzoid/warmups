@@ -1,6 +1,7 @@
 // Pure spaced-repetition session logic (no React), so it can be reasoned about
 // and unit-tested in isolation.
 
+import { State } from 'ts-fsrs';
 import type { Exercise, Runner, Track } from '../core/types';
 import { due, type Card } from '../core/srs';
 import { getCard, isIntroduced, type ProgressState } from '../core/storage';
@@ -12,9 +13,20 @@ export const RUNNERS: Record<Track, Runner> = {
   javascript: javascriptRunner,
 };
 
-/** All of `ex`'s prereqs have already been introduced. */
+/**
+ * `id` has been learned well enough to unlock exercises that depend on it:
+ * its card exists, has been answered at least once (reps >= 1), and has
+ * graduated out of the initial New state. Merely introducing an exercise is
+ * no longer sufficient — the learner must actually have scheduled it.
+ */
+function learnedEnough(state: ProgressState, id: string): boolean {
+  const card = getCard(state, id);
+  return card !== undefined && card.reps >= 1 && card.state !== State.New;
+}
+
+/** All of `ex`'s prereqs have been learned well enough (not just introduced). */
 function prereqsMet(ex: Exercise, state: ProgressState): boolean {
-  return (ex.prereqs ?? []).every((id) => isIntroduced(state, id));
+  return (ex.prereqs ?? []).every((id) => learnedEnough(state, id));
 }
 
 export interface NextPick {
