@@ -19,7 +19,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "types": ["node", "vitest/globals"]
+    "types": ["node"]
   },
   "include": ["src", "scripts", "vite.config.ts"]
 }

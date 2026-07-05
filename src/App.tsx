@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Exercise, RunResult, Track } from './core/types';
-import { newCard, review } from './core/srs';
+import { newCard, review, gradeFor, type Card } from './core/srs';
 import {
   load,
   save,
@@ -13,6 +13,8 @@ import { exercisesForTrack } from './ui/content';
 import { pickNext, computeCounts, RUNNERS, type NextPick } from './ui/session';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
+import { Visualizer } from './ui/Visualizer';
+import { buildWalkthroughPrompt } from './ui/walkthroughPrompt';
 
 const TRACK_LABELS: Record<Track, string> = {
   python: 'Python',
@@ -31,6 +33,13 @@ export default function App() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState<RunResult | null>(null);
   const [running, setRunning] = useState(false);
+  // Whether the learner leaned on any hint rung for the current exercise. An
+  // assisted attempt is scheduled as a lapse regardless of pass (see grade()).
+  const [assisted, setAssisted] = useState(false);
+  // The card as it stood when the current exercise was picked. Grading always
+  // derives from this base so re-grading (e.g. after a hint marks the attempt
+  // assisted) replaces the schedule instead of compounding it.
+  const baseCard = useRef<Card | null>(null);
 
   const exercises = useMemo(
     () => (track ? exercisesForTrack(track) : []),
@@ -53,13 +62,17 @@ export default function App() {
       const next = pickNext(exs, progress.current, now);
       setResult(null);
       setRunning(false);
+      setAssisted(false);
       if (next) {
         if (next.isNew) {
           markIntroduced(progress.current, next.exercise.id);
           putCard(progress.current, next.exercise.id, newCard(now));
           save(progress.current);
         }
+        baseCard.current = getCard(progress.current, next.exercise.id) ?? newCard(now);
         seedInput(next.exercise);
+      } else {
+        baseCard.current = null;
       }
       setPick(next);
       bump();
@@ -72,6 +85,19 @@ export default function App() {
     advance(exercisesForTrack(t));
   };
 
+  // Schedule the current card from its base state. An assisted attempt is a
+  // lapse ('again') no matter what; otherwise pass → 'good', fail → 'again'.
+  const grade = useCallback(
+    (exId: string, passed: boolean, wasAssisted: boolean) => {
+      const now = new Date();
+      const base = baseCard.current ?? getCard(progress.current, exId) ?? newCard(now);
+      const rating = gradeFor({ passed, assisted: wasAssisted });
+      putCard(progress.current, exId, review(base, rating, now));
+      persist();
+    },
+    [persist],
+  );
+
   const submit = useCallback(async () => {
     if (!track || !pick) return;
     const ex = pick.exercise;
@@ -82,18 +108,18 @@ export default function App() {
     } catch (err) {
       res = { passed: false, error: err instanceof Error ? err.message : String(err) };
     }
-    // Grade + reschedule.
-    const now = new Date();
-    const card = getCard(progress.current, ex.id) ?? newCard(now);
-    putCard(
-      progress.current,
-      ex.id,
-      review(card, res.passed ? 'good' : 'again', now),
-    );
-    persist();
+    grade(ex.id, res.passed, assisted);
     setResult(res);
     setRunning(false);
-  }, [track, pick, input, persist]);
+  }, [track, pick, input, assisted, grade]);
+
+  // Opening any hint rung marks the attempt assisted and (if already graded)
+  // re-schedules it as a lapse. Idempotent: once assisted, further hints no-op.
+  const useHint = useCallback(() => {
+    if (assisted || !pick) return;
+    setAssisted(true);
+    if (result) grade(pick.exercise.id, result.passed, true);
+  }, [assisted, pick, result, grade]);
 
   const counts = useMemo(
     () => (track ? computeCounts(exercises, progress.current, new Date()) : null),
@@ -136,6 +162,8 @@ export default function App() {
                 onInput={setInput}
                 running={running}
                 result={result}
+                assisted={assisted}
+                onUseHint={useHint}
                 onSubmit={submit}
                 onNext={() => advance(exercises)}
               />
@@ -193,6 +221,8 @@ function ExerciseView({
   onInput,
   running,
   result,
+  assisted,
+  onUseHint,
   onSubmit,
   onNext,
 }: {
@@ -201,6 +231,8 @@ function ExerciseView({
   onInput: (s: string) => void;
   running: boolean;
   result: RunResult | null;
+  assisted: boolean;
+  onUseHint: () => void;
   onSubmit: () => void;
   onNext: () => void;
 }) {
@@ -265,17 +297,126 @@ function ExerciseView({
         )}
       </div>
 
-      {result && <ResultView result={result} />}
+      {result && <ResultView result={result} assisted={assisted} />}
+
+      {graded && (
+        <HintLadder ex={ex} input={input} assisted={assisted} onUse={onUseHint} />
+      )}
     </div>
   );
 }
 
-function ResultView({ result }: { result: RunResult }) {
-  const color = result.passed ? theme.good : theme.bad;
+function HintLadder({
+  ex,
+  input,
+  assisted,
+  onUse,
+}: {
+  ex: Exercise;
+  input: string;
+  assisted: boolean;
+  onUse: () => void;
+}) {
+  const [open, setOpen] = useState({ visualize: false, reveal: false, walkthrough: false });
+  const toggle = (key: keyof typeof open) => {
+    const willOpen = !open[key];
+    if (willOpen) onUse();
+    setOpen((o) => ({ ...o, [key]: willOpen }));
+  };
+
+  const answer =
+    ex.kind === 'predict' ? ex.expected : ex.solution;
+
+  return (
+    <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
+      <div style={{ ...styles.row, justifyContent: 'space-between' }}>
+        <p style={{ ...styles.label, margin: 0 }}>Need a hand?</p>
+        {assisted && (
+          <span style={{ ...styles.pill, color: theme.bad, borderColor: theme.bad }}>
+            assisted — counts as a lapse
+          </span>
+        )}
+      </div>
+      <div style={{ ...styles.row, marginTop: '0.6rem' }}>
+        <button style={styles.btnGhost} onClick={() => toggle('visualize')}>
+          {open.visualize ? 'Hide visualization' : 'Visualize my run'}
+        </button>
+        <button style={styles.btnGhost} onClick={() => toggle('reveal')}>
+          {open.reveal ? 'Hide answer' : 'Reveal answer'}
+        </button>
+        <button style={styles.btnGhost} onClick={() => toggle('walkthrough')}>
+          {open.walkthrough ? 'Hide walkthrough' : 'Get a walkthrough'}
+        </button>
+      </div>
+
+      {open.visualize && (
+        <div style={{ marginTop: '1rem' }}>
+          <Visualizer track={ex.track} code={input} title={ex.concept} />
+        </div>
+      )}
+
+      {open.reveal && (
+        <div style={{ marginTop: '1rem' }}>
+          <p style={styles.label}>{ex.kind === 'predict' ? 'Expected value' : 'Reference solution'}</p>
+          {answer && answer.length > 0 ? (
+            <pre style={styles.code}>{answer}</pre>
+          ) : (
+            <p style={{ ...styles.tagline, margin: 0 }}>No reference answer is available for this exercise.</p>
+          )}
+        </div>
+      )}
+
+      {open.walkthrough && (
+        <div style={{ marginTop: '1rem' }}>
+          <WalkthroughBox prompt={buildWalkthroughPrompt(ex, input)} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WalkthroughBox({ prompt }: { prompt: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <>
+      <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+        <p style={{ ...styles.label, margin: 0 }}>Paste into your AI coding agent</p>
+        <button style={styles.btnGhost} onClick={copy}>
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <textarea
+        readOnly
+        value={prompt}
+        spellCheck={false}
+        style={{ ...styles.editor, fontFamily: theme.mono, minHeight: 220 }}
+      />
+    </>
+  );
+}
+
+function ResultView({ result, assisted }: { result: RunResult; assisted: boolean }) {
+  const color = result.passed && !assisted ? theme.good : theme.bad;
+  const label = assisted
+    ? result.passed
+      ? '✓ Pass, but assisted — will repeat soon'
+      : '✗ Fail — will repeat soon'
+    : result.passed
+      ? '✓ Pass — scheduled further out'
+      : '✗ Fail — will repeat soon';
   return (
     <div style={{ marginTop: '1rem' }}>
       <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>
-        {result.passed ? '✓ Pass — scheduled further out' : '✗ Fail — will repeat soon'}
+        {label}
       </p>
       {result.error && (
         <pre style={{ ...styles.code, borderColor: theme.bad }}>{result.error}</pre>

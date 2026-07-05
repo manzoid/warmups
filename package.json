@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate-content.mjs",
-    "test": "vitest run"
+    "test:scaffold": "node scripts/test-scaffold.mjs",
+    "test:pytrace": "node scripts/test-pytrace.mjs",
+    "test": "node scripts/test-scaffold.mjs && node scripts/selftest-rendertrace.mjs && node scripts/test-pytrace.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.4",
@@ -29,7 +31,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "typescript": "^6.0.3",
-    "vite": "^6.4.3",
-    "vitest": "^4.1.9"
+    "vite": "^6.4.3"
   }
 }

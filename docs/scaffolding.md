@@ -93,27 +93,42 @@ observe directly).
 
 ### codeviz integration (rung 3)
 
-codeviz already has everything this rung needs, so there is nothing to build on
-the codeviz side and no need for a Python Tutor stopgap:
+This rung is built for Python and reuses codeviz's pieces with no codeviz-side
+changes and no Python Tutor stopgap. The "Visualize my run" button traces the
+learner's **own submitted code**, not a fixed authored snippet, and renders it
+inline. See `src/ui/Visualizer.tsx`, `src/runners/pytrace.ts`, and
+`src/ui/renderTrace.ts`.
 
-- It renders a **single self-contained, offline HTML page** (step-through code,
-  stack frames, heap objects, reference arrows). The trace JSON is inlined into
-  the page (`render_html`), with no runtime network use, so it drops into an
-  `<iframe>` directly.
-- It traces an **inline snippet** with `codeviz --code "<source>" --lang .py|.js|.ts
-  -o out.html` (programmatic entry `trace_code(code, ext)`), so an exercise's
-  snippet can be visualized as-is.
-- **Python and JavaScript/TypeScript are the fully-local, no-Docker backends** —
-  exactly warmups' two tracks. No container dependency for our use.
+- codeviz's viewer renders a **single self-contained, offline HTML page**
+  (step-through code, stack frames, heap objects, reference arrows). The trace
+  JSON is injected into the page by string replacement (the `__TRACE_JSON__` and
+  `__TITLE__` markers), with no runtime network use, so it drops into an
+  `<iframe srcdoc>` directly.
+- **Python live path (built).** warmups already loads Pyodide to grade Python, so
+  the tracer runs there too: it drops the vendored Online Python Tutor tracer
+  (`pg_logger.py` + `pg_encoder.py`) onto Pyodide's virtual filesystem and drives
+  it exactly like codeviz's `python_backend` does,
+  `exec_script_str_local(code, None, False, False, finalizer)`, with a finalizer
+  that captures `{code, trace}`. The resulting OPT-format trace JSON is injected
+  into the viewer template and shown in a sandboxed `<iframe>`. The tracer is pure
+  stdlib and Pyodide-safe (its `import resource` is optional and the `setrlimit`
+  path is skipped when security checks are disabled).
+- **JavaScript live tracing is the next increment.** For now the rung shows an
+  honest note for the JS track instead of faking a visualization; codeviz's
+  JS/TS backend is the intended source when it is wired up.
 
-The fit for a static, local-first site is **build-time prerender**: exercise
-snippets are known authored content, so run codeviz over each snippet during the
-warmups build, bundle the resulting self-contained HTML, and `<iframe>` it in the
-visualization rung. This keeps warmups backend-free and offline, works for both
-tracks in-house, and avoids any external service. (The alternative, calling a
-local codeviz process or server at runtime, would break the no-backend model, so
-prefer prerender.) Repo: https://github.com/manzoid/codeviz (also cloned locally
-at ../codeviz).
+Why runtime-in-Pyodide rather than build-time prerender: it visualizes the
+learner's actual submission (the thing they are stuck on), reuses the Pyodide
+runtime already loaded for grading, and keeps warmups backend-free and offline
+with no external service. The alternative, calling a local codeviz process or
+server at runtime, would break the no-backend model.
+
+**Vendored assets.** The tracer and renderer are copied into
+`src/vendor/codeviz/` (`pg_logger.py`, `pg_encoder.py`, `viewer_template.html`)
+and imported at build time as raw strings via Vite `?raw`. They are copies, not a
+dependency: update codeviz and re-copy rather than editing them in place (see
+`src/vendor/codeviz/NOTICE` for attribution). Repo:
+https://github.com/manzoid/codeviz (also cloned locally at ../codeviz).
 
 ## Fade is the same ladder with a moving entry point
 
@@ -169,10 +184,10 @@ variety, and the predict-to-write ramp handled at the curriculum level.
    worst current gap where a stuck write has no escape).
 2. The cue / syntax rungs (1 and 2) plus ladder-depth to FSRS-grade mapping (turns
    the reveal into a real ladder and upgrades the scheduler signal).
-3. Execution visualization rung: prerender each snippet with codeviz at build
-   time and iframe the self-contained HTML (no Python Tutor stopgap needed;
-   codeviz already renders offline HTML and traces inline snippets for both
-   tracks). See the codeviz integration note above.
+3. Execution visualization rung: **Python path done** — trace the learner's own
+   submitted code with the vendored codeviz tracer inside the Pyodide runtime
+   already used for grading, and iframe the self-contained offline HTML. JS live
+   tracing is the next increment. See the codeviz integration note above.
 4. AI Socratic walkthrough rung: a copyable, well-tuned prompt handoff.
 5. Mastery-based advancement + the predict-to-write ramp.
 6. Variety pass on the content for transfer.

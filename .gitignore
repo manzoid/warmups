@@ -1,3 +1,7 @@
 node_modules
 dist
 .DS_Store
+
+# Python bytecode from running the vendored codeviz tracer (src/vendor/codeviz)
+__pycache__/
+*.pyc

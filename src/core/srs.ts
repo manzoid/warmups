@@ -40,3 +40,20 @@ export function review(card: Card, grade: Grade, now: Date): Card {
 export function due(card: Card, now: Date): boolean {
   return card.due.getTime() <= now.getTime();
 }
+
+/**
+ * Map an attempt outcome to a review grade. An assisted attempt (the learner
+ * leaned on any hint rung) is always a lapse — 'again' — regardless of whether
+ * it passed, so leaning on help stays honest in the schedule. Otherwise pass →
+ * 'good', fail → 'again'.
+ */
+export function gradeFor({
+  passed,
+  assisted,
+}: {
+  passed: boolean;
+  assisted: boolean;
+}): Grade {
+  if (assisted) return 'again';
+  return passed ? 'good' : 'again';
+}

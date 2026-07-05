@@ -1,0 +1,32 @@
+warmups — vendored codeviz assets and attribution
+=================================================
+
+These files are vendored (copied) from codeviz
+(https://github.com/manzoid/codeviz) so warmups can run the Python live tracer
+in the browser via Pyodide and render traces offline. They are imported at build
+time via Vite `?raw` imports. Do not edit them here; update codeviz and re-copy.
+
+Files
+-----
+  pg_logger.py         Online Python Tutor (OPT) Python tracer
+  pg_encoder.py        OPT heap/value encoder
+  viewer_template.html codeviz's self-contained offline trace renderer
+
+Online Python Tutor — Python tracer
+-----------------------------------
+  pg_logger.py
+  pg_encoder.py
+
+From Online Python Tutor (https://github.com/pgbovine/OnlinePythonTutor/),
+Copyright (C) Philip J. Guo (philip@pgbovine.net), MIT License.
+
+The OPT trace JSON format consumed by viewer_template.html and produced by
+pg_logger.py also originates from Online Python Tutor.
+
+codeviz renderer
+----------------
+  viewer_template.html
+
+codeviz's own work, MIT-licensed. It is a self-contained offline page (inline
+CSS + JS, no network). The trace JSON is injected by string replacement of the
+`__TRACE_JSON__` and `__TITLE__` markers.

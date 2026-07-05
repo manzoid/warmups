@@ -15,7 +15,7 @@ const PYODIDE_SCRIPT_URL = `${PYODIDE_INDEX_URL}pyodide.js`;
 interface PyProxyDict {
   destroy(): void;
 }
-interface PyodideAPI {
+export interface PyodideAPI {
   runPython(code: string, options?: { globals?: PyProxyDict }): unknown;
   runPythonAsync(code: string, options?: { globals?: PyProxyDict }): Promise<unknown>;
   globals: {
@@ -23,6 +23,12 @@ interface PyodideAPI {
   };
   setStdout(options: { batched?: (s: string) => void; write?: (buf: Uint8Array) => number }): void;
   setStderr(options: { batched?: (s: string) => void; write?: (buf: Uint8Array) => number }): void;
+  // Emscripten virtual filesystem. Used to write the vendored codeviz tracer
+  // modules so they can be `import`ed inside the Pyodide runtime.
+  FS: {
+    writeFile(path: string, data: string | Uint8Array, opts?: { encoding?: 'utf8' }): void;
+    mkdirTree(path: string): void;
+  };
 }
 
 type LoadPyodideFn = (options: { indexURL: string }) => Promise<PyodideAPI>;
