@@ -20,6 +20,7 @@ export interface Attempt {
   rung: number; // deepest hint-ladder rung used (0 = unaided, 1 cue … 5 reveal)
   skipped?: boolean; // learner tested out / skipped it (counts as "seen", not passed)
   ms?: number; // wall-clock time from when the exercise appeared to submit (fluency signal)
+  selfDeclared?: boolean; // learner clicked "I've got this" (self-rated mastery; for tuning)
 }
 
 export interface ProgressState {

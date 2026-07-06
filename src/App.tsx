@@ -193,6 +193,19 @@ export default function App() {
   }, [exercises, skip]);
 
   // Skip past the opening predict/trivia cluster to the next hands-on write.
+  // "Skip to first write" is a one-time onboarding shortcut; once used, we stop
+  // offering it (persisted, so it stays gone across sessions).
+  const [usedSkipFirstWrite, setUsedSkipFirstWrite] = useState<boolean>(() => {
+    try {
+      return (
+        typeof window !== 'undefined' &&
+        window.localStorage.getItem('warmups.usedSkipFirstWrite') === '1'
+      );
+    } catch {
+      return false;
+    }
+  });
+
   const skipToFirstWrite = useCallback(() => {
     const ids: string[] = [];
     let started = false;
@@ -201,6 +214,12 @@ export default function App() {
       if (started && ex.kind === 'write') break; // land on the next write
       ids.push(ex.id);
       started = true;
+    }
+    setUsedSkipFirstWrite(true);
+    try {
+      window.localStorage.setItem('warmups.usedSkipFirstWrite', '1');
+    } catch {
+      // best-effort
     }
     if (ids.length) skip(ids);
   }, [exercises, skip]);
@@ -267,6 +286,25 @@ export default function App() {
         ms: bestMs,
       });
       persist();
+      bump();
+    },
+    [persist, bump],
+  );
+
+  // "I've got this": the learner self-declares mastery of a pattern. Recorded
+  // (distinctly, via selfDeclared) so we can tune their drills later, then we
+  // exit back to the pattern picker.
+  const recordGotThis = useCallback(
+    (exId: string) => {
+      recordAttempt(progress.current, {
+        id: exId,
+        at: Date.now(),
+        passed: true,
+        rung: 0,
+        selfDeclared: true,
+      });
+      persist();
+      setFluencyEx(null);
       bump();
     },
     [persist, bump],
@@ -396,7 +434,7 @@ export default function App() {
                   experienced={experienced}
                   onToggleExperienced={toggleExperienced}
                   onSkip={() => skip([pick.exercise.id])}
-                  onSkipToFirstWrite={skipToFirstWrite}
+                  onSkipToFirstWrite={usedSkipFirstWrite ? undefined : skipToFirstWrite}
                   onSkipToProblems={INTERVIEW_FEATURES ? skipToProblems : undefined}
                   onSkipUnit={() =>
                     skip(
@@ -468,6 +506,7 @@ export default function App() {
                   ex={fluencyEx}
                   best={bestTimeMs(progress.current, fluencyEx.id)}
                   onCleared={(ms) => recordFluencyClear(fluencyEx.id, ms)}
+                  onGotThis={() => recordGotThis(fluencyEx.id)}
                   onExit={() => setFluencyEx(null)}
                 />
               ))}
@@ -728,21 +767,20 @@ function PracticeDone({
 }
 
 // --- Fluency mode (Kumon-style speed drilling) ------------------------------
-// Each pattern generates a fresh random instance every rep. You first do a few
-// to set your own baseline pace (SCT, Standard Completion Time in Kumon terms),
-// then "clear" the pattern by answering a streak of them correctly AND under
-// that pace — speed, not just correctness, is the mastery signal.
+// Each pattern generates a fresh random instance every rep. You "clear" it by
+// answering a few in a row correctly AND under a reasonable pace target — speed,
+// not just correctness, is the mastery signal. The target starts at a sensible
+// default for the kind (no averaging your first attempts); "speed up" tightens
+// it. A miss steps you back one, it doesn't wipe your run.
 
-const FLU_CALIBRATION = 3; // correct reps used to set your baseline pace
-const FLU_GOAL = 5; // consecutive correct-and-fast reps to clear
-const FLU_GRACE = 1.15; // target = 1.15 × your median baseline (a little slack)
+const FLU_GOAL = 3; // correct-and-fast reps to clear a pattern
 const FLU_SPEEDUP = 0.85; // "speed up" round tightens the target by 15%
+// Reasonable upfront pace targets by exercise kind (ms). Not derived from the
+// learner's own reps; just a sane starting bar they race against from rep one.
+const FLU_DEFAULT_MS = { predict: 10000, write: 60000 } as const;
 
-function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const s = [...xs].sort((a, b) => a - b);
-  const mid = Math.floor(s.length / 2);
-  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+function defaultTargetMs(kind: Exercise['kind']): number {
+  return kind === 'write' ? FLU_DEFAULT_MS.write : FLU_DEFAULT_MS.predict;
 }
 
 function FluencyPicker({
@@ -819,12 +857,14 @@ function FluencyDrill({
   ex,
   best,
   onCleared,
+  onGotThis,
   onExit,
 }: {
   track: Track;
   ex: Exercise;
   best: number | null;
   onCleared: (bestMs: number) => void;
+  onGotThis: () => void;
   onExit: () => void;
 }) {
   const [inst, setInst] = useState<Exercise | null>(null);
@@ -837,7 +877,7 @@ function FluencyDrill({
   const [times, setTimes] = useState<number[]>([]); // correct-rep times this session
   const [streak, setStreak] = useState(0);
   const [reps, setReps] = useState(0); // correct reps this session
-  const [targetMs, setTargetMs] = useState<number | null>(null);
+  const [targetMs, setTargetMs] = useState<number>(() => defaultTargetMs(ex.kind));
   const [cleared, setCleared] = useState(false);
   const [lastMs, setLastMs] = useState<number | null>(null);
   const [lastFast, setLastFast] = useState(false);
@@ -915,7 +955,8 @@ function FluencyDrill({
 
     if (!res.passed) {
       setLastFast(false);
-      setStreak(0); // a miss breaks the streak; absorb the answer, advance manually
+      // A miss steps the streak back by one, it does NOT wipe your whole run.
+      setStreak((s) => Math.max(0, s - 1));
       return;
     }
 
@@ -923,20 +964,13 @@ function FluencyDrill({
     setTimes(newTimes);
     setReps((r) => r + 1);
 
-    let tgt = targetMs;
-    if (tgt === null && newTimes.length >= FLU_CALIBRATION) {
-      tgt = Math.round(median(newTimes) * FLU_GRACE);
-      setTargetMs(tgt);
-    }
-
-    const fast = tgt !== null && ms <= tgt;
+    const fast = ms <= targetMs;
     setLastFast(fast);
 
     let willClear = false;
     // A correct-but-slow rep HOLDS the streak (it doesn't advance, but it isn't
-    // punished either) — being right should never feel like failing. Only a
-    // wrong answer resets the streak (handled in the !res.passed branch above).
-    if (tgt !== null && fast) {
+    // punished either) — being right should never feel like failing.
+    if (fast) {
       const s = streak + 1;
       setStreak(s);
       if (s >= FLU_GOAL) {
@@ -955,7 +989,7 @@ function FluencyDrill({
     const bestMs = times.length ? Math.min(...times) : 0;
     const avgMs = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
     const speedUp = () => {
-      setTargetMs((t) => (t ? Math.round(t * FLU_SPEEDUP) : t));
+      setTargetMs((t) => Math.round(t * FLU_SPEEDUP));
       setStreak(0);
       setCleared(false);
       void genNext();
@@ -966,12 +1000,12 @@ function FluencyDrill({
           Cleared “{ex.concept}” 🎉
         </h2>
         <p style={{ ...styles.tagline, margin: '0 0 0.9rem' }}>
-          {FLU_GOAL} in a row, correct and under {targetMs ? secs(targetMs) : ''}.
-          Best {secs(bestMs)} · avg {secs(avgMs)} over {reps} solved.
+          {FLU_GOAL} in a row, correct and under {secs(targetMs)}.
+          {times.length ? ` Best ${secs(bestMs)} · avg ${secs(avgMs)} over ${reps} solved.` : ''}
         </p>
         <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
           <button style={styles.btn} onClick={speedUp}>
-            Speed up (target {targetMs ? secs(Math.round(targetMs * FLU_SPEEDUP)) : ''}) →
+            Speed up (target {secs(Math.round(targetMs * FLU_SPEEDUP))}) →
           </button>
           <button style={styles.btnGhost} onClick={onExit}>
             Pick another pattern
@@ -1002,38 +1036,27 @@ function FluencyDrill({
 
       {/* HUD: pace target, streak, live/last time */}
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginBottom: '0.75rem' }}>
-        {targetMs == null ? (
-          <span style={styles.pill}>
-            Warming up {Math.min(times.length, FLU_CALIBRATION)}/{FLU_CALIBRATION} — setting your pace
-          </span>
-        ) : (
-          <span style={styles.pill}>Target ≤ {secs(targetMs)}</span>
-        )}
-        {targetMs != null && (
-          <span
-            style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
-            title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
-          >
-            {dots} {streak}/{FLU_GOAL}
-          </span>
-        )}
+        <span style={styles.pill}>Target ≤ {secs(targetMs)}</span>
+        <span
+          style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
+          title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
+        >
+          {dots} {streak}/{FLU_GOAL}
+        </span>
         <span style={styles.pill}>
           ⏱ {graded && lastMs != null ? secs(lastMs) : secs(elapsed)}
         </span>
         {best != null && <span style={styles.pill}>best {secs(best)}</span>}
-        {targetMs != null && (
-          <button
-            style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
-            title="Reset your pace and calibrate again over the next few reps"
-            onClick={() => {
-              setTargetMs(null);
-              setTimes([]);
-              setStreak(0);
-            }}
-          >
-            Re-pace
-          </button>
-        )}
+        <button
+          style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
+          title="Loosen the pace target back to the default"
+          onClick={() => {
+            setTargetMs(defaultTargetMs(ex.kind));
+            setStreak(0);
+          }}
+        >
+          Re-pace
+        </button>
       </div>
 
       <p style={{ margin: '0 0 1rem', color: theme.text }}>{ex.prompt}</p>
@@ -1072,7 +1095,7 @@ function FluencyDrill({
             />
           )}
 
-          <div style={{ ...styles.row, marginTop: '1rem' }}>
+          <div style={{ ...styles.row, marginTop: '1rem', flexWrap: 'wrap', gap: 8 }}>
             {!graded && (
               <button style={styles.btn} onClick={() => void submit()} disabled={running}>
                 {running ? 'Checking…' : 'Check'}
@@ -1083,7 +1106,33 @@ function FluencyDrill({
                 Next →
               </button>
             )}
+            <button
+              style={styles.btnGhost}
+              onClick={() => setShowViz((v) => !v)}
+              title="Trace it in codeviz. The clock keeps running, so it costs you time."
+            >
+              {showViz ? 'Hide run' : 'See it run'}
+            </button>
+            {!graded && onGotThis && (
+              <button
+                style={styles.btnGhost}
+                onClick={onGotThis}
+                title="Already automatic for you. We record that so we can tune your drills."
+              >
+                I've got this →
+              </button>
+            )}
           </div>
+
+          {showViz && (
+            <div style={{ marginTop: '0.6rem' }}>
+              <Visualizer
+                track={track}
+                code={vizCode(inst, input, result?.failingCase)}
+                title={inst.concept}
+              />
+            </div>
+          )}
 
           {graded && result && (
             <div style={{ marginTop: '0.9rem' }}>
@@ -1092,14 +1141,12 @@ function FluencyDrill({
                   style={{
                     ...styles.label,
                     margin: 0,
-                    color: lastFast || targetMs == null ? theme.good : theme.accent,
+                    color: lastFast ? theme.good : theme.accent,
                   }}
                 >
-                  {targetMs == null
-                    ? `✓ ${lastMs != null ? secs(lastMs) : ''} — pace set after ${FLU_CALIBRATION}`
-                    : lastFast
-                      ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
-                      : `✓ Correct, just over ${secs(targetMs)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
+                  {lastFast
+                    ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
+                    : `✓ Correct, just over ${secs(targetMs)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
                 </p>
               ) : (
                 <>
@@ -1114,27 +1161,15 @@ function FluencyDrill({
                       Answer: <code>{inst.expected}</code>
                     </p>
                   )}
-                  <div style={{ ...styles.row, gap: 8, marginTop: '0.5rem', flexWrap: 'wrap' }}>
-                    <button style={styles.btnGhost} onClick={() => setShowViz((v) => !v)}>
-                      {showViz ? 'Hide run' : 'See it run'}
-                    </button>
-                    {inst.kind === 'write' && inst.solution && (
+                  {inst.kind === 'write' && inst.solution && (
+                    <div style={{ marginTop: '0.5rem' }}>
                       <button style={styles.btnGhost} onClick={() => setShowSol((s) => !s)}>
                         {showSol ? 'Hide solution' : 'Show solution'}
                       </button>
-                    )}
-                  </div>
-                  {showViz && (
-                    <div style={{ marginTop: '0.6rem' }}>
-                      <Visualizer
-                        track={track}
-                        code={vizCode(inst, input, result.failingCase)}
-                        title={inst.concept}
-                      />
+                      {showSol && (
+                        <pre style={{ ...styles.code, marginTop: '0.6rem' }}>{inst.solution}</pre>
+                      )}
                     </div>
-                  )}
-                  {showSol && inst.solution && (
-                    <pre style={{ ...styles.code, marginTop: '0.6rem' }}>{inst.solution}</pre>
                   )}
                 </>
               )}
