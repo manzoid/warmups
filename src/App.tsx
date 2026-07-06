@@ -1595,8 +1595,13 @@ function HintLadder({
       n += 1;
       s.push({ key: 'syntax', rung: RUNG.syntax, title: `Hint ${n}`, action: `Show hint ${n}` });
     }
-    if (graded) {
+    // "See it run" is available BEFORE submitting on a WRITE exercise (it traces
+    // your own in-progress code and spoils nothing). On a PREDICT it waits until
+    // graded, since running the snippet would reveal the value you're predicting.
+    if (graded || ex.kind === 'write') {
       s.push({ key: 'visualize', rung: RUNG.visualize, title: 'See it run', action: 'Visualize your run' });
+    }
+    if (graded) {
       s.push({ key: 'walkthrough', rung: RUNG.walkthrough, title: 'Talk it through', action: 'Get a walkthrough' });
       if (answer && answer.length > 0) {
         s.push({
