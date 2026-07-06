@@ -6,8 +6,10 @@ warmups is an open-source, **local-first** spaced-repetition kata app for gettin
 
 ```bash
 npm install
-npm run dev      # start the Vite dev server (http://localhost:5173)
+npm run dev      # Vite dev server (http://localhost:5173) + codeviz if installed
 ```
+
+`npm run dev` also starts the codeviz trace API if `codeviz` is on your PATH (for the "Visualize my run" hint, below); if it isn't, it prints the one-time install line and carries on. Use `npm run dev:vite` for Vite alone.
 
 Then open the app, pick a track (Python or JavaScript), and start a session.
 
@@ -20,12 +22,13 @@ Grade yourself by submitting: a pass schedules the card further out, a fail brin
 
 ## Visualize a run (optional)
 
-When you're stuck, the "Visualize my run" hint steps through your own code (frames, heap, arrows) using [codeviz](https://github.com/manzoid/codeviz). Running and grading exercises never need it — only this one feature does. Start codeviz alongside warmups:
+When you're stuck, the "Visualize my run" hint steps through your own code (frames, heap, arrows) using [codeviz](https://github.com/manzoid/codeviz). Running and grading exercises never need it — only this one feature does. Install codeviz once:
 
 ```bash
 uv tool install git+https://github.com/manzoid/codeviz   # once
-codeviz api                                              # serves http://127.0.0.1:8930
 ```
+
+After that, `npm run dev` starts the codeviz API for you (it detects `codeviz` on your PATH and launches `codeviz api` on http://127.0.0.1:8930 alongside Vite; if you already have one running, it reuses it). A browser tab can't install or launch anything itself, so the dev launcher (`scripts/dev.mjs`) is what bridges that gap — it never installs software on its own, it just runs codeviz if it's there. You can also start it by hand with `codeviz api`.
 
 warmups calls that local API and shows the step-through inline; it works for both Python and JavaScript. If codeviz isn't running, the hint just tells you how to start it. (Run warmups over http, i.e. `npm run dev`/`preview`; a page served over https may block calls to the local http API.)
 
@@ -39,7 +42,8 @@ warmups calls that local API and shows the step-through inline; it works for bot
 ## Scripts
 
 ```bash
-npm run dev        # dev server
+npm run dev        # Vite dev server + codeviz api (if installed)
+npm run dev:vite   # Vite alone (no codeviz)
 npm run build      # production static build → dist/
 npm run preview    # preview the production build
 npm run typecheck  # tsc --noEmit

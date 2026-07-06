@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev.mjs",
+    "dev:vite": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate-content.mjs",
-    "test:scaffold": "node scripts/test-scaffold.mjs",
-    "test:pytrace": "node scripts/test-pytrace.mjs",
     "test": "node scripts/test-scaffold.mjs"
   },
   "dependencies": {
