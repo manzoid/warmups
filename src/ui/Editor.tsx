@@ -58,6 +58,18 @@ export function CodeEditor({
       extensions={extensions}
       theme="dark"
       autoFocus={autoFocus}
+      onCreateEditor={(view) => {
+        // Pre-select the "your code here" placeholder (plus a trailing `pass`
+        // stub, for Python) so the first keystroke replaces it — no manual
+        // deleting. Runs once per editor (the view remounts per exercise).
+        const doc = view.state.doc.toString();
+        const m = doc.match(/(?:#|\/\/) your code here/);
+        if (!m || m.index === undefined) return;
+        let end = m.index + m[0].length;
+        const passLine = doc.slice(end).match(/^\n[ \t]*pass\b[ \t]*(?=\n|$)/);
+        if (passLine) end += passLine[0].length;
+        view.dispatch({ selection: { anchor: m.index, head: end } });
+      }}
       basicSetup={{
         lineNumbers: true,
         foldGutter: false,
