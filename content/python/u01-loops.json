@@ -103,7 +103,8 @@
       "py.u01.accumulate.sum.predict"
     ],
     "cue": "Keep one running total, updated once per element as you index `a[i]`.",
-    "syntax": "for i in range(len(a))"
+    "syntax": "for i in range(len(a))",
+    "note": "We start with indexed loops on purpose: a[i] with an explicit counter is what a list really is, and it carries over to C and to interview mechanics. The for-each and comprehension shortcuts come next."
   },
   {
     "id": "py.u01.accumulate.foreach.predict",

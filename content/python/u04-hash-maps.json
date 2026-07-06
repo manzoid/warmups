@@ -5,7 +5,7 @@
     "group": "Hash maps",
     "concept": "character codes and zero-filled slots",
     "kind": "predict",
-    "prompt": "What does this evaluate to?",
+    "prompt": "Given that ord('a') == 97 and the letters are consecutive (so 'b' is 98 and 'c' is 99), what does this evaluate to?",
     "snippet": "codes = [ord('a'), ord('b'), ord('c')]\nslots = [0] * 3\n[codes, slots]",
     "expected": "[[97, 98, 99], [0, 0, 0]]",
     "prereqs": [],

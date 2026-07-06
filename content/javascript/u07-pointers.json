@@ -20,7 +20,7 @@
     "cue": "Keep your own index and add each element as you advance it.",
     "syntax": "while (i < a.length)",
     "kind": "write",
-    "prompt": "Write `sumAll(a)` that returns the sum of the numbers in `a`. Use a `while` loop with an index you increment yourself; do not use `for`, `reduce`, or other built-ins.",
+    "prompt": "Write `sumAll(a)` that returns the sum of the numbers in `a`. Use a `while` loop with an index you increment yourself; do not use `for`, `reduce`, or other built-ins. They are banned so you practice driving the index pointer by hand.",
     "starter": "function sumAll(a) {\n  // your code here\n}",
     "solution": "function sumAll(a) {\n  let i = 0;\n  let s = 0;\n  while (i < a.length) {\n    s += a[i];\n    i++;\n  }\n  return s;\n}",
     "tests": "if (sumAll([10, 20, 30]) !== 60) throw new Error('60: ' + sumAll([10, 20, 30]));\nif (sumAll([]) !== 0) throw new Error('empty must be 0');\nif (sumAll([5]) !== 5) throw new Error('single');\nif (sumAll([-1, 1, -2, 2]) !== 0) throw new Error('signs');",

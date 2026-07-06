@@ -34,7 +34,7 @@
     "group": "Strings",
     "concept": "char to code point",
     "kind": "predict",
-    "prompt": "What does this evaluate to?",
+    "prompt": "Given that 'A' has code point 65, what does this evaluate to?",
     "snippet": "\"A\".charCodeAt(0)",
     "expected": "65",
     "prereqs": [
@@ -50,7 +50,7 @@
     "group": "Strings",
     "concept": "code point to char",
     "kind": "predict",
-    "prompt": "What does this evaluate to?",
+    "prompt": "Given that 'A' has code point 65 and the letters are consecutive, what does this evaluate to?",
     "snippet": "String.fromCharCode(66)",
     "expected": "'B'",
     "prereqs": [],

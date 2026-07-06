@@ -175,7 +175,7 @@
     "prereqs": [
       "py.u01.extreme.max"
     ],
-    "cue": "`cur` is the best sum ending here: either extend the run or restart at `a[i]`. This list is all-negative, so the answer is the least-negative single element.",
+    "cue": "`cur` is the best sum ending here: either extend the run or restart at `a[i]`, whichever is larger.",
     "syntax": "cur = max(a[i], cur + a[i])"
   },
   {
@@ -186,14 +186,14 @@
     "kind": "write",
     "prompt": "Write `max_subarray(a)` for non-empty list `a`, returning the largest sum of any contiguous non-empty slice. All-negative inputs return the least-negative element.",
     "starter": "def max_subarray(a):\n    # your code here\n    pass",
-    "solution": "def max_subarray(a):\n    best = a[0]\n    cur = a[0]\n    for i in range(1, len(a)):\n        if cur < 0:\n            cur = a[i]\n        else:\n            cur = cur + a[i]\n        if cur > best:\n            best = cur\n    return best",
+    "solution": "def max_subarray(a):\n    best = a[0]\n    cur = a[0]\n    for i in range(1, len(a)):\n        cur = max(a[i], cur + a[i])\n        if cur > best:\n            best = cur\n    return best",
     "tests": "assert max_subarray([1]) == 1, max_subarray([1])\nassert max_subarray([-1]) == -1, max_subarray([-1])\nassert max_subarray([-3, -1, -2]) == -1, max_subarray([-3, -1, -2])\nassert max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6, max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4])\nassert max_subarray([5, 4, -1, 7, 8]) == 23, max_subarray([5, 4, -1, 7, 8])",
     "prereqs": [
       "py.u01.kadane.best-here.predict",
       "py.u01.extreme.max"
     ],
-    "cue": "Carry the best sum ending at the current index; whenever that running sum turns negative it can only drag the next element down, so drop it and restart.",
-    "syntax": "reset the running sum when it goes negative",
+    "cue": "Carry the best sum ending at the current index: either extend the previous run or restart at `a[i]`, whichever is larger.",
+    "syntax": "cur = max(a[i], cur + a[i])",
     "note": "One pass, carrying the best sum ending here: O(n). Trying every start/end pair would be O(n^2).",
     "mapsTo": "LC 53 · Maximum Subarray"
   },

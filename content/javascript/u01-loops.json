@@ -91,6 +91,7 @@
     "starter": "function sum(a) {\n  // your code here\n}",
     "solution": "function sum(a) {\n  let total = 0;\n  for (let i = 0; i < a.length; i++) total += a[i];\n  return total;\n}",
     "tests": "if (sum([1, 2, 3]) !== 6) throw new Error('sum [1,2,3]');\nif (sum([]) !== 0) throw new Error('empty');\nif (sum([-1, 1]) !== 0) throw new Error('neg cancel');",
+    "note": "We start with indexed loops on purpose: a[i] with an explicit counter is what an array really is, and it carries over to C and to interview mechanics. The for-of and map/reduce shortcuts come next.",
     "prereqs": ["js.u01.accumulate.sum.index.predict"]
   },
   {

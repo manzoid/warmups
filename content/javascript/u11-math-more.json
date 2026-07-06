@@ -26,7 +26,7 @@
     "banned": ["**", "Math.pow"],
     "cue": "Start the accumulator at 1 (the empty product) and multiply by base once per exponent step.",
     "syntax": "result *= base",
-    "prereqs": ["js.u11.horner.abc"]
+    "prereqs": []
   },
   {
     "id": "js.u11.isqrt.write",

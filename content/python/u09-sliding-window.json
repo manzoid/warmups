@@ -74,7 +74,7 @@
     "group": "Sliding window",
     "concept": "maximum average size-k block",
     "kind": "write",
-    "prompt": "Write `max_average(nums, k)` returning the maximum average of any contiguous block of exactly `k` elements, as a float. Assume 1 <= k <= len(nums). Slide the window in O(1); do not re-sum each block.",
+    "prompt": "Write `max_average(nums, k)` returning the maximum average of any contiguous block of exactly `k` elements, as a float. Assume 1 <= k <= len(nums). Slide the window in O(1); do not re-sum each block. Using `sum()` once to prime the first window is fine; just do not re-sum every block.",
     "starter": "def max_average(nums, k):\n    # your code here\n    pass",
     "solution": "def max_average(nums, k):\n    s = sum(nums[:k])\n    best = s\n    for i in range(k, len(nums)):\n        s += nums[i] - nums[i - k]\n        if s > best:\n            best = s\n    return best / k",
     "tests": "assert max_average([1, 12, -5, -6, 50, 3], 4) == 12.75, max_average([1, 12, -5, -6, 50, 3], 4)\nassert max_average([5], 1) == 5.0, max_average([5], 1)",

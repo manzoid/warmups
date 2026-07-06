@@ -280,7 +280,7 @@
     "solution": "function findAnagrams(s, p) {\n  const res = [];\n  if (p.length > s.length) return res;\n  const need = new Map();\n  for (let i = 0; i < p.length; i++) need.set(p[i], (need.get(p[i]) || 0) + 1);\n  const win = new Map();\n  const k = p.length;\n  const eq = (a, b) => {\n    if (a.size !== b.size) return false;\n    for (const [key, v] of a) if (b.get(key) !== v) return false;\n    return true;\n  };\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    win.set(c, (win.get(c) || 0) + 1);\n    if (right >= k) {\n      const lc = s[right - k];\n      win.set(lc, win.get(lc) - 1);\n      if (win.get(lc) === 0) win.delete(lc);\n    }\n    if (right >= k - 1 && eq(win, need)) res.push(right - k + 1);\n  }\n  return res;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(findAnagrams('cbaebabacd', 'abc'), [0, 6]);\neq(findAnagrams('abab', 'ab'), [0, 1, 2]);\neq(findAnagrams('aa', 'bb'), []);\neq(findAnagrams('a', 'a'), [0]);",
     "mapsTo": "LC 438 · Find All Anagrams in a String",
-    "prereqs": ["js.u09.countmap.slide.predict", "js.u09.fixed.maxsum.write"]
+    "prereqs": ["js.u09.countmap.slide.predict"]
   },
   {
     "id": "js.u09.minwindow.missing.predict",
