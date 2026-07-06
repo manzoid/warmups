@@ -51,13 +51,15 @@
     "concept": "max of an array by hand",
     "kind": "write",
     "prompt": "Implement `biggest(a)` returning the largest element — by hand, no `Math.max`. Fresh data every time.",
-    "banned": ["Math.max"],
+    "banned": [
+      "Math.max"
+    ],
     "generator": "function make() {\n  const n = 4 + Math.floor(Math.random() * 4);\n  const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 50));\n  const m = Math.max(...a);\n  const starter = 'function biggest(a) {\\n  // your code here\\n}';\n  const solution = 'function biggest(a) {\\n  let m = a[0];\\n  for (let i = 1; i < a.length; i++) {\\n    if (a[i] > m) m = a[i];\\n  }\\n  return m;\\n}';\n  const tests = `if (biggest([${a.join(', ')}]) !== ${m}) throw new Error('expected ${m}');`;\n  return { starter, solution, tests, banned: ['Math.max'] };\n}"
   },
   {
     "id": "js.fluency.mapget",
     "track": "javascript",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "Map.get on a missing key",
     "kind": "predict",
     "prompt": "Predict the value. Map.get returns undefined for a key that is not present. Fresh queries every time.",
@@ -66,7 +68,7 @@
   {
     "id": "js.fluency.sortnum",
     "track": "javascript",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "numeric sort with a comparator",
     "kind": "predict",
     "prompt": "Predict the sorted array. The (a, b) => a - b comparator sorts numerically (default sort is lexicographic). Fresh data every time.",
@@ -75,7 +77,7 @@
   {
     "id": "js.fluency.nullish",
     "track": "javascript",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "|| vs ?? on a falsy value",
     "kind": "predict",
     "prompt": "Predict the value. || falls back on any falsy left side; ?? falls back only on null or undefined. Watch what happens when the left is 0. Fresh each time.",

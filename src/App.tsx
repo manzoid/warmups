@@ -602,28 +602,50 @@ function FluencyPicker({
         then clear the pattern with a streak of correct-and-fast answers. Speed is
         the goal: you want these automatic.
       </p>
-      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
-        {generators.map((ex) => (
-          <button
-            key={ex.id}
-            style={styles.btnGhost}
-            onClick={() => onPick(ex)}
-            title={
-              ex.kind === 'write'
-                ? 'A write drill: you implement the function each time'
-                : 'A predict drill: you type the value each time'
-            }
-          >
-            {ex.concept}
-            {ex.kind === 'write' && (
-              <span style={{ ...styles.pill, marginLeft: 6, color: theme.accent, borderColor: theme.accent }}>
-                write
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-      <p style={{ ...styles.tagline, margin: '0.7rem 0 0', fontSize: '0.8rem', color: theme.muted }}>
+      {(() => {
+        // Group by the generator's `group` so language IDIOMS are their own
+        // findable lane, not buried among the basic arithmetic drills. Idiom
+        // groups (labelled "... idioms") sort first — that's what experienced
+        // learners come for.
+        const byGroup = new Map<string, Exercise[]>();
+        for (const ex of generators) {
+          const g = ex.group;
+          if (!byGroup.has(g)) byGroup.set(g, []);
+          byGroup.get(g)!.push(ex);
+        }
+        const groups = [...byGroup.entries()].sort(([a], [b]) => {
+          const ai = /idiom/i.test(a) ? 0 : 1;
+          const bi = /idiom/i.test(b) ? 0 : 1;
+          return ai !== bi ? ai - bi : a < b ? -1 : 1;
+        });
+        return groups.map(([g, exs]) => (
+          <div key={g} style={{ marginBottom: '0.9rem' }}>
+            <p style={{ ...styles.label, margin: '0 0 0.4rem' }}>{g}</p>
+            <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+              {exs.map((ex) => (
+                <button
+                  key={ex.id}
+                  style={styles.btnGhost}
+                  onClick={() => onPick(ex)}
+                  title={
+                    ex.kind === 'write'
+                      ? 'A write drill: you implement the function each time'
+                      : 'A predict drill: you type the value each time'
+                  }
+                >
+                  {ex.concept}
+                  {ex.kind === 'write' && (
+                    <span style={{ ...styles.pill, marginLeft: 6, color: theme.accent, borderColor: theme.accent }}>
+                      write
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        ));
+      })()}
+      <p style={{ ...styles.tagline, margin: '0.4rem 0 0', fontSize: '0.8rem', color: theme.muted }}>
         Fluency is for getting fast at a mechanic you already know. Learn it first
         in Learn, then come here to make it automatic.
       </p>

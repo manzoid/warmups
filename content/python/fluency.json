@@ -60,13 +60,15 @@
     "concept": "max of a list by hand",
     "kind": "write",
     "prompt": "Implement `biggest(a)` returning the largest element — by hand, no `max()`. Fresh data every time.",
-    "banned": ["max("],
+    "banned": [
+      "max("
+    ],
     "generator": "import random\ndef make():\n    a = [random.randint(1, 50) for _ in range(random.randint(4, 7))]\n    starter = \"def biggest(a):\\n    # your code here\\n    pass\"\n    solution = \"def biggest(a):\\n    m = a[0]\\n    for i in range(1, len(a)):\\n        if a[i] > m:\\n            m = a[i]\\n    return m\"\n    tests = \"assert biggest(\" + repr(a) + \") == \" + repr(max(a))\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests, \"banned\": [\"max(\"]}"
   },
   {
     "id": "py.fluency.dictget",
     "track": "python",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "dict.get with a default",
     "kind": "predict",
     "prompt": "Predict the value. Remember d.get(key, default) returns the default when the key is missing. Fresh queries every time.",
@@ -75,7 +77,7 @@
   {
     "id": "py.fluency.zip",
     "track": "python",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "zip two lists into pairs",
     "kind": "predict",
     "prompt": "Predict the list of pairs. Fresh data every time — make zip automatic.",
@@ -84,7 +86,7 @@
   {
     "id": "py.fluency.enumerate",
     "track": "python",
-    "group": "Fluency drills",
+    "group": "Fluency idioms",
     "concept": "enumerate to index-value pairs",
     "kind": "predict",
     "prompt": "Predict the list of (index, value) pairs. Fresh data every time — make enumerate automatic.",
