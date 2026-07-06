@@ -680,6 +680,21 @@ function ExerciseView({
 
       {result && <ResultView result={result} maxRung={maxRung} />}
 
+      {graded && (ex.note || ex.mapsTo) && (
+        <div style={{ marginTop: '0.85rem' }}>
+          {ex.mapsTo && (
+            <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
+              {ex.mapsTo}
+            </span>
+          )}
+          {ex.note && (
+            <p style={{ ...styles.tagline, margin: '0.5rem 0 0', color: theme.muted }}>
+              {ex.note}
+            </p>
+          )}
+        </div>
+      )}
+
       {graded && <HintLadder ex={ex} input={input} onUse={onUseHint} />}
     </div>
   );

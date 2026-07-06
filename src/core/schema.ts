@@ -22,6 +22,9 @@ export const ExerciseSchema = z.object({
   solution: z.string().optional(),
   tests: z.string().optional(),
   prereqs: z.array(z.string()).optional(),
+  // shown only after solving
+  note: z.string().optional(),
+  mapsTo: z.string().optional(),
 }).superRefine((ex, ctx) => {
   if (ex.kind === 'predict' && ex.expected === undefined) {
     ctx.addIssue({

@@ -19,6 +19,9 @@ export interface Exercise {
   solution?: string;     // reference solution (hidden; used only for content validation)
   tests?: string;        // appended after the user's code; must throw/assert on failure
   prereqs?: string[];    // exercise ids that should be learned first
+  // Shown only AFTER solving (never in the prompt — prompts stay terse):
+  note?: string;         // one-line "why" / under-the-hood / big-O payoff
+  mapsTo?: string;       // real interview problem this maps to, e.g. "LC 76 · Minimum Window Substring"
 }
 export interface RunResult { passed: boolean; actual?: string; error?: string; }
 export interface Runner { track: Track; run(userCode: string, ex: Exercise): Promise<RunResult>; }
