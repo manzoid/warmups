@@ -170,6 +170,11 @@ __wu_actual = eval(compile(__wu_ast.Expression(__wu_last.value), "<snippet>", "e
 try:
     __wu_user = eval(${JSON.stringify(userAnswer)}, {})
     __wu_passed = bool(__wu_user == __wu_actual)
+    # Bracket-forgiving fallback: a learner who types a bare "2, 3, 4" for an
+    # expected list [2, 3, 4] gets a tuple, which != the list. Accept it when the
+    # element sequence matches, so a right value isn't failed on bracket style.
+    if not __wu_passed and isinstance(__wu_user, tuple) and isinstance(__wu_actual, list):
+        __wu_passed = list(__wu_user) == __wu_actual
 except Exception:
     # Bare-token fallback: if the value is a string and the learner typed an
     # unquoted token (e.g. bcd instead of 'bcd'), eval raises NameError. Accept

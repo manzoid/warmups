@@ -594,11 +594,29 @@ function FluencyPicker({
       </p>
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
         {generators.map((ex) => (
-          <button key={ex.id} style={styles.btnGhost} onClick={() => onPick(ex)}>
+          <button
+            key={ex.id}
+            style={styles.btnGhost}
+            onClick={() => onPick(ex)}
+            title={
+              ex.kind === 'write'
+                ? 'A write drill: you implement the function each time'
+                : 'A predict drill: you type the value each time'
+            }
+          >
             {ex.concept}
+            {ex.kind === 'write' && (
+              <span style={{ ...styles.pill, marginLeft: 6, color: theme.accent, borderColor: theme.accent }}>
+                write
+              </span>
+            )}
           </button>
         ))}
       </div>
+      <p style={{ ...styles.tagline, margin: '0.7rem 0 0', fontSize: '0.8rem', color: theme.muted }}>
+        Fluency is for getting fast at a mechanic you already know. Learn it first
+        in Learn, then come here to make it automatic.
+      </p>
     </div>
   );
 }
@@ -717,17 +735,16 @@ function FluencyDrill({
     setLastFast(fast);
 
     let willClear = false;
-    if (tgt !== null) {
-      if (fast) {
-        const s = streak + 1;
-        setStreak(s);
-        if (s >= FLU_GOAL) {
-          willClear = true;
-          setCleared(true);
-          onCleared(Math.min(...newTimes));
-        }
-      } else {
-        setStreak(0);
+    // A correct-but-slow rep HOLDS the streak (it doesn't advance, but it isn't
+    // punished either) — being right should never feel like failing. Only a
+    // wrong answer resets the streak (handled in the !res.passed branch above).
+    if (tgt !== null && fast) {
+      const s = streak + 1;
+      setStreak(s);
+      if (s >= FLU_GOAL) {
+        willClear = true;
+        setCleared(true);
+        onCleared(Math.min(...newTimes));
       }
     }
     if (!willClear) scheduleAdvance(); // keep the flow moving on a correct rep
@@ -866,7 +883,7 @@ function FluencyDrill({
                     ? `✓ ${lastMs != null ? secs(lastMs) : ''} — pace set after ${FLU_CALIBRATION}`
                     : lastFast
                       ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
-                      : `✓ Correct but over ${secs(targetMs)} — streak reset, speed it up`}
+                      : `✓ Correct, just over ${secs(targetMs)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
                 </p>
               ) : (
                 <>
@@ -1190,7 +1207,7 @@ function ExerciseView({
             Skip
           </button>
         )}
-        {!graded && onSkipToFirstWrite && (
+        {!graded && !firstScreen && onSkipToFirstWrite && (
           <button
             style={styles.btnGhost}
             onClick={onSkipToFirstWrite}
@@ -1199,7 +1216,7 @@ function ExerciseView({
             Skip to first write →
           </button>
         )}
-        {!graded && onSkipToProblems && (
+        {!graded && !firstScreen && onSkipToProblems && (
           <button
             style={styles.btnGhost}
             onClick={onSkipToProblems}
@@ -1208,7 +1225,7 @@ function ExerciseView({
             Skip to problems →
           </button>
         )}
-        {!graded && onSkipUnit && (
+        {!graded && !firstScreen && onSkipUnit && (
           <button style={styles.btnGhost} onClick={onSkipUnit} title="Skip the rest of this group">
             Skip “{ex.group}”
           </button>

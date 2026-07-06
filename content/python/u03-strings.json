@@ -33,7 +33,7 @@
     "group": "Strings",
     "concept": "ord / chr both ways",
     "kind": "predict",
-    "prompt": "What does this evaluate to?",
+    "prompt": "Given that ord('a') == 97 and ord('A') == 65, and that a, b, c... are consecutive code points, what does this evaluate to?",
     "snippet": "[ord('a'), chr(98), ord('A')]",
     "expected": "[97, 'b', 65]",
     "prereqs": [],
