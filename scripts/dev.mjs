@@ -18,6 +18,8 @@ import { pathToFileURL } from 'node:url';
 
 const PORT = 8930;
 const HEALTH = `http://127.0.0.1:${PORT}/health`;
+const DATA_PORT = 8931;
+const DATA_HEALTH = `http://127.0.0.1:${DATA_PORT}/health`;
 
 function log(msg) {
   process.stdout.write(`[warmups] ${msg}\n`);
@@ -40,6 +42,16 @@ export function haveCodeviz() {
     p.on('error', () => resolve(false));
     p.on('exit', (code) => resolve(code === 0));
   });
+}
+
+/** Is the warmups data server already listening? */
+export async function dataServerUp() {
+  try {
+    const res = await fetch(DATA_HEALTH, { signal: AbortSignal.timeout(600) });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function main() {
@@ -82,6 +94,26 @@ async function main() {
     log('  Running and grading exercises works without it. To enable it:');
     log('    uv tool install git+https://github.com/manzoid/codeviz   # once');
     log('  then re-run `npm run dev` (or start `codeviz api` yourself).');
+  }
+
+  // Durable history store (SQLite). It's an in-repo Node server (no external
+  // install), so always start it — reusing one already running.
+  if (await dataServerUp()) {
+    log(`data server already running on http://127.0.0.1:${DATA_PORT} — reusing it.`);
+  } else {
+    log(`starting data server on http://127.0.0.1:${DATA_PORT} …`);
+    const ds = spawn('node', ['--experimental-sqlite', 'server/index.mjs'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const relay = (buf) =>
+      String(buf)
+        .split('\n')
+        .filter((l) => l.trim() && !/ExperimentalWarning|--trace-warnings/.test(l))
+        .forEach((l) => process.stdout.write(`[data] ${l}\n`));
+    ds.stdout.on('data', relay);
+    ds.stderr.on('data', relay);
+    ds.on('error', (e) => log(`data server failed to start: ${e.message}`));
+    children.push(ds);
   }
 
   // Vite is the thing you actually wait on; when it exits, tear everything down.

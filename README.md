@@ -1,22 +1,22 @@
 # warmups
 
-warmups is an open-source, **local-first** spaced-repetition kata app for getting fast and automatic at Python and JavaScript language fluency and a small set of reverse-engineered problem-solving primitives. It runs entirely in your browser as a static site with no backend and no accounts: Python exercises execute in-browser via [Pyodide](https://pyodide.org/), JavaScript exercises run in a Web Worker, and your progress is scheduled with the [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) spaced-repetition algorithm and persisted to `localStorage` — so you can drill small "predict the value" and "write the code" problems every day until the fundamentals become reflexive. (TypeScript syntax is accepted in the JavaScript track, but types are not taught or checked yet.)
+warmups is an open-source, **local-first** coding-kata app for getting fast and automatic at Python and JavaScript language fluency and a small set of reverse-engineered problem-solving primitives. It runs in your browser (no accounts, no cloud): Python exercises execute in-browser via [Pyodide](https://pyodide.org/), JavaScript in a Web Worker. You move through the sequence in **Learn**, drill any set in **Practice**, and use a filterable **History** to redo what you missed — you drive review, not an algorithm. Your attempt history is kept in a local SQLite database via a tiny companion data server, with a `localStorage` fallback. (TypeScript syntax is accepted in the JavaScript track, but types are not taught or checked yet.)
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # Vite dev server (http://localhost:5173) + codeviz if installed
+npm run dev      # Vite dev server + local data server + codeviz (if installed)
 ```
 
-`npm run dev` also starts the codeviz trace API if `codeviz` is on your PATH (for the "Visualize my run" hint, below); if it isn't, it prints the one-time install line and carries on. Use `npm run dev:vite` for Vite alone.
+`npm run dev` starts three things: the Vite dev server, the local **data server** that persists your history to SQLite, and (if `codeviz` is on your PATH) the codeviz trace API for the "Visualize my run" hint. Anything already running is reused; if `codeviz` isn't installed it prints the one-time install line and carries on. Use `npm run dev:vite` for Vite alone, or `npm run server` for just the data server.
 
 Then open the app, pick a track (Python or JavaScript), and start a session.
 
 - **Predict** exercises show a code snippet; you type the value it evaluates to.
 - **Write** exercises give you a seeded editor; your code is run against hidden tests.
 
-Grade yourself by submitting: a pass schedules the card further out, a fail brings it back soon. Progress (due / new / learned) lives only in your browser.
+Submit to grade (pass / fail). **Learn** walks you forward through the sequence; **Practice** drills any set you pick; **History** is a filterable log (failed / used-a-hint / clean) with "Practice these" so you decide what to redo.
 
 > The first Python submission downloads the Pyodide runtime from a CDN (a few MB), so give it a moment. JavaScript runs immediately in a Web Worker.
 
@@ -37,13 +37,15 @@ warmups calls that local API and shows the step-through inline; it works for bot
 - **Vite + React + TypeScript**, built as a fully static site (`npm run build` → `dist/`).
 - **Exercises are open content** — plain JSON under [`content/`](./content), validated by a shared [zod](https://zod.dev) schema (`src/core/schema.ts`) and loaded via a Vite glob import. Add your own by dropping a JSON file in `content/python/` or `content/javascript/`.
 - **Runners** execute learner code in isolation: `src/runners/python.ts` (Pyodide, fresh namespace per run) and `src/runners/javascript.ts` (a per-run Web Worker with a hard timeout; TypeScript stripped by [sucrase](https://github.com/alangpierce/sucrase)).
-- **Scheduling** is a thin `ts-fsrs` wrapper (`src/core/srs.ts`) with a three-grade *again / hard / good* flow derived from how far you descended the hint ladder; state is persisted by `src/core/storage.ts`.
+- **Selection** is sequence-driven (`src/ui/session.ts`): Learn marches through the content in order off an append-only **attempt log**; there's no scheduling algorithm in the driver's seat (FSRS is kept in `src/core/srs.ts` but demoted). You control review via Practice and History.
+- **Persistence** (`src/core/storage.ts`): each attempt `{id, when, pass/fail, hint rung}` is written to the local **data server** (`server/index.mjs`, SQLite via Node's built-in `node:sqlite`, stored at `~/.warmups/warmups.db`) with a `localStorage` cache/fallback. On start the app hydrates from the server and unions in anything only in the cache, so nothing is lost if you drilled while it was down. History survives browser, port, and site-data changes because it lives in a file, not origin-scoped storage.
 
 ## Scripts
 
 ```bash
-npm run dev        # Vite dev server + codeviz api (if installed)
-npm run dev:vite   # Vite alone (no codeviz)
+npm run dev        # Vite + data server + codeviz api (if installed)
+npm run dev:vite   # Vite alone
+npm run server     # the local history data server alone (SQLite)
 npm run build      # production static build → dist/
 npm run preview    # preview the production build
 npm run typecheck  # tsc --noEmit

@@ -74,7 +74,32 @@ function serializeCard(card: Card): StoredCard {
   } as StoredCard;
 }
 
-/** Load persisted progress, or a fresh empty state if none/invalid. */
+function serialize(state: ProgressState): StoredState {
+  const cards: Record<string, StoredCard> = {};
+  for (const [id, card] of state.cards) cards[id] = serializeCard(card);
+  return {
+    version: SCHEMA_VERSION,
+    cards,
+    introduced: [...state.introduced],
+    attempts: state.attempts,
+  };
+}
+
+function deserialize(parsed: StoredState | null): ProgressState | null {
+  if (!parsed || parsed.version !== SCHEMA_VERSION) return null;
+  const cards = new Map<string, Card>();
+  for (const [id, sc] of Object.entries(parsed.cards ?? {})) {
+    cards.set(id, reviveCard(sc));
+  }
+  return {
+    version: SCHEMA_VERSION,
+    cards,
+    introduced: new Set(parsed.introduced ?? []),
+    attempts: Array.isArray(parsed.attempts) ? parsed.attempts : [],
+  };
+}
+
+/** Load persisted progress from localStorage (a fast cache), or a fresh state. */
 export function load(): ProgressState {
   if (!hasStorage()) return emptyState();
   let raw: string | null = null;
@@ -84,42 +109,51 @@ export function load(): ProgressState {
     return emptyState();
   }
   if (!raw) return emptyState();
-
   try {
-    const parsed = JSON.parse(raw) as StoredState;
-    if (!parsed || parsed.version !== SCHEMA_VERSION) return emptyState();
-    const cards = new Map<string, Card>();
-    for (const [id, sc] of Object.entries(parsed.cards ?? {})) {
-      cards.set(id, reviveCard(sc));
-    }
-    return {
-      version: SCHEMA_VERSION,
-      cards,
-      introduced: new Set(parsed.introduced ?? []),
-      attempts: Array.isArray(parsed.attempts) ? parsed.attempts : [],
-    };
+    return deserialize(JSON.parse(raw)) ?? emptyState();
   } catch {
     return emptyState();
   }
 }
 
-/** Persist progress to localStorage. No-op without storage. */
+/** Persist progress to localStorage (the offline cache). No-op without storage. */
 export function save(state: ProgressState): void {
   if (!hasStorage()) return;
-  const cards: Record<string, StoredCard> = {};
-  for (const [id, card] of state.cards) {
-    cards[id] = serializeCard(card);
-  }
-  const out: StoredState = {
-    version: SCHEMA_VERSION,
-    cards,
-    introduced: [...state.introduced],
-    attempts: state.attempts,
-  };
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize(state)));
   } catch {
     // Quota / disabled storage — swallow; persistence is best-effort.
+  }
+}
+
+// --- Durable store: the local data server (SQLite), when running --------------
+
+export const DATA_API_BASE = 'http://127.0.0.1:8931';
+
+/** Fetch progress from the local data server. `up` distinguishes "not running". */
+export async function loadRemote(): Promise<{ state: ProgressState | null; up: boolean }> {
+  try {
+    const res = await fetch(`${DATA_API_BASE}/progress`, {
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!res.ok) return { state: null, up: true };
+    return { state: deserialize((await res.json()) as StoredState), up: true };
+  } catch {
+    return { state: null, up: false };
+  }
+}
+
+/** Push progress to the local data server. Silent no-op if it isn't running. */
+export async function saveRemote(state: ProgressState): Promise<void> {
+  try {
+    await fetch(`${DATA_API_BASE}/progress`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(serialize(state)),
+      signal: AbortSignal.timeout(2500),
+    });
+  } catch {
+    // Backend down — the localStorage cache still holds it; it'll sync next run.
   }
 }
 

@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+// warmups local data server.
+//
+// Persists the attempt log to a SQLite database on disk (via Node's built-in
+// node:sqlite — no dependency), so history survives browser / port / origin
+// changes, is queryable with any sqlite tool, and is a single file you can back
+// up. Binds to 127.0.0.1 only.
+//
+//   GET  /health    -> { ok, service, data }
+//   GET  /progress  -> { version, cards, introduced, attempts:[...] }
+//   PUT  /progress   <- the whole state; attempts are replaced (in a transaction)
+//
+// Run with the flag: `node --experimental-sqlite server/index.mjs`.
+// DB file: ~/.warmups/warmups.db (override with WARMUPS_DB); port 8931
+// (override with WARMUPS_PORT). The `attempts` table is:
+//   attempts(rowid, id TEXT, at INTEGER, passed INTEGER, rung INTEGER)
+
+import { createServer } from 'node:http';
+import { DatabaseSync } from 'node:sqlite';
+import { mkdirSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
+
+const PORT = Number(process.env.WARMUPS_PORT) || 8931;
+const DB_PATH =
+  process.env.WARMUPS_DB || join(homedir(), '.warmups', 'warmups.db');
+const SCHEMA_VERSION = 1;
+
+mkdirSync(dirname(DB_PATH), { recursive: true });
+const db = new DatabaseSync(DB_PATH);
+db.exec(`
+  CREATE TABLE IF NOT EXISTS attempts (
+    rowid  INTEGER PRIMARY KEY,
+    id     TEXT    NOT NULL,
+    at     INTEGER NOT NULL,
+    passed INTEGER NOT NULL,
+    rung   INTEGER NOT NULL
+  );
+`);
+
+const selectAll = db.prepare('SELECT id, at, passed, rung FROM attempts ORDER BY at, rowid');
+const insertOne = db.prepare('INSERT INTO attempts (id, at, passed, rung) VALUES (?, ?, ?, ?)');
+const deleteAll = db.prepare('DELETE FROM attempts');
+
+function readProgress() {
+  const attempts = selectAll.all().map((r) => ({
+    id: r.id,
+    at: r.at,
+    passed: !!r.passed,
+    rung: r.rung,
+  }));
+  // cards/introduced are legacy (SRS demoted) — kept in the shape for the client.
+  return { version: SCHEMA_VERSION, cards: {}, introduced: [], attempts };
+}
+
+function replaceAttempts(attempts) {
+  db.exec('BEGIN');
+  try {
+    deleteAll.run();
+    for (const a of attempts) {
+      insertOne.run(String(a.id), Number(a.at), a.passed ? 1 : 0, Number(a.rung ?? 0));
+    }
+    db.exec('COMMIT');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  }
+}
+
+function cors(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+async function readBody(req) {
+  const chunks = [];
+  for await (const c of req) chunks.push(c);
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+const server = createServer(async (req, res) => {
+  cors(res);
+  const url = req.url || '';
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+  try {
+    if (req.method === 'GET' && url.startsWith('/health')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, service: 'warmups', data: DB_PATH }));
+      return;
+    }
+    if (req.method === 'GET' && url.startsWith('/progress')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(readProgress()));
+      return;
+    }
+    if (req.method === 'PUT' && url.startsWith('/progress')) {
+      const parsed = JSON.parse(await readBody(req));
+      const attempts = Array.isArray(parsed?.attempts) ? parsed.attempts : [];
+      replaceAttempts(attempts);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, count: attempts.length }));
+      return;
+    }
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'not found' }));
+  } catch (e) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: String((e && e.message) || e) }));
+  }
+});
+
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`warmups data server on http://127.0.0.1:${PORT}  (sqlite: ${DB_PATH})`);
+});

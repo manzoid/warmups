@@ -1,8 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Exercise, RunResult, Track } from './core/types';
 import {
   load,
   save,
+  saveRemote,
+  loadRemote,
   recordAttempt,
   bumpLastAttemptRung,
   lastAttempt,
@@ -29,6 +31,40 @@ export default function App() {
   const progress = useRef<ProgressState>(load());
   const [, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
+
+  // Persist to both the localStorage cache and the durable local data server.
+  const persist = useCallback(() => {
+    save(progress.current);
+    void saveRemote(progress.current);
+  }, []);
+
+  // On start, hydrate from the data server (SQLite) if it's running: take its
+  // attempt log as truth, but UNION in anything only in the local cache (so an
+  // attempt made while the server was down isn't lost). If the server is up but
+  // empty, seed it from the cache.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { state: remote, up } = await loadRemote();
+      if (cancelled) return;
+      if (remote) {
+        const seen = new Set(remote.attempts.map((a) => `${a.id}@${a.at}`));
+        for (const a of progress.current.attempts) {
+          if (!seen.has(`${a.id}@${a.at}`)) remote.attempts.push(a);
+        }
+        remote.attempts.sort((x, y) => x.at - y.at);
+        progress.current = remote;
+        save(progress.current);
+        void saveRemote(progress.current);
+      } else if (up) {
+        void saveRemote(progress.current);
+      }
+      bump();
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [bump]);
 
   const [track, setTrack] = useState<Track | null>(null);
   const [view, setView] = useState<View>('learn');
@@ -126,10 +162,10 @@ export default function App() {
         passed,
         rung,
       });
-      save(progress.current);
+      persist();
       bump();
     },
-    [bump],
+    [persist, bump],
   );
 
   const submit = useCallback(async () => {
@@ -158,23 +194,23 @@ export default function App() {
       setMaxRung(next);
       if (result) {
         bumpLastAttemptRung(progress.current, pick.exercise.id, next);
-        save(progress.current);
+        persist();
         bump();
       }
     },
-    [maxRung, pick, result, bump],
+    [maxRung, pick, result, persist, bump],
   );
 
   const resetHistory = useCallback(() => {
     resetProgress(progress.current);
-    save(progress.current);
+    persist();
     setQueue(null);
     setView('learn');
     const next = pickNextLearn(exercises, progress.current);
     if (next) startExercise(next.exercise, next.isNew);
     else setPick(null);
     bump();
-  }, [exercises, startExercise, bump]);
+  }, [exercises, startExercise, persist, bump]);
 
   const counts = track ? learnCounts(exercises, progress.current) : null;
 
