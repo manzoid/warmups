@@ -23,6 +23,28 @@ export interface Exercise {
   // Shown only AFTER solving (never in the prompt — prompts stay terse):
   note?: string;         // one-line "why" / under-the-hood / big-O payoff
   mapsTo?: string;       // real interview problem this maps to, e.g. "LC 76 · Minimum Window Substring"
+  // Fluency generators (Kumon-style infinite drilling). Trusted source code in
+  // the exercise's language defining `make()`, which returns a fresh randomized
+  // instance ({snippet,expected} for predict; {starter,tests,solution} for write).
+  // Ground truth is computed by executing, so instances are self-verifying.
+  generator?: string;
 }
 export interface RunResult { passed: boolean; actual?: string; error?: string; }
-export interface Runner { track: Track; run(userCode: string, ex: Exercise): Promise<RunResult>; }
+
+/** One freshly-generated exercise instance (from an Exercise's `generator`). */
+export interface GeneratedInstance {
+  prompt?: string;
+  snippet?: string;
+  expected?: string;
+  starter?: string;
+  solution?: string;
+  tests?: string;
+  banned?: string[];
+}
+
+export interface Runner {
+  track: Track;
+  run(userCode: string, ex: Exercise): Promise<RunResult>;
+  /** Run ex.generator (trusted content code) to produce a fresh random instance. */
+  generate?(ex: Exercise): Promise<GeneratedInstance>;
+}

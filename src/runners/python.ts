@@ -1,4 +1,4 @@
-import type { Exercise, RunResult, Runner } from '../core/types';
+import type { Exercise, GeneratedInstance, RunResult, Runner } from '../core/types';
 import { firstBanned, bannedMessage } from '../core/banned';
 
 // ---------------------------------------------------------------------------
@@ -98,23 +98,6 @@ export async function initPyodide(): Promise<PyodideAPI> {
 }
 
 // ---------------------------------------------------------------------------
-// Grading helpers (pure — mirrored in the node harness for validation).
-// ---------------------------------------------------------------------------
-
-/**
- * Whitespace-normalize a predicted/expected value: trim ends and collapse any
- * run of internal whitespace (including newlines/tabs) to a single space.
- */
-export function normalizeAnswer(s: string): string {
-  return s.trim().replace(/\s+/g, ' ');
-}
-
-/** Compare a learner's typed answer against the canonical expected string. */
-export function predictPasses(userAnswer: string, expected: string): boolean {
-  return normalizeAnswer(userAnswer) === normalizeAnswer(expected);
-}
-
-// ---------------------------------------------------------------------------
 // Runner implementation.
 // ---------------------------------------------------------------------------
 
@@ -164,22 +147,28 @@ async function runPredict(
   userAnswer: string,
   ex: Exercise,
 ): Promise<RunResult> {
-  const expected = ex.expected ?? '';
-  const groundTruth = ex.snippet ?? expected;
-
-  // Grade by VALUE, not by string: evaluate the ground-truth expression and the
-  // learner's typed answer, then compare with Python `==`. So `{'a':1,'b':2}`
-  // and `{'a': 1, 'b': 2}` are equal, and dict/set order doesn't matter — while
+  // Grade by VALUE, never by string: run the snippet's statements, evaluate its
+  // trailing expression as the ground truth, evaluate the learner's typed
+  // answer, and compare with Python `==`. So `{'a':1,'b':2}` and
+  // `{'a': 1, 'b': 2}` are equal and dict/set order doesn't matter, while
   // strings that legitimately contain spaces still compare correctly.
   const ns = freshNamespace(py);
   try {
     const src = `
-import json as __wu_json
-__wu_actual = (
-${groundTruth}
-)
+import ast as __wu_ast, json as __wu_json
+
+__wu_tree = __wu_ast.parse(${JSON.stringify(ex.snippet ?? '')})
+if not (__wu_tree.body and isinstance(__wu_tree.body[-1], __wu_ast.Expr)):
+    raise SyntaxError("predict snippet has no trailing expression to evaluate")
+__wu_last = __wu_tree.body.pop()
+__wu_ns = {}
+exec(compile(__wu_tree, "<snippet>", "exec"), __wu_ns)
+__wu_actual = eval(compile(__wu_ast.Expression(__wu_last.value), "<snippet>", "eval"), __wu_ns)
+
+# The learner's answer evaluates in a CLEAN namespace, so typing a variable
+# name from the snippet (e.g. \`out\`) can't accidentally pass.
 try:
-    __wu_user = eval(${JSON.stringify(userAnswer)})
+    __wu_user = eval(${JSON.stringify(userAnswer)}, {})
     __wu_passed = bool(__wu_user == __wu_actual)
 except Exception:
     __wu_passed = False
@@ -190,12 +179,11 @@ __wu_json.dumps({"passed": __wu_passed, "actual": repr(__wu_actual)})
       passed: boolean;
       actual: string;
     };
-    // Lenient fallback: accept if the normalized strings also match.
-    const passed = parsed.passed || predictPasses(userAnswer, expected);
-    return { passed, actual: parsed.actual };
-  } catch {
-    // If evaluation machinery failed, fall back to a normalized string compare.
-    return { passed: predictPasses(userAnswer, expected), actual: undefined };
+    return { passed: parsed.passed, actual: parsed.actual };
+  } catch (err) {
+    // The snippet itself failed to parse or run — a content bug, not a wrong
+    // answer. Surface it instead of guessing.
+    return { passed: false, error: formatError(err) };
   } finally {
     ns.destroy();
   }
@@ -221,6 +209,31 @@ function formatError(err: unknown): string {
   return cleanTraceback(raw);
 }
 
+// Run a generator (trusted content code defining `make()`) and JSON-round-trip
+// the fresh instance it returns.
+async function runGenerate(
+  py: PyodideAPI,
+  ex: Exercise,
+): Promise<GeneratedInstance> {
+  const ns = freshNamespace(py);
+  let stdout = '';
+  py.setStdout({
+    batched: (s) => {
+      stdout += s;
+    },
+  });
+  try {
+    await py.runPythonAsync(
+      `${ex.generator ?? ''}\nimport json as __wu_json\nprint(__wu_json.dumps(make()))`,
+      { globals: ns },
+    );
+    return JSON.parse(stdout.trim()) as GeneratedInstance;
+  } finally {
+    py.setStdout({});
+    ns.destroy();
+  }
+}
+
 export const pythonRunner: Runner = {
   track: 'python',
   async run(userCode: string, ex: Exercise): Promise<RunResult> {
@@ -229,6 +242,10 @@ export const pythonRunner: Runner = {
       return runPredict(py, userCode, ex);
     }
     return runWrite(py, userCode, ex);
+  },
+  async generate(ex: Exercise): Promise<GeneratedInstance> {
+    const py = await initPyodide();
+    return runGenerate(py, ex);
   },
 };
 

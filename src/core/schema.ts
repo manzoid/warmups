@@ -26,6 +26,8 @@ export const ExerciseSchema = z.object({
   // shown only after solving
   note: z.string().optional(),
   mapsTo: z.string().optional(),
+  // fluency generator (trusted source producing fresh instances)
+  generator: z.string().optional(),
 }).superRefine((ex, ctx) => {
   if (ex.kind === 'predict' && ex.expected === undefined) {
     ctx.addIssue({
