@@ -685,6 +685,11 @@ function ExerciseView({
               if (e.key === 'Enter' && !graded) onSubmit();
             }}
           />
+          <p style={{ ...styles.tagline, margin: '0.35rem 0 0', fontSize: '0.78rem', color: theme.muted }}>
+            {ex.track === 'python'
+              ? "Match how Python prints it (strings in quotes, e.g. 'abc'). Spacing and dict/set order are ignored."
+              : 'Match how JS prints it (a top-level string can be bare; objects like {a: 1}, Maps like Map(2) {"a" => 1}). Spacing is ignored.'}
+          </p>
         </>
       )}
 

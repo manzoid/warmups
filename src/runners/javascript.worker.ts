@@ -11,6 +11,7 @@
 
 import { transform } from 'sucrase';
 import type { Exercise, RunResult } from '../core/types';
+import { firstBanned, bannedMessage } from '../core/banned';
 
 // `new AsyncFunction(...)` lets learner code and tests use top-level `await`.
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as
@@ -148,6 +149,8 @@ export async function runExercise(ex: Exercise, userCode: string): Promise<RunRe
   }
 
   // kind === 'write'
+  const banned = firstBanned(userCode, ex.banned);
+  if (banned) return { passed: false, error: bannedMessage(banned) };
   const logs: string[] = [];
   const sandboxConsole = {
     log: (...a: unknown[]) => logs.push(a.map(formatLogArg).join(' ')),

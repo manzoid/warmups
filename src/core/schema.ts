@@ -21,6 +21,7 @@ export const ExerciseSchema = z.object({
   starter: z.string().optional(),
   solution: z.string().optional(),
   tests: z.string().optional(),
+  banned: z.array(z.string()).optional(),
   prereqs: z.array(z.string()).optional(),
   // shown only after solving
   note: z.string().optional(),

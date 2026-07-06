@@ -18,6 +18,7 @@ export interface Exercise {
   starter?: string;      // pre-filled editor content
   solution?: string;     // reference solution (hidden; used only for content validation)
   tests?: string;        // appended after the user's code; must throw/assert on failure
+  banned?: string[];     // substrings the learner's code may NOT contain (enforces "do not use X")
   prereqs?: string[];    // exercise ids that should be learned first
   // Shown only AFTER solving (never in the prompt — prompts stay terse):
   note?: string;         // one-line "why" / under-the-hood / big-O payoff

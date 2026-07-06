@@ -214,6 +214,20 @@ async function main() {
     }
   }
 
+  // Structural: a write's own reference solution must not trip its 'banned'
+  // list (else the exercise is unsolvable as authored / the enforcement is wrong).
+  for (const { ex, file } of all) {
+    if (ex.kind !== 'write' || !Array.isArray(ex.banned)) continue;
+    const sol = typeof ex.solution === 'string' ? ex.solution : '';
+    for (const b of ex.banned) {
+      if (b && sol.includes(b)) {
+        failures.push(
+          `${ex.id} (${relative(ROOT, file)}): reference solution contains its own banned token "${b}"`,
+        );
+      }
+    }
+  }
+
   // Execution.
   for (const { ex, file } of all) {
     const where = `${ex.id} (${relative(ROOT, file)})`;

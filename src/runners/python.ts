@@ -1,4 +1,5 @@
 import type { Exercise, RunResult, Runner } from '../core/types';
+import { firstBanned, bannedMessage } from '../core/banned';
 
 // ---------------------------------------------------------------------------
 // Pyodide loading (from the jsdelivr CDN — Pyodide is NOT an npm dependency).
@@ -132,6 +133,8 @@ async function runWrite(
   userCode: string,
   ex: Exercise,
 ): Promise<RunResult> {
+  const banned = firstBanned(userCode, ex.banned);
+  if (banned) return { passed: false, error: bannedMessage(banned) };
   const ns = freshNamespace(py);
   let stdout = '';
   const capture = (s: string) => {
