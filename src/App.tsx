@@ -984,7 +984,7 @@ function FluencyDrill({
       <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
         <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>
           Fluency · {ex.concept}
-          {ex.mapsTo && (
+          {INTERVIEW_FEATURES && ex.mapsTo && (
             <span style={{ ...styles.pill, marginLeft: 8, color: theme.accent, borderColor: theme.accent }}>
               {ex.mapsTo}
             </span>
@@ -1473,9 +1473,9 @@ function ExerciseView({
 
       {result && <ResultView result={result} maxRung={maxRung} timing={timing} />}
 
-      {graded && (ex.note || ex.mapsTo) && (
+      {graded && (ex.note || (INTERVIEW_FEATURES && ex.mapsTo)) && (
         <div style={{ marginTop: '0.85rem' }}>
-          {ex.mapsTo && (
+          {INTERVIEW_FEATURES && ex.mapsTo && (
             <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
               {ex.mapsTo}
             </span>
