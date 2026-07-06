@@ -44,7 +44,8 @@
       "py.u10.stack.list.predict"
     ],
     "cue": "Push the running minimum alongside each value so pop restores it for free.",
-    "syntax": "list[-1] reads the current top"
+    "syntax": "list[-1] reads the current top",
+    "mapsTo": "LC 155 · Min Stack"
   },
   {
     "id": "py.u10.dailytemps.write",
@@ -60,7 +61,9 @@
       "py.u10.nge.write"
     ],
     "cue": "Hold indices whose warmer day hasn't arrived; a hotter reading settles them.",
-    "syntax": "for i in range(len(temps))"
+    "syntax": "for i in range(len(temps))",
+    "note": "The stored value is an index, so the answer is a distance i - j, not the temperature itself.",
+    "mapsTo": "LC 739 · Daily Temperatures"
   },
   {
     "id": "py.u10.queue2stacks.write",
@@ -76,6 +79,8 @@
       "py.u10.stack.list.predict"
     ],
     "cue": "One stack takes arrivals; pouring it into a second reverses to arrival order.",
-    "syntax": "while self.in_st: pour with list.pop()"
+    "syntax": "while self.in_st: pour with list.pop()",
+    "note": "Each item is moved between stacks at most once, so dequeue is amortized O(1).",
+    "mapsTo": "LC 232 · Implement Queue using Stacks"
   }
 ]

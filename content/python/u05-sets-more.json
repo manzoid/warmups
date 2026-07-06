@@ -25,6 +25,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "{1, 2, 3}.isdisjoint({4, 5})",
     "expected": "True",
+    "note": "isdisjoint can stop at the first shared element, so it may beat building the full intersection.",
     "prereqs": [
       "py.u05.setops.intersection"
     ]
@@ -41,6 +42,8 @@
     "starter": "def count_jewels(jewels, stones):\n    # your code here\n    pass",
     "solution": "def count_jewels(jewels, stones):\n    js = set(jewels)\n    count = 0\n    for i in range(len(stones)):\n        if stones[i] in js:\n            count += 1\n    return count",
     "tests": "assert count_jewels(\"aA\", \"aAAbbbb\") == 3, count_jewels(\"aA\", \"aAAbbbb\")\nassert count_jewels(\"z\", \"ZZ\") == 0, count_jewels(\"z\", \"ZZ\")\nassert count_jewels(\"\", \"abc\") == 0, count_jewels(\"\", \"abc\")\nassert count_jewels(\"xyz\", \"\") == 0, count_jewels(\"xyz\", \"\")",
+    "note": "Set membership keeps this O(len(stones)); scanning the jewels string for each stone would be O(len(jewels)*len(stones)).",
+    "mapsTo": "LC 771 · Jewels and Stones",
     "prereqs": [
       "py.u05.membership.build_query"
     ]

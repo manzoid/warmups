@@ -11,7 +11,8 @@
     "tests": "if (JSON.stringify(rotateLeft([1, 2, 3, 4, 5], 2)) !== JSON.stringify([3, 4, 5, 1, 2])) throw new Error('two');\nif (JSON.stringify(rotateLeft([1, 2, 3], 0)) !== JSON.stringify([1, 2, 3])) throw new Error('zero');\nif (JSON.stringify(rotateLeft([1, 2, 3], 4)) !== JSON.stringify([2, 3, 1])) throw new Error('wrap');\nif (JSON.stringify(rotateLeft([], 3)) !== JSON.stringify([])) throw new Error('empty');",
     "prereqs": ["js.u02.access.ring"],
     "cue": "Pull each output element from a wrapped source index.",
-    "syntax": "(i + k) % a.length"
+    "syntax": "(i + k) % a.length",
+    "mapsTo": "LC 189 · Rotate Array"
   },
   {
     "id": "js.u02.rotate.slice",

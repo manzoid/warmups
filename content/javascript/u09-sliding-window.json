@@ -23,6 +23,7 @@
     "prompt": "What is the value of `s`?",
     "snippet": "const nums = [2, 1, 5, 1, 3, 2];\nconst k = 3;\nlet s = 0;\nfor (let i = 0; i < k; i++) s += nums[i];\nconst i = k;\ns += nums[i] - nums[i - k];\ns;",
     "expected": "7",
+    "note": "Reusing the running sum (add the entering value, subtract the leaving one) makes the whole scan O(n); re-adding all k elements per window is O(nk).",
     "prereqs": ["js.u09.fixed.prime.predict"]
   },
   {
@@ -50,6 +51,7 @@
     "starter": "function maxSumK(nums, k) {\n  // your code here\n}",
     "solution": "function maxSumK(nums, k) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let best = s;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s > best) best = s;\n  }\n  return best;\n}",
     "tests": "if (maxSumK([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error(maxSumK([2, 1, 5, 1, 3, 2], 3));\nif (maxSumK([1, 2, 3], 3) !== 6) throw new Error('full');\nif (maxSumK([5, -1, -1, 5], 2) !== 4) throw new Error('neg');\nif (maxSumK([4], 1) !== 4) throw new Error('single');",
+    "note": "Recomputing every block from scratch is O(nk); the slide keeps it O(n) by carrying the sum forward.",
     "prereqs": ["js.u09.fixed.maxsum.predict"]
   },
   {
@@ -64,6 +66,7 @@
     "starter": "function maxAverageK(nums, k) {\n  // your code here\n}",
     "solution": "function maxAverageK(nums, k) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let best = s;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s > best) best = s;\n  }\n  return best / k;\n}",
     "tests": "if (maxAverageK([1, 12, -5, -6, 50, 3], 4) !== 12.75) throw new Error(maxAverageK([1, 12, -5, -6, 50, 3], 4));\nif (maxAverageK([5], 1) !== 5) throw new Error('single');\nif (maxAverageK([0, 4, 0, 3, 2], 1) !== 4) throw new Error('k1');",
+    "mapsTo": "LC 643 · Maximum Average Subarray I",
     "prereqs": ["js.u09.fixed.maxsum.write"]
   },
   {
@@ -117,6 +120,7 @@
     "prompt": "What is the value of `m.size`?",
     "snippet": "const a = [1, 2, 2, 3];\nconst m = new Map();\nfor (let i = 0; i < a.length; i++) m.set(a[i], (m.get(a[i]) || 0) + 1);\nconst leaving = [1, 2];\nfor (let j = 0; j < leaving.length; j++) {\n  const lc = leaving[j];\n  m.set(lc, m.get(lc) - 1);\n  if (m.get(lc) === 0) m.delete(lc);\n}\nm.size;",
     "expected": "2",
+    "note": "Deleting a key the moment its count hits 0 keeps map.size equal to the number of distinct values actually present; leftover zero-count keys would over-count distinctness.",
     "prereqs": ["js.u09.countmap.build.predict"]
   },
   {
@@ -171,6 +175,7 @@
     "starter": "function minSubArrayLen(target, nums) {\n  // your code here\n}",
     "solution": "function minSubArrayLen(target, nums) {\n  let left = 0, s = 0, best = Infinity;\n  for (let right = 0; right < nums.length; right++) {\n    s += nums[right];\n    while (s >= target) {\n      best = Math.min(best, right - left + 1);\n      s -= nums[left];\n      left++;\n    }\n  }\n  return best === Infinity ? 0 : best;\n}",
     "tests": "if (minSubArrayLen(7, [2, 3, 1, 2, 4, 3]) !== 2) throw new Error(minSubArrayLen(7, [2, 3, 1, 2, 4, 3]));\nif (minSubArrayLen(4, [1, 4, 4]) !== 1) throw new Error('one');\nif (minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1]) !== 0) throw new Error('none');\nif (minSubArrayLen(15, [1, 2, 3, 4, 5]) !== 5) throw new Error('whole');\nif (minSubArrayLen(3, [3]) !== 1) throw new Error('single');",
+    "mapsTo": "LC 209 · Minimum Size Subarray Sum",
     "prereqs": ["js.u09.var.minlen.predict"]
   },
   {
@@ -198,6 +203,7 @@
     "starter": "function lengthOfLongestSubstring(s) {\n  // your code here\n}",
     "solution": "function lengthOfLongestSubstring(s) {\n  let left = 0, best = 0;\n  const count = new Map();\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    count.set(c, (count.get(c) || 0) + 1);\n    while (count.get(c) > 1) {\n      count.set(s[left], count.get(s[left]) - 1);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
     "tests": "if (lengthOfLongestSubstring('abcabcbb') !== 3) throw new Error(lengthOfLongestSubstring('abcabcbb'));\nif (lengthOfLongestSubstring('bbbbb') !== 1) throw new Error('same');\nif (lengthOfLongestSubstring('pwwkew') !== 3) throw new Error('pwwkew');\nif (lengthOfLongestSubstring('') !== 0) throw new Error('empty');\nif (lengthOfLongestSubstring('au') !== 2) throw new Error('au');\nif (lengthOfLongestSubstring('dvdf') !== 3) throw new Error('dvdf');",
+    "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
     "prereqs": ["js.u09.norepeat.predict"]
   },
   {
@@ -225,6 +231,7 @@
     "starter": "function longestAtMostKDistinct(s, k) {\n  // your code here\n}",
     "solution": "function longestAtMostKDistinct(s, k) {\n  let left = 0, best = 0;\n  const count = new Map();\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    count.set(c, (count.get(c) || 0) + 1);\n    while (count.size > k) {\n      const lc = s[left];\n      count.set(lc, count.get(lc) - 1);\n      if (count.get(lc) === 0) count.delete(lc);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
     "tests": "if (longestAtMostKDistinct('eceba', 2) !== 3) throw new Error(longestAtMostKDistinct('eceba', 2));\nif (longestAtMostKDistinct('aa', 1) !== 2) throw new Error('aa');\nif (longestAtMostKDistinct('a', 0) !== 0) throw new Error('zero');\nif (longestAtMostKDistinct('ccaabbb', 2) !== 5) throw new Error('ccaabbb');",
+    "mapsTo": "LC 340 · Longest Substring with At Most K Distinct Characters",
     "prereqs": ["js.u09.atmostk.predict"]
   },
   {
@@ -239,7 +246,22 @@
     "starter": "function findAnagrams(s, p) {\n  // your code here\n}",
     "solution": "function findAnagrams(s, p) {\n  const res = [];\n  if (p.length > s.length) return res;\n  const need = new Map();\n  for (let i = 0; i < p.length; i++) need.set(p[i], (need.get(p[i]) || 0) + 1);\n  const win = new Map();\n  const k = p.length;\n  const eq = (a, b) => {\n    if (a.size !== b.size) return false;\n    for (const [key, v] of a) if (b.get(key) !== v) return false;\n    return true;\n  };\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    win.set(c, (win.get(c) || 0) + 1);\n    if (right >= k) {\n      const lc = s[right - k];\n      win.set(lc, win.get(lc) - 1);\n      if (win.get(lc) === 0) win.delete(lc);\n    }\n    if (right >= k - 1 && eq(win, need)) res.push(right - k + 1);\n  }\n  return res;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(findAnagrams('cbaebabacd', 'abc'), [0, 6]);\neq(findAnagrams('abab', 'ab'), [0, 1, 2]);\neq(findAnagrams('aa', 'bb'), []);\neq(findAnagrams('a', 'a'), [0]);",
+    "mapsTo": "LC 438 · Find All Anagrams in a String",
     "prereqs": ["js.u09.countmap.slide.predict", "js.u09.fixed.maxsum.write"]
+  },
+  {
+    "id": "js.u09.minwindow.missing.predict",
+    "track": "javascript",
+    "group": "Sliding window",
+    "concept": "missing-count: how many chars still needed, with multiplicity",
+    "cue": "missing starts at t.length; it drops by one only when the entering char was still needed (its need count was still positive before you decrement it).",
+    "syntax": "if (need.get(c) > 0) missing--",
+    "kind": "predict",
+    "prompt": "What is the value of `missing`?",
+    "snippet": "const s = 'AXB';\nconst t = 'AAB';\nconst need = new Map();\nfor (let i = 0; i < t.length; i++) need.set(t[i], (need.get(t[i]) || 0) + 1);\nlet missing = t.length;\nfor (let right = 0; right < s.length; right++) {\n  const c = s[right];\n  if ((need.get(c) || 0) > 0) missing--;\n  need.set(c, (need.get(c) || 0) - 1);\n}\nmissing;",
+    "expected": "1",
+    "note": "One counter replaces re-scanning t on every step: missing === 0 means the window now covers t. Chars beyond what is needed push need below 0, so missing does not drop for them.",
+    "prereqs": ["js.u09.countmap.build.predict"]
   },
   {
     "id": "js.u09.minwindow.write",
@@ -253,6 +275,7 @@
     "starter": "function minWindow(s, t) {\n  // your code here\n}",
     "solution": "function minWindow(s, t) {\n  if (t.length === 0 || s.length < t.length) return '';\n  const need = new Map();\n  for (let i = 0; i < t.length; i++) need.set(t[i], (need.get(t[i]) || 0) + 1);\n  let missing = t.length;\n  let left = 0, bestL = 0, bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    if ((need.get(c) || 0) > 0) missing--;\n    need.set(c, (need.get(c) || 0) - 1);\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) { bestLen = right - left + 1; bestL = left; }\n      const lc = s[left];\n      need.set(lc, need.get(lc) + 1);\n      if (need.get(lc) > 0) missing++;\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestL, bestL + bestLen);\n}",
     "tests": "if (minWindow('ADOBECODEBANC', 'ABC') !== 'BANC') throw new Error(minWindow('ADOBECODEBANC', 'ABC'));\nif (minWindow('a', 'a') !== 'a') throw new Error('single');\nif (minWindow('a', 'aa') !== '') throw new Error('none');\nif (minWindow('ab', 'b') !== 'b') throw new Error('tail');",
-    "prereqs": ["js.u09.atmostk.write", "js.u09.var.minlen.write"]
+    "mapsTo": "LC 76 · Minimum Window Substring",
+    "prereqs": ["js.u09.minwindow.missing.predict", "js.u09.atmostk.write", "js.u09.var.minlen.write"]
   }
 ]

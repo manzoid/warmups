@@ -60,7 +60,9 @@
       "js.u06.comparator.numeric"
     ],
     "cue": "Sort a copy descending, then take the first k.",
-    "syntax": "arr.slice().sort((a, b) => b - a)"
+    "syntax": "arr.slice().sort((a, b) => b - a)",
+    "note": "Sorting is O(n log n); a heap or quickselect finds the k largest in O(n log k) or O(n) average when n is huge and k is small.",
+    "mapsTo": "LC 215 · Kth Largest Element in an Array"
   },
   {
     "id": "js.u06.mingap",
@@ -76,6 +78,8 @@
       "js.u06.sweep.dup"
     ],
     "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
-    "syntax": "a[i] - a[i - 1] neighbor diff"
+    "syntax": "a[i] - a[i - 1] neighbor diff",
+    "note": "The closest pair can only be adjacent once sorted, so you check n-1 neighbor gaps instead of all n^2 pairs.",
+    "mapsTo": "LC 1200 · Minimum Absolute Difference"
   }
 ]

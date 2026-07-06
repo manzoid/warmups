@@ -2,7 +2,7 @@
   {
     "id": "py.u07.manual-advance.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "manual advance (while i < n)",
     "kind": "predict",
     "prompt": "What is the value of `total`?",
@@ -15,7 +15,7 @@
   {
     "id": "py.u07.manual-advance.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "manual advance (while i < n)",
     "kind": "write",
     "prompt": "Write `total(a)` that returns the sum of all elements in list `a`. Use a while loop with an index you increment yourself. Do not use the built-in sum.",
@@ -31,7 +31,7 @@
   {
     "id": "py.u07.stride.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "advance by a constant stride (i += 2)",
     "kind": "predict",
     "prompt": "What is the value of `picked`?",
@@ -46,7 +46,7 @@
   {
     "id": "py.u07.stride.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "advance by a constant stride (i += 2)",
     "kind": "write",
     "prompt": "Write `every_other(a)` that returns a list of the elements of `a` at indices 0, 2, 4, and so on. Advance an index by 2 each step. Do not use slicing.",
@@ -62,7 +62,7 @@
   {
     "id": "py.u07.stride.slice-sugar",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "stride via slicing a[::2]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -77,7 +77,7 @@
   {
     "id": "py.u07.skip-prefix.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "advance-while-condition (skip a prefix)",
     "kind": "predict",
     "prompt": "What is the value of `i`?",
@@ -92,7 +92,7 @@
   {
     "id": "py.u07.skip-prefix.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "advance-while-condition (skip a prefix)",
     "kind": "write",
     "prompt": "Write `first_nonzero_index(a)` that returns the index of the first nonzero element of `a`, or `len(a)` if every element is zero. Advance an index while the current element is zero.",
@@ -108,7 +108,7 @@
   {
     "id": "py.u07.skip-prefix.lstrip-sugar",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "skip leading spaces via str.lstrip",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -123,7 +123,7 @@
   {
     "id": "py.u07.skip-run.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "skip a run of equal elements",
     "kind": "predict",
     "prompt": "What is the value of `j`?",
@@ -138,7 +138,7 @@
   {
     "id": "py.u07.skip-run.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "skip a run of equal elements",
     "kind": "write",
     "prompt": "Write `count_runs(a)` that returns the number of maximal runs of equal consecutive elements in `a`. Use an inner loop to skip past each run.",
@@ -154,22 +154,22 @@
   {
     "id": "py.u07.compact.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "in-place compaction (w++ write index)",
     "kind": "predict",
-    "prompt": "What is the value of `a`?",
-    "snippet": "a = [0, 3, 0, 5, 7, 0]\nw = 0\nfor i in range(len(a)):\n    if a[i] != 0:\n        a[w] = a[i]\n        w += 1\ndel a[w:]\na",
-    "expected": "[3, 5, 7]",
+    "prompt": "What is the value of `(a, w)`?",
+    "snippet": "a = [0, 3, 0, 5, 7, 0]\nw = 0\nfor i in range(len(a)):\n    if a[i] != 0:\n        a[w] = a[i]\n        w += 1\n(a, w)",
+    "expected": "([3, 5, 7, 5, 7, 0], 3)",
     "prereqs": [
       "py.u07.manual-advance.write"
     ],
-    "cue": "Track the write index as nonzero values are copied forward.",
-    "syntax": "del a[w:] truncates"
+    "cue": "Copy each kept element to a write index; watch what stays behind past w.",
+    "syntax": "a[w] = a[i]"
   },
   {
     "id": "py.u07.compact.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "in-place compaction (w++ write index)",
     "kind": "write",
     "prompt": "Write `remove_value(a, val)` that removes every occurrence of `val` from list `a` in place (mutating `a`) and returns the new length. Use a write index. Do not use a list comprehension or list.remove.",
@@ -180,12 +180,14 @@
       "py.u07.compact.predict"
     ],
     "cue": "Copy kept elements to a write index, then trim the tail.",
-    "syntax": "del a[w:] truncates"
+    "syntax": "del a[w:] truncates",
+    "note": "A read cursor scans while a write cursor trails behind: compaction in place, O(1) extra space.",
+    "mapsTo": "LC 27 · Remove Element"
   },
   {
     "id": "py.u07.compact.comprehension-sugar",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "compaction via list comprehension",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -200,7 +202,7 @@
   {
     "id": "py.u07.find-next.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "find-next-occurrence & reposition",
     "kind": "predict",
     "prompt": "What is the value of `i`?",
@@ -215,7 +217,7 @@
   {
     "id": "py.u07.find-next.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "find-next-occurrence & reposition",
     "kind": "write",
     "prompt": "Write `index_of(a, target)` that returns the index of the first element of `a` equal to `target`, or -1 if `target` is absent. Scan with a manual index. Do not use list.index.",
@@ -231,7 +233,7 @@
   {
     "id": "py.u07.find-next.index-sugar",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "find via list.index",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -240,28 +242,28 @@
     "prereqs": [
       "py.u07.find-next.write"
     ],
-    "cue": "Recall what list.index returns for the first match.",
+    "cue": "Consider what list.index gives you for the first matching element.",
     "syntax": "list.index(x)"
   },
   {
     "id": "py.u07.merge.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "single walk into a second array (merge-style)",
     "kind": "predict",
-    "prompt": "What is the value of `out`?",
-    "snippet": "A = [1, 3, 5]\nB = [2, 4, 6]\ni = j = 0\nout = []\nwhile i < len(A) and j < len(B):\n    if A[i] <= B[j]:\n        out.append(A[i])\n        i += 1\n    else:\n        out.append(B[j])\n        j += 1\nwhile i < len(A):\n    out.append(A[i])\n    i += 1\nwhile j < len(B):\n    out.append(B[j])\n    j += 1\nout",
-    "expected": "[1, 2, 3, 4, 5, 6]",
+    "prompt": "What is the value of `(out, i, j)`?",
+    "snippet": "A = [1, 4, 5]\nB = [2, 3]\ni = j = 0\nout = []\nwhile i < len(A) and j < len(B):\n    if A[i] <= B[j]:\n        out.append(A[i])\n        i += 1\n    else:\n        out.append(B[j])\n        j += 1\n(out, i, j)",
+    "expected": "([1, 2, 3], 1, 2)",
     "prereqs": [
       "py.u07.manual-advance.write"
     ],
-    "cue": "Compare the heads of A and B, take the smaller, advance that cursor.",
-    "syntax": "while i < len(A) to drain the remainder"
+    "cue": "The comparison loop ends when one list runs out; note what is still unmerged.",
+    "syntax": "loop stops when i or j hits its end"
   },
   {
     "id": "py.u07.merge.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "single walk into a second array (merge-style)",
     "kind": "write",
     "prompt": "Write `merge(A, B)` that merges two already-sorted lists into one sorted list, using two cursors in a single pass. Do not concatenate and call sorted.",
@@ -272,27 +274,29 @@
       "py.u07.merge.predict"
     ],
     "cue": "Two cursors: take the smaller head each step, then drain the remainder.",
-    "syntax": "while i < len(A) to drain the remainder"
+    "syntax": "while i < len(A) to drain the remainder",
+    "note": "The two drain loops matter: once one list ends, the other's tail is already sorted, so append it as-is.",
+    "mapsTo": "LC 88 · Merge Sorted Array"
   },
   {
     "id": "py.u07.rle.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "run-length encode (skip-run + emit)",
     "kind": "predict",
-    "prompt": "What is the value of `res`?",
-    "snippet": "s = 'aaabbc'\ni = 0\nres = ''\nwhile i < len(s):\n    j = i\n    while j < len(s) and s[j] == s[i]:\n        j += 1\n    res += s[i] + str(j - i)\n    i = j\nres",
-    "expected": "'a3b2c1'",
+    "prompt": "What is the value of `runs`?",
+    "snippet": "s = 'aabbbc'\ni = 0\nruns = []\nwhile i < len(s):\n    j = i\n    while j < len(s) and s[j] == s[i]:\n        j += 1\n    runs.append((s[i], j - i))\n    i = j\nruns",
+    "expected": "[('a', 2), ('b', 3), ('c', 1)]",
     "prereqs": [
       "py.u07.skip-run.write"
     ],
-    "cue": "Skip each run, then emit its char and length.",
-    "syntax": "str(count)"
+    "cue": "For each run, find its end, then record its char and length as a pair.",
+    "syntax": "j - i is the run length"
   },
   {
     "id": "py.u07.rle.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "run-length encode (skip-run + emit)",
     "kind": "write",
     "prompt": "Write `rle(s)` that returns the run-length encoding of string `s`: each maximal run of a character becomes that character followed by its count. For example `rle('aaabbc')` returns `'a3b2c1'`.",
@@ -308,7 +312,7 @@
   {
     "id": "py.u07.move-zeros.predict",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "lead/trail cursors, swap forward",
     "kind": "predict",
     "prompt": "What is the value of `a`?",
@@ -323,7 +327,7 @@
   {
     "id": "py.u07.move-zeros.write",
     "track": "python",
-    "group": "Pointers (single cursor)",
+    "group": "Pointers (cursor walks)",
     "concept": "lead/trail cursors, swap forward",
     "kind": "write",
     "prompt": "Write `move_zeros(a)` that moves all zeros in list `a` to the end in place, keeping the order of the nonzero elements, and returns `a`. Use a trailing write index and swap forward.",
@@ -334,6 +338,8 @@
       "py.u07.move-zeros.predict"
     ],
     "cue": "Swap each nonzero forward to a trailing write index.",
-    "syntax": "tuple swap x, y = y, x"
+    "syntax": "tuple swap x, y = y, x",
+    "note": "Swapping forward preserves the original order of the nonzeros (a stable move).",
+    "mapsTo": "LC 283 · Move Zeroes"
   }
 ]

@@ -102,6 +102,7 @@
     "expected": "7",
     "cue": "Trace it: half the gap added onto the low end.",
     "syntax": "Math.trunc(x)",
+    "note": "Writing lo + (hi - lo) / 2 instead of (lo + hi) / 2 guards against lo + hi overflowing fixed-width ints in C/Java; below 2^53 in JS it is a safe habit.",
     "prereqs": ["js.u11.intdiv.trunc-negative"]
   },
   {
@@ -116,6 +117,7 @@
     "tests": "if (reverseDigits(1234) !== 4321) throw new Error('1234');\nif (reverseDigits(120) !== 21) throw new Error('120');\nif (reverseDigits(0) !== 0) throw new Error('0');\nif (reverseDigits(7) !== 7) throw new Error('7');",
     "cue": "Peel the last digit each pass and fold it onto a growing result.",
     "syntax": "% 10 and Math.trunc(x)",
+    "mapsTo": "LC 7 · Reverse Integer",
     "prereqs": ["js.u11.mod.last-digit", "js.u11.intdiv.trunc-negative"]
   },
   {
@@ -153,10 +155,11 @@
     "concept": "polynomial hash via Horner",
     "kind": "predict",
     "prompt": "What is the value of `h`?",
-    "snippet": "let h = 0;\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) h = h * 31 + s.charCodeAt(i);\nh;",
-    "expected": "96354",
-    "cue": "Walk each index, updating the accumulator once per character.",
+    "snippet": "let h = 0;\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) h = h * 4 + (s.charCodeAt(i) - 96);\nh;",
+    "expected": "27",
+    "cue": "Each pass multiplies the running value by the base, then adds this character's small offset code.",
     "syntax": "s.charCodeAt(i)",
+    "note": "Characters are numbered by their code unit; subtracting a base like 'a' maps them to a small 0-based range.",
     "prereqs": []
   },
   {
@@ -171,6 +174,7 @@
     "tests": "if (parseNum('0') !== 0) throw new Error('0');\nif (parseNum('1234') !== 1234) throw new Error('1234');\nif (parseNum('7') !== 7) throw new Error('7');\nif (parseNum('1000') !== 1000) throw new Error('1000');",
     "cue": "Fold digits left to right, subtracting the code of '0' to get each digit.",
     "syntax": "s.charCodeAt(i)",
+    "note": "Subtracting the code of '0' (48) turns a digit character into its numeric value 0-9.",
     "prereqs": ["js.u11.horner.abc"]
   },
   {
@@ -333,6 +337,7 @@
     "tests": "if (popcount(0) !== 0) throw new Error('0');\nif (popcount(7) !== 3) throw new Error('7');\nif (popcount(12) !== 2) throw new Error('12');\nif (popcount(255) !== 8) throw new Error('255');\nif (popcount(1) !== 1) throw new Error('1');",
     "cue": "Clear the lowest set bit repeatedly, counting how many passes it takes.",
     "syntax": "x &= x - 1",
+    "mapsTo": "LC 191 · Number of 1 Bits",
     "prereqs": ["js.u11.bits.clear-lowest"]
   },
   {
@@ -347,6 +352,7 @@
     "tests": "for (const v of [1, 2, 4, 8, 16, 1024]) if (!isPowerOfTwo(v)) throw new Error('true ' + v);\nfor (const v of [0, 3, 6, 12, -2]) if (isPowerOfTwo(v)) throw new Error('false ' + v);",
     "cue": "A power of two has exactly one set bit; guard the positive case too.",
     "syntax": "x & (x - 1)",
+    "mapsTo": "LC 231 · Power of Two",
     "prereqs": ["js.u11.bits.clear-lowest"]
   },
   {
@@ -362,5 +368,19 @@
     "cue": "For each index, OR in a 1 shifted to that number's bit position.",
     "syntax": "1 << nums[i]",
     "prereqs": ["js.u11.bits.clear-lowest"]
+  },
+  {
+    "id": "js.u11.bits.xor-fold",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "xor cancels equal values",
+    "kind": "predict",
+    "prompt": "What is the value of `x`?",
+    "snippet": "const xs = [4, 1, 4];\nlet x = 0;\nfor (let i = 0; i < xs.length; i++) x ^= xs[i];\nx;",
+    "expected": "1",
+    "cue": "XOR of a value with itself is zero, so equal values cancel in pairs.",
+    "syntax": "x ^= xs[i]",
+    "note": "a ^ a is 0 and a ^ 0 is a, so folding an array with XOR leaves only the values that appear an odd number of times.",
+    "prereqs": []
   }
 ]

@@ -149,7 +149,7 @@
   },
   {
     "id": "js.u10.stack.pop-empty-js",
-    "cue": "Recall what popping an empty array yields.",
+    "cue": "Consider what Array.pop returns when there is nothing left to remove.",
     "syntax": "Array.prototype.pop()",
     "track": "javascript",
     "group": "Stack / queue / deque",
@@ -167,6 +167,8 @@
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "match brackets with a stack",
+    "mapsTo": "LC 20 · Valid Parentheses",
+    "note": "The stack height is the current nesting depth; a closer must match whatever opener is on top.",
     "kind": "write",
     "prompt": "Write `valid(s)` that returns `true` if the brackets in `s` (`()`, `[]`, `{}`) are balanced and correctly nested, else `false`. Use an array as a stack.",
     "starter": "function valid(s) {\n  // your code here\n}",
@@ -181,6 +183,8 @@
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "next greater element via monotonic stack",
+    "mapsTo": "LC 496 · Next Greater Element I",
+    "note": "Each index is pushed and popped at most once, so the whole scan is O(n) despite the inner while.",
     "kind": "write",
     "prompt": "Write `nge(nums)` returning an array where position `i` holds the nearest later value greater than `nums[i]`, or `-1` if none. Keep a stack of pending indices and resolve each in one pass.",
     "starter": "function nge(nums) {\n  // your code here\n}",
@@ -202,6 +206,20 @@
     "prereqs": []
   },
   {
+    "id": "js.u10.mod.wrap",
+    "cue": "Divide by `cap` and keep the remainder; watch what happens as the value passes `cap`.",
+    "syntax": "% remainder operator",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "modulo folds a value into 0..cap-1",
+    "note": "Modulo keeps an index inside a fixed buffer without any branch — the counter can climb forever while the slot stays in range.",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const cap = 4;\n[3 % cap, 4 % cap, 5 % cap, 8 % cap];",
+    "expected": "[3, 0, 1, 0]",
+    "prereqs": ["js.u10.queue.count"]
+  },
+  {
     "id": "js.u10.queue.wrap",
     "cue": "Wrap the write index with modulo capacity.",
     "syntax": "(head + size) % cap",
@@ -212,7 +230,7 @@
     "prompt": "What is the value of `writeIndex`?",
     "snippet": "const cap = 3;\nconst head = 2;\nconst size = 1;\nconst writeIndex = (head + size) % cap;\nwriteIndex;",
     "expected": "0",
-    "prereqs": ["js.u10.queue.count"]
+    "prereqs": ["js.u10.queue.count", "js.u10.mod.wrap"]
   },
   {
     "id": "js.u10.build.enqueue",
@@ -221,6 +239,7 @@
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "ring buffer enqueue at (head+size)%cap",
+    "note": "Wrapping the write index lets a fixed array reuse slots freed at the front, so no data ever shifts.",
     "kind": "write",
     "prompt": "Complete `enqueue(x)` on `RingQueue`: write `x` at index `(head + size) % cap`, then increase `size` by one.",
     "starter": "class RingQueue {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  enqueue(x) {\n    // your code here\n  }\n}",
@@ -249,6 +268,7 @@
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "Array.shift removes the front element",
+    "note": "Array.shift is O(n): every remaining element slides down one index. A head pointer makes dequeue O(1).",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const q = [1, 2, 3];\nconst v = q.shift();\n[v, q];",
@@ -330,6 +350,8 @@
     "track": "javascript",
     "group": "Stack / queue / deque",
     "concept": "sliding window maximum via monotonic deque",
+    "mapsTo": "LC 239 · Sliding Window Maximum",
+    "note": "The deque front is always the window max; smaller trailing values can never win while a bigger, later one is present.",
     "kind": "write",
     "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, in one pass. Keep a deque of candidate indices whose values decrease front to back.",
     "starter": "function maxwin(nums, k) {\n  // your code here\n}",

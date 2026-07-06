@@ -24,6 +24,7 @@
     "tests": "if (maxVowels('abciiidef', 3) !== 3) throw new Error(maxVowels('abciiidef', 3));\nif (maxVowels('aeiou', 2) !== 2) throw new Error('aeiou');\nif (maxVowels('leetcode', 3) !== 2) throw new Error('leetcode');\nif (maxVowels('b', 1) !== 0) throw new Error('b');",
     "cue": "The aggregate is a vowel count, not a sum: on each slide add one if the entering char is a vowel, drop one if the leaving char was.",
     "syntax": "vowels.has(ch)",
+    "mapsTo": "LC 1456 · Maximum Number of Vowels in a Substring of Given Length",
     "prereqs": ["js.u09.fixed.maxsum.write"]
   },
   {
@@ -38,6 +39,7 @@
     "tests": "if (longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2) !== 6) throw new Error('a');\nif (longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3) !== 10) throw new Error('b');\nif (longestOnes([1, 1, 1], 0) !== 3) throw new Error('c');\nif (longestOnes([0, 0, 0], 0) !== 0) throw new Error('d');",
     "cue": "Grow right; the window is valid while it contains at most k zeros. Shrink left when a k+1'th zero enters.",
     "syntax": "while (zeros > k)",
+    "mapsTo": "LC 1004 · Max Consecutive Ones III",
     "prereqs": ["js.u09.var.longest.predict"]
   },
   {
@@ -52,6 +54,7 @@
     "tests": "if (characterReplacement('ABAB', 2) !== 4) throw new Error('ABAB');\nif (characterReplacement('AABABBA', 1) !== 4) throw new Error('AABABBA');\nif (characterReplacement('AAAA', 0) !== 4) throw new Error('AAAA');\nif (characterReplacement('', 2) !== 0) throw new Error('empty');",
     "cue": "The non-dominant characters are the ones you replace: window length minus the top frequency is how many replacements it needs.",
     "syntax": "(right - left + 1) - maxFreq",
+    "mapsTo": "LC 424 · Longest Repeating Character Replacement",
     "prereqs": ["js.u09.norepeat.write"]
   },
   {
@@ -79,6 +82,7 @@
     "tests": "if (numSubarrayProductLessThanK([10, 5, 2, 6], 100) !== 8) throw new Error('a');\nif (numSubarrayProductLessThanK([1, 2, 3], 0) !== 0) throw new Error('b');\nif (numSubarrayProductLessThanK([1, 1, 1], 2) !== 6) throw new Error('c');",
     "cue": "Same grow/shrink shape, but the aggregate is a product and you tally windows instead of measuring one. Guard k <= 1 (no positive product is below it).",
     "syntax": "prod /= nums[left]",
+    "mapsTo": "LC 713 · Subarray Product Less Than K",
     "prereqs": ["js.u09.count.atmost.predict"]
   },
   {
@@ -93,6 +97,7 @@
     "tests": "if (checkInclusion('ab', 'eidbaooo') !== true) throw new Error('a');\nif (checkInclusion('ab', 'eidboaoo') !== false) throw new Error('b');\nif (checkInclusion('a', 'a') !== true) throw new Error('c');\nif (checkInclusion('abc', 'ab') !== false) throw new Error('d');",
     "cue": "This is the anagram scan returning a boolean: return the moment a window's counts equal s1's.",
     "syntax": "win.delete(key) on zero",
+    "mapsTo": "LC 567 · Permutation in String",
     "prereqs": ["js.u09.anagram.write"]
   }
 ]

@@ -50,6 +50,7 @@
     "tests": "assert max_sum_k([1, 3, 2, 6, 1], 2) == 8, max_sum_k([1, 3, 2, 6, 1], 2)\nassert max_sum_k([2, 3], 2) == 5, max_sum_k([2, 3], 2)\nassert max_sum_k([5, -1, 5, -1, 5], 1) == 5, max_sum_k([5, -1, 5, -1, 5], 1)",
     "cue": "Prime the first k-sum, then slide: add the entering element, drop the one k back.",
     "syntax": "range(k, len(nums))",
+    "note": "Sliding the running sum keeps the whole scan O(n); re-summing each block from scratch would be O(n*k).",
     "prereqs": ["py.u09.fixed.slide.predict"]
   },
   {
@@ -77,6 +78,7 @@
     "tests": "assert max_average([1, 12, -5, -6, 50, 3], 4) == 12.75, max_average([1, 12, -5, -6, 50, 3], 4)\nassert max_average([5], 1) == 5.0, max_average([5], 1)",
     "cue": "Track the best size-k sum with an O(1) slide, then convert to an average at the end.",
     "syntax": "best / k float division",
+    "mapsTo": "LC 643 · Maximum Average Subarray I",
     "prereqs": ["py.u09.fixed.maxsum.write", "py.u09.fixed.slice-prime.predict"]
   },
   {
@@ -118,6 +120,7 @@
     "tests": "assert min_subarray_len([2, 3, 1, 2, 4, 3], 7) == 2, min_subarray_len([2, 3, 1, 2, 4, 3], 7)\nassert min_subarray_len([1, 1, 1, 1], 100) == 0, min_subarray_len([1, 1, 1, 1], 100)\nassert min_subarray_len([1, 4, 4], 8) == 2, min_subarray_len([1, 4, 4], 8)",
     "cue": "Two pointers: expand right, then shrink left while still at or above target, keeping the min length.",
     "syntax": "while s >= target",
+    "mapsTo": "LC 209 · Minimum Size Subarray Sum",
     "prereqs": ["py.u09.var.grow-shrink.predict"]
   },
   {
@@ -158,6 +161,7 @@
     "tests": "assert length_of_longest_substring(\"abcabcbb\") == 3, length_of_longest_substring(\"abcabcbb\")\nassert length_of_longest_substring(\"bbbbb\") == 1, length_of_longest_substring(\"bbbbb\")\nassert length_of_longest_substring(\"\") == 0, length_of_longest_substring(\"\")\nassert length_of_longest_substring(\"pwwkew\") == 3, length_of_longest_substring(\"pwwkew\")",
     "cue": "Carry a window count-map; grow right, shrink left while the current char repeats.",
     "syntax": "dict.get(c, 0) + 1",
+    "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
     "prereqs": ["py.u09.countmap.norepeat.predict"]
   },
   {
@@ -185,6 +189,7 @@
     "tests": "assert longest_at_most_k_distinct(\"eceba\", 2) == 3, longest_at_most_k_distinct(\"eceba\", 2)\nassert longest_at_most_k_distinct(\"aa\", 1) == 2, longest_at_most_k_distinct(\"aa\", 1)\nassert longest_at_most_k_distinct(\"\", 2) == 0, longest_at_most_k_distinct(\"\", 2)\nassert longest_at_most_k_distinct(\"abaccc\", 2) == 4, longest_at_most_k_distinct(\"abaccc\", 2)",
     "cue": "Count distinct chars in a window map; shrink left while it holds more than k, deleting keys at zero.",
     "syntax": "del count[key] when it hits 0",
+    "mapsTo": "LC 340 · Longest Substring with At Most K Distinct Characters",
     "prereqs": ["py.u09.atmostk.predict"]
   },
   {
@@ -212,7 +217,22 @@
     "tests": "assert find_anagrams(\"cbaebabacd\", \"abc\") == [0, 6], find_anagrams(\"cbaebabacd\", \"abc\")\nassert find_anagrams(\"abab\", \"ab\") == [0, 1, 2], find_anagrams(\"abab\", \"ab\")\nassert find_anagrams(\"a\", \"ab\") == [], find_anagrams(\"a\", \"ab\")",
     "cue": "Slide a fixed len(p) window, comparing its counts against p's at each step.",
     "syntax": "Counter(s[:k])",
+    "mapsTo": "LC 438 · Find All Anagrams in a String",
     "prereqs": ["py.u09.fixed.slide.predict", "py.u09.countmap.counter.predict"]
+  },
+  {
+    "id": "py.u09.minwindow.missing.predict",
+    "track": "python",
+    "group": "Sliding window",
+    "concept": "missing counter: only still-needed chars decrement it",
+    "kind": "predict",
+    "prompt": "What is the value of `missing`?",
+    "snippet": "need = {'a': 2, 'b': 1}\nmissing = 3\nfor c in \"axa\":\n    if need.get(c, 0) > 0:\n        missing -= 1\n    need[c] = need.get(c, 0) - 1\nmissing",
+    "expected": "1",
+    "cue": "missing counts required chars not yet covered; it drops only when the entering char is one still needed (its need is positive). A surplus char pushes its need below zero and leaves missing alone.",
+    "syntax": "need.get(c, 0) > 0",
+    "note": "One integer replaces a full count-map comparison: missing == 0 means every required char is covered, in O(1) per step.",
+    "prereqs": ["py.u09.countmap.enter.predict"]
   },
   {
     "id": "py.u09.minwindow.write",
@@ -226,6 +246,8 @@
     "tests": "assert min_window(\"ADOBECODEBANC\", \"ABC\") == \"BANC\", min_window(\"ADOBECODEBANC\", \"ABC\")\nassert min_window(\"a\", \"a\") == \"a\", min_window(\"a\", \"a\")\nassert min_window(\"a\", \"aa\") == \"\", min_window(\"a\", \"aa\")\nassert min_window(\"a\", \"b\") == \"\", min_window(\"a\", \"b\")",
     "cue": "Expand right until every needed char is covered, then shrink left to the shortest cover.",
     "syntax": "dict.get(c, 0)",
-    "prereqs": ["py.u09.atmostk.write", "py.u09.countmap.norepeat.write"]
+    "mapsTo": "LC 76 · Minimum Window Substring",
+    "note": "The missing counter reduces 'is t fully covered?' to an O(1) test each step, instead of comparing whole count-maps.",
+    "prereqs": ["py.u09.atmostk.write", "py.u09.countmap.norepeat.write", "py.u09.minwindow.missing.predict"]
   }
 ]

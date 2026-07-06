@@ -13,7 +13,8 @@
       "py.u06.selection.write"
     ],
     "cue": "Each pass bubbles the largest remaining value to the end via adjacent swaps.",
-    "syntax": "a[j], a[j + 1] = a[j + 1], a[j] swap"
+    "syntax": "a[j], a[j + 1] = a[j + 1], a[j] swap",
+    "note": "Each pass locks one more element at the end; it stays O(n^2), the slowest of these sorts, kept as a baseline."
   },
   {
     "id": "py.u06.insertion.pass.predict",
@@ -59,7 +60,8 @@
       "py.u06.sorted.reverse.predict"
     ],
     "cue": "Sort descending, then take the front slice.",
-    "syntax": "sorted(xs, reverse=True)[:k]"
+    "syntax": "sorted(xs, reverse=True)[:k]",
+    "note": "Full sort is O(n log n); a size-k heap gets the top k in O(n log k), which wins when k is much smaller than n."
   },
   {
     "id": "py.u06.mingap.write",
@@ -75,6 +77,7 @@
       "py.u06.sweep.dup.write"
     ],
     "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
-    "syntax": "a[i] - a[i - 1] neighbor diff"
+    "syntax": "a[i] - a[i - 1] neighbor diff",
+    "note": "Once sorted, the closest pair is always adjacent, so one linear sweep replaces checking every O(n^2) pair."
   }
 ]

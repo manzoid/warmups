@@ -24,19 +24,21 @@
     "starter": "function reverse(a) {\n  // your code here\n}",
     "solution": "function reverse(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    [a[lo], a[hi]] = [a[hi], a[lo]];\n    lo++;\n    hi--;\n  }\n  return a;\n}",
     "tests": "if (JSON.stringify(reverse([1,2,3,4,5])) !== JSON.stringify([5,4,3,2,1])) throw new Error('odd');\nif (JSON.stringify(reverse([1,2,3,4])) !== JSON.stringify([4,3,2,1])) throw new Error('even');\nif (JSON.stringify(reverse([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverse([9])) !== JSON.stringify([9])) throw new Error('single');",
+    "mapsTo": "LC 344 · Reverse String",
     "prereqs": ["js.u08.converge.guard"]
   },
   {
     "id": "js.u08.reverse.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "reverse in place",
-    "cue": "Trace the swaps as the pointers move toward the middle.",
+    "concept": "reverse bug: looping the full length",
+    "cue": "Follow each swap; watch what happens once the index passes the midpoint.",
     "syntax": "[x, y] = [y, x] destructuring swap",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function reverse(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  return a;\n}\nreverse([1, 2, 3, 4]);",
-    "expected": "[4, 3, 2, 1]",
+    "snippet": "function reverse(a) {\n  for (let i = 0; i < a.length; i++) {\n    [a[i], a[a.length - 1 - i]] = [a[a.length - 1 - i], a[i]];\n  }\n  return a;\n}\nreverse([1, 2, 3, 4]);",
+    "expected": "[1, 2, 3, 4]",
+    "note": "Looping the whole length swaps each pair twice, undoing itself; the pointers must stop at the middle.",
     "prereqs": ["js.u08.reverse.write"]
   },
   {
@@ -57,13 +59,14 @@
     "id": "js.u08.palindrome.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "compare ends, fail fast",
-    "cue": "Trace each end-to-end comparison until the pointers meet.",
+    "concept": "palindrome bug: only one pointer moves",
+    "cue": "Track both indices after each step; notice which one never changes.",
     "syntax": "!== strict inequality",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function isPal(s) {\n  let lo = 0, hi = s.length - 1;\n  while (lo < hi) { if (s[lo] !== s[hi]) return false; lo++; hi--; }\n  return true;\n}\nisPal(\"abba\");",
-    "expected": "true",
+    "snippet": "function isPal(s) {\n  let lo = 0, hi = s.length - 1;\n  while (lo < hi) { if (s[lo] !== s[hi]) return false; lo++; }\n  return true;\n}\nisPal(\"abba\");",
+    "expected": "false",
+    "note": "With `hi` frozen, `s[hi]` stays 'a' while `lo` walks forward, so a real palindrome is rejected.",
     "prereqs": ["js.u08.palindrome.write"]
   },
   {
@@ -78,6 +81,8 @@
     "starter": "function pairSum(a, t) {\n  // your code here\n}",
     "solution": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}",
     "tests": "if (JSON.stringify(pairSum([1,2,4,7,11,15], 15)) !== JSON.stringify([2,4])) throw new Error('found');\nif (pairSum([1,2,3], 100) !== null) throw new Error('none');\nif (JSON.stringify(pairSum([2,3,4], 6)) !== JSON.stringify([0,2])) throw new Error('ends');",
+    "note": "On a sorted array this is O(n) time and O(1) space; a hash map matches the time but adds O(n) space.",
+    "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted",
     "prereqs": ["js.u08.converge.guard"]
   },
   {
@@ -85,12 +90,12 @@
     "track": "javascript",
     "group": "Two pointers",
     "concept": "pair-sum in sorted array",
-    "cue": "Trace the pointers moving as the running sum crosses the target.",
+    "cue": "Follow each pointer step: the high end drops while the sum is too big, the low end rises while it is too small.",
     "syntax": "a[i] + a[j]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}\npairSum([1, 2, 4, 7, 11, 15], 15);",
-    "expected": "[2, 4]",
+    "snippet": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}\npairSum([1, 2, 4, 7, 11, 15], 9);",
+    "expected": "[1, 3]",
     "prereqs": ["js.u08.pairsum.write"]
   },
   {
@@ -118,6 +123,8 @@
     "starter": "function maxArea(h) {\n  // your code here\n}",
     "solution": "function maxArea(h) {\n  let lo = 0, hi = h.length - 1, best = 0;\n  while (lo < hi) {\n    best = Math.max(best, (hi - lo) * Math.min(h[lo], h[hi]));\n    if (h[lo] < h[hi]) lo++;\n    else hi--;\n  }\n  return best;\n}",
     "tests": "if (maxArea([1,8,6,2,5,4,8,3,7]) !== 49) throw new Error('main');\nif (maxArea([1,1]) !== 1) throw new Error('two');\nif (maxArea([4,3,2,1,4]) !== 16) throw new Error('outer');",
+    "note": "Advancing the shorter wall can't lose the best area: the width only shrinks, so keeping the shorter wall could never beat what you already measured.",
+    "mapsTo": "LC 11 · Container With Most Water",
     "prereqs": ["js.u08.converge.guard"]
   },
   {
@@ -145,6 +152,8 @@
     "starter": "function sortedSquares(a) {\n  // your code here\n}",
     "solution": "function sortedSquares(a) {\n  const n = a.length, res = new Array(n);\n  let lo = 0, hi = n - 1;\n  for (let i = n - 1; i >= 0; i--) {\n    if (Math.abs(a[lo]) > Math.abs(a[hi])) { res[i] = a[lo] * a[lo]; lo++; }\n    else { res[i] = a[hi] * a[hi]; hi--; }\n  }\n  return res;\n}",
     "tests": "if (JSON.stringify(sortedSquares([-4,-1,0,3,10])) !== JSON.stringify([0,1,9,16,100])) throw new Error('a');\nif (JSON.stringify(sortedSquares([-7,-3,2,3,11])) !== JSON.stringify([4,9,9,49,121])) throw new Error('b');\nif (JSON.stringify(sortedSquares([1,2,3])) !== JSON.stringify([1,4,9])) throw new Error('positive');",
+    "note": "The largest square sits at one of the two ends, so filling the result from the back is O(n) and skips a final sort's O(n log n).",
+    "mapsTo": "LC 977 · Squares of a Sorted Array",
     "prereqs": ["js.u08.converge.guard"]
   },
   {
@@ -185,6 +194,7 @@
     "starter": "function removeDupes(a) {\n  // your code here\n}",
     "solution": "function removeDupes(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let r = 1; r < a.length; r++) {\n    if (a[r] !== a[w - 1]) { a[w] = a[r]; w++; }\n  }\n  return w;\n}",
     "tests": "const b = [0,0,1,1,1,2,2,3,3,4];\nconst k = removeDupes(b);\nif (k !== 5) throw new Error('k');\nif (JSON.stringify(b.slice(0, k)) !== JSON.stringify([0,1,2,3,4])) throw new Error('prefix');\nif (removeDupes([]) !== 0) throw new Error('empty');\nif (removeDupes([7]) !== 1) throw new Error('single');",
+    "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
     "prereqs": ["js.u08.compaction.intro"]
   },
   {
@@ -212,6 +222,7 @@
     "starter": "function removeElement(a, val) {\n  // your code here\n}",
     "solution": "function removeElement(a, val) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== val) { a[w] = a[r]; w++; }\n  }\n  return w;\n}",
     "tests": "const a = [3,2,2,3];\nconst k = removeElement(a, 3);\nif (k !== 2) throw new Error('k');\nif (JSON.stringify(a.slice(0, k)) !== JSON.stringify([2,2])) throw new Error('prefix');\nconst b = [0,1,2,2,3,0,4,2];\nconst k2 = removeElement(b, 2);\nif (k2 !== 5) throw new Error('k2');\nif (JSON.stringify(b.slice(0, k2)) !== JSON.stringify([0,1,3,0,4])) throw new Error('prefix2');",
+    "mapsTo": "LC 27 · Remove Element",
     "prereqs": ["js.u08.removedupes.write"]
   },
   {
@@ -226,6 +237,7 @@
     "starter": "function moveZeroes(a) {\n  // your code here\n}",
     "solution": "function moveZeroes(a) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== 0) { a[w] = a[r]; w++; }\n  }\n  while (w < a.length) { a[w] = 0; w++; }\n  return a;\n}",
     "tests": "if (JSON.stringify(moveZeroes([0,1,0,3,12])) !== JSON.stringify([1,3,12,0,0])) throw new Error('a');\nif (JSON.stringify(moveZeroes([0,0,1])) !== JSON.stringify([1,0,0])) throw new Error('b');\nif (JSON.stringify(moveZeroes([1,2,3])) !== JSON.stringify([1,2,3])) throw new Error('none');",
+    "mapsTo": "LC 283 · Move Zeroes",
     "prereqs": ["js.u08.removeelement.write"]
   },
   {
@@ -242,6 +254,34 @@
     "prereqs": ["js.u08.movezeroes.write"]
   },
   {
+    "id": "js.u08.linkedlist.walk.predict",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "index array as a linked list",
+    "cue": "Start at the given index and keep jumping to `nxt[cur]`; `-1` marks the end.",
+    "syntax": "cur = nxt[cur]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const nxt = [1, 3, -1, 2, 0];\nconst out = [];\nlet cur = 4;\nwhile (cur !== -1) { out.push(cur); cur = nxt[cur]; }\nout;",
+    "expected": "[4, 0, 1, 3, 2]",
+    "note": "`nxt[i]` holds the index of the next node, so an array can encode a linked list without objects or pointers.",
+    "prereqs": []
+  },
+  {
+    "id": "js.u08.floyd.trace.predict",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "one pointer twice as fast as the other",
+    "cue": "Each step, slow follows one link and fast follows two; note how far apart they get.",
+    "syntax": "fast = nxt[nxt[fast]]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const nxt = [1, 2, 3, 4, 5, -1];\nlet slow = 0, fast = 0;\nfor (let step = 0; step < 2; step++) {\n  slow = nxt[slow];\n  fast = nxt[nxt[fast]];\n}\n[slow, fast];",
+    "expected": "[2, 4]",
+    "note": "On a cycle the fast pointer laps the slow one and they eventually land on the same index; on a straight list fast runs off the end first.",
+    "prereqs": ["js.u08.linkedlist.walk.predict"]
+  },
+  {
     "id": "js.u08.hascycle.write",
     "track": "javascript",
     "group": "Two pointers",
@@ -253,7 +293,9 @@
     "starter": "function hasCycle(nxt, start) {\n  // your code here\n}",
     "solution": "function hasCycle(nxt, start) {\n  let slow = start, fast = start;\n  while (fast !== -1 && nxt[fast] !== -1) {\n    slow = nxt[slow];\n    fast = nxt[nxt[fast]];\n    if (slow === fast) return true;\n  }\n  return false;\n}",
     "tests": "if (hasCycle([1,2,3,1], 0) !== true) throw new Error('cycle');\nif (hasCycle([1,2,3,-1], 0) !== false) throw new Error('nocycle');\nif (hasCycle([-1], 0) !== false) throw new Error('single');",
-    "prereqs": []
+    "note": "Floyd's tortoise and hare uses O(1) extra space; a visited set would cost O(n).",
+    "mapsTo": "LC 141 · Linked List Cycle",
+    "prereqs": ["js.u08.linkedlist.walk.predict", "js.u08.floyd.trace.predict"]
   },
   {
     "id": "js.u08.hascycle.predict",
@@ -280,6 +322,7 @@
     "starter": "function middleIndex(nxt, start) {\n  // your code here\n}",
     "solution": "function middleIndex(nxt, start) {\n  let slow = start, fast = start;\n  while (fast !== -1 && nxt[fast] !== -1) {\n    slow = nxt[slow];\n    fast = nxt[nxt[fast]];\n  }\n  return slow;\n}",
     "tests": "if (middleIndex([1,2,3,4,-1], 0) !== 2) throw new Error('odd');\nif (middleIndex([1,2,3,-1], 0) !== 2) throw new Error('even');\nif (middleIndex([-1], 0) !== 0) throw new Error('single');\nif (middleIndex([1,-1], 0) !== 1) throw new Error('two');",
+    "mapsTo": "LC 876 · Middle of the Linked List",
     "prereqs": ["js.u08.hascycle.write"]
   },
   {
@@ -287,12 +330,13 @@
     "track": "javascript",
     "group": "Two pointers",
     "concept": "default sort is lexicographic",
-    "cue": "Recall how the no-argument sort orders numbers before you read them off.",
+    "cue": "Consider how sort compares a negative and a multi-digit number when you give it no comparator.",
     "syntax": "Array.prototype.sort()",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "[1, 2, 10, 3].sort();",
-    "expected": "[1, 10, 2, 3]",
+    "snippet": "[10, -3, 2, -1].sort();",
+    "expected": "[-1, -3, 10, 2]",
+    "note": "Default sort compares the STRING form of each element, so '10' < '2' and '-1' < '-3'; pass `(x, y) => x - y` for numeric order.",
     "prereqs": []
   },
   {
@@ -307,6 +351,8 @@
     "starter": "function threeSum(a) {\n  // your code here\n}",
     "solution": "function threeSum(a) {\n  a.sort((x, y) => x - y);\n  const res = [], n = a.length;\n  for (let i = 0; i < n; i++) {\n    if (i > 0 && a[i] === a[i - 1]) continue;\n    let lo = i + 1, hi = n - 1;\n    while (lo < hi) {\n      const s = a[i] + a[lo] + a[hi];\n      if (s < 0) lo++;\n      else if (s > 0) hi--;\n      else {\n        res.push([a[i], a[lo], a[hi]]);\n        lo++;\n        hi--;\n        while (lo < hi && a[lo] === a[lo - 1]) lo++;\n        while (lo < hi && a[hi] === a[hi + 1]) hi--;\n      }\n    }\n  }\n  return res;\n}",
     "tests": "if (JSON.stringify(threeSum([-1,0,1,2,-1,-4])) !== JSON.stringify([[-1,-1,2],[-1,0,1]])) throw new Error('a');\nif (JSON.stringify(threeSum([0,0,0])) !== JSON.stringify([[0,0,0]])) throw new Error('zeros');\nif (JSON.stringify(threeSum([1,2,3])) !== JSON.stringify([])) throw new Error('none');",
+    "note": "Sorting first makes equal values adjacent, so skipping neighbors that match dedups triples in O(1) extra space.",
+    "mapsTo": "LC 15 · 3Sum",
     "prereqs": ["js.u08.pairsum.write", "js.u08.sort.trap"]
   },
   {

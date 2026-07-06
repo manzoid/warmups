@@ -43,7 +43,8 @@
       "py.u04.freq.counter.mostcommon"
     ],
     "cue": "Two strings are anagrams exactly when their character tallies match.",
-    "syntax": "Counter(s) == Counter(t)"
+    "syntax": "Counter(s) == Counter(t)",
+    "mapsTo": "LC 242 · Valid Anagram"
   },
   {
     "id": "py.u04.wordcount.get.write",
@@ -75,6 +76,91 @@
       "py.u04.freq.counter.mostcommon"
     ],
     "cue": "Count every value, then take the single most frequent one.",
-    "syntax": "Counter(...).most_common(1)"
+    "syntax": "Counter(...).most_common(1)",
+    "mapsTo": "LC 169 · Majority Element"
+  },
+  {
+    "id": "py.u04.topk.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "top-k frequent via Counter.most_common",
+    "kind": "write",
+    "prompt": "Write `top_k_frequent(nums, k)` that returns the `k` most frequent values in `nums`, most frequent first.",
+    "starter": "def top_k_frequent(nums, k):\n    # your code here\n    pass",
+    "solution": "def top_k_frequent(nums, k):\n    from collections import Counter\n    return [v for v, _ in Counter(nums).most_common(k)]",
+    "tests": "assert top_k_frequent([1, 1, 1, 2, 2, 3], 2) == [1, 2], top_k_frequent([1, 1, 1, 2, 2, 3], 2)\nassert top_k_frequent([1], 1) == [1], top_k_frequent([1], 1)\nassert top_k_frequent([4, 4, 4, 5, 5, 6], 1) == [4], top_k_frequent([4, 4, 4, 5, 5, 6], 1)",
+    "prereqs": [
+      "py.u04.freq.counter.mostcommon"
+    ],
+    "cue": "Count all values, then peel off the top k pairs and keep only the keys.",
+    "syntax": "Counter(...).most_common(k)",
+    "mapsTo": "LC 347 · Top K Frequent Elements"
+  },
+  {
+    "id": "py.u04.subarraysum.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "prefix-sum counts in a dict",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "nums = [1, 1, 1]\nk = 2\ncount = {0: 1}\nprefix = 0\ntotal = 0\nfor i in range(len(nums)):\n    prefix += nums[i]\n    total += count.get(prefix - k, 0)\n    count[prefix] = count.get(prefix, 0) + 1\ntotal",
+    "expected": "2",
+    "prereqs": [
+      "py.u04.freq.get.predict"
+    ],
+    "cue": "Track how often each running total has occurred; a matching earlier total means a subarray sums to k.",
+    "syntax": "count.get(prefix - k, 0)",
+    "note": "prefix[j] - prefix[i] == k means the slice (i, j] sums to k, so each earlier prefix equal to prefix - k is one more valid subarray."
+  },
+  {
+    "id": "py.u04.subarraysum.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "count subarrays summing to k (prefix-sum map)",
+    "kind": "write",
+    "prompt": "Write `subarray_sum(nums, k)` that returns the number of contiguous subarrays of `nums` whose elements sum to `k`. Values may be negative. Make one pass using a dict of prefix-sum counts.",
+    "starter": "def subarray_sum(nums, k):\n    # your code here\n    pass",
+    "solution": "def subarray_sum(nums, k):\n    count = {0: 1}\n    prefix = 0\n    total = 0\n    for i in range(len(nums)):\n        prefix += nums[i]\n        total += count.get(prefix - k, 0)\n        count[prefix] = count.get(prefix, 0) + 1\n    return total",
+    "tests": "assert subarray_sum([1, 1, 1], 2) == 2, subarray_sum([1, 1, 1], 2)\nassert subarray_sum([1, 2, 3], 3) == 2, subarray_sum([1, 2, 3], 3)\nassert subarray_sum([1], 0) == 0, subarray_sum([1], 0)\nassert subarray_sum([-1, -1, 1], 0) == 1, subarray_sum([-1, -1, 1], 0)",
+    "prereqs": [
+      "py.u04.subarraysum.predict"
+    ],
+    "cue": "Keep a running prefix sum; for each one, add how many earlier prefixes equal prefix - k.",
+    "syntax": "count = {0: 1}",
+    "note": "Seed {0: 1} so a prefix that itself equals k counts on its own; negatives break the sliding-window trick, so the prefix map is the fallback.",
+    "mapsTo": "LC 560 · Subarray Sum Equals K"
+  },
+  {
+    "id": "py.u04.longest.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "run-starts via set membership",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "nums = [100, 4, 200, 1, 3, 2]\ns = set(nums)\nstarts = [x for x in sorted(s) if x - 1 not in s]\nstarts",
+    "expected": "[1, 100, 200]",
+    "prereqs": [
+      "py.u04.seen.set-sorted.predict"
+    ],
+    "cue": "A value begins a consecutive run only when its predecessor is missing from the set.",
+    "syntax": "x - 1 not in s",
+    "note": "Counting a run only from its start visits each element once, giving O(n) instead of the O(n log n) you'd pay to sort."
+  },
+  {
+    "id": "py.u04.longest.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "longest consecutive run via a set",
+    "kind": "write",
+    "prompt": "Write `longest_consecutive(nums)` that returns the length of the longest run of consecutive integers in `nums` (in any order). Return 0 for an empty list. Do not sort; use a set.",
+    "starter": "def longest_consecutive(nums):\n    # your code here\n    pass",
+    "solution": "def longest_consecutive(nums):\n    s = set(nums)\n    best = 0\n    for x in s:\n        if x - 1 not in s:\n            length = 1\n            y = x + 1\n            while y in s:\n                length += 1\n                y += 1\n            best = max(best, length)\n    return best",
+    "tests": "assert longest_consecutive([100, 4, 200, 1, 3, 2]) == 4, longest_consecutive([100, 4, 200, 1, 3, 2])\nassert longest_consecutive([]) == 0, longest_consecutive([])\nassert longest_consecutive([1, 2, 0, 1]) == 3, longest_consecutive([1, 2, 0, 1])\nassert longest_consecutive([10]) == 1, longest_consecutive([10])",
+    "prereqs": [
+      "py.u04.longest.predict"
+    ],
+    "cue": "From each run-start, walk upward through the set counting how far the run extends.",
+    "syntax": "while y in s: y += 1",
+    "mapsTo": "LC 128 · Longest Consecutive Sequence"
   }
 ]

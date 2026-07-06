@@ -10,6 +10,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const m = new Map();\nm.set('x', 0);\n(m.get('x') ?? 5);",
     "expected": "0",
+    "note": "?? only falls through on null/undefined, so a genuine stored 0 survives where || would replace it.",
     "prereqs": [
       "js.u04.freq.zero-clobber"
     ]
@@ -41,6 +42,7 @@
     "starter": "function isAnagram(s, t) {\n  // your code here\n}",
     "solution": "function isAnagram(s, t) {\n  if (s.length !== t.length) return false;\n  const cnt = {};\n  for (let i = 0; i < s.length; i++) cnt[s[i]] = (cnt[s[i]] || 0) + 1;\n  for (let i = 0; i < t.length; i++) {\n    const ch = t[i];\n    if (!cnt[ch]) return false;\n    cnt[ch]--;\n  }\n  return true;\n}",
     "tests": "if (isAnagram('anagram', 'nagaram') !== true) throw new Error('anagram');\nif (isAnagram('rat', 'car') !== false) throw new Error('not anagram');\nif (isAnagram('', '') !== true) throw new Error('empty');\nif (isAnagram('a', 'ab') !== false) throw new Error('length mismatch');",
+    "mapsTo": "LC 242 · Valid Anagram",
     "prereqs": [
       "js.u04.freq.write"
     ]
@@ -57,6 +59,7 @@
     "starter": "function majority(nums) {\n  // your code here\n}",
     "solution": "function majority(nums) {\n  const m = new Map();\n  let best = null, bestCount = 0;\n  for (let i = 0; i < nums.length; i++) {\n    const x = nums[i];\n    const c = (m.get(x) || 0) + 1;\n    m.set(x, c);\n    if (c > bestCount) { bestCount = c; best = x; }\n  }\n  return best;\n}",
     "tests": "if (majority([3, 2, 3]) !== 3) throw new Error('basic');\nif (majority([2, 2, 1, 1, 1, 2, 2]) !== 2) throw new Error('longer');\nif (majority([1]) !== 1) throw new Error('single');",
+    "mapsTo": "LC 169 · Majority Element",
     "prereqs": [
       "js.u04.freq.map"
     ]

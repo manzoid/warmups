@@ -51,7 +51,8 @@
       "js.u03.charcode.at"
     ],
     "cue": "Subtract the two code points for the offset.",
-    "syntax": "charCodeAt(0) difference"
+    "syntax": "charCodeAt(0) difference",
+    "note": "Chars are numbered; subtracting 'a' maps a-z onto 0-25."
   },
   {
     "id": "js.u03.index.collect",
@@ -100,6 +101,20 @@
     "syntax": "for (let i = 0; i < s.length; i++)"
   },
   {
+    "id": "js.u03.counter.idiom",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "object as a counter (default-to-zero bump)",
+    "kind": "predict",
+    "prompt": "What is the value of `m`?",
+    "snippet": "const m = {};\nm[\"a\"] = (m[\"a\"] || 0) + 1;\nm[\"a\"] = (m[\"a\"] || 0) + 1;\nm[\"b\"] = (m[\"b\"] || 0) + 1;\nm",
+    "expected": "{a: 2, b: 1}",
+    "prereqs": [],
+    "cue": "A missing key reads as undefined; the || supplies the starting count.",
+    "syntax": "obj[k] = (obj[k] || 0) + 1",
+    "note": "obj[k] || 0 turns a first-seen key into 0, so the bump starts its tally at 1."
+  },
+  {
     "id": "js.u03.freq",
     "track": "javascript",
     "group": "Strings",
@@ -110,7 +125,8 @@
     "solution": "function charFreq(s) {\n  const freq = {};\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    freq[c] = (freq[c] || 0) + 1;\n  }\n  return freq;\n}",
     "tests": "if (JSON.stringify(charFreq(\"aab\")) !== JSON.stringify({ a: 2, b: 1 })) throw new Error(\"aab\");\nif (JSON.stringify(charFreq(\"\")) !== JSON.stringify({})) throw new Error(\"empty\");",
     "prereqs": [
-      "js.u03.count.char"
+      "js.u03.count.char",
+      "js.u03.counter.idiom"
     ],
     "cue": "Tally each char into a plain object.",
     "syntax": "obj[c] = (obj[c] || 0) + 1"
@@ -158,7 +174,8 @@
       "js.u03.char.arith"
     ],
     "cue": "Subtract the zero code point.",
-    "syntax": "charCodeAt(0) - '0'.charCodeAt(0)"
+    "syntax": "charCodeAt(0) - '0'.charCodeAt(0)",
+    "note": "Digits '0'..'9' sit at consecutive code points, so subtracting '0' gives the numeric value."
   },
   {
     "id": "js.u03.count.digits",
@@ -272,7 +289,8 @@
       "js.u03.char.arith"
     ],
     "cue": "Shift lowercase letters by the case offset.",
-    "syntax": "String.fromCharCode(code - 32)"
+    "syntax": "String.fromCharCode(code - 32)",
+    "note": "Each lowercase letter sits exactly 32 code points above its uppercase twin."
   },
   {
     "id": "js.u03.template",
@@ -303,7 +321,8 @@
       "js.u03.index.char"
     ],
     "cue": "Walk indices from the end down to zero.",
-    "syntax": "for (let i = s.length - 1; i >= 0; i--)"
+    "syntax": "for (let i = s.length - 1; i >= 0; i--)",
+    "mapsTo": "LC 344 · Reverse String"
   },
   {
     "id": "js.u03.reverse.sugar",
@@ -334,7 +353,8 @@
       "js.u03.index.char"
     ],
     "cue": "Two pointers converging from both ends.",
-    "syntax": "while (i < j)"
+    "syntax": "while (i < j)",
+    "mapsTo": "LC 125 · Valid Palindrome"
   },
   {
     "id": "js.u03.palindrome.sugar",
@@ -377,7 +397,7 @@
     "prereqs": [
       "js.u03.indexof"
     ],
-    "cue": "Recall what indexOf returns when nothing matches.",
+    "cue": "Consider what indexOf gives back when the char never appears.",
     "syntax": "str.indexOf(sub)"
   },
   {
@@ -431,7 +451,7 @@
     "group": "Strings",
     "concept": "naive substring search",
     "kind": "write",
-    "prompt": "Write `myIndexOf(s, p)` returning the index of the first occurrence of `p` in `s`, or `-1` if absent. Use a nested scan; do not use `indexOf`, `includes`, or `search`.",
+    "prompt": "Write `myIndexOf(s, p)` returning the index of the first occurrence of `p` in `s`, or `-1` if absent. An empty pattern `p` matches at index 0. Use a nested scan; do not use `indexOf`, `includes`, or `search`.",
     "starter": "function myIndexOf(s, p) {\n  // your code here\n}",
     "solution": "function myIndexOf(s, p) {\n  for (let i = 0; i + p.length <= s.length; i++) {\n    let k = 0;\n    while (k < p.length && s[i + k] === p[k]) k++;\n    if (k === p.length) return i;\n  }\n  return -1;\n}",
     "tests": "if (myIndexOf(\"hello\", \"ll\") !== 2) throw new Error(\"ll\");\nif (myIndexOf(\"abc\", \"z\") !== -1) throw new Error(\"absent\");\nif (myIndexOf(\"aaa\", \"aa\") !== 0) throw new Error(\"aa\");\nif (myIndexOf(\"abc\", \"\") !== 0) throw new Error(\"empty pattern\");\nif (myIndexOf(\"abc\", \"c\") !== 2) throw new Error(\"last\");",
@@ -440,7 +460,8 @@
       "js.u03.indexof"
     ],
     "cue": "At each start position, scan the pattern for a full match.",
-    "syntax": "nested loop over s and p"
+    "syntax": "nested loop over s and p",
+    "mapsTo": "LC 28 · Find the Index of the First Occurrence in a String"
   },
   {
     "id": "js.u03.split.native",

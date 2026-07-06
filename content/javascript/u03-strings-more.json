@@ -11,7 +11,8 @@
     "tests": "if (firstUnique(\"leetcode\") !== 0) throw new Error(\"leetcode\");\nif (firstUnique(\"loveleetcode\") !== 2) throw new Error(\"loveleetcode\");\nif (firstUnique(\"aabb\") !== -1) throw new Error(\"aabb\");\nif (firstUnique(\"\") !== -1) throw new Error(\"empty\");\nif (firstUnique(\"z\") !== 0) throw new Error(\"z\");",
     "prereqs": ["js.u03.freq"],
     "cue": "Count all characters first, then scan in order for the first count of one.",
-    "syntax": "two passes over s"
+    "syntax": "two passes over s",
+    "mapsTo": "LC 387 · First Unique Character in a String"
   },
   {
     "id": "js.u03.anagram",
@@ -25,21 +26,23 @@
     "tests": "if (isAnagram(\"listen\", \"silent\") !== true) throw new Error(\"listen\");\nif (isAnagram(\"rat\", \"car\") !== false) throw new Error(\"rat\");\nif (isAnagram(\"\", \"\") !== true) throw new Error(\"empty\");\nif (isAnagram(\"aabb\", \"bbaa\") !== true) throw new Error(\"aabb\");\nif (isAnagram(\"a\", \"ab\") !== false) throw new Error(\"len\");",
     "prereqs": ["js.u03.freq"],
     "cue": "Tally one string, then draw the tally down with the other.",
-    "syntax": "freq[c] = (freq[c] || 0) + 1"
+    "syntax": "freq[c] = (freq[c] || 0) + 1",
+    "mapsTo": "LC 242 · Valid Anagram"
   },
   {
     "id": "js.u03.whisper",
     "track": "javascript",
     "group": "Strings",
-    "concept": "lowercase letters via char arithmetic",
+    "concept": "toggle case in one pass via char arithmetic",
     "kind": "write",
-    "prompt": "Write `whisper(s)` returning `s` with every uppercase letter A-Z converted to lowercase, other characters unchanged. Convert with `charCodeAt`/`String.fromCharCode`; do not use `toLowerCase`.",
-    "starter": "function whisper(s) {\n  // your code here\n}",
-    "solution": "function whisper(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"A\" && c <= \"Z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) + 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
-    "tests": "if (whisper(\"HI!\") !== \"hi!\") throw new Error(\"HI!\");\nif (whisper(\"Ab3\") !== \"ab3\") throw new Error(\"Ab3\");\nif (whisper(\"\") !== \"\") throw new Error(\"empty\");\nif (whisper(\"abc\") !== \"abc\") throw new Error(\"abc\");",
+    "prompt": "Write `swapCase(s)` returning `s` with every lowercase letter made uppercase AND every uppercase letter made lowercase in a single pass, other characters unchanged. Convert with `charCodeAt`/`String.fromCharCode`; do not use `toLowerCase` or `toUpperCase`.",
+    "starter": "function swapCase(s) {\n  // your code here\n}",
+    "solution": "function swapCase(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else if (c >= \"A\" && c <= \"Z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) + 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
+    "tests": "if (swapCase(\"Hi!\") !== \"hI!\") throw new Error(\"Hi!\");\nif (swapCase(\"aB3\") !== \"Ab3\") throw new Error(\"aB3\");\nif (swapCase(\"abcABC\") !== \"ABCabc\") throw new Error(\"mix\");\nif (swapCase(\"\") !== \"\") throw new Error(\"empty\");\nif (swapCase(\"123\") !== \"123\") throw new Error(\"digits\");",
     "prereqs": ["js.u03.shout"],
-    "cue": "Shift uppercase letters by the case offset in the other direction.",
-    "syntax": "String.fromCharCode(code + 32)"
+    "cue": "Branch on which case a letter is, then shift it the opposite way.",
+    "syntax": "code - 32 for lower, code + 32 for upper",
+    "note": "One pass, two branches: the +32/-32 case gap runs both directions here."
   },
   {
     "id": "js.u03.reverse.words",
@@ -53,7 +56,8 @@
     "tests": "if (reverseWords(\"the sky is blue\") !== \"blue is sky the\") throw new Error(\"sky\");\nif (reverseWords(\"hello\") !== \"hello\") throw new Error(\"one\");\nif (reverseWords(\"a b c\") !== \"c b a\") throw new Error(\"abc\");\nif (reverseWords(\"\") !== \"\") throw new Error(\"empty\");",
     "prereqs": ["js.u03.split.native", "js.u03.reverse.sugar"],
     "cue": "Split on spaces, reverse the array of words, then join with spaces.",
-    "syntax": "str.split(' ') / arr.reverse() / arr.join(' ')"
+    "syntax": "str.split(' ') / arr.reverse() / arr.join(' ')",
+    "mapsTo": "LC 151 · Reverse Words in a String"
   },
   {
     "id": "js.u03.startswith",
@@ -81,7 +85,8 @@
     "tests": "if (removeVowels(\"banana\") !== \"bnn\") throw new Error(\"banana\");\nif (removeVowels(\"xyz\") !== \"xyz\") throw new Error(\"xyz\");\nif (removeVowels(\"aeiou\") !== \"\") throw new Error(\"vowels\");\nif (removeVowels(\"\") !== \"\") throw new Error(\"empty\");",
     "prereqs": ["js.u03.keep.digits"],
     "cue": "Keep the chars that are not vowels, then join.",
-    "syntax": "'aeiou'.indexOf(c) === -1"
+    "syntax": "'aeiou'.indexOf(c) === -1",
+    "mapsTo": "LC 1119 · Remove Vowels from a String"
   },
   {
     "id": "js.u03.tochar",

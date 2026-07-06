@@ -82,15 +82,16 @@
   },
   {
     "id": "py.u06.merge.two.predict",
-    "cue": "Advance whichever pointer holds the smaller front, then drain the tails.",
-    "syntax": "res.extend(L[i:]) drains a tail",
+    "cue": "Stop the walk when either side runs out; notice which elements are still waiting.",
+    "syntax": "while i < len(L) and j < len(R)",
     "track": "python",
     "group": "Sorting",
-    "concept": "merge two sorted lists (two-pointer walk)",
+    "concept": "merge loop stops when one list empties",
     "kind": "predict",
     "prompt": "What is the value of `res`?",
-    "snippet": "L = [1, 4]\nR = [2, 3]\nres = []\ni = j = 0\nwhile i < len(L) and j < len(R):\n    if L[i] <= R[j]:\n        res.append(L[i]); i += 1\n    else:\n        res.append(R[j]); j += 1\nres.extend(L[i:])\nres.extend(R[j:])\nres",
-    "expected": "[1, 2, 3, 4]",
+    "snippet": "L = [1, 4, 5]\nR = [2, 3]\nres = []\ni = j = 0\nwhile i < len(L) and j < len(R):\n    if L[i] <= R[j]:\n        res.append(L[i]); i += 1\n    else:\n        res.append(R[j]); j += 1\nres",
+    "expected": "[1, 2, 3]",
+    "note": "The loop ends the moment one list empties; the other list's leftover tail still has to be appended.",
     "prereqs": ["py.u06.insertion.write"]
   },
   {
@@ -105,7 +106,22 @@
     "starter": "def merge(L, R):\n    # your code here\n    pass",
     "solution": "def merge(L, R):\n    res = []\n    i = j = 0\n    while i < len(L) and j < len(R):\n        if L[i] <= R[j]:\n            res.append(L[i]); i += 1\n        else:\n            res.append(R[j]); j += 1\n    res.extend(L[i:])\n    res.extend(R[j:])\n    return res",
     "tests": "assert merge([1, 4], [2, 3]) == [1, 2, 3, 4], 'basic'\nassert merge([], [1, 2]) == [1, 2], 'left empty'\nassert merge([1, 2], []) == [1, 2], 'right empty'\nassert merge([1, 1], [1, 1]) == [1, 1, 1, 1], 'all equal'",
+    "mapsTo": "LC 21 · Merge Two Sorted Lists",
     "prereqs": ["py.u06.merge.two.predict"]
+  },
+  {
+    "id": "py.u06.recursion.trace.predict",
+    "cue": "The base case returns 1; a longer list splits in half and adds the two halves' results.",
+    "syntax": "len(a) // 2 split point",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "recursion: split, recurse on halves, combine",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def rec(a):\n    if len(a) <= 1:\n        return 1\n    mid = len(a) // 2\n    return rec(a[:mid]) + rec(a[mid:])\n\nrec([5, 2, 4, 6])",
+    "expected": "4",
+    "note": "Split-recurse-combine is the shape of merge sort: keep halving down to a base case, then fold the pieces back together.",
+    "prereqs": ["py.u06.merge.write"]
   },
   {
     "id": "py.u06.mergesort.write",
@@ -119,7 +135,9 @@
     "starter": "def merge(L, R):\n    res = []\n    i = j = 0\n    while i < len(L) and j < len(R):\n        if L[i] <= R[j]:\n            res.append(L[i]); i += 1\n        else:\n            res.append(R[j]); j += 1\n    res.extend(L[i:])\n    res.extend(R[j:])\n    return res\n\ndef merge_sort(a):\n    # your code here\n    pass",
     "solution": "def merge(L, R):\n    res = []\n    i = j = 0\n    while i < len(L) and j < len(R):\n        if L[i] <= R[j]:\n            res.append(L[i]); i += 1\n        else:\n            res.append(R[j]); j += 1\n    res.extend(L[i:])\n    res.extend(R[j:])\n    return res\n\ndef merge_sort(a):\n    if len(a) <= 1:\n        return a[:]\n    mid = len(a) // 2\n    left = merge_sort(a[:mid])\n    right = merge_sort(a[mid:])\n    return merge(left, right)",
     "tests": "assert merge_sort([5, 2, 4, 6, 1, 3]) == [1, 2, 3, 4, 5, 6], 'basic'\nassert merge_sort([]) == [], 'empty'\nassert merge_sort([1]) == [1], 'single'\nassert merge_sort([3, 1, 2, 3, 1]) == [1, 1, 2, 3, 3], 'dups'",
-    "prereqs": ["py.u06.merge.write"]
+    "note": "Halving each level gives log n levels, each doing O(n) merging: O(n log n) overall, and stable.",
+    "mapsTo": "LC 912 · Sort an Array",
+    "prereqs": ["py.u06.recursion.trace.predict", "py.u06.merge.write"]
   },
   {
     "id": "py.u06.partition.write",
@@ -160,6 +178,7 @@
     "starter": "def partition(a, lo, hi):\n    pivot = a[hi]\n    i = lo\n    for j in range(lo, hi):\n        if a[j] < pivot:\n            a[i], a[j] = a[j], a[i]\n            i += 1\n    a[i], a[hi] = a[hi], a[i]\n    return i\n\ndef quicksort(a, lo=0, hi=None):\n    # your code here\n    pass",
     "solution": "def partition(a, lo, hi):\n    pivot = a[hi]\n    i = lo\n    for j in range(lo, hi):\n        if a[j] < pivot:\n            a[i], a[j] = a[j], a[i]\n            i += 1\n    a[i], a[hi] = a[hi], a[i]\n    return i\n\ndef quicksort(a, lo=0, hi=None):\n    if hi is None:\n        hi = len(a) - 1\n    if lo < hi:\n        p = partition(a, lo, hi)\n        quicksort(a, lo, p - 1)\n        quicksort(a, p + 1, hi)\n    return a",
     "tests": "assert quicksort([5, 2, 4, 6, 1, 3]) == [1, 2, 3, 4, 5, 6], 'basic'\nassert quicksort([]) == [], 'empty'\nassert quicksort([1]) == [1], 'single'\nassert quicksort([1, 2, 3]) == [1, 2, 3], 'sorted'\nassert quicksort([3, 1, 2, 3, 1]) == [1, 1, 2, 3, 3], 'dups'",
+    "mapsTo": "LC 912 · Sort an Array",
     "prereqs": ["py.u06.partition.write"]
   },
   {
@@ -186,19 +205,20 @@
     "prompt": "What does this evaluate to?",
     "snippet": "pairs = [(1, 'a'), (2, 'b'), (1, 'c'), (2, 'd')]\nsorted(pairs, key=lambda p: p[0])",
     "expected": "[(1, 'a'), (1, 'c'), (2, 'b'), (2, 'd')]",
+    "note": "A stable sort keeps equal keys in their original relative order, which lets you sort by one key and then by another without disturbing earlier ties.",
     "prereqs": ["py.u06.sorted.builtin.predict"]
   },
   {
     "id": "py.u06.sweep.dup.predict",
-    "cue": "After sorting, check whether any element matches the one before it.",
+    "cue": "Sorting drops equal values next to each other; here, do any two land adjacent?",
     "syntax": "a[i] == a[i - 1] neighbor compare",
     "track": "python",
     "group": "Sorting",
-    "concept": "sort then sweep neighbors for a duplicate",
+    "concept": "sort then sweep finds no adjacent duplicate",
     "kind": "predict",
     "prompt": "What is the value of `dup`?",
-    "snippet": "a = [3, 1, 3, 2]\na = sorted(a)\ndup = False\nfor i in range(1, len(a)):\n    if a[i] == a[i - 1]:\n        dup = True\ndup",
-    "expected": "True",
+    "snippet": "a = [3, 1, 4, 2]\na = sorted(a)\ndup = False\nfor i in range(1, len(a)):\n    if a[i] == a[i - 1]:\n        dup = True\ndup",
+    "expected": "False",
     "prereqs": ["py.u06.sorted.builtin.predict"]
   },
   {
@@ -213,19 +233,20 @@
     "starter": "def has_duplicate(a):\n    # your code here\n    pass",
     "solution": "def has_duplicate(a):\n    a = sorted(a)\n    for i in range(1, len(a)):\n        if a[i] == a[i - 1]:\n            return True\n    return False",
     "tests": "assert has_duplicate([1, 2, 3, 1]) is True, 'has dup'\nassert has_duplicate([1, 2, 3]) is False, 'no dup'\nassert has_duplicate([]) is False, 'empty'\nassert has_duplicate([5, 5]) is True, 'pair'\norig = [3, 1, 2]\nhas_duplicate(orig)\nassert orig == [3, 1, 2], orig",
+    "mapsTo": "LC 217 · Contains Duplicate",
     "prereqs": ["py.u06.sweep.dup.predict"]
   },
   {
     "id": "py.u06.twopointer.predict",
-    "cue": "Move the low or high pointer based on how the pair sum compares to the target.",
+    "cue": "Move the near or far pointer by how the sum compares; what happens if they meet with no hit?",
     "syntax": "i, j = 0, len(a) - 1",
     "track": "python",
     "group": "Sorting",
-    "concept": "sort then converge two pointers to a target sum",
+    "concept": "two-pointer converge with no matching pair",
     "kind": "predict",
     "prompt": "What is the value of `res`?",
-    "snippet": "a = sorted([8, 1, 3, 5])\ni, j = 0, len(a) - 1\ntarget = 8\nres = None\nwhile i < j:\n    s = a[i] + a[j]\n    if s == target:\n        res = (a[i], a[j]); break\n    elif s < target:\n        i += 1\n    else:\n        j -= 1\nres",
-    "expected": "(3, 5)",
+    "snippet": "a = sorted([7, 1, 4, 2])\ni, j = 0, len(a) - 1\ntarget = 10\nres = None\nwhile i < j:\n    s = a[i] + a[j]\n    if s == target:\n        res = (a[i], a[j]); break\n    elif s < target:\n        i += 1\n    else:\n        j -= 1\nres",
+    "expected": "None",
     "prereqs": ["py.u06.sweep.dup.write"]
   },
   {
@@ -240,6 +261,8 @@
     "starter": "def two_sum_sorted(a, target):\n    # your code here\n    pass",
     "solution": "def two_sum_sorted(a, target):\n    a = sorted(a)\n    i, j = 0, len(a) - 1\n    while i < j:\n        s = a[i] + a[j]\n        if s == target:\n            return (a[i], a[j])\n        elif s < target:\n            i += 1\n        else:\n            j -= 1\n    return None",
     "tests": "assert two_sum_sorted([8, 1, 3, 5], 8) == (3, 5), 'basic'\nassert two_sum_sorted([1, 2, 3], 10) is None, 'none'\nassert two_sum_sorted([2, 2], 4) == (2, 2), 'pair'\nassert two_sum_sorted([1, 2, 4, 7], 11) == (4, 7), 'high pair'",
+    "note": "Sorting first lets two pointers converge in one O(n) pass; checking every pair would be O(n^2).",
+    "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted",
     "prereqs": ["py.u06.twopointer.predict"]
   },
   {
@@ -284,7 +307,7 @@
   },
   {
     "id": "py.u06.sort.inplace.predict",
-    "cue": "Recall what list.sort() gives back versus what it does to the list.",
+    "cue": "Consider whether list.sort() hands back the sorted list or changes the list itself.",
     "syntax": "list.sort() sorts in place",
     "track": "python",
     "group": "Sorting",
@@ -293,6 +316,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [3, 1, 2]\nr = a.sort()\n(r, a)",
     "expected": "(None, [1, 2, 3])",
+    "note": "list.sort() reorders the list and returns None; reach for sorted() when you want a new list and the original left intact.",
     "prereqs": ["py.u06.sorted.builtin.predict"]
   },
   {

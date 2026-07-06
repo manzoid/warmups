@@ -11,7 +11,8 @@
     "tests": "assert first_unique(\"leetcode\") == 0\nassert first_unique(\"loveleetcode\") == 2\nassert first_unique(\"aabb\") == -1\nassert first_unique(\"\") == -1\nassert first_unique(\"z\") == 0",
     "prereqs": ["py.u03.freq.build", "py.u03.enumerate.pairs"],
     "cue": "Count every character first, then scan in order for the first count of one.",
-    "syntax": "two passes: build counts, then find"
+    "syntax": "two passes: build counts, then find",
+    "mapsTo": "LC 387 · First Unique Character in a String"
   },
   {
     "id": "py.u03.anagram",
@@ -25,7 +26,8 @@
     "tests": "assert is_anagram(\"listen\", \"silent\") == True\nassert is_anagram(\"rat\", \"car\") == False\nassert is_anagram(\"\", \"\") == True\nassert is_anagram(\"aabb\", \"bbaa\") == True\nassert is_anagram(\"a\", \"ab\") == False",
     "prereqs": ["py.u03.freq.build"],
     "cue": "Tally one string, then draw down that tally with the other.",
-    "syntax": "dict.get(key, 0) counts"
+    "syntax": "dict.get(key, 0) counts",
+    "mapsTo": "LC 242 · Valid Anagram"
   },
   {
     "id": "py.u03.swapcase",
@@ -53,7 +55,8 @@
     "tests": "assert reverse_words(\"the sky is blue\") == \"blue is sky the\"\nassert reverse_words(\"hello\") == \"hello\"\nassert reverse_words(\"a b c\") == \"c b a\"\nassert reverse_words(\"\") == \"\"",
     "prereqs": ["py.u03.sugar.splitjoin", "py.u03.reverse.slice"],
     "cue": "Split into words, reverse that list, then join back with spaces.",
-    "syntax": "str.split(\" \") / \" \".join(...)"
+    "syntax": "str.split(\" \") / \" \".join(...)",
+    "mapsTo": "LC 151 · Reverse Words in a String"
   },
   {
     "id": "py.u03.prefix.check",

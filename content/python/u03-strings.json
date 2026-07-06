@@ -51,7 +51,22 @@
     "expected": "4",
     "prereqs": [],
     "cue": "Subtract the code point of the base letter.",
-    "syntax": "ord() code points"
+    "syntax": "ord() code points",
+    "note": "Characters are numbered by code point; subtracting ord('a') maps a-z onto 0-25."
+  },
+  {
+    "id": "py.u03.dict.counter",
+    "track": "python",
+    "group": "Strings",
+    "concept": "dict.get default as a counter",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "counts = {'a': 2}\n[counts.get('a', 0), counts.get('z', 0)]",
+    "expected": "[2, 0]",
+    "prereqs": [],
+    "cue": "The second argument is the fallback when the key is missing.",
+    "syntax": "dict.get(key, default)",
+    "note": "get(k, 0) reads a missing key as zero, so one line both starts and bumps a count -- the idea behind collections.Counter."
   },
   {
     "id": "py.u03.freq.build",
@@ -64,26 +79,28 @@
     "solution": "def char_freq(s):\n    counts = {}\n    for c in s:\n        counts[c] = counts.get(c, 0) + 1\n    return counts",
     "tests": "assert char_freq(\"aab\") == {\"a\": 2, \"b\": 1}, char_freq(\"aab\")\nassert char_freq(\"\") == {}, char_freq(\"\")\nassert char_freq(\"xxx\") == {\"x\": 3}, char_freq(\"xxx\")",
     "prereqs": [
-      "py.u03.charloop.forc"
+      "py.u03.charloop.forc",
+      "py.u03.dict.counter"
     ],
     "cue": "One pass, bump a running count per character.",
-    "syntax": "dict.get(key, 0)"
+    "syntax": "dict.get(key, 0)",
+    "note": "A dict keyed by character is the standard O(n) frequency count; collections.Counter wraps exactly this loop."
   },
   {
     "id": "py.u03.count.vowels",
     "track": "python",
     "group": "Strings",
-    "concept": "count matching chars",
+    "concept": "count matching chars (case-insensitive)",
     "kind": "write",
-    "prompt": "Write `count_vowels(s)` returning the number of characters in `s` that are one of a, e, i, o, u (lowercase only).",
+    "prompt": "Write `count_vowels(s)` returning the number of vowel characters (a, e, i, o, u) in `s`, counting both uppercase and lowercase.",
     "starter": "def count_vowels(s):\n    # your code here\n    pass",
-    "solution": "def count_vowels(s):\n    n = 0\n    for c in s:\n        if c in \"aeiou\":\n            n += 1\n    return n",
-    "tests": "assert count_vowels(\"banana\") == 3\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
+    "solution": "def count_vowels(s):\n    n = 0\n    for c in s:\n        if c in \"aeiouAEIOU\":\n            n += 1\n    return n",
+    "tests": "assert count_vowels(\"Banana\") == 3\nassert count_vowels(\"AEIOU\") == 5\nassert count_vowels(\"HELLO\") == 2\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
     "prereqs": [
       "py.u03.charloop.forc"
     ],
-    "cue": "Loop once, increment when the character is a vowel.",
-    "syntax": "in for membership"
+    "cue": "Loop once, incrementing when the character is a vowel of either case.",
+    "syntax": "membership against a both-case vowel set"
   },
   {
     "id": "py.u03.enumerate.pairs",
@@ -292,7 +309,9 @@
       "py.u03.reverse.range"
     ],
     "cue": "Build the result by indexing from the last character to the first.",
-    "syntax": "range(stop, -1, -1) counts down"
+    "syntax": "range(stop, -1, -1) counts down",
+    "note": "out += c rebuilds the whole string each pass (O(n^2)); collecting chars in a list and joining once is O(n).",
+    "mapsTo": "LC 344 · Reverse String"
   },
   {
     "id": "py.u03.reverse.slice",
@@ -336,7 +355,8 @@
       "py.u03.palindrome.mirror"
     ],
     "cue": "Two pointers from both ends, stepping inward while they match.",
-    "syntax": "converging while-loop with two indices"
+    "syntax": "converging while-loop with two indices",
+    "note": "Converging pointers check in place with O(1) extra space, versus building a reversed copy to compare."
   },
   {
     "id": "py.u03.palindrome.slice",
@@ -369,7 +389,8 @@
       "py.u03.classify.isalnum"
     ],
     "cue": "Two pointers, but skip non-alphanumeric characters and ignore case before comparing.",
-    "syntax": "str.isalnum() / str.lower()"
+    "syntax": "str.isalnum() / str.lower()",
+    "mapsTo": "LC 125 · Valid Palindrome"
   },
   {
     "id": "py.u03.find.builtin",
@@ -420,7 +441,7 @@
     "group": "Strings",
     "concept": "drop first and last char",
     "kind": "write",
-    "prompt": "Write `strip_ends(s)` returning `s` without its first and last characters. Return `\\\"\\\"` for strings of length 0 or 1.",
+    "prompt": "Write `strip_ends(s)` returning `s` without its first and last characters. Return the empty string for strings of length 0 or 1.",
     "starter": "def strip_ends(s):\n    # your code here\n    pass",
     "solution": "def strip_ends(s):\n    if len(s) <= 1:\n        return \"\"\n    return s[1:-1]",
     "tests": "assert strip_ends(\"hello\") == \"ell\"\nassert strip_ends(\"ab\") == \"\"\nassert strip_ends(\"a\") == \"\"\nassert strip_ends(\"\") == \"\"\nassert strip_ends(\"abcde\") == \"bcd\"",
@@ -451,7 +472,7 @@
     "group": "Strings",
     "concept": "naive substring search",
     "kind": "write",
-    "prompt": "Write `my_find(s, p)` returning the index of the first occurrence of `p` in `s`, or -1 if `p` does not occur. Do not use `str.find`, `str.index`, or the `in` operator.",
+    "prompt": "Write `my_find(s, p)` returning the index of the first occurrence of `p` in `s`, or -1 if `p` does not occur. An empty pattern matches at index 0. Do not use `str.find`, `str.index`, or the `in` operator.",
     "starter": "def my_find(s, p):\n    # your code here\n    pass",
     "solution": "def my_find(s, p):\n    n, m = len(s), len(p)\n    for i in range(n - m + 1):\n        k = 0\n        while k < m and s[i + k] == p[k]:\n            k += 1\n        if k == m:\n            return i\n    return -1",
     "tests": "assert my_find(\"hello\", \"ll\") == 2\nassert my_find(\"hello\", \"z\") == -1\nassert my_find(\"hello\", \"\") == 0\nassert my_find(\"aaa\", \"aa\") == 0\nassert my_find(\"abcabc\", \"cab\") == 2",
@@ -459,7 +480,9 @@
       "py.u03.charloop.index"
     ],
     "cue": "Try each start position, comparing the pattern character by character.",
-    "syntax": "nested loop over start offsets"
+    "syntax": "nested loop over start offsets",
+    "note": "This naive scan is O(n*m); KMP and Boyer-Moore reuse earlier comparisons to skip ahead.",
+    "mapsTo": "LC 28 · Find the Index of the First Occurrence in a String"
   },
   {
     "id": "py.u03.myjoin.write",

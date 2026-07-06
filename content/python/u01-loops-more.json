@@ -124,6 +124,41 @@
       "py.u01.reverse.raw"
     ],
     "cue": "Two indices walking inward, swapping until they meet.",
-    "syntax": "a[lo], a[hi] = a[hi], a[lo]"
+    "syntax": "a[lo], a[hi] = a[hi], a[lo]",
+    "note": "In-place swap uses O(1) extra space; building a new reversed list uses O(n)."
+  },
+  {
+    "id": "py.u01.profit.min-so-far.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "running minimum-so-far in one pass",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "a = [7, 3, 5, 1, 6]\nlo = a[0]\nout = []\nfor i in range(1, len(a)):\n    if a[i] < lo:\n        lo = a[i]\n    out.append(lo)\nout",
+    "expected": "[3, 3, 1, 1]",
+    "prereqs": [
+      "py.u01.extreme.min"
+    ],
+    "cue": "Carry the smallest value seen so far and record it each pass.",
+    "syntax": "if a[i] < lo: lo = a[i]"
+  },
+  {
+    "id": "py.u01.profit.maxprofit",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "best buy-then-sell gain in one pass",
+    "kind": "write",
+    "prompt": "Write `max_profit(a)` where `a[i]` is a price on day `i`, returning the largest `a[j] - a[i]` for some `j > i`, or 0 if no gain is possible. Empty and single-element lists give 0.",
+    "starter": "def max_profit(a):\n    # your code here\n    pass",
+    "solution": "def max_profit(a):\n    if not a:\n        return 0\n    best = 0\n    lo = a[0]\n    for i in range(1, len(a)):\n        if a[i] - lo > best:\n            best = a[i] - lo\n        if a[i] < lo:\n            lo = a[i]\n    return best",
+    "tests": "assert max_profit([]) == 0, max_profit([])\nassert max_profit([5]) == 0, max_profit([5])\nassert max_profit([7, 1, 5, 3, 6, 4]) == 5, max_profit([7, 1, 5, 3, 6, 4])\nassert max_profit([7, 6, 4, 3, 1]) == 0, max_profit([7, 6, 4, 3, 1])\nassert max_profit([1, 2]) == 1, max_profit([1, 2])",
+    "prereqs": [
+      "py.u01.profit.min-so-far.predict",
+      "py.u01.accumulate.sum"
+    ],
+    "cue": "Track the cheapest price seen so far; at each day the best sale is today's price minus that.",
+    "syntax": "keep a running minimum, compare price - min",
+    "note": "One pass, tracking the cheapest price so far: O(n). Comparing every buy/sell pair would be O(n^2).",
+    "mapsTo": "LC 121 · Best Time to Buy and Sell Stock"
   }
 ]

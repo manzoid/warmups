@@ -166,22 +166,23 @@
       "py.u10.stack.list.predict"
     ],
     "cue": "Scan tokens; on an operator pop two operands and push the result.",
-    "syntax": "list.pop() / list.append(x)"
+    "syntax": "list.pop() / list.append(x)",
+    "mapsTo": "LC 150 · Evaluate Reverse Polish Notation"
   },
   {
     "id": "py.u10.parens.predict",
     "track": "python",
     "group": "Stack / queue / deque",
-    "concept": "match brackets with a stack",
+    "concept": "leftover openers = unbalanced",
     "kind": "predict",
-    "prompt": "What does this evaluate to?",
-    "snippet": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for i in range(len(s)):\n        c = s[i]\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st\n[valid('()[]{}'), valid('([)]'), valid('(')]",
-    "expected": "[True, False, False]",
+    "prompt": "What is the value of `st`?",
+    "snippet": "st = []\ns = '(()'\nfor i in range(len(s)):\n    c = s[i]\n    if c == ')':\n        st.pop()\n    else:\n        st.append(c)\nst",
+    "expected": "['(']",
     "prereqs": [
       "py.u10.stack.list.predict"
     ],
-    "cue": "For each string, trace a stack of openers checked against closers.",
-    "syntax": "dict[key] lookup"
+    "cue": "Push each opener, pop on each closer; see what is left at the end.",
+    "syntax": "list.append(x) / list.pop()"
   },
   {
     "id": "py.u10.parens.write",
@@ -197,7 +198,8 @@
       "py.u10.parens.predict"
     ],
     "cue": "Push openers; on each closer verify it matches the top.",
-    "syntax": "c in dict membership"
+    "syntax": "c in dict membership",
+    "mapsTo": "LC 20 · Valid Parentheses"
   },
   {
     "id": "py.u10.nge.predict",
@@ -228,7 +230,9 @@
       "py.u10.nge.predict"
     ],
     "cue": "Hold a stack of unresolved indices; a larger element settles them.",
-    "syntax": "for i in range(len(nums))"
+    "syntax": "for i in range(len(nums))",
+    "note": "Each index is pushed and popped at most once, so the whole scan is O(n).",
+    "mapsTo": "LC 496 · Next Greater Element"
   },
   {
     "id": "py.u10.nge.enumerate.predict",
@@ -262,6 +266,21 @@
     "syntax": "- subtraction"
   },
   {
+    "id": "py.u10.queue.modulo.predict",
+    "track": "python",
+    "group": "Stack / queue / deque",
+    "concept": "modulo wraps an index back to 0",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "n = 3\n[0 % n, 1 % n, 2 % n, 3 % n, 4 % n]",
+    "expected": "[0, 1, 2, 0, 1]",
+    "prereqs": [
+      "py.u10.queue.count.predict"
+    ],
+    "cue": "Consider what happens to a counter once it reaches n.",
+    "syntax": "i % n modulo"
+  },
+  {
     "id": "py.u10.queue.wrap.predict",
     "track": "python",
     "group": "Stack / queue / deque",
@@ -271,7 +290,7 @@
     "snippet": "n = 3\na = [None] * n\nhead = 0\nsize = 0\nvals = [10, 20, 30]\nfor i in range(len(vals)):\n    a[(head + size) % n] = vals[i]\n    size += 1\nv = a[head]\nhead = (head + 1) % n\nsize -= 1\na[(head + size) % n] = 40\nsize += 1\na",
     "expected": "[40, 20, 30]",
     "prereqs": [
-      "py.u10.queue.count.predict"
+      "py.u10.queue.modulo.predict"
     ],
     "cue": "Trace the ring: three enqueues, one dequeue, one more enqueue, watching wraparound.",
     "syntax": "(i) % n modulo"
@@ -321,7 +340,8 @@
       "py.u10.queue.dequeue"
     ],
     "cue": "Remove from the front twice, collecting each removed item.",
-    "syntax": "deque.popleft()"
+    "syntax": "deque.popleft()",
+    "note": "deque.popleft() is O(1); list.pop(0) is O(n) because it shifts every later element down."
   },
   {
     "id": "py.u10.deque.appendleft",
@@ -368,7 +388,8 @@
       "py.u10.deque.pop"
     ],
     "cue": "Push one value on the front, remove one from the back, then list what remains.",
-    "syntax": "deque.appendleft(x) / deque.pop()"
+    "syntax": "deque.appendleft(x) / deque.pop()",
+    "note": "A deque is O(1) at both ends; a list is O(1) at the back but O(n) at the front."
   },
   {
     "id": "py.u10.bfs.write",
@@ -415,6 +436,8 @@
       "py.u10.maxwin.predict"
     ],
     "cue": "Maintain a monotonic deque of indices; drop the front once it leaves the window.",
-    "syntax": "deque[0] front index"
+    "syntax": "deque[0] front index",
+    "note": "Each index enters and leaves the deque once, so it is O(n), not O(nk) re-scanning each window.",
+    "mapsTo": "LC 239 · Sliding Window Maximum"
   }
 ]

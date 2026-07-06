@@ -35,7 +35,8 @@
     "expected": "2",
     "prereqs": ["py.u11.mod.wrap"],
     "cue": "In Python the remainder takes the sign of the divisor.",
-    "syntax": "% remainder"
+    "syntax": "% remainder",
+    "note": "This is the unit's trap. C and JS give -1 (sign follows the dividend). For a safe non-negative index there, write ((x % n) + n) % n."
   },
   {
     "id": "py.u11.mod.lastdigit",
@@ -114,7 +115,8 @@
     "expected": "(3, 2)",
     "prereqs": ["py.u11.intdiv.floor", "py.u11.mod.lastdigit"],
     "cue": "One call returns the quotient and remainder together.",
-    "syntax": "divmod(a, b)"
+    "syntax": "divmod(a, b)",
+    "note": "One trip instead of computing a // b and a % b separately. Unpack it: q, r = divmod(a, b)."
   },
   {
     "id": "py.u11.divmod.rowcol",
@@ -141,7 +143,8 @@
     "tests": "assert reverse_int(1234) == 4321, reverse_int(1234)\nassert reverse_int(100) == 1, reverse_int(100)\nassert reverse_int(0) == 0, reverse_int(0)",
     "prereqs": ["py.u11.intdiv.floor", "py.u11.mod.lastdigit"],
     "cue": "Peel the last digit off and stack it onto a growing result.",
-    "syntax": "n % 10 and n //= 10"
+    "syntax": "n % 10 and n //= 10",
+    "mapsTo": "LC 7 · Reverse Integer"
   },
   {
     "id": "py.u11.intdiv.digitsum",
@@ -250,7 +253,8 @@
     "tests": "assert lcm(4, 6) == 12, lcm(4, 6)\nassert lcm(3, 5) == 15, lcm(3, 5)\nassert lcm(6, 6) == 6, lcm(6, 6)",
     "prereqs": ["py.u11.gcd.write", "py.u11.intdiv.floor"],
     "cue": "Combine the product with the gcd, dividing first to keep the number small.",
-    "syntax": "// floor division"
+    "syntax": "// floor division",
+    "note": "a // gcd * b never forms the full a * b, so it dodges overflow in fixed-width languages."
   },
   {
     "id": "py.u11.minmax.clamp",
@@ -290,7 +294,8 @@
     "expected": "6",
     "prereqs": ["py.u11.intdiv.floor"],
     "cue": "Shifting right by one drops the lowest bit.",
-    "syntax": ">> right shift"
+    "syntax": ">> right shift",
+    "note": "x >> 1 floors a divide by 2 for x >= 0, and a shift is often cheaper than a divide on the CPU."
   },
   {
     "id": "py.u11.bits.clearlow",
@@ -303,7 +308,8 @@
     "expected": "8",
     "prereqs": ["py.u11.bits.parity"],
     "cue": "Subtracting one turns the lowest set bit and everything below it, then AND masks them off.",
-    "syntax": "x & (x - 1)"
+    "syntax": "x & (x - 1)",
+    "note": "x & (x - 1) clears exactly the lowest set bit. Repeat it and you visit one set bit per step: that is the popcount loop, and x & (x-1) == 0 is the power-of-two test."
   },
   {
     "id": "py.u11.bits.poweroftwo",
@@ -312,11 +318,13 @@
     "concept": "power-of-two test",
     "kind": "predict",
     "prompt": "What is the value of `is_pow2`?",
-    "snippet": "x = 16\nis_pow2 = x & (x - 1) == 0\nis_pow2",
+    "snippet": "x = 16\nis_pow2 = (x & (x - 1)) == 0\nis_pow2",
     "expected": "True",
     "prereqs": ["py.u11.bits.clearlow"],
     "cue": "A single-bit number becomes zero once its lone bit is cleared.",
-    "syntax": "x & (x - 1)"
+    "syntax": "x & (x - 1)",
+    "note": "Keep the parens. In Python & binds tighter than ==, but in C/Java == binds tighter, so `x & (x-1) == 0` there reads as `x & ((x-1)==0)`. Parenthesize and it reads the same everywhere.",
+    "mapsTo": "LC 231 · Power of Two"
   },
   {
     "id": "py.u11.bits.popcount",
@@ -330,7 +338,9 @@
     "tests": "assert popcount(12) == 2, popcount(12)\nassert popcount(0) == 0, popcount(0)\nassert popcount(7) == 3, popcount(7)",
     "prereqs": ["py.u11.bits.clearlow"],
     "cue": "Count how many times you can clear the lowest set bit before hitting zero.",
-    "syntax": "x & (x - 1)"
+    "syntax": "x & (x - 1)",
+    "note": "This loop runs once per set bit, so it is O(popcount), not O(bit width). `bin(x).count('1')` or `x.bit_count()` is the shortcut once you have done it by hand.",
+    "mapsTo": "LC 191 · Number of 1 Bits"
   },
   {
     "id": "py.u11.bits.mask",
@@ -345,5 +355,35 @@
     "prereqs": ["py.u11.bits.parity"],
     "cue": "Set one bit per value at its index, then read back the bit at the target position.",
     "syntax": "1 << k, |= to set"
+  },
+  {
+    "id": "py.u11.bits.xorfold",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "XOR cancels equal pairs",
+    "kind": "predict",
+    "prompt": "What is the value of `x`?",
+    "snippet": "x = 0\nfor v in [2, 3, 2]:\n    x ^= v\nx",
+    "expected": "3",
+    "prereqs": ["py.u11.bits.parity"],
+    "cue": "XOR of a value with itself is zero, and order does not matter. Fold and watch the repeats cancel.",
+    "syntax": "x ^= v",
+    "note": "a ^ a == 0 and a ^ 0 == a, so XOR-ing a whole list makes every value that appears an even number of times vanish."
+  },
+  {
+    "id": "py.u11.bits.single",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "single number via XOR fold",
+    "kind": "write",
+    "prompt": "Write `single_number(nums)` where every value appears exactly twice except one that appears once; return that one. Use O(1) extra space.",
+    "starter": "def single_number(nums):\n    # your code here\n    pass",
+    "solution": "def single_number(nums):\n    x = 0\n    for i in range(len(nums)):\n        x ^= nums[i]\n    return x",
+    "tests": "assert single_number([2, 3, 2]) == 3, single_number([2, 3, 2])\nassert single_number([4]) == 4, single_number([4])\nassert single_number([7, 1, 7, 2, 2, 1, 9]) == 9, single_number([7, 1, 7, 2, 2, 1, 9])",
+    "prereqs": ["py.u11.bits.xorfold"],
+    "cue": "Fold every element together with the same operator that cancels equal pairs; the survivor is the loner.",
+    "syntax": "x ^= nums[i]",
+    "note": "The paired values cancel to zero and the lone value is left, all in one pass with no extra structure. A hash-set count would work too but needs O(n) space.",
+    "mapsTo": "LC 136 · Single Number"
   }
 ]

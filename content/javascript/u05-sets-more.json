@@ -41,6 +41,8 @@
     "starter": "function countJewels(jewels, stones) {\n  // your code here\n}",
     "solution": "function countJewels(jewels, stones) {\n  const set = new Set(jewels);\n  let count = 0;\n  for (let i = 0; i < stones.length; i++) if (set.has(stones[i])) count++;\n  return count;\n}",
     "tests": "if (countJewels('aA', 'aAAbbbb') !== 3) throw new Error('mixed case');\nif (countJewels('z', 'ZZ') !== 0) throw new Error('case sensitive');\nif (countJewels('', 'abc') !== 0) throw new Error('no jewels');\nif (countJewels('xyz', '') !== 0) throw new Error('no stones');",
+    "note": "Building the jewel Set once turns each stone lookup into O(1), so the whole scan is O(|stones|) instead of O(|jewels|*|stones|).",
+    "mapsTo": "LC 771 · Jewels and Stones",
     "prereqs": [
       "js.u05.set.has"
     ]

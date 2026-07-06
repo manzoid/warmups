@@ -78,14 +78,15 @@
     "id": "js.u06.merge.predict",
     "track": "javascript",
     "group": "Sorting",
-    "concept": "two-pointer merge of sorted arrays",
+    "concept": "tail drain after interleave",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const L = [1, 4], R = [2, 3];\nconst res = [];\nlet i = 0, j = 0;\nwhile (i < L.length && j < R.length) {\n  if (L[i] <= R[j]) { res.push(L[i]); i++; }\n  else { res.push(R[j]); j++; }\n}\nwhile (i < L.length) { res.push(L[i]); i++; }\nwhile (j < R.length) { res.push(R[j]); j++; }\nres;",
-    "expected": "[1, 2, 3, 4]",
+    "snippet": "const res = [1, 2, 3];\nconst R = [3, 5, 8];\nlet j = 1;\nwhile (j < R.length) { res.push(R[j]); j++; }\nres;",
+    "expected": "[1, 2, 3, 5, 8]",
     "prereqs": [],
-    "cue": "Two pointers walk both arrays, appending the smaller front each step.",
-    "syntax": "arr.push(x)"
+    "cue": "One array is spent; this loop copies whatever is left of the other from index j on.",
+    "syntax": "arr.push(x)",
+    "note": "A merge interleaves until one side runs out, then drains the rest of the other. Forgetting either drain loop silently drops elements."
   },
   {
     "id": "js.u06.merge.build",
@@ -104,6 +105,34 @@
     "syntax": "arr.push(x)"
   },
   {
+    "id": "js.u06.recursion.combine",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "recursion: combine on the way up",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function sumTo(n) {\n  if (n === 0) return 0;\n  return n + sumTo(n - 1);\n}\nsumTo(4);",
+    "expected": "10",
+    "prereqs": [],
+    "cue": "Follow the calls down to the base case, then add each n as they return.",
+    "syntax": "return n + f(n - 1)",
+    "note": "The base case stops the descent; partial results combine as the call stack unwinds. Merge sort has the same shape, merging halves instead of adding numbers."
+  },
+  {
+    "id": "js.u06.recursion.halve",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "recursion: halving depth",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function depth(n) {\n  if (n <= 1) return 0;\n  return 1 + depth(Math.floor(n / 2));\n}\ndepth(8);",
+    "expected": "3",
+    "prereqs": [],
+    "cue": "Each call halves n; count the calls it takes to reach 1.",
+    "syntax": "Math.floor(n / 2)",
+    "note": "Halving down to 1 takes about log2(n) steps. That halving depth is the log n factor in an O(n log n) sort."
+  },
+  {
     "id": "js.u06.mergesort",
     "track": "javascript",
     "group": "Sorting",
@@ -114,10 +143,14 @@
     "solution": "function mergeSort(a) {\n  if (a.length <= 1) return a.slice();\n  const mid = Math.floor(a.length / 2);\n  const L = mergeSort(a.slice(0, mid));\n  const R = mergeSort(a.slice(mid));\n  const res = [];\n  let i = 0, j = 0;\n  while (i < L.length && j < R.length) {\n    if (L[i] <= R[j]) { res.push(L[i]); i++; }\n    else { res.push(R[j]); j++; }\n  }\n  while (i < L.length) { res.push(L[i]); i++; }\n  while (j < R.length) { res.push(R[j]); j++; }\n  return res;\n}",
     "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(mergeSort([5, 2, 4, 6, 1, 3]), [1, 2, 3, 4, 5, 6])) throw new Error('basic');\nif (!eq(mergeSort([]), [])) throw new Error('empty');\nconst orig = [3, 1, 2];\nmergeSort(orig);\nif (!eq(orig, [3, 1, 2])) throw new Error('must not mutate input');",
     "prereqs": [
-      "js.u06.merge.build"
+      "js.u06.merge.build",
+      "js.u06.recursion.combine",
+      "js.u06.recursion.halve"
     ],
     "cue": "Recurse until length is 1 or less, then merge sorted halves back up.",
-    "syntax": "Array.prototype.slice(i, j)"
+    "syntax": "Array.prototype.slice(i, j)",
+    "note": "O(n log n): log n levels of splitting, O(n) merging per level. Stable, but needs O(n) extra space for the merged output.",
+    "mapsTo": "LC 912 · Sort an Array"
   },
   {
     "id": "js.u06.partition",
@@ -146,10 +179,13 @@
     "solution": "function quickSort(a) {\n  function partition(lo, hi) {\n    const pivot = a[hi];\n    let i = lo;\n    for (let j = lo; j < hi; j++) {\n      if (a[j] < pivot) {\n        const t = a[i];\n        a[i] = a[j];\n        a[j] = t;\n        i++;\n      }\n    }\n    const t = a[i];\n    a[i] = a[hi];\n    a[hi] = t;\n    return i;\n  }\n  function qs(lo, hi) {\n    if (lo >= hi) return;\n    const p = partition(lo, hi);\n    qs(lo, p - 1);\n    qs(p + 1, hi);\n  }\n  qs(0, a.length - 1);\n  return a;\n}",
     "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(quickSort([5, 2, 4, 6, 1, 3]), [1, 2, 3, 4, 5, 6])) throw new Error('basic');\nif (!eq(quickSort([1, 2, 3]), [1, 2, 3])) throw new Error('already sorted');\nif (!eq(quickSort([3, 3, 1, 2]), [1, 2, 3, 3])) throw new Error('dups');\nif (!eq(quickSort([]), [])) throw new Error('empty');",
     "prereqs": [
-      "js.u06.partition"
+      "js.u06.partition",
+      "js.u06.recursion.combine"
     ],
     "cue": "Partition around a pivot, then recurse on each side excluding the pivot.",
-    "syntax": "recursion over lo/hi bounds"
+    "syntax": "recursion over lo/hi bounds",
+    "note": "In place and O(n log n) on average, but O(n^2) when the pivot keeps landing at an end (e.g. already-sorted input). Not stable.",
+    "mapsTo": "LC 912 · Sort an Array"
   },
   {
     "id": "js.u06.sort.default-gotcha",
@@ -164,7 +200,8 @@
       "js.u06.insertion"
     ],
     "cue": "Default sort orders by string form, not numeric value.",
-    "syntax": "Array.prototype.sort()"
+    "syntax": "Array.prototype.sort()",
+    "note": "With no comparator, sort() converts each element to a string and orders by UTF-16 code units, so '10' sorts before '2'. Pass a comparator for numbers."
   },
   {
     "id": "js.u06.comparator.numeric",
@@ -179,7 +216,8 @@
       "js.u06.sort.default-gotcha"
     ],
     "cue": "The comparator's sign sets order: negative keeps a before b.",
-    "syntax": "sort((a, b) => a - b)"
+    "syntax": "sort((a, b) => a - b)",
+    "note": "The comparator returns a number: negative means a before b, positive means b before a, 0 means leave them. a - b gives ascending numeric order."
   },
   {
     "id": "js.u06.sort.in-place",
@@ -224,7 +262,8 @@
       "js.u06.comparator.numeric"
     ],
     "cue": "Equal keys keep their original relative order under a stable sort.",
-    "syntax": "data[i][1] index read"
+    "syntax": "data[i][1] index read",
+    "note": "JS sort is stable since ES2019. Stability is what lets you sort by a secondary key first, then a primary key, to get multi-key ordering."
   },
   {
     "id": "js.u06.sort.tiebreak",
@@ -256,7 +295,9 @@
       "js.u06.sort.slice-copy"
     ],
     "cue": "Sort a copy, then compare each element with the one before it.",
-    "syntax": "arr.slice().sort(cmp)"
+    "syntax": "arr.slice().sort(cmp)",
+    "note": "Sorting makes duplicates adjacent, so one linear sweep finds them: O(n log n). A hash set answers the same in O(n) when you don't also need order.",
+    "mapsTo": "LC 217 · Contains Duplicate"
   },
   {
     "id": "js.u06.twopointer.twosum",
@@ -272,7 +313,9 @@
       "js.u06.comparator.numeric"
     ],
     "cue": "Sort first, then converge one index from each end by the running sum.",
-    "syntax": "two pointers from both ends"
+    "syntax": "two pointers from both ends",
+    "note": "Once sorted, the sum's size tells you which end to move: too small, raise the low end; too big, lower the high end. O(n) after the sort.",
+    "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted"
   },
   {
     "id": "js.u06.sortkey.bylen",

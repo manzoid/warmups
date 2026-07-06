@@ -1,5 +1,61 @@
 [
   {
+    "id": "py.u01.atom.read.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "index into a list by position",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "a = [3, 1, 4, 1, 5]\na[0], a[2]",
+    "expected": "(3, 4)",
+    "prereqs": [],
+    "cue": "Positions count from 0, so `a[0]` is the first element.",
+    "syntax": "a[0] reads by position"
+  },
+  {
+    "id": "py.u01.atom.len.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "length of a list",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "a = [3, 1, 4, 1, 5]\nlen(a)",
+    "expected": "5",
+    "prereqs": [
+      "py.u01.atom.read.predict"
+    ],
+    "cue": "Count the elements.",
+    "syntax": "len(a)"
+  },
+  {
+    "id": "py.u01.atom.indexvar.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "index with a variable subscript",
+    "kind": "predict",
+    "prompt": "What is the value of `a[i]`?",
+    "snippet": "a = [3, 1, 4, 1, 5]\ni = 2\na[i]",
+    "expected": "4",
+    "prereqs": [
+      "py.u01.atom.read.predict"
+    ],
+    "cue": "The subscript can be a variable; substitute its value for the position.",
+    "syntax": "a[i] with a variable i"
+  },
+  {
+    "id": "py.u01.atom.accum.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "update a variable in place with +=",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "total = 0\ntotal += 5\ntotal",
+    "expected": "5",
+    "prereqs": [],
+    "cue": "`+=` adds to the current value and stores the result back.",
+    "syntax": "total += 5"
+  },
+  {
     "id": "py.u01.accumulate.sum.predict",
     "track": "python",
     "group": "Loops & iteration",
@@ -8,7 +64,11 @@
     "prompt": "What is the value of `total`?",
     "snippet": "a = [3, 1, 4, 1, 5]\ntotal = 0\nfor i in range(len(a)):\n    total += a[i]\ntotal",
     "expected": "14",
-    "prereqs": [],
+    "prereqs": [
+      "py.u01.atom.len.predict",
+      "py.u01.atom.indexvar.predict",
+      "py.u01.atom.accum.predict"
+    ],
     "cue": "Index the list with `range(len(a))` and track `total`.",
     "syntax": "a[i] by index; += adds in place"
   },
@@ -86,7 +146,7 @@
     "prereqs": [
       "py.u01.accumulate.sum"
     ],
-    "cue": "Recall what the second argument to `sum` does.",
+    "cue": "Consider what the second argument to `sum` contributes to the result.",
     "syntax": "sum(iterable, start)"
   },
   {
@@ -662,7 +722,7 @@
     "prereqs": [
       "py.u01.reverse.raw"
     ],
-    "cue": "Recall the built-in that iterates back to front.",
+    "cue": "Consider which built-in iterates a sequence back to front.",
     "syntax": "reversed(seq)"
   },
   {
@@ -723,6 +783,7 @@
       "py.u01.accumulate.sum"
     ],
     "cue": "For each window start, sum its k elements.",
-    "syntax": "range(len(a) - k + 1)"
+    "syntax": "range(len(a) - k + 1)",
+    "note": "This re-sums every window from scratch: O(n*k). A rolling sum that adds the entering element and drops the leaving one does it in O(n)."
   }
 ]

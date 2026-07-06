@@ -54,5 +54,51 @@
     "cue": "Same digit-peel loop as reversing a number, but the modulus is b, not 10, and Math.trunc replaces the drop. Peeling gives least-significant first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and Math.trunc(n / b)",
     "prereqs": ["js.u11.digits.reverse"]
+  },
+  {
+    "id": "js.u11.bits.single-number",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "single number via xor fold",
+    "kind": "write",
+    "prompt": "Write `singleNumber(xs)` where every value appears exactly twice except one that appears once; return that value. Use O(1) extra space.",
+    "starter": "function singleNumber(xs) {\n  // your code here\n}",
+    "solution": "function singleNumber(xs) {\n  let x = 0;\n  for (let i = 0; i < xs.length; i++) x ^= xs[i];\n  return x;\n}",
+    "tests": "if (singleNumber([2, 2, 1]) !== 1) throw new Error('a');\nif (singleNumber([4, 1, 2, 1, 2]) !== 4) throw new Error('b');\nif (singleNumber([7]) !== 7) throw new Error('c');\nif (singleNumber([0, 5, 0]) !== 5) throw new Error('d');",
+    "cue": "Fold the whole array with XOR; the paired values cancel and the lone one survives.",
+    "syntax": "x ^= xs[i]",
+    "mapsTo": "LC 136 · Single Number",
+    "prereqs": ["js.u11.bits.xor-fold"]
+  },
+  {
+    "id": "js.u11.power.fast",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "fast exponentiation by squaring",
+    "kind": "write",
+    "prompt": "Write `fastPow(base, exp)` for integer `exp >= 0` that returns `base` raised to `exp` in O(log exp) multiplies by squaring the base and consuming one bit of `exp` per step. Do not use `**` or `Math.pow`.",
+    "starter": "function fastPow(base, exp) {\n  // your code here\n}",
+    "solution": "function fastPow(base, exp) {\n  let result = 1;\n  while (exp > 0) {\n    if (exp & 1) result *= base;\n    base *= base;\n    exp = Math.trunc(exp / 2);\n  }\n  return result;\n}",
+    "tests": "if (fastPow(2, 10) !== 1024) throw new Error('2^10');\nif (fastPow(3, 0) !== 1) throw new Error('3^0');\nif (fastPow(5, 3) !== 125) throw new Error('5^3');\nif (fastPow(7, 1) !== 7) throw new Error('7^1');\nif (fastPow(2, 0) !== 1) throw new Error('2^0');\nif (fastPow(2, 16) !== 65536) throw new Error('2^16');",
+    "cue": "Multiply the result by base only when the current low bit of exp is set, then square base and halve exp.",
+    "syntax": "exp & 1 and Math.trunc(exp / 2)",
+    "note": "Each step handles one bit of the exponent, so the multiply count is log2(exp) rather than exp.",
+    "mapsTo": "LC 50 · Pow(x, n)",
+    "prereqs": ["js.u11.power.write", "js.u11.bits.parity"]
+  },
+  {
+    "id": "js.u11.bsearch.write",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "binary search a sorted array",
+    "kind": "write",
+    "prompt": "Write `binarySearch(xs, target)` for an array sorted ascending that returns the index of `target`, or `-1` if it is absent. Use the overflow-safe midpoint.",
+    "starter": "function binarySearch(xs, target) {\n  // your code here\n}",
+    "solution": "function binarySearch(xs, target) {\n  let lo = 0, hi = xs.length - 1;\n  while (lo <= hi) {\n    const mid = lo + Math.trunc((hi - lo) / 2);\n    if (xs[mid] === target) return mid;\n    if (xs[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}",
+    "tests": "if (binarySearch([1, 3, 5, 7, 9], 7) !== 3) throw new Error('a');\nif (binarySearch([1, 3, 5, 7, 9], 1) !== 0) throw new Error('b');\nif (binarySearch([1, 3, 5, 7, 9], 9) !== 4) throw new Error('c');\nif (binarySearch([1, 3, 5, 7, 9], 4) !== -1) throw new Error('d');\nif (binarySearch([], 5) !== -1) throw new Error('e');\nif (binarySearch([2], 2) !== 0) throw new Error('f');",
+    "cue": "Keep a lo/hi window; compare the midpoint and discard the half that cannot hold the target.",
+    "syntax": "lo + Math.trunc((hi - lo) / 2)",
+    "mapsTo": "LC 704 · Binary Search",
+    "prereqs": ["js.u11.intdiv.midpoint"]
   }
 ]

@@ -1,44 +1,84 @@
 [
   {
+    "id": "py.u05.membership.list_scan",
+    "track": "python",
+    "group": "Sets",
+    "concept": "membership via list scan (O(n))",
+    "cue": "Ask whether the value occurs anywhere in the list.",
+    "syntax": "x in list",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "a = [1, 2, 3, 4]\n3 in a",
+    "expected": "True",
+    "prereqs": []
+  },
+  {
+    "id": "py.u05.membership.set",
+    "track": "python",
+    "group": "Sets",
+    "concept": "membership via set (O(1))",
+    "cue": "Ask whether the value is in the set.",
+    "syntax": "x in set",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = set([1, 2, 3, 4])\n2 in s",
+    "expected": "True",
+    "note": "Set lookup is O(1) on average via hashing; the list scan above is O(n).",
+    "prereqs": ["py.u05.membership.list_scan"]
+  },
+  {
+    "id": "py.u05.add.idempotent",
+    "track": "python",
+    "group": "Sets",
+    "concept": "add is idempotent",
+    "cue": "Track the size after adding the same value twice.",
+    "syntax": "set.add(x), len(s)",
+    "kind": "predict",
+    "prompt": "What is the value of `n`?",
+    "snippet": "s = set()\ns.add(3)\ns.add(3)\nn = len(s)\nn",
+    "expected": "1",
+    "note": "A set stores each value once, so re-adding it is a no-op.",
+    "prereqs": ["py.u05.membership.set"]
+  },
+  {
     "id": "py.u05.boolset.add",
     "track": "python",
     "group": "Sets",
-    "concept": "boolean-array set: add",
-    "cue": "Index into the backing flag list by the key.",
-    "syntax": "list[i] = value",
+    "concept": "boolean-array set: add / contains / remove",
+    "cue": "Each key is one slot in the flag list; set it, read it, or clear it by index.",
+    "syntax": "self.present[k] = ...",
     "kind": "write",
-    "prompt": "Complete `BoolSet` for keys in `0..n-1`. Implement `add(k)` so the key is marked present. Do not use Python's built-in `set`.",
-    "starter": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        # your code here\n        pass\n",
-    "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n",
-    "tests": "s = BoolSet(5)\ns.add(2)\ns.add(2)\nassert s.present[2] is True, s.present\nassert s.present[0] is False, s.present\n",
-    "prereqs": []
+    "prompt": "Complete `BoolSet` for keys in `0..n-1`, backed by a list of flags. Implement `add(k)`, `contains(k)`, and `remove(k)` without Python's built-in `set`.",
+    "starter": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        # your code here\n        pass\n\n    def contains(self, k):\n        # your code here\n        pass\n\n    def remove(self, k):\n        # your code here\n        pass\n",
+    "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n\n    def remove(self, k):\n        self.present[k] = False\n",
+    "tests": "s = BoolSet(5)\ns.add(2)\ns.add(2)\nassert s.contains(2) is True, s.present\nassert s.contains(0) is False, s.present\ns.remove(2)\nassert s.contains(2) is False, s.present\ns.remove(4)\nassert s.contains(4) is False, s.present\n",
+    "note": "A set is one flag of presence per slot; indexing straight to the slot makes add, contains, and remove O(1).",
+    "prereqs": ["py.u05.add.idempotent"]
   },
   {
     "id": "py.u05.boolset.contains",
     "track": "python",
     "group": "Sets",
-    "concept": "boolean-array set: contains",
-    "cue": "Read the flag stored at the key's slot.",
+    "concept": "boolean-array set: contains reads the flag",
+    "cue": "A set slot never touched is still its initial value.",
     "syntax": "list[i] indexing",
-    "kind": "write",
-    "prompt": "Add `contains(k)` to `BoolSet`, returning whether key `k` is present.",
-    "starter": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        # your code here\n        pass\n",
-    "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n",
-    "tests": "s = BoolSet(5)\ns.add(2)\nassert s.contains(2) is True, 2\nassert s.contains(0) is False, 0\n",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "present = [False] * 5\npresent[3] = True\n(present[3], present[0])",
+    "expected": "(True, False)",
     "prereqs": ["py.u05.boolset.add"]
   },
   {
     "id": "py.u05.boolset.remove",
     "track": "python",
     "group": "Sets",
-    "concept": "boolean-array set: remove",
-    "cue": "Clear the flag at the key's slot.",
+    "concept": "boolean-array set: remove clears the flag",
+    "cue": "Removing a key just resets its slot.",
     "syntax": "list[i] = value",
-    "kind": "write",
-    "prompt": "Add `remove(k)` to `BoolSet`, marking key `k` absent.",
-    "starter": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n\n    def remove(self, k):\n        # your code here\n        pass\n",
-    "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n\n    def remove(self, k):\n        self.present[k] = False\n",
-    "tests": "s = BoolSet(5)\ns.add(2)\ns.remove(2)\nassert s.contains(2) is False, 2\ns.remove(4)\nassert s.contains(4) is False, 4\n",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "present = [False] * 5\npresent[3] = True\npresent[3] = False\npresent[3]",
+    "expected": "False",
     "prereqs": ["py.u05.boolset.contains"]
   },
   {
@@ -53,6 +93,7 @@
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n",
     "tests": "s = HashSet()\ns.add(5)\ns.add(5)\ns.add(1)\nassert sum(len(b) for b in s.buckets) == 2, sum(len(b) for b in s.buckets)\n",
+    "note": "A hash set is u04's HashMap with the value dropped: each bucket stores bare keys, not [key, val] pairs.",
     "prereqs": ["py.u05.boolset.remove"]
   },
   {
@@ -84,55 +125,17 @@
     "prereqs": ["py.u05.hashset.contains"]
   },
   {
-    "id": "py.u05.add.idempotent",
-    "track": "python",
-    "group": "Sets",
-    "concept": "add is idempotent",
-    "cue": "Track the size after adding the same value twice.",
-    "syntax": "set.add(x), len(s)",
-    "kind": "predict",
-    "prompt": "What is the value of `n`?",
-    "snippet": "s = set()\ns.add(3)\ns.add(3)\nn = len(s)\nn",
-    "expected": "1",
-    "prereqs": ["py.u05.hashset.add"]
-  },
-  {
-    "id": "py.u05.membership.list_scan",
-    "track": "python",
-    "group": "Sets",
-    "concept": "membership via list scan (O(n))",
-    "cue": "Ask whether the value occurs anywhere in the list.",
-    "syntax": "x in list",
-    "kind": "predict",
-    "prompt": "What does this evaluate to?",
-    "snippet": "a = [1, 2, 3, 4]\n3 in a",
-    "expected": "True",
-    "prereqs": ["py.u05.hashset.remove"]
-  },
-  {
-    "id": "py.u05.membership.set",
-    "track": "python",
-    "group": "Sets",
-    "concept": "membership via set (O(1))",
-    "cue": "Ask whether the value is in the set.",
-    "syntax": "x in set",
-    "kind": "predict",
-    "prompt": "What does this evaluate to?",
-    "snippet": "s = set([1, 2, 3, 4])\n2 in s",
-    "expected": "True",
-    "prereqs": ["py.u05.membership.list_scan"]
-  },
-  {
     "id": "py.u05.empty_brace",
     "track": "python",
     "group": "Sets",
     "concept": "{} is a dict, not a set",
-    "cue": "Recall which type the bare `{}` literal builds.",
+    "cue": "Consider which type the bare `{}` literal builds, dict or set.",
     "syntax": "type(obj) is T",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "type({}) is set",
     "expected": "False",
+    "note": "{} is an empty dict; the empty set has no literal, so write set().",
     "prereqs": ["py.u05.membership.set"]
   },
   {
@@ -174,6 +177,7 @@
     "starter": "def is_member(items, targets):\n    # your code here\n    pass\n",
     "solution": "def is_member(items, targets):\n    s = set(items)\n    out = []\n    for i in range(len(targets)):\n        out.append(targets[i] in s)\n    return out\n",
     "tests": "assert is_member([1, 2, 3], [2, 5]) == [True, False], is_member([1, 2, 3], [2, 5])\nassert is_member([], [1]) == [False]\nassert is_member([9, 9, 8], [8, 9, 7]) == [True, True, False]\n",
+    "note": "Building the set costs O(n) once; each of the m queries is then O(1), for O(n+m) instead of O(n*m) rescans.",
     "prereqs": ["py.u05.iterate.indexed"]
   },
   {
@@ -189,6 +193,20 @@
     "solution": "def dedup(a):\n    seen = set()\n    out = []\n    for x in a:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out\n",
     "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == []\nassert dedup([5, 5, 5]) == [5]\n",
     "prereqs": ["py.u05.dedup.indexed"]
+  },
+  {
+    "id": "py.u05.dedup.last",
+    "track": "python",
+    "group": "Sets",
+    "concept": "dedup keeping the LAST occurrence",
+    "cue": "When a value returns, move it to the end instead of skipping it.",
+    "syntax": "list.remove(x); list.append(x)",
+    "kind": "write",
+    "prompt": "Write `dedup_last(a)` returning the distinct elements of list `a`, ordered by where each value LAST occurs. So a repeated value takes the position of its final appearance.",
+    "starter": "def dedup_last(a):\n    # your code here\n    pass\n",
+    "solution": "def dedup_last(a):\n    out = []\n    for x in a:\n        if x in out:\n            out.remove(x)\n        out.append(x)\n    return out\n",
+    "tests": "assert dedup_last([3, 1, 3, 2, 1]) == [3, 2, 1], dedup_last([3, 1, 3, 2, 1])\nassert dedup_last([]) == []\nassert dedup_last([5, 5, 5]) == [5]\nassert dedup_last([1, 2, 3]) == [1, 2, 3]\n",
+    "prereqs": ["py.u05.dedup.manual"]
   },
   {
     "id": "py.u05.dedup.set",
@@ -214,6 +232,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "list(dict.fromkeys([3, 1, 3, 2, 1]))",
     "expected": "[3, 1, 2]",
+    "note": "Unlike set(), dict keys keep first-seen insertion order, so this dedups without losing order.",
     "prereqs": ["py.u05.dedup.manual"]
   },
   {
@@ -228,6 +247,7 @@
     "starter": "def has_dup(a):\n    # your code here\n    pass\n",
     "solution": "def has_dup(a):\n    seen = set()\n    for i in range(len(a)):\n        if a[i] in seen:\n            return True\n        seen.add(a[i])\n    return False\n",
     "tests": "assert has_dup([1, 2, 1]) is True, [1, 2, 1]\nassert has_dup([1, 2, 3]) is False, [1, 2, 3]\nassert has_dup([]) is False\nassert has_dup([7]) is False\n",
+    "mapsTo": "LC 217 · Contains Duplicate",
     "prereqs": ["py.u05.membership.set"]
   },
   {
@@ -241,6 +261,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 1]\nlen(set(a)) != len(a)",
     "expected": "True",
+    "note": "One line, but it always scans the whole list; the early-exit loop can stop at the first repeat.",
     "prereqs": ["py.u05.hasdup.earlyexit"]
   },
   {
@@ -307,6 +328,7 @@
     "starter": "def common(a, b):\n    # your code here\n    pass\n",
     "solution": "def common(a, b):\n    bs = set(b)\n    return sorted(x for x in set(a) if x in bs)\n",
     "tests": "assert common([1, 2, 3], [2, 3, 4]) == [2, 3], common([1, 2, 3], [2, 3, 4])\nassert common([1, 1, 2], [2, 2, 3]) == [2]\nassert common([], [1]) == []\n",
+    "mapsTo": "LC 349 · Intersection of Two Arrays",
     "prereqs": ["py.u05.setops.intersection"]
   },
   {
@@ -333,6 +355,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = {1, 2, 3}\ns.discard(9)\nsorted(s)",
     "expected": "[1, 2, 3]",
+    "note": "discard removes the value if present and does nothing if absent; remove would raise KeyError here.",
     "prereqs": ["py.u05.membership.set"]
   },
   {
@@ -347,6 +370,8 @@
     "starter": "def longest_unique(s):\n    # your code here\n    pass\n",
     "solution": "def longest_unique(s):\n    seen = set()\n    l = 0\n    best = 0\n    for r in range(len(s)):\n        while s[r] in seen:\n            seen.discard(s[l])\n            l += 1\n        seen.add(s[r])\n        if r - l + 1 > best:\n            best = r - l + 1\n    return best\n",
     "tests": "assert longest_unique('abcabcbb') == 3, longest_unique('abcabcbb')\nassert longest_unique('bbbbb') == 1\nassert longest_unique('') == 0\nassert longest_unique('pwwkew') == 3\nassert longest_unique('au') == 2\n",
+    "note": "One pass is O(n): each index joins and leaves the window's set once, instead of re-checking every substring.",
+    "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
     "prereqs": ["py.u05.hasdup.earlyexit"]
   }
 ]

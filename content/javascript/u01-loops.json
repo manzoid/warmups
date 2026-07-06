@@ -1,5 +1,57 @@
 [
   {
+    "id": "js.u01.atom.read.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "read an element by index",
+    "cue": "Index into the array at two positions.",
+    "syntax": "a[0] reads the first element",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "let a = [4, 5, 6];\n[a[0], a[2]]",
+    "expected": "[4, 6]",
+    "prereqs": []
+  },
+  {
+    "id": "js.u01.atom.length.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "array length",
+    "cue": "How many elements does the array hold?",
+    "syntax": "a.length",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "let a = [4, 5, 6];\na.length",
+    "expected": "3",
+    "prereqs": ["js.u01.atom.read.predict"]
+  },
+  {
+    "id": "js.u01.atom.subscript.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "index with a variable",
+    "cue": "The index can be a variable, not just a literal.",
+    "syntax": "a[i]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "let a = [4, 5, 6];\nlet i = 2;\na[i]",
+    "expected": "6",
+    "prereqs": ["js.u01.atom.read.predict"]
+  },
+  {
+    "id": "js.u01.atom.accum.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "update a variable in place",
+    "cue": "Change a variable in place, then read it back.",
+    "syntax": "+= adds in place",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "let total = 0;\ntotal += 5;\ntotal",
+    "expected": "5",
+    "prereqs": []
+  },
+  {
     "id": "js.u01.accumulate.sum.index.predict",
     "track": "javascript",
     "group": "Loops & iteration",
@@ -10,7 +62,8 @@
     "prompt": "What is the value of `total`?",
     "snippet": "let a = [4, 5, 6];\nlet total = 0;\nfor (let i = 0; i < a.length; i++) total += a[i];\ntotal",
     "expected": "15",
-    "prereqs": []
+    "note": "This loop is just the three atoms stacked: read a[i], run i to a.length, and += into an accumulator.",
+    "prereqs": ["js.u01.atom.subscript.predict", "js.u01.atom.length.predict", "js.u01.atom.accum.predict"]
   },
   {
     "id": "js.u01.accumulate.sum.predict",
@@ -64,6 +117,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[1, 2, 3, 4].reduce((s, x) => s + x, 0)",
     "expected": "10",
+    "note": "reduce is the accumulator loop folded into one call: acc starts at the init, each step returns the next acc.",
     "prereqs": ["js.u01.accumulate.sum.predict"]
   },
   {
@@ -239,6 +293,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[1, 2, 3].map(x => x * x)",
     "expected": "[1, 4, 9]",
+    "note": "This is the push-loop you just wrote: allocate a fresh array, push one transformed element per pass.",
     "prereqs": ["js.u01.map.squares"]
   },
   {
@@ -266,6 +321,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "[1, 2, 3, 4, 5].filter(x => x % 2 === 0)",
     "expected": "[2, 4]",
+    "note": "Same push-loop as keepEvens: push only the elements where the predicate holds.",
     "prereqs": ["js.u01.filter.evens"]
   },
   {

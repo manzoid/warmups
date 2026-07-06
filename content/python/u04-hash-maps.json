@@ -86,7 +86,8 @@
       "py.u04.freq.get.predict"
     ],
     "cue": "Walk the indices; missing keys auto-start at zero.",
-    "syntax": "defaultdict(int)"
+    "syntax": "defaultdict(int)",
+    "note": "defaultdict(int) auto-creates a 0 on first touch, so the `if key in d` branch disappears."
   },
   {
     "id": "py.u04.freq.counter.mostcommon",
@@ -119,20 +120,38 @@
     "syntax": "tuples sort by first element"
   },
   {
+    "id": "py.u04.build.oo.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "class, self, and a method that mutates state",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "class Table:\n    def __init__(self):\n        self.slots = [0, 0, 0, 0]\n    def bump(self, i):\n        self.slots[i] += 1\nt = Table()\nt.bump(1)\nt.bump(1)\nt.slots",
+    "expected": "[0, 2, 0, 0]",
+    "prereqs": [
+      "py.u04.direct-address.count"
+    ],
+    "cue": "`self` is the object; `__init__` sets its fields, a method reads and updates them across calls.",
+    "syntax": "self.field; obj.method(arg)",
+    "note": "The next few writes build a hash map as a class: `self` holds the buckets, each method (`_hash`, `put`, `get`) reads or updates them, exactly like `bump` here."
+  },
+  {
     "id": "py.u04.build.hash",
     "track": "python",
     "group": "Hash maps",
     "concept": "string hash into SIZE slots",
     "kind": "write",
     "prompt": "Complete `_hash(self, key)` so it returns an int slot in the range [0, self.size) for the string `key`, using the rolling hash `h = h*31 + ord(ch)` folded by `% self.size`. Same key must always give the same slot.",
-    "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        # your code here\n        pass",
+    "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for i in range(len(key)):\n            h = h * 31 + ord(key[i])\n        # fold h into [0, self.size) and return it\n        pass",
     "solution": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for i in range(len(key)):\n            h = h * 31 + ord(key[i])\n        return h % self.size",
     "tests": "m = HashMap(8)\nh = m._hash(\"tea\")\nassert isinstance(h, int), h\nassert 0 <= h < 8, h\nassert m._hash(\"tea\") == m._hash(\"tea\"), \"must be deterministic\"",
     "prereqs": [
-      "py.u04.direct-address.count"
+      "py.u04.direct-address.count",
+      "py.u04.build.oo.predict"
     ],
-    "cue": "Accumulate a rolling hash over the char indices, then fold into range.",
-    "syntax": "% self.size"
+    "cue": "The loop is given; you supply the fold that pins any h into a valid slot.",
+    "syntax": "% self.size",
+    "note": "The multiplier 31 spreads similar strings apart; `% self.size` is what turns an unbounded number back into a real array index."
   },
   {
     "id": "py.u04.build.put",
@@ -195,7 +214,9 @@
       "py.u04.two-sum.predict"
     ],
     "cue": "One pass storing value to index; look up the complement first.",
-    "syntax": "seen[nums[i]] = i"
+    "syntax": "seen[nums[i]] = i",
+    "note": "The map trades O(n) space to drop the O(n^2) inner loop of checking every pair: each complement lookup is O(1).",
+    "mapsTo": "LC 1 · Two Sum"
   },
   {
     "id": "py.u04.groupby.setdefault.predict",
@@ -226,7 +247,9 @@
       "py.u04.groupby.setdefault.predict"
     ],
     "cue": "Bucket each word under its sorted-letters signature.",
-    "syntax": "\"\".join(sorted(w))"
+    "syntax": "\"\".join(sorted(w))",
+    "note": "Sorting the letters makes a canonical key: anagrams collide on purpose, non-anagrams never do.",
+    "mapsTo": "LC 49 · Group Anagrams"
   },
   {
     "id": "py.u04.first-unique.predict",
@@ -257,7 +280,9 @@
       "py.u04.first-unique.predict"
     ],
     "cue": "Precount, then walk indices returning the first singleton.",
-    "syntax": "for i in range(len(s)): s[i]"
+    "syntax": "for i in range(len(s)): s[i]",
+    "note": "Two passes are required: a single pass can't know an early char is unique until the whole string is counted.",
+    "mapsTo": "LC 387 · First Unique Character in a String"
   },
   {
     "id": "py.u04.index-map.write",
@@ -349,7 +374,9 @@
       "py.u04.seen.dedup.write"
     ],
     "cue": "Compare the unique count against the total length.",
-    "syntax": "len(set(xs)) vs len(xs)"
+    "syntax": "len(set(xs)) vs len(xs)",
+    "note": "Dropping into a set collapses duplicates; a shorter set than list means at least one repeat.",
+    "mapsTo": "LC 217 · Contains Duplicate"
   },
   {
     "id": "py.u04.seen.set-sorted.predict",

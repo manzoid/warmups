@@ -39,7 +39,8 @@
     "tests": "assert isqrt(0) == 0, isqrt(0)\nassert isqrt(1) == 1, isqrt(1)\nassert isqrt(15) == 3, isqrt(15)\nassert isqrt(16) == 4, isqrt(16)\nassert isqrt(24) == 4, isqrt(24)\nassert isqrt(25) == 5, isqrt(25)",
     "cue": "Advance i while the next square still fits under n; the last i that fits is the floor root.",
     "syntax": "(i + 1) * (i + 1) <= n",
-    "prereqs": ["py.u11.intdiv.floor"]
+    "prereqs": ["py.u11.intdiv.floor"],
+    "mapsTo": "LC 69 · Sqrt(x)"
   },
   {
     "id": "py.u11.base.write",
@@ -54,5 +55,35 @@
     "cue": "Same digit-peel loop as reversing a number, but the modulus is b, not 10. Peeling gives least-significant first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and n //= b",
     "prereqs": ["py.u11.intdiv.revnum"]
+  },
+  {
+    "id": "py.u11.power.sqfold",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "repeated squaring jumps exponents",
+    "kind": "predict",
+    "prompt": "What is the value of `squares`?",
+    "snippet": "base = 2\nsquares = []\nfor _ in range(4):\n    squares.append(base)\n    base *= base\nsquares",
+    "expected": "[2, 4, 16, 256]",
+    "prereqs": ["py.u11.power.write"],
+    "cue": "Each pass squares what you had, so the reachable exponent doubles: 2^1, 2^2, 2^4, 2^8.",
+    "syntax": "base *= base",
+    "note": "Squaring k times reaches exponent 2^k. Combining only the squares whose bit is set in the exponent turns a linear multiply loop into a log-time one."
+  },
+  {
+    "id": "py.u11.power.fastpow",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "exponentiation by squaring",
+    "kind": "write",
+    "prompt": "Write `fast_pow(base, exp)` for `exp >= 0` returning `base` to the `exp` in O(log exp) multiplies by squaring the base and halving the exponent. Do not use `**` or `pow`.",
+    "starter": "def fast_pow(base, exp):\n    # your code here\n    pass",
+    "solution": "def fast_pow(base, exp):\n    result = 1\n    while exp:\n        if exp & 1:\n            result *= base\n        base *= base\n        exp >>= 1\n    return result",
+    "tests": "assert fast_pow(2, 10) == 1024, fast_pow(2, 10)\nassert fast_pow(5, 0) == 1, fast_pow(5, 0)\nassert fast_pow(3, 3) == 27, fast_pow(3, 3)\nassert fast_pow(7, 1) == 7, fast_pow(7, 1)\nassert fast_pow(10, 5) == 100000, fast_pow(10, 5)",
+    "prereqs": ["py.u11.power.write", "py.u11.power.sqfold"],
+    "cue": "Read the exponent bit by bit: square the base every step, and fold it into the result only when the low bit is set.",
+    "syntax": "exp & 1, base *= base, exp >>= 1",
+    "note": "The exponent's binary digits pick which squares to multiply in, so the loop runs about log2(exp) times instead of exp times.",
+    "mapsTo": "LC 50 · Pow(x, n)"
   }
 ]

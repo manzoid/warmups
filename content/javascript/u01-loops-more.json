@@ -35,14 +35,14 @@
     "id": "js.u01.count.vowels",
     "track": "javascript",
     "group": "Loops & iteration",
-    "concept": "count matches over a string domain",
-    "cue": "Same tally loop, but the test is membership in a small set.",
-    "syntax": "'aeiou'.includes(s[i])",
+    "concept": "count matches over a string domain (case-insensitive)",
+    "cue": "Same tally loop, but the test is membership in a small set, either case.",
+    "syntax": "'aeiouAEIOU'.includes(s[i])",
     "kind": "write",
-    "prompt": "Implement `countVowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
+    "prompt": "Implement `countVowels(s)` returning how many characters of string `s` are vowels (`a`, `e`, `i`, `o`, `u`), upper or lower case.",
     "starter": "function countVowels(s) {\n  // your code here\n}",
-    "solution": "function countVowels(s) {\n  let c = 0;\n  for (let i = 0; i < s.length; i++) if ('aeiou'.includes(s[i])) c++;\n  return c;\n}",
-    "tests": "if (countVowels('') !== 0) throw new Error('empty');\nif (countVowels('hello') !== 2) throw new Error('hello');\nif (countVowels('xyz') !== 0) throw new Error('none');\nif (countVowels('aeiou') !== 5) throw new Error('all');",
+    "solution": "function countVowels(s) {\n  let c = 0;\n  for (let i = 0; i < s.length; i++) if ('aeiouAEIOU'.includes(s[i])) c++;\n  return c;\n}",
+    "tests": "if (countVowels('') !== 0) throw new Error('empty');\nif (countVowels('hello') !== 2) throw new Error('hello');\nif (countVowels('xyz') !== 0) throw new Error('none');\nif (countVowels('aeiou') !== 5) throw new Error('all');\nif (countVowels('HELLO') !== 2) throw new Error('upper');\nif (countVowels('AeIoU') !== 5) throw new Error('mixed case');",
     "prereqs": [
       "js.u01.count.predict"
     ]
@@ -121,8 +121,44 @@
     "starter": "function reverseInPlace(a) {\n  // your code here\n}",
     "solution": "function reverseInPlace(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const t = a[lo];\n    a[lo] = a[hi];\n    a[hi] = t;\n    lo++;\n    hi--;\n  }\n  return a;\n}",
     "tests": "if (JSON.stringify(reverseInPlace([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverseInPlace([7])) !== JSON.stringify([7])) throw new Error('single');\nif (JSON.stringify(reverseInPlace([1, 2, 3, 4])) !== JSON.stringify([4, 3, 2, 1])) throw new Error('even');\nif (JSON.stringify(reverseInPlace([1, 2, 3])) !== JSON.stringify([3, 2, 1])) throw new Error('odd');",
+    "note": "In place uses O(1) extra space: swap the ends and walk inward, versus the spread copy which allocates a second array.",
     "prereqs": [
       "js.u01.reverse.predict"
+    ]
+  },
+  {
+    "id": "js.u01.accumulate.runningsum.write",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "prefix sums via running accumulator",
+    "cue": "One accumulator, but emit its value once per element.",
+    "syntax": "push inside the loop",
+    "kind": "write",
+    "prompt": "Implement `runningSum(a)` returning an array whose element `i` is the sum of `a[0..i]`. `runningSum([])` is `[]`.",
+    "starter": "function runningSum(a) {\n  // your code here\n}",
+    "solution": "function runningSum(a) {\n  const out = [];\n  let run = 0;\n  for (let i = 0; i < a.length; i++) {\n    run += a[i];\n    out.push(run);\n  }\n  return out;\n}",
+    "tests": "if (JSON.stringify(runningSum([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(runningSum([1, 2, 3, 4])) !== JSON.stringify([1, 3, 6, 10])) throw new Error('rsum');\nif (JSON.stringify(runningSum([3, 1, 4, 1])) !== JSON.stringify([3, 4, 8, 9])) throw new Error('mixed');",
+    "mapsTo": "LC 1480 · Running Sum of 1d Array",
+    "prereqs": [
+      "js.u01.accumulate.runningsum.predict"
+    ]
+  },
+  {
+    "id": "js.u01.extreme.maxprofit",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "best gain via min-so-far",
+    "cue": "One pass: consider what you must remember about earlier elements to score each one.",
+    "syntax": "track the min seen so far",
+    "kind": "write",
+    "prompt": "Implement `maxProfit(a)` returning the largest `a[j] - a[i]` for some `i < j`, or 0 if no later element is larger. Empty or single-element arrays give 0.",
+    "starter": "function maxProfit(a) {\n  // your code here\n}",
+    "solution": "function maxProfit(a) {\n  let best = 0;\n  let lo = Infinity;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] < lo) lo = a[i];\n    else if (a[i] - lo > best) best = a[i] - lo;\n  }\n  return best;\n}",
+    "tests": "if (maxProfit([]) !== 0) throw new Error('empty');\nif (maxProfit([5]) !== 0) throw new Error('single');\nif (maxProfit([7, 1, 5, 3, 6, 4]) !== 5) throw new Error('profit');\nif (maxProfit([7, 6, 4, 3, 1]) !== 0) throw new Error('descending');\nif (maxProfit([1, 2]) !== 1) throw new Error('rise');",
+    "note": "The trick is a single min-so-far carried left to right, so it stays O(n) instead of comparing every pair O(n^2).",
+    "mapsTo": "LC 121 · Best Time to Buy and Sell Stock",
+    "prereqs": [
+      "js.u01.extreme.runningmax"
     ]
   }
 ]
