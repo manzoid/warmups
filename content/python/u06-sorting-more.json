@@ -38,14 +38,31 @@
     "prompt": "Write `top_k(nums, k)` returning the `k` largest values of `nums` in descending order. If `k` exceeds the length, return all values sorted descending.",
     "starter": "def top_k(nums, k):\n    # your code here\n    pass",
     "solution": "def top_k(nums, k):\n    return sorted(nums, reverse=True)[:k]",
-    "tests": "assert top_k([3, 1, 4, 1, 5, 9, 2], 3) == [9, 5, 4], top_k([3, 1, 4, 1, 5, 9, 2], 3)\nassert top_k([1], 5) == [1], top_k([1], 5)\nassert top_k([], 3) == [], top_k([], 3)\nassert top_k([2, 2, 2], 2) == [2, 2], top_k([2, 2, 2], 2)",
     "prereqs": [
       "py.u06.sorted.reverse.predict"
     ],
     "cue": "Sort descending, then take the front slice.",
     "syntax": "sorted(xs, reverse=True)[:k]",
     "mapsTo": "pattern behind LC 215 · Kth Largest Element in an Array",
-    "note": "Full sort is O(n log n); a size-k heap gets the top k in O(n log k), which wins when k is much smaller than n."
+    "note": "Full sort is O(n log n); a size-k heap gets the top k in O(n log k), which wins when k is much smaller than n.",
+    "cases": [
+      {
+        "call": "top_k([3, 1, 4, 1, 5, 9, 2], 3)",
+        "expect": "[9, 5, 4]"
+      },
+      {
+        "call": "top_k([1], 5)",
+        "expect": "[1]"
+      },
+      {
+        "call": "top_k([], 3)",
+        "expect": "[]"
+      },
+      {
+        "call": "top_k([2, 2, 2], 2)",
+        "expect": "[2, 2]"
+      }
+    ]
   },
   {
     "id": "py.u06.mingap.write",
@@ -56,13 +73,30 @@
     "prompt": "Write `min_gap(nums)` returning the smallest difference between any two values in `nums` (length at least 2). Sort first so the closest pair is adjacent.",
     "starter": "def min_gap(nums):\n    # your code here\n    pass",
     "solution": "def min_gap(nums):\n    a = sorted(nums)\n    return min(a[i] - a[i - 1] for i in range(1, len(a)))",
-    "tests": "assert min_gap([3, 8, 1, 5]) == 2, min_gap([3, 8, 1, 5])\nassert min_gap([1, 100, 101]) == 1, min_gap([1, 100, 101])\nassert min_gap([5, 5, 9]) == 0, min_gap([5, 5, 9])\nassert min_gap([10, 3]) == 7, min_gap([10, 3])",
     "prereqs": [
       "py.u06.sweep.dup.write"
     ],
     "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
     "syntax": "a[i] - a[i - 1] neighbor diff",
     "mapsTo": "pattern behind LC 1200 · Minimum Absolute Difference",
-    "note": "Once sorted, the closest pair is always adjacent, so one linear sweep replaces checking every O(n^2) pair."
+    "note": "Once sorted, the closest pair is always adjacent, so one linear sweep replaces checking every O(n^2) pair.",
+    "cases": [
+      {
+        "call": "min_gap([3, 8, 1, 5])",
+        "expect": "2"
+      },
+      {
+        "call": "min_gap([1, 100, 101])",
+        "expect": "1"
+      },
+      {
+        "call": "min_gap([5, 5, 9])",
+        "expect": "0"
+      },
+      {
+        "call": "min_gap([10, 3])",
+        "expect": "7"
+      }
+    ]
   }
 ]

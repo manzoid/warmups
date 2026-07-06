@@ -23,13 +23,26 @@
     "prompt": "Write `running_max(a)` returning a list whose element `i` is the largest value among `a[0..i]`. `running_max([])` is `[]`.",
     "starter": "def running_max(a):\n    # your code here\n    pass",
     "solution": "def running_max(a):\n    out = []\n    best = None\n    for i in range(len(a)):\n        if best is None or a[i] > best:\n            best = a[i]\n        out.append(best)\n    return out",
-    "tests": "assert running_max([]) == [], running_max([])\nassert running_max([3, 1, 4, 1, 5, 9, 2]) == [3, 3, 4, 4, 5, 9, 9], running_max([3, 1, 4, 1, 5, 9, 2])\nassert running_max([-2, -5, -1]) == [-2, -2, -1], running_max([-2, -5, -1])",
     "prereqs": [
       "py.u01.extreme.max",
       "py.u01.accumulate.runningsum.predict"
     ],
     "cue": "Carry a best-so-far and emit it once per element.",
-    "syntax": "append the current best each pass"
+    "syntax": "append the current best each pass",
+    "cases": [
+      {
+        "call": "running_max([])",
+        "expect": "[]"
+      },
+      {
+        "call": "running_max([3, 1, 4, 1, 5, 9, 2])",
+        "expect": "[3, 3, 4, 4, 5, 9, 9]"
+      },
+      {
+        "call": "running_max([-2, -5, -1])",
+        "expect": "[-2, -2, -1]"
+      }
+    ]
   },
   {
     "id": "py.u01.count.vowels",
@@ -40,12 +53,29 @@
     "prompt": "Write `count_vowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
     "starter": "def count_vowels(s):\n    # your code here\n    pass",
     "solution": "def count_vowels(s):\n    c = 0\n    for i in range(len(s)):\n        if s[i] in 'aeiou':\n            c += 1\n    return c",
-    "tests": "assert count_vowels('') == 0, count_vowels('')\nassert count_vowels('hello') == 2, count_vowels('hello')\nassert count_vowels('xyz') == 0, count_vowels('xyz')\nassert count_vowels('aeiou') == 5, count_vowels('aeiou')",
     "prereqs": [
       "py.u01.count.predicate"
     ],
     "cue": "Same tally loop, but the test is membership in a small set.",
-    "syntax": "s[i] in 'aeiou'"
+    "syntax": "s[i] in 'aeiou'",
+    "cases": [
+      {
+        "call": "count_vowels('')",
+        "expect": "0"
+      },
+      {
+        "call": "count_vowels('hello')",
+        "expect": "2"
+      },
+      {
+        "call": "count_vowels('xyz')",
+        "expect": "0"
+      },
+      {
+        "call": "count_vowels('aeiou')",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u01.extreme.closest",
@@ -56,12 +86,25 @@
     "prompt": "Write `closest(a, t)` returning the element of non-empty list `a` nearest to `t` (smallest `abs(x - t)`); on ties keep the first.",
     "starter": "def closest(a, t):\n    # your code here\n    pass",
     "solution": "def closest(a, t):\n    best = a[0]\n    for i in range(1, len(a)):\n        if abs(a[i] - t) < abs(best - t):\n            best = a[i]\n    return best",
-    "tests": "assert closest([5], 0) == 5, closest([5], 0)\nassert closest([10, 4, 7, 1], 5) == 4, closest([10, 4, 7, 1], 5)\nassert closest([-3, -1, -8], -2) == -3, closest([-3, -1, -8], -2)",
     "prereqs": [
       "py.u01.extreme.min"
     ],
     "cue": "Compare-and-keep, but rank by distance to the target, not by value.",
-    "syntax": "abs(a[i] - t)"
+    "syntax": "abs(a[i] - t)",
+    "cases": [
+      {
+        "call": "closest([5], 0)",
+        "expect": "5"
+      },
+      {
+        "call": "closest([10, 4, 7, 1], 5)",
+        "expect": "4"
+      },
+      {
+        "call": "closest([-3, -1, -8], -2)",
+        "expect": "-3"
+      }
+    ]
   },
   {
     "id": "py.u01.parallel.count-equal.predict",
@@ -87,13 +130,30 @@
     "prompt": "Write `max_rise(a)` returning the largest increase between consecutive elements (`a[i] - a[i-1]`), or 0 if it never increases. Empty and single-element lists give 0.",
     "starter": "def max_rise(a):\n    # your code here\n    pass",
     "solution": "def max_rise(a):\n    best = 0\n    for i in range(1, len(a)):\n        d = a[i] - a[i-1]\n        if d > best:\n            best = d\n    return best",
-    "tests": "assert max_rise([]) == 0, max_rise([])\nassert max_rise([5]) == 0, max_rise([5])\nassert max_rise([1, 5, 2, 10]) == 8, max_rise([1, 5, 2, 10])\nassert max_rise([5, 4, 3]) == 0, max_rise([5, 4, 3])",
     "prereqs": [
       "py.u01.neighbor.diffs",
       "py.u01.extreme.max"
     ],
     "cue": "Track a best-so-far over each adjacent difference.",
-    "syntax": "a[i] - a[i-1]"
+    "syntax": "a[i] - a[i-1]",
+    "cases": [
+      {
+        "call": "max_rise([])",
+        "expect": "0"
+      },
+      {
+        "call": "max_rise([5])",
+        "expect": "0"
+      },
+      {
+        "call": "max_rise([1, 5, 2, 10])",
+        "expect": "8"
+      },
+      {
+        "call": "max_rise([5, 4, 3])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u01.filter.indices.predict",
@@ -117,17 +177,38 @@
     "concept": "reverse in place via two-pointer swap",
     "kind": "write",
     "prompt": "Write `reverse_in_place(a)` that reverses list `a` in place and returns it. Do not build a new list or use `reversed`, `.reverse()`, or `a[::-1]`.",
-    "banned": ["reversed(", ".reverse(", "[::-1]"],
+    "banned": [
+      "reversed(",
+      ".reverse(",
+      "[::-1]"
+    ],
     "starter": "def reverse_in_place(a):\n    # your code here\n    pass",
     "solution": "def reverse_in_place(a):\n    lo = 0\n    hi = len(a) - 1\n    while lo < hi:\n        a[lo], a[hi] = a[hi], a[lo]\n        lo += 1\n        hi -= 1\n    return a",
-    "tests": "assert reverse_in_place([]) == [], reverse_in_place([])\nassert reverse_in_place([7]) == [7], reverse_in_place([7])\nassert reverse_in_place([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_in_place([1, 2, 3, 4])\nassert reverse_in_place([1, 2, 3]) == [3, 2, 1], reverse_in_place([1, 2, 3])",
     "prereqs": [
       "py.u01.reverse.raw"
     ],
     "cue": "Two indices walking inward, swapping until they meet.",
     "syntax": "a[lo], a[hi] = a[hi], a[lo]",
     "note": "In-place swap uses O(1) extra space; building a new reversed list uses O(n).",
-    "mapsTo": "LC 344 · Reverse String"
+    "mapsTo": "LC 344 · Reverse String",
+    "cases": [
+      {
+        "call": "reverse_in_place([])",
+        "expect": "[]"
+      },
+      {
+        "call": "reverse_in_place([7])",
+        "expect": "[7]"
+      },
+      {
+        "call": "reverse_in_place([1, 2, 3, 4])",
+        "expect": "[4, 3, 2, 1]"
+      },
+      {
+        "call": "reverse_in_place([1, 2, 3])",
+        "expect": "[3, 2, 1]"
+      }
+    ]
   },
   {
     "id": "py.u01.profit.min-so-far.predict",
@@ -153,7 +234,6 @@
     "prompt": "Write `max_profit(a)` where `a[i]` is a price on day `i`, returning the largest `a[j] - a[i]` for some `j > i`, or 0 if no gain is possible. Empty and single-element lists give 0.",
     "starter": "def max_profit(a):\n    # your code here\n    pass",
     "solution": "def max_profit(a):\n    if not a:\n        return 0\n    best = 0\n    lo = a[0]\n    for i in range(1, len(a)):\n        if a[i] - lo > best:\n            best = a[i] - lo\n        if a[i] < lo:\n            lo = a[i]\n    return best",
-    "tests": "assert max_profit([]) == 0, max_profit([])\nassert max_profit([5]) == 0, max_profit([5])\nassert max_profit([7, 1, 5, 3, 6, 4]) == 5, max_profit([7, 1, 5, 3, 6, 4])\nassert max_profit([7, 6, 4, 3, 1]) == 0, max_profit([7, 6, 4, 3, 1])\nassert max_profit([1, 2]) == 1, max_profit([1, 2])",
     "prereqs": [
       "py.u01.profit.min-so-far.predict",
       "py.u01.accumulate.sum"
@@ -161,7 +241,29 @@
     "cue": "Track the cheapest price seen so far; at each day the best sale is today's price minus that.",
     "syntax": "keep a running minimum, compare price - min",
     "note": "One pass, tracking the cheapest price so far: O(n). Comparing every buy/sell pair would be O(n^2).",
-    "mapsTo": "LC 121 · Best Time to Buy and Sell Stock"
+    "mapsTo": "LC 121 · Best Time to Buy and Sell Stock",
+    "cases": [
+      {
+        "call": "max_profit([])",
+        "expect": "0"
+      },
+      {
+        "call": "max_profit([5])",
+        "expect": "0"
+      },
+      {
+        "call": "max_profit([7, 1, 5, 3, 6, 4])",
+        "expect": "5"
+      },
+      {
+        "call": "max_profit([7, 6, 4, 3, 1])",
+        "expect": "0"
+      },
+      {
+        "call": "max_profit([1, 2])",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u01.kadane.best-here.predict",
@@ -187,7 +289,6 @@
     "prompt": "Write `max_subarray(a)` for non-empty list `a`, returning the largest sum of any contiguous non-empty slice. All-negative inputs return the least-negative element.",
     "starter": "def max_subarray(a):\n    # your code here\n    pass",
     "solution": "def max_subarray(a):\n    best = a[0]\n    cur = a[0]\n    for i in range(1, len(a)):\n        cur = max(a[i], cur + a[i])\n        if cur > best:\n            best = cur\n    return best",
-    "tests": "assert max_subarray([1]) == 1, max_subarray([1])\nassert max_subarray([-1]) == -1, max_subarray([-1])\nassert max_subarray([-3, -1, -2]) == -1, max_subarray([-3, -1, -2])\nassert max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6, max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4])\nassert max_subarray([5, 4, -1, 7, 8]) == 23, max_subarray([5, 4, -1, 7, 8])",
     "prereqs": [
       "py.u01.kadane.best-here.predict",
       "py.u01.extreme.max"
@@ -195,7 +296,29 @@
     "cue": "Carry the best sum ending at the current index: either extend the previous run or restart at `a[i]`, whichever is larger.",
     "syntax": "cur = max(a[i], cur + a[i])",
     "note": "One pass, carrying the best sum ending here: O(n). Trying every start/end pair would be O(n^2).",
-    "mapsTo": "LC 53 · Maximum Subarray"
+    "mapsTo": "LC 53 · Maximum Subarray",
+    "cases": [
+      {
+        "call": "max_subarray([1])",
+        "expect": "1"
+      },
+      {
+        "call": "max_subarray([-1])",
+        "expect": "-1"
+      },
+      {
+        "call": "max_subarray([-3, -1, -2])",
+        "expect": "-1"
+      },
+      {
+        "call": "max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4])",
+        "expect": "6"
+      },
+      {
+        "call": "max_subarray([5, 4, -1, 7, 8])",
+        "expect": "23"
+      }
+    ]
   },
   {
     "id": "py.u01.parallel.zip-truncate.predict",

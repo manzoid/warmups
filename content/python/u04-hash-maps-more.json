@@ -44,7 +44,10 @@
     ],
     "cue": "Two strings are anagrams exactly when their character tallies match.",
     "syntax": "Counter(s) == Counter(t)",
-    "banned": ["sorted(", ".sort("],
+    "banned": [
+      "sorted(",
+      ".sort("
+    ],
     "mapsTo": "LC 242 · Valid Anagram"
   },
   {
@@ -86,15 +89,34 @@
     "prompt": "Write `word_count(text)` that returns a dict mapping each whitespace-separated word in `text` to how many times it appears. Do not use collections.Counter.",
     "starter": "def word_count(text):\n    # your code here\n    pass",
     "solution": "def word_count(text):\n    freq = {}\n    words = text.split()\n    for i in range(len(words)):\n        w = words[i]\n        freq[w] = freq.get(w, 0) + 1\n    return freq",
-    "tests": "assert word_count(\"a b a\") == {'a': 2, 'b': 1}, word_count(\"a b a\")\nassert word_count(\"\") == {}, word_count(\"\")\nassert word_count(\"hi\") == {'hi': 1}, word_count(\"hi\")\nassert word_count(\"go go go\") == {'go': 3}, word_count(\"go go go\")",
     "prereqs": [
       "py.u04.freq.get.predict",
       "py.u04.split-default.predict"
     ],
     "cue": "Split into words, then tally each by index with a miss-safe read.",
     "syntax": "str.split()",
-    "banned": ["Counter"],
-    "mapsTo": "pattern behind LC 819 · Most Common Word"
+    "banned": [
+      "Counter"
+    ],
+    "mapsTo": "pattern behind LC 819 · Most Common Word",
+    "cases": [
+      {
+        "call": "word_count('a b a')",
+        "expect": "{'a': 2, 'b': 1}"
+      },
+      {
+        "call": "word_count('')",
+        "expect": "{}"
+      },
+      {
+        "call": "word_count('hi')",
+        "expect": "{'hi': 1}"
+      },
+      {
+        "call": "word_count('go go go')",
+        "expect": "{'go': 3}"
+      }
+    ]
   },
   {
     "id": "py.u04.majority.write",
@@ -105,13 +127,26 @@
     "prompt": "Write `majority(nums)` that returns the value appearing more than `len(nums) // 2` times. Assume such an element always exists.",
     "starter": "def majority(nums):\n    # your code here\n    pass",
     "solution": "def majority(nums):\n    from collections import Counter\n    return Counter(nums).most_common(1)[0][0]",
-    "tests": "assert majority([3, 2, 3]) == 3, majority([3, 2, 3])\nassert majority([2, 2, 1, 1, 1, 2, 2]) == 2, majority([2, 2, 1, 1, 1, 2, 2])\nassert majority([1]) == 1, majority([1])",
     "prereqs": [
       "py.u04.freq.counter.mostcommon"
     ],
     "cue": "Count every value, then take the single most frequent one.",
     "syntax": "Counter(...).most_common(1)",
-    "mapsTo": "LC 169 · Majority Element"
+    "mapsTo": "LC 169 · Majority Element",
+    "cases": [
+      {
+        "call": "majority([3, 2, 3])",
+        "expect": "3"
+      },
+      {
+        "call": "majority([2, 2, 1, 1, 1, 2, 2])",
+        "expect": "2"
+      },
+      {
+        "call": "majority([1])",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u04.topk.write",
@@ -122,14 +157,27 @@
     "prompt": "Write `top_k_frequent(nums, k)` that returns the `k` most frequent values in `nums`, most frequent first.",
     "starter": "def top_k_frequent(nums, k):\n    # your code here\n    pass",
     "solution": "def top_k_frequent(nums, k):\n    from collections import Counter\n    return [v for v, _ in Counter(nums).most_common(k)]",
-    "tests": "assert top_k_frequent([1, 1, 1, 2, 2, 3], 2) == [1, 2], top_k_frequent([1, 1, 1, 2, 2, 3], 2)\nassert top_k_frequent([1], 1) == [1], top_k_frequent([1], 1)\nassert top_k_frequent([4, 4, 4, 5, 5, 6], 1) == [4], top_k_frequent([4, 4, 4, 5, 5, 6], 1)",
     "prereqs": [
       "py.u04.freq.counter.mostcommon"
     ],
     "cue": "Count all values, then take the k highest-count pairs and keep only the keys.",
     "syntax": "Counter(...).most_common(k)",
     "note": "Counter.most_common does the ranking for you; done by hand the interview-optimal way is bucket sort by frequency (O(n)) or a size-k heap (O(n log k)).",
-    "mapsTo": "LC 347 · Top K Frequent Elements"
+    "mapsTo": "LC 347 · Top K Frequent Elements",
+    "cases": [
+      {
+        "call": "top_k_frequent([1, 1, 1, 2, 2, 3], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "top_k_frequent([1], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "top_k_frequent([4, 4, 4, 5, 5, 6], 1)",
+        "expect": "[4]"
+      }
+    ]
   },
   {
     "id": "py.u04.prefixsum.bridge.predict",
@@ -173,14 +221,31 @@
     "prompt": "Write `subarray_sum(nums, k)` that returns the number of contiguous subarrays of `nums` whose elements sum to `k`. Values may be negative. Make one pass using a dict of prefix-sum counts.",
     "starter": "def subarray_sum(nums, k):\n    # your code here\n    pass",
     "solution": "def subarray_sum(nums, k):\n    count = {0: 1}\n    prefix = 0\n    total = 0\n    for i in range(len(nums)):\n        prefix += nums[i]\n        total += count.get(prefix - k, 0)\n        count[prefix] = count.get(prefix, 0) + 1\n    return total",
-    "tests": "assert subarray_sum([1, 1, 1], 2) == 2, subarray_sum([1, 1, 1], 2)\nassert subarray_sum([1, 2, 3], 3) == 2, subarray_sum([1, 2, 3], 3)\nassert subarray_sum([1], 0) == 0, subarray_sum([1], 0)\nassert subarray_sum([-1, -1, 1], 0) == 1, subarray_sum([-1, -1, 1], 0)",
     "prereqs": [
       "py.u04.subarraysum.predict"
     ],
     "cue": "Keep a running prefix sum; for each one, add how many earlier prefixes equal prefix - k.",
     "syntax": "count = {0: 1}",
     "note": "Seed {0: 1} so a prefix that itself equals k counts on its own; negatives break the sliding-window trick, so the prefix map is the fallback.",
-    "mapsTo": "LC 560 · Subarray Sum Equals K"
+    "mapsTo": "LC 560 · Subarray Sum Equals K",
+    "cases": [
+      {
+        "call": "subarray_sum([1, 1, 1], 2)",
+        "expect": "2"
+      },
+      {
+        "call": "subarray_sum([1, 2, 3], 3)",
+        "expect": "2"
+      },
+      {
+        "call": "subarray_sum([1], 0)",
+        "expect": "0"
+      },
+      {
+        "call": "subarray_sum([-1, -1, 1], 0)",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u04.longest.predict",
@@ -207,13 +272,33 @@
     "prompt": "Write `longest_consecutive(nums)` that returns the length of the longest run of consecutive integers in `nums` (in any order). Return 0 for an empty list. Do not sort; use a set.",
     "starter": "def longest_consecutive(nums):\n    # your code here\n    pass",
     "solution": "def longest_consecutive(nums):\n    s = set(nums)\n    best = 0\n    for x in s:\n        if x - 1 not in s:\n            length = 1\n            y = x + 1\n            while y in s:\n                length += 1\n                y += 1\n            best = max(best, length)\n    return best",
-    "tests": "assert longest_consecutive([100, 4, 200, 1, 3, 2]) == 4, longest_consecutive([100, 4, 200, 1, 3, 2])\nassert longest_consecutive([]) == 0, longest_consecutive([])\nassert longest_consecutive([1, 2, 0, 1]) == 3, longest_consecutive([1, 2, 0, 1])\nassert longest_consecutive([10]) == 1, longest_consecutive([10])",
     "prereqs": [
       "py.u04.longest.predict"
     ],
     "cue": "From each run-start, walk upward through the set counting how far the run extends.",
     "syntax": "while y in s: y += 1",
-    "banned": [".sort(", "sorted("],
-    "mapsTo": "LC 128 · Longest Consecutive Sequence"
+    "banned": [
+      ".sort(",
+      "sorted("
+    ],
+    "mapsTo": "LC 128 · Longest Consecutive Sequence",
+    "cases": [
+      {
+        "call": "longest_consecutive([100, 4, 200, 1, 3, 2])",
+        "expect": "4"
+      },
+      {
+        "call": "longest_consecutive([])",
+        "expect": "0"
+      },
+      {
+        "call": "longest_consecutive([1, 2, 0, 1])",
+        "expect": "3"
+      },
+      {
+        "call": "longest_consecutive([10])",
+        "expect": "1"
+      }
+    ]
   }
 ]

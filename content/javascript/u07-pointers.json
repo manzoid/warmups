@@ -24,8 +24,14 @@
     "starter": "function sumAll(a) {\n  // your code here\n}",
     "solution": "function sumAll(a) {\n  let i = 0;\n  let s = 0;\n  while (i < a.length) {\n    s += a[i];\n    i++;\n  }\n  return s;\n}",
     "tests": "if (sumAll([10, 20, 30]) !== 60) throw new Error('60: ' + sumAll([10, 20, 30]));\nif (sumAll([]) !== 0) throw new Error('empty must be 0');\nif (sumAll([5]) !== 5) throw new Error('single');\nif (sumAll([-1, 1, -2, 2]) !== 0) throw new Error('signs');",
-    "banned": ["for (", "for(", ".reduce("],
-    "prereqs": ["js.u07.manual.sum"]
+    "banned": [
+      "for (",
+      "for(",
+      ".reduce("
+    ],
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.stride.predict",
@@ -38,7 +44,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "const a = [5, 6, 7, 8];\nlet i = 0;\nconst out = [];\nwhile (i < a.length) {\n  out.push(a[i]);\n  i += 2;\n}\nout;",
     "expected": "[5, 7]",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.stride.write",
@@ -51,9 +59,30 @@
     "prompt": "Write `everyOther(a)` that returns a new array holding the elements of `a` at indices 0, 2, 4, and so on. Advance the index by 2 each step.",
     "starter": "function everyOther(a) {\n  // your code here\n}",
     "solution": "function everyOther(a) {\n  let i = 0;\n  const out = [];\n  while (i < a.length) {\n    out.push(a[i]);\n    i += 2;\n  }\n  return out;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(everyOther([5, 6, 7, 8, 9]), [5, 7, 9]);\neq(everyOther([]), []);\neq(everyOther([1]), [1]);\neq(everyOther([1, 2]), [1]);",
-    "banned": [".filter("],
-    "prereqs": ["js.u07.manual.write"]
+    "banned": [
+      ".filter("
+    ],
+    "prereqs": [
+      "js.u07.manual.write"
+    ],
+    "cases": [
+      {
+        "call": "everyOther([5, 6, 7, 8, 9])",
+        "expect": "[5, 7, 9]"
+      },
+      {
+        "call": "everyOther([])",
+        "expect": "[]"
+      },
+      {
+        "call": "everyOther([1])",
+        "expect": "[1]"
+      },
+      {
+        "call": "everyOther([1, 2])",
+        "expect": "[1]"
+      }
+    ]
   },
   {
     "id": "js.u07.jump.predict",
@@ -66,7 +95,9 @@
     "prompt": "What is the value of `hops`?",
     "snippet": "const a = [1, 2, 1, 1];\nlet i = 0;\nlet hops = 0;\nwhile (i < a.length) {\n  i += a[i];\n  hops++;\n}\nhops;",
     "expected": "3",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.skipprefix.predict",
@@ -79,7 +110,9 @@
     "prompt": "What is the value of `i`?",
     "snippet": "const s = '   hi';\nlet i = 0;\nwhile (i < s.length && s[i] === ' ') i++;\ni;",
     "expected": "3",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.skipprefix.allspaces.predict",
@@ -92,7 +125,9 @@
     "prompt": "What is the value of `i`?",
     "snippet": "const s = '    ';\nlet i = 0;\nwhile (i < s.length && s[i] === ' ') i++;\ni;",
     "expected": "4",
-    "prereqs": ["js.u07.skipprefix.predict"]
+    "prereqs": [
+      "js.u07.skipprefix.predict"
+    ]
   },
   {
     "id": "js.u07.skipprefix.write",
@@ -106,8 +141,13 @@
     "starter": "function firstNonZero(a) {\n  // your code here\n}",
     "solution": "function firstNonZero(a) {\n  let i = 0;\n  while (i < a.length && a[i] === 0) i++;\n  return i;\n}",
     "tests": "if (firstNonZero([0, 0, 5, 0]) !== 2) throw new Error('2');\nif (firstNonZero([0, 0, 0]) !== 3) throw new Error('all zero');\nif (firstNonZero([]) !== 0) throw new Error('empty');\nif (firstNonZero([7]) !== 0) throw new Error('first');",
-    "banned": [".findIndex(", ".filter("],
-    "prereqs": ["js.u07.skipprefix.predict"]
+    "banned": [
+      ".findIndex(",
+      ".filter("
+    ],
+    "prereqs": [
+      "js.u07.skipprefix.predict"
+    ]
   },
   {
     "id": "js.u07.find.predict",
@@ -120,7 +160,9 @@
     "prompt": "What is the value of `i`?",
     "snippet": "const a = [4, 5, 6, 5, 7];\nconst target = 5;\nlet i = 0;\nwhile (i < a.length && a[i] !== target) i++;\ni;",
     "expected": "1",
-    "prereqs": ["js.u07.skipprefix.predict"]
+    "prereqs": [
+      "js.u07.skipprefix.predict"
+    ]
   },
   {
     "id": "js.u07.find.absent.predict",
@@ -133,7 +175,9 @@
     "prompt": "What is the value of `i`?",
     "snippet": "const a = [4, 5, 6, 5, 7];\nconst target = 9;\nlet i = 0;\nwhile (i < a.length && a[i] !== target) i++;\ni;",
     "expected": "5",
-    "prereqs": ["js.u07.find.predict"]
+    "prereqs": [
+      "js.u07.find.predict"
+    ]
   },
   {
     "id": "js.u07.find.write",
@@ -147,8 +191,13 @@
     "starter": "function indexOfManual(a, target) {\n  // your code here\n}",
     "solution": "function indexOfManual(a, target) {\n  let i = 0;\n  while (i < a.length && a[i] !== target) i++;\n  return i < a.length ? i : -1;\n}",
     "tests": "if (indexOfManual([4, 5, 6, 5, 7], 5) !== 1) throw new Error('1');\nif (indexOfManual([4, 5, 6, 5, 7], 9) !== -1) throw new Error('absent');\nif (indexOfManual([], 1) !== -1) throw new Error('empty');\nif (indexOfManual([7], 7) !== 0) throw new Error('first');",
-    "banned": [".indexOf(", ".findIndex("],
-    "prereqs": ["js.u07.find.predict"]
+    "banned": [
+      ".indexOf(",
+      ".findIndex("
+    ],
+    "prereqs": [
+      "js.u07.find.predict"
+    ]
   },
   {
     "id": "js.u07.find.sugar.predict",
@@ -161,7 +210,9 @@
     "prompt": "What is the value of `r`?",
     "snippet": "const a = [4, 5, 6, 5, 7];\nconst r = a.indexOf(9);\nr;",
     "expected": "-1",
-    "prereqs": ["js.u07.find.write"]
+    "prereqs": [
+      "js.u07.find.write"
+    ]
   },
   {
     "id": "js.u07.skiprun.predict",
@@ -174,7 +225,9 @@
     "prompt": "What is the value of `j`?",
     "snippet": "const a = [5, 5, 5, 5];\nlet j = 0;\nwhile (j < a.length && a[j] === a[0]) j++;\nj;",
     "expected": "4",
-    "prereqs": ["js.u07.skipprefix.predict"]
+    "prereqs": [
+      "js.u07.skipprefix.predict"
+    ]
   },
   {
     "id": "js.u07.skiprun.write",
@@ -188,8 +241,12 @@
     "starter": "function firstRunLength(a) {\n  // your code here\n}",
     "solution": "function firstRunLength(a) {\n  if (a.length === 0) return 0;\n  let j = 0;\n  while (j < a.length && a[j] === a[0]) j++;\n  return j;\n}",
     "tests": "if (firstRunLength([1, 1, 1, 2]) !== 3) throw new Error('3');\nif (firstRunLength([5]) !== 1) throw new Error('single');\nif (firstRunLength([]) !== 0) throw new Error('empty');\nif (firstRunLength([3, 3]) !== 2) throw new Error('two');\nif (firstRunLength([1, 2, 2]) !== 1) throw new Error('run of one');",
-    "banned": [".findIndex("],
-    "prereqs": ["js.u07.skiprun.predict"]
+    "banned": [
+      ".findIndex("
+    ],
+    "prereqs": [
+      "js.u07.skiprun.predict"
+    ]
   },
   {
     "id": "js.u07.truncate.predict",
@@ -202,7 +259,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "const a = [1, 2, 3, 4, 5];\na.length = 2;\na;",
     "expected": "[1, 2]",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.compact.predict",
@@ -216,7 +275,10 @@
     "snippet": "const a = [1, 0, 2, 0];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    a[w] = a[i];\n    w++;\n  }\n}\na.length = w;\na;",
     "expected": "[1, 2]",
     "note": "Assigning to `a.length = w` truncates the array to its first w elements, dropping the leftover tail slots after the survivors were copied to the front.",
-    "prereqs": ["js.u07.manual.sum", "js.u07.truncate.predict"]
+    "prereqs": [
+      "js.u07.manual.sum",
+      "js.u07.truncate.predict"
+    ]
   },
   {
     "id": "js.u07.compact.write",
@@ -230,10 +292,15 @@
     "starter": "function removeVal(a, val) {\n  // your code here\n}",
     "solution": "function removeVal(a, val) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== val) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  a.length = w;\n  return w;\n}",
     "tests": "const a = [0, 3, 0, 5, 7, 0];\nif (removeVal(a, 0) !== 3) throw new Error('len');\nif (JSON.stringify(a) !== JSON.stringify([3, 5, 7])) throw new Error('a: ' + a);\nconst b = [1, 1, 1];\nif (removeVal(b, 1) !== 0) throw new Error('all removed');\nif (JSON.stringify(b) !== JSON.stringify([])) throw new Error('b empty');\nconst c = [1, 2, 3];\nif (removeVal(c, 9) !== 3) throw new Error('none removed');",
-    "banned": [".filter(", ".splice("],
+    "banned": [
+      ".filter(",
+      ".splice("
+    ],
     "note": "The write index w never runs ahead of the read index i, so overwriting a[w] can't clobber an element you still need to read.",
     "mapsTo": "LC 27 · Remove Element",
-    "prereqs": ["js.u07.compact.predict"]
+    "prereqs": [
+      "js.u07.compact.predict"
+    ]
   },
   {
     "id": "js.u07.compact.dedup.write",
@@ -247,10 +314,15 @@
     "starter": "function dedupeSorted(a) {\n  // your code here\n}",
     "solution": "function dedupeSorted(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let i = 1; i < a.length; i++) {\n    if (a[i] !== a[w - 1]) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  a.length = w;\n  return w;\n}",
     "tests": "const a = [1, 1, 2, 2, 3];\nif (dedupeSorted(a) !== 3) throw new Error('len');\nif (JSON.stringify(a) !== JSON.stringify([1, 2, 3])) throw new Error('a: ' + a);\nif (dedupeSorted([]) !== 0) throw new Error('empty');\nconst c = [5];\nif (dedupeSorted(c) !== 1) throw new Error('single');\nconst d = [1, 1, 1];\nif (dedupeSorted(d) !== 1 || JSON.stringify(d) !== JSON.stringify([1])) throw new Error('all same');",
-    "banned": ["Set(", ".filter("],
+    "banned": [
+      "Set(",
+      ".filter("
+    ],
     "note": "Comparing against the last kept element (a[w-1]) instead of a fixed anchor is what lets one pass collapse every duplicate run; it only works because the array is sorted.",
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
-    "prereqs": ["js.u07.compact.write"]
+    "prereqs": [
+      "js.u07.compact.write"
+    ]
   },
   {
     "id": "js.u07.compact.sugar.write",
@@ -263,8 +335,27 @@
     "prompt": "Write `keepNonzero(a)` that returns a new array with the non-zero elements of `a`, in order. Use `.filter`.",
     "starter": "function keepNonzero(a) {\n  // your code here\n}",
     "solution": "function keepNonzero(a) {\n  return a.filter(x => x !== 0);\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(keepNonzero([0, 3, 0, 5, 7, 0]), [3, 5, 7]);\neq(keepNonzero([]), []);\neq(keepNonzero([0, 0]), []);\neq(keepNonzero([1, 2]), [1, 2]);",
-    "prereqs": ["js.u07.compact.write"]
+    "prereqs": [
+      "js.u07.compact.write"
+    ],
+    "cases": [
+      {
+        "call": "keepNonzero([0, 3, 0, 5, 7, 0])",
+        "expect": "[3, 5, 7]"
+      },
+      {
+        "call": "keepNonzero([])",
+        "expect": "[]"
+      },
+      {
+        "call": "keepNonzero([0, 0])",
+        "expect": "[]"
+      },
+      {
+        "call": "keepNonzero([1, 2])",
+        "expect": "[1, 2]"
+      }
+    ]
   },
   {
     "id": "js.u07.swap.predict",
@@ -277,7 +368,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "const a = [10, 20, 30];\n[a[0], a[2]] = [a[2], a[0]];\na;",
     "expected": "[30, 20, 10]",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.movezeros.predict",
@@ -291,7 +384,10 @@
     "snippet": "const a = [1, 0, 2, 0, 0, 3];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    [a[w], a[i]] = [a[i], a[w]];\n    w++;\n  }\n}\na;",
     "expected": "[1, 2, 3, 0, 0, 0]",
     "note": "`[a[w], a[i]] = [a[i], a[w]]` is a destructuring swap: it exchanges the two elements in one line, with no temporary variable.",
-    "prereqs": ["js.u07.compact.predict", "js.u07.swap.predict"]
+    "prereqs": [
+      "js.u07.compact.predict",
+      "js.u07.swap.predict"
+    ]
   },
   {
     "id": "js.u07.movezeros.write",
@@ -304,11 +400,37 @@
     "prompt": "Write `moveZeros(a)` that shifts every zero in `a` to the end while keeping the order of the non-zero elements, mutating `a` in place. Return `a`. Use a trailing write index and swap forward.",
     "starter": "function moveZeros(a) {\n  // your code here\n}",
     "solution": "function moveZeros(a) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== 0) {\n      [a[w], a[i]] = [a[i], a[w]];\n      w++;\n    }\n  }\n  return a;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(moveZeros([0, 1, 0, 3, 12]), [1, 3, 12, 0, 0]);\neq(moveZeros([0]), [0]);\neq(moveZeros([1, 2]), [1, 2]);\neq(moveZeros([0, 0, 1]), [1, 0, 0]);\neq(moveZeros([]), []);",
-    "banned": [".filter(", ".sort("],
+    "banned": [
+      ".filter(",
+      ".sort("
+    ],
     "note": "Swapping (not copying) preserves every value, so the zeros collect at the end for free and no truncation is needed.",
     "mapsTo": "LC 283 · Move Zeroes",
-    "prereqs": ["js.u07.compact.write"]
+    "prereqs": [
+      "js.u07.compact.write"
+    ],
+    "cases": [
+      {
+        "call": "moveZeros([0, 1, 0, 3, 12])",
+        "expect": "[1, 3, 12, 0, 0]"
+      },
+      {
+        "call": "moveZeros([0])",
+        "expect": "[0]"
+      },
+      {
+        "call": "moveZeros([1, 2])",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "moveZeros([0, 0, 1])",
+        "expect": "[1, 0, 0]"
+      },
+      {
+        "call": "moveZeros([])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u07.merge.predict",
@@ -321,7 +443,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "const A = [1, 5, 9];\nconst B = [2, 3];\nlet i = 0, j = 0;\nconst out = [];\nwhile (i < A.length && j < B.length) {\n  if (A[i] <= B[j]) { out.push(A[i]); i++; }\n  else { out.push(B[j]); j++; }\n}\nwhile (i < A.length) { out.push(A[i]); i++; }\nwhile (j < B.length) { out.push(B[j]); j++; }\nout;",
     "expected": "[1, 2, 3, 5, 9]",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": [
+      "js.u07.manual.sum"
+    ]
   },
   {
     "id": "js.u07.merge.write",
@@ -334,11 +458,37 @@
     "prompt": "Write `mergeSorted(A, B)` that returns a new sorted array containing all elements of the two already-sorted arrays `A` and `B`. Walk both with two cursors in a single pass; do not concatenate and sort.",
     "starter": "function mergeSorted(A, B) {\n  // your code here\n}",
     "solution": "function mergeSorted(A, B) {\n  let i = 0, j = 0;\n  const out = [];\n  while (i < A.length && j < B.length) {\n    if (A[i] <= B[j]) { out.push(A[i]); i++; }\n    else { out.push(B[j]); j++; }\n  }\n  while (i < A.length) { out.push(A[i]); i++; }\n  while (j < B.length) { out.push(B[j]); j++; }\n  return out;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(mergeSorted([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);\neq(mergeSorted([], [1, 2]), [1, 2]);\neq(mergeSorted([1, 2], []), [1, 2]);\neq(mergeSorted([1, 1], [1]), [1, 1, 1]);\neq(mergeSorted([], []), []);",
-    "banned": [".sort(", ".concat("],
+    "banned": [
+      ".sort(",
+      ".concat("
+    ],
     "note": "One interleaved pass is O(n+m); concatenating then sorting would be O((n+m) log(n+m)). The two drain loops handle whichever array still has a tail.",
     "mapsTo": "pattern behind LC 88 · Merge Sorted Array (LC 88 itself merges in place from the back; this is the same two-cursor merge, returning a new array)",
-    "prereqs": ["js.u07.merge.predict"]
+    "prereqs": [
+      "js.u07.merge.predict"
+    ],
+    "cases": [
+      {
+        "call": "mergeSorted([1, 3, 5], [2, 4, 6])",
+        "expect": "[1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "call": "mergeSorted([], [1, 2])",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "mergeSorted([1, 2], [])",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "mergeSorted([1, 1], [1])",
+        "expect": "[1, 1, 1]"
+      },
+      {
+        "call": "mergeSorted([], [])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u07.rle.predict",
@@ -351,7 +501,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const s = 'aabcccc';\nlet i = 0;\nlet res = '';\nwhile (i < s.length) {\n  let j = i;\n  while (j < s.length && s[j] === s[i]) j++;\n  res += s[i] + (j - i);\n  i = j;\n}\nres;",
     "expected": "'a2b1c4'",
-    "prereqs": ["js.u07.skiprun.predict"]
+    "prereqs": [
+      "js.u07.skiprun.predict"
+    ]
   },
   {
     "id": "js.u07.rle.write",
@@ -365,7 +517,11 @@
     "starter": "function rle(s) {\n  // your code here\n}",
     "solution": "function rle(s) {\n  let i = 0;\n  let res = '';\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    res += s[i] + (j - i);\n    i = j;\n  }\n  return res;\n}",
     "tests": "if (rle('aaabbc') !== 'a3b2c1') throw new Error(rle('aaabbc'));\nif (rle('') !== '') throw new Error('empty');\nif (rle('a') !== 'a1') throw new Error('single');\nif (rle('abc') !== 'a1b1c1') throw new Error('distinct');\nif (rle('aabbaa') !== 'a2b2a2') throw new Error('repeat block');",
-    "banned": [".match("],
-    "prereqs": ["js.u07.rle.predict"]
+    "banned": [
+      ".match("
+    ],
+    "prereqs": [
+      "js.u07.rle.predict"
+    ]
   }
 ]

@@ -23,7 +23,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a = [1, 2, 3, 4, 5]\na[0], a[4] = a[4], a[0]\na[1], a[3] = a[3], a[1]\na",
     "expected": "[5, 4, 3, 2, 1]",
-    "prereqs": ["py.u08.converge.swap.predict"]
+    "prereqs": [
+      "py.u08.converge.swap.predict"
+    ]
   },
   {
     "id": "py.u08.converge.reverse",
@@ -36,10 +38,33 @@
     "prompt": "Write `reverse(a)` that reverses list `a` in place and returns it. Use two pointers starting at each end; do not use slicing or the built-in reverse.",
     "mapsTo": "LC 344 · Reverse String",
     "starter": "def reverse(a):\n    # your code here\n    return a",
-    "banned": ["[::-1]", ".reverse(", "reversed("],
+    "banned": [
+      "[::-1]",
+      ".reverse(",
+      "reversed("
+    ],
     "solution": "def reverse(a):\n    lo, hi = 0, len(a) - 1\n    while lo < hi:\n        a[lo], a[hi] = a[hi], a[lo]\n        lo += 1\n        hi -= 1\n    return a",
-    "tests": "assert reverse([1, 2, 3, 4, 5]) == [5, 4, 3, 2, 1]\nassert reverse([]) == []\nassert reverse([9]) == [9]\nassert reverse([1, 2]) == [2, 1]",
-    "prereqs": ["py.u08.converge.reverse.predict"]
+    "prereqs": [
+      "py.u08.converge.reverse.predict"
+    ],
+    "cases": [
+      {
+        "call": "reverse([1, 2, 3, 4, 5])",
+        "expect": "[5, 4, 3, 2, 1]"
+      },
+      {
+        "call": "reverse([])",
+        "expect": "[]"
+      },
+      {
+        "call": "reverse([9])",
+        "expect": "[9]"
+      },
+      {
+        "call": "reverse([1, 2])",
+        "expect": "[2, 1]"
+      }
+    ]
   },
   {
     "id": "py.u08.converge.palindrome.predict",
@@ -52,7 +77,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "def is_pal(s):\n    lo, hi = 0, len(s) - 1\n    while lo < hi:\n        if s[lo] != s[hi]:\n            return False\n        lo += 1\n        hi -= 1\n    return True\n\nis_pal(\"abca\")",
     "expected": "False",
-    "prereqs": ["py.u08.converge.reverse"]
+    "prereqs": [
+      "py.u08.converge.reverse"
+    ]
   },
   {
     "id": "py.u08.converge.palindrome.edges",
@@ -65,7 +92,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "def is_pal(s):\n    lo, hi = 0, len(s) - 1\n    while lo < hi:\n        if s[lo] != s[hi]:\n            return False\n        lo += 1\n        hi -= 1\n    return True\n\n[is_pal(\"racecar\"), is_pal(\"\"), is_pal(\"a\")]",
     "expected": "[True, True, True]",
-    "prereqs": ["py.u08.converge.palindrome.predict"]
+    "prereqs": [
+      "py.u08.converge.palindrome.predict"
+    ]
   },
   {
     "id": "py.u08.converge.palindrome",
@@ -77,10 +106,36 @@
     "kind": "write",
     "prompt": "Write `is_pal(s)` that returns True if string `s` reads the same forward and backward. Use two pointers from each end.",
     "starter": "def is_pal(s):\n    # your code here\n    return True",
-    "banned": ["[::-1]", "reversed("],
+    "banned": [
+      "[::-1]",
+      "reversed("
+    ],
     "solution": "def is_pal(s):\n    lo, hi = 0, len(s) - 1\n    while lo < hi:\n        if s[lo] != s[hi]:\n            return False\n        lo += 1\n        hi -= 1\n    return True",
-    "tests": "assert is_pal(\"racecar\") == True\nassert is_pal(\"abca\") == False\nassert is_pal(\"\") == True\nassert is_pal(\"a\") == True\nassert is_pal(\"abba\") == True",
-    "prereqs": ["py.u08.converge.palindrome.predict"]
+    "prereqs": [
+      "py.u08.converge.palindrome.predict"
+    ],
+    "cases": [
+      {
+        "call": "is_pal('racecar')",
+        "expect": "True"
+      },
+      {
+        "call": "is_pal('abca')",
+        "expect": "False"
+      },
+      {
+        "call": "is_pal('')",
+        "expect": "True"
+      },
+      {
+        "call": "is_pal('a')",
+        "expect": "True"
+      },
+      {
+        "call": "is_pal('abba')",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u08.pairsum.predict",
@@ -93,7 +148,9 @@
     "prompt": "What is the value of `res`?",
     "snippet": "a = [1, 2, 4, 7, 11, 15]\nlo, hi = 0, len(a) - 1\nres = None\nwhile lo < hi:\n    s = a[lo] + a[hi]\n    if s == 15:\n        res = (lo, hi)\n        break\n    elif s < 15:\n        lo += 1\n    else:\n        hi -= 1\nres",
     "expected": "(2, 4)",
-    "prereqs": ["py.u08.converge.reverse"]
+    "prereqs": [
+      "py.u08.converge.reverse"
+    ]
   },
   {
     "id": "py.u08.pairsum",
@@ -107,10 +164,30 @@
     "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted",
     "note": "Sorted order lets one comparison rule out a whole side each step: O(n) instead of the O(n^2) brute-force pair scan.",
     "starter": "def pair_sum(a, target):\n    # your code here\n    return None",
-    "banned": ["dict(", "set(", "{"],
+    "banned": [
+      "dict(",
+      "set(",
+      "{"
+    ],
     "solution": "def pair_sum(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo < hi:\n        s = a[lo] + a[hi]\n        if s == target:\n            return (lo, hi)\n        elif s < target:\n            lo += 1\n        else:\n            hi -= 1\n    return None",
-    "tests": "assert pair_sum([1, 2, 4, 7, 11, 15], 15) == (2, 4)\nassert pair_sum([1, 2, 3], 100) is None\nassert pair_sum([1, 2, 3, 4], 5) == (0, 3)",
-    "prereqs": ["py.u08.pairsum.predict", "py.u08.converge.reverse"]
+    "prereqs": [
+      "py.u08.pairsum.predict",
+      "py.u08.converge.reverse"
+    ],
+    "cases": [
+      {
+        "call": "pair_sum([1, 2, 4, 7, 11, 15], 15)",
+        "expect": "(2, 4)"
+      },
+      {
+        "call": "pair_sum([1, 2, 3], 100)",
+        "expect": "None"
+      },
+      {
+        "call": "pair_sum([1, 2, 3, 4], 5)",
+        "expect": "(0, 3)"
+      }
+    ]
   },
   {
     "id": "py.u08.maxarea.predict",
@@ -123,7 +200,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "h = [1, 8, 6, 2, 5, 4, 8, 3, 7]\nlo, hi = 0, len(h) - 1\nwide = (hi - lo) * min(h[lo], h[hi])\nlo, hi = 1, 6\nnarrow = (hi - lo) * min(h[lo], h[hi])\n[wide, narrow]",
     "expected": "[8, 40]",
-    "prereqs": ["py.u08.pairsum"]
+    "prereqs": [
+      "py.u08.pairsum"
+    ]
   },
   {
     "id": "py.u08.maxarea",
@@ -138,8 +217,27 @@
     "note": "Advance the shorter side: moving the taller one only narrows the width without ever lifting the limiting height, so it can never beat what you already have.",
     "starter": "def max_area(h):\n    # your code here\n    return 0",
     "solution": "def max_area(h):\n    lo, hi = 0, len(h) - 1\n    best = 0\n    while lo < hi:\n        best = max(best, (hi - lo) * min(h[lo], h[hi]))\n        if h[lo] < h[hi]:\n            lo += 1\n        else:\n            hi -= 1\n    return best",
-    "tests": "assert max_area([1, 8, 6, 2, 5, 4, 8, 3, 7]) == 49\nassert max_area([1, 1]) == 1\nassert max_area([4, 3, 2, 1, 4]) == 16\nassert max_area([1, 2, 1]) == 2",
-    "prereqs": ["py.u08.maxarea.predict"]
+    "prereqs": [
+      "py.u08.maxarea.predict"
+    ],
+    "cases": [
+      {
+        "call": "max_area([1, 8, 6, 2, 5, 4, 8, 3, 7])",
+        "expect": "49"
+      },
+      {
+        "call": "max_area([1, 1])",
+        "expect": "1"
+      },
+      {
+        "call": "max_area([4, 3, 2, 1, 4])",
+        "expect": "16"
+      },
+      {
+        "call": "max_area([1, 2, 1])",
+        "expect": "2"
+      }
+    ]
   },
   {
     "id": "py.u08.squares.init.predict",
@@ -165,7 +263,10 @@
     "prompt": "What is the value of `res`?",
     "snippet": "a = [-4, -1, 0, 3, 10]\nn = len(a)\nres = [0] * n\nlo, hi = 0, n - 1\nfor i in range(n - 1, -1, -1):\n    if abs(a[lo]) > abs(a[hi]):\n        res[i] = a[lo] * a[lo]\n        lo += 1\n    else:\n        res[i] = a[hi] * a[hi]\n        hi -= 1\nres",
     "expected": "[0, 1, 9, 16, 100]",
-    "prereqs": ["py.u08.pairsum", "py.u08.squares.init.predict"]
+    "prereqs": [
+      "py.u08.pairsum",
+      "py.u08.squares.init.predict"
+    ]
   },
   {
     "id": "py.u08.squares",
@@ -179,10 +280,32 @@
     "mapsTo": "LC 977 · Squares of a Sorted Array",
     "note": "The largest square sits at one of the two ends; filling the result back-to-front keeps it O(n) instead of squaring then sorting at O(n log n).",
     "starter": "def sorted_squares(a):\n    # your code here\n    return []",
-    "banned": [".sort(", "sorted("],
+    "banned": [
+      ".sort(",
+      "sorted("
+    ],
     "solution": "def sorted_squares(a):\n    n = len(a)\n    res = [0] * n\n    lo, hi = 0, n - 1\n    for i in range(n - 1, -1, -1):\n        if abs(a[lo]) > abs(a[hi]):\n            res[i] = a[lo] * a[lo]\n            lo += 1\n        else:\n            res[i] = a[hi] * a[hi]\n            hi -= 1\n    return res",
-    "tests": "assert sorted_squares([-4, -1, 0, 3, 10]) == [0, 1, 9, 16, 100]\nassert sorted_squares([-7, -3, 2, 3, 11]) == [4, 9, 9, 49, 121]\nassert sorted_squares([]) == []\nassert sorted_squares([-5]) == [25]",
-    "prereqs": ["py.u08.squares.predict"]
+    "prereqs": [
+      "py.u08.squares.predict"
+    ],
+    "cases": [
+      {
+        "call": "sorted_squares([-4, -1, 0, 3, 10])",
+        "expect": "[0, 1, 9, 16, 100]"
+      },
+      {
+        "call": "sorted_squares([-7, -3, 2, 3, 11])",
+        "expect": "[4, 9, 9, 49, 121]"
+      },
+      {
+        "call": "sorted_squares([])",
+        "expect": "[]"
+      },
+      {
+        "call": "sorted_squares([-5])",
+        "expect": "[25]"
+      }
+    ]
   },
   {
     "id": "py.u08.compaction.dupes.predict",
@@ -195,7 +318,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]\nw = 1\nfor r in range(1, len(a)):\n    if a[r] != a[w - 1]:\n        a[w] = a[r]\n        w += 1\na[:w]",
     "expected": "[0, 1, 2, 3, 4]",
-    "prereqs": ["py.u08.converge.reverse"]
+    "prereqs": [
+      "py.u08.converge.reverse"
+    ]
   },
   {
     "id": "py.u08.compaction.dupes",
@@ -209,10 +334,16 @@
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
     "note": "The write pointer only advances on a new value, so the front stays compacted in one pass with O(1) extra space (constant, independent of input size).",
     "starter": "def remove_dupes(a):\n    # your code here\n    return 0",
-    "banned": ["set(", "sorted(", "dict("],
+    "banned": [
+      "set(",
+      "sorted(",
+      "dict("
+    ],
     "solution": "def remove_dupes(a):\n    if not a:\n        return 0\n    w = 1\n    for r in range(1, len(a)):\n        if a[r] != a[w - 1]:\n            a[w] = a[r]\n            w += 1\n    return w",
     "tests": "a = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]\nk = remove_dupes(a)\nassert k == 5, k\nassert a[:k] == [0, 1, 2, 3, 4], a[:k]\nassert remove_dupes([]) == 0\nassert remove_dupes([1]) == 1\nassert remove_dupes([1, 1, 1]) == 1",
-    "prereqs": ["py.u08.compaction.dupes.predict"]
+    "prereqs": [
+      "py.u08.compaction.dupes.predict"
+    ]
   },
   {
     "id": "py.u08.compaction.element",
@@ -225,10 +356,15 @@
     "prompt": "Write `remove_element(a, val)` that removes every occurrence of `val` from list `a` in place, packing the kept values to the front, and returns the count `k` of kept values. Use a read pointer and a write pointer.",
     "mapsTo": "LC 27 · Remove Element",
     "starter": "def remove_element(a, val):\n    # your code here\n    return 0",
-    "banned": [".remove(", "filter("],
+    "banned": [
+      ".remove(",
+      "filter("
+    ],
     "solution": "def remove_element(a, val):\n    w = 0\n    for r in range(len(a)):\n        if a[r] != val:\n            a[w] = a[r]\n            w += 1\n    return w",
     "tests": "a = [3, 2, 2, 3]\nk = remove_element(a, 3)\nassert k == 2, k\nassert sorted(a[:k]) == [2, 2], a[:k]\na = [0, 1, 2, 2, 3, 0, 4, 2]\nk = remove_element(a, 2)\nassert k == 5, k\nassert sorted(a[:k]) == [0, 0, 1, 3, 4], a[:k]\nassert remove_element([], 1) == 0",
-    "prereqs": ["py.u08.compaction.dupes"]
+    "prereqs": [
+      "py.u08.compaction.dupes"
+    ]
   },
   {
     "id": "py.u08.compaction.zeroes",
@@ -241,10 +377,33 @@
     "prompt": "Write `move_zeroes(a)` that moves all zeros in list `a` to the end while keeping the order of the non-zero values, in place, and returns `a`. Use a read pointer and a write pointer.",
     "mapsTo": "LC 283 · Move Zeroes",
     "starter": "def move_zeroes(a):\n    # your code here\n    return a",
-    "banned": [".sort(", "sorted(", ".remove("],
+    "banned": [
+      ".sort(",
+      "sorted(",
+      ".remove("
+    ],
     "solution": "def move_zeroes(a):\n    w = 0\n    for r in range(len(a)):\n        if a[r] != 0:\n            a[w] = a[r]\n            w += 1\n    for i in range(w, len(a)):\n        a[i] = 0\n    return a",
-    "tests": "assert move_zeroes([0, 1, 0, 3, 12]) == [1, 3, 12, 0, 0]\nassert move_zeroes([0, 0, 0]) == [0, 0, 0]\nassert move_zeroes([1, 2, 3]) == [1, 2, 3]\nassert move_zeroes([]) == []",
-    "prereqs": ["py.u08.compaction.dupes"]
+    "prereqs": [
+      "py.u08.compaction.dupes"
+    ],
+    "cases": [
+      {
+        "call": "move_zeroes([0, 1, 0, 3, 12])",
+        "expect": "[1, 3, 12, 0, 0]"
+      },
+      {
+        "call": "move_zeroes([0, 0, 0])",
+        "expect": "[0, 0, 0]"
+      },
+      {
+        "call": "move_zeroes([1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "move_zeroes([])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u08.fastslow.model.predict",
@@ -258,7 +417,9 @@
     "snippet": "nxt = [1, 2, 3, -1]\ni = 0\npath = []\nwhile i != -1:\n    path.append(i)\n    i = nxt[i]\npath",
     "expected": "[0, 1, 2, 3]",
     "note": "The fast/slow exercises model a linked list as an array `nxt` where `nxt[i]` holds the index of node i's successor and -1 stands in for null. Following `i = nxt[i]` walks the list one node at a time.",
-    "prereqs": ["py.u08.converge.reverse"]
+    "prereqs": [
+      "py.u08.converge.reverse"
+    ]
   },
   {
     "id": "py.u08.fastslow.cycle.predict",
@@ -271,7 +432,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "def has_cycle(nxt, start):\n    slow = fast = start\n    while fast != -1 and nxt[fast] != -1:\n        slow = nxt[slow]\n        fast = nxt[nxt[fast]]\n        if slow == fast:\n            return True\n    return False\n\nhas_cycle([1, 2, 3, 1], 0)",
     "expected": "True",
-    "prereqs": ["py.u08.fastslow.model.predict"]
+    "prereqs": [
+      "py.u08.fastslow.model.predict"
+    ]
   },
   {
     "id": "py.u08.fastslow.cycle",
@@ -286,8 +449,27 @@
     "note": "Floyd's tortoise and hare: if there is a loop the fast pointer keeps lapping the slow one until they land on the same node, all in O(1) extra space (no seen-set).",
     "starter": "def has_cycle(nxt, start):\n    # your code here\n    return False",
     "solution": "def has_cycle(nxt, start):\n    slow = fast = start\n    while fast != -1 and nxt[fast] != -1:\n        slow = nxt[slow]\n        fast = nxt[nxt[fast]]\n        if slow == fast:\n            return True\n    return False",
-    "tests": "assert has_cycle([1, 2, 3, 1], 0) == True\nassert has_cycle([1, 2, 3, -1], 0) == False\nassert has_cycle([-1], 0) == False\nassert has_cycle([1, 0], 0) == True",
-    "prereqs": ["py.u08.fastslow.cycle.predict"]
+    "prereqs": [
+      "py.u08.fastslow.cycle.predict"
+    ],
+    "cases": [
+      {
+        "call": "has_cycle([1, 2, 3, 1], 0)",
+        "expect": "True"
+      },
+      {
+        "call": "has_cycle([1, 2, 3, -1], 0)",
+        "expect": "False"
+      },
+      {
+        "call": "has_cycle([-1], 0)",
+        "expect": "False"
+      },
+      {
+        "call": "has_cycle([1, 0], 0)",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u08.fastslow.middle.predict",
@@ -300,7 +482,9 @@
     "prompt": "What is the value of `slow`?",
     "snippet": "nxt = [1, 2, 3, 4, -1]\nslow = fast = 0\nwhile fast != -1 and nxt[fast] != -1:\n    slow = nxt[slow]\n    fast = nxt[nxt[fast]]\nslow",
     "expected": "2",
-    "prereqs": ["py.u08.fastslow.cycle"]
+    "prereqs": [
+      "py.u08.fastslow.cycle"
+    ]
   },
   {
     "id": "py.u08.fastslow.middle",
@@ -315,8 +499,27 @@
     "note": "Fast moves twice as far as slow, so when fast reaches the end slow is exactly halfway: one pass, no length measured first.",
     "starter": "def find_middle(nxt, start):\n    # your code here\n    return start",
     "solution": "def find_middle(nxt, start):\n    slow = fast = start\n    while fast != -1 and nxt[fast] != -1:\n        slow = nxt[slow]\n        fast = nxt[nxt[fast]]\n    return slow",
-    "tests": "assert find_middle([1, 2, 3, 4, -1], 0) == 2\nassert find_middle([1, 2, 3, -1], 0) == 2\nassert find_middle([-1], 0) == 0\nassert find_middle([1, -1], 0) == 1",
-    "prereqs": ["py.u08.fastslow.middle.predict"]
+    "prereqs": [
+      "py.u08.fastslow.middle.predict"
+    ],
+    "cases": [
+      {
+        "call": "find_middle([1, 2, 3, 4, -1], 0)",
+        "expect": "2"
+      },
+      {
+        "call": "find_middle([1, 2, 3, -1], 0)",
+        "expect": "2"
+      },
+      {
+        "call": "find_middle([-1], 0)",
+        "expect": "0"
+      },
+      {
+        "call": "find_middle([1, -1], 0)",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u08.fastslow.nth.predict",
@@ -329,7 +532,9 @@
     "prompt": "What is the value of `slow`?",
     "snippet": "nxt = [1, 2, 3, 4, -1]\nn = 2\nfast = 0\nfor _ in range(n):\n    fast = nxt[fast]\nslow = 0\nwhile nxt[fast] != -1:\n    fast = nxt[fast]\n    slow = nxt[slow]\nslow",
     "expected": "2",
-    "prereqs": ["py.u08.fastslow.cycle"]
+    "prereqs": [
+      "py.u08.fastslow.cycle"
+    ]
   },
   {
     "id": "py.u08.fastslow.nth",
@@ -344,8 +549,27 @@
     "note": "The n-node gap means when fast reaches the end, slow sits just before the target, so one pass removes it; if fast falls off during the lead, the target was the head itself.",
     "starter": "def remove_nth_from_end(nxt, start, n):\n    # your code here\n    return []",
     "solution": "def remove_nth_from_end(nxt, start, n):\n    fast = start\n    for _ in range(n):\n        fast = nxt[fast]\n    if fast == -1:\n        start = nxt[start]\n    else:\n        slow = start\n        while nxt[fast] != -1:\n            fast = nxt[fast]\n            slow = nxt[slow]\n        nxt[slow] = nxt[nxt[slow]]\n    res = []\n    i = start\n    while i != -1:\n        res.append(i)\n        i = nxt[i]\n    return res",
-    "tests": "assert remove_nth_from_end([1, 2, 3, 4, -1], 0, 2) == [0, 1, 2, 4]\nassert remove_nth_from_end([1, 2, -1], 0, 3) == [1, 2]\nassert remove_nth_from_end([1, 2, -1], 0, 1) == [0, 1]\nassert remove_nth_from_end([-1], 0, 1) == []",
-    "prereqs": ["py.u08.fastslow.nth.predict"]
+    "prereqs": [
+      "py.u08.fastslow.nth.predict"
+    ],
+    "cases": [
+      {
+        "call": "remove_nth_from_end([1, 2, 3, 4, -1], 0, 2)",
+        "expect": "[0, 1, 2, 4]"
+      },
+      {
+        "call": "remove_nth_from_end([1, 2, -1], 0, 3)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "remove_nth_from_end([1, 2, -1], 0, 1)",
+        "expect": "[0, 1]"
+      },
+      {
+        "call": "remove_nth_from_end([-1], 0, 1)",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u08.fixone.threesum.predict",
@@ -358,7 +582,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [-2, -1, 0, 1, 3]\ni = 0\nlo, hi = i + 1, len(a) - 1\nres = []\nwhile lo < hi:\n    s = a[i] + a[lo] + a[hi]\n    if s < 0:\n        lo += 1\n    elif s > 0:\n        hi -= 1\n    else:\n        res.append([a[i], a[lo], a[hi]])\n        lo += 1\n        hi -= 1\nres",
     "expected": "[[-2, -1, 3]]",
-    "prereqs": ["py.u08.pairsum"]
+    "prereqs": [
+      "py.u08.pairsum"
+    ]
   },
   {
     "id": "py.u08.fixone.threesum",
@@ -373,7 +599,31 @@
     "note": "Sorting first is what makes both the inner two-pointer scan and the skip-equal-neighbors dedup work; the whole thing is O(n^2) versus O(n^3) brute force.",
     "starter": "def three_sum(a):\n    # your code here\n    return []",
     "solution": "def three_sum(a):\n    a.sort()\n    res, n = [], len(a)\n    for i in range(n):\n        if i > 0 and a[i] == a[i - 1]:\n            continue\n        lo, hi = i + 1, n - 1\n        while lo < hi:\n            s = a[i] + a[lo] + a[hi]\n            if s < 0:\n                lo += 1\n            elif s > 0:\n                hi -= 1\n            else:\n                res.append([a[i], a[lo], a[hi]])\n                lo += 1\n                hi -= 1\n                while lo < hi and a[lo] == a[lo - 1]:\n                    lo += 1\n                while lo < hi and a[hi] == a[hi + 1]:\n                    hi -= 1\n    return res",
-    "tests": "assert sorted(three_sum([-1, 0, 1, 2, -1, -4])) == [[-1, -1, 2], [-1, 0, 1]], three_sum([-1, 0, 1, 2, -1, -4])\nassert three_sum([0, 1, 1]) == []\nassert three_sum([0, 0, 0]) == [[0, 0, 0]]\nassert three_sum([-2, 0, 0, 2, 2]) == [[-2, 0, 2]], three_sum([-2, 0, 0, 2, 2])\nassert three_sum([]) == []",
-    "prereqs": ["py.u08.fixone.threesum.predict", "py.u08.pairsum"]
+    "prereqs": [
+      "py.u08.fixone.threesum.predict",
+      "py.u08.pairsum"
+    ],
+    "cases": [
+      {
+        "call": "sorted(three_sum([-1, 0, 1, 2, -1, -4]))",
+        "expect": "[[-1, -1, 2], [-1, 0, 1]]"
+      },
+      {
+        "call": "three_sum([0, 1, 1])",
+        "expect": "[]"
+      },
+      {
+        "call": "three_sum([0, 0, 0])",
+        "expect": "[[0, 0, 0]]"
+      },
+      {
+        "call": "three_sum([-2, 0, 0, 2, 2])",
+        "expect": "[[-2, 0, 2]]"
+      },
+      {
+        "call": "three_sum([])",
+        "expect": "[]"
+      }
+    ]
   }
 ]

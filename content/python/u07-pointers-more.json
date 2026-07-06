@@ -23,7 +23,10 @@
     "prompt": "Write `dedupe_sorted(a)` where list `a` is sorted ascending. Remove duplicates in place so the unique values fill the front, keeping one of each, and return the new length `k`. Use a write index. Do not build a new list or use set.",
     "starter": "def dedupe_sorted(a):\n    # your code here\n    return 0",
     "solution": "def dedupe_sorted(a):\n    if not a:\n        return 0\n    w = 1\n    for r in range(1, len(a)):\n        if a[r] != a[w - 1]:\n            a[w] = a[r]\n            w += 1\n    return w",
-    "banned": ["set(", "list("],
+    "banned": [
+      "set(",
+      "list("
+    ],
     "tests": "a = [1, 1, 2, 3, 3, 3, 4]\nk = dedupe_sorted(a)\nassert k == 4, k\nassert a[:k] == [1, 2, 3, 4], a[:k]\nassert dedupe_sorted([]) == 0\nassert dedupe_sorted([5]) == 1\nb = [5, 5, 5]\nassert dedupe_sorted(b) == 1 and b[:1] == [5], b[:1]",
     "prereqs": [
       "py.u07.compact.write"
@@ -57,13 +60,37 @@
     "prompt": "Write `last_nonzero_index(a)` that returns the index of the last nonzero element of `a`, or -1 if every element is zero or `a` is empty. Scan backward from the end.",
     "starter": "def last_nonzero_index(a):\n    # your code here\n    return -1",
     "solution": "def last_nonzero_index(a):\n    i = len(a) - 1\n    while i >= 0 and a[i] == 0:\n        i -= 1\n    return i",
-    "banned": ["enumerate", "max("],
-    "tests": "assert last_nonzero_index([0, 5, 0, 0]) == 1, last_nonzero_index([0, 5, 0, 0])\nassert last_nonzero_index([0, 0, 0]) == -1\nassert last_nonzero_index([]) == -1\nassert last_nonzero_index([7]) == 0\nassert last_nonzero_index([1, 0]) == 0",
+    "banned": [
+      "enumerate",
+      "max("
+    ],
     "prereqs": [
       "py.u07.skip-suffix.predict"
     ],
     "cue": "Decrement an index from the end while the element is zero; where it lands is the answer.",
-    "syntax": "range from len(a) - 1 downward"
+    "syntax": "range from len(a) - 1 downward",
+    "cases": [
+      {
+        "call": "last_nonzero_index([0, 5, 0, 0])",
+        "expect": "1"
+      },
+      {
+        "call": "last_nonzero_index([0, 0, 0])",
+        "expect": "-1"
+      },
+      {
+        "call": "last_nonzero_index([])",
+        "expect": "-1"
+      },
+      {
+        "call": "last_nonzero_index([7])",
+        "expect": "0"
+      },
+      {
+        "call": "last_nonzero_index([1, 0])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u07.partition.write",
@@ -74,7 +101,10 @@
     "prompt": "Write `partition_even_odd(a)` that rearranges list `a` in place so every even number comes before every odd number, and returns `a`. The order within each group need not be preserved.",
     "starter": "def partition_even_odd(a):\n    # your code here\n    return a",
     "solution": "def partition_even_odd(a):\n    w = 0\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            a[w], a[i] = a[i], a[w]\n            w += 1\n    return a",
-    "banned": [".sort(", "sorted("],
+    "banned": [
+      ".sort(",
+      "sorted("
+    ],
     "tests": "from collections import Counter\ndef _check(orig):\n    a = list(orig)\n    r = partition_even_odd(a)\n    assert r is a, 'must rearrange in place and return the same list'\n    seen_odd = False\n    for x in r:\n        if x % 2 == 1:\n            seen_odd = True\n        elif seen_odd:\n            assert False, ('odd before even', r)\n    assert Counter(r) == Counter(orig), r\n_check([1, 2, 3, 4, 5])\n_check([])\n_check([2, 4])\n_check([1, 3])\n_check([4, 1, 6, 3, 8])",
     "prereqs": [
       "py.u07.move-zeros.write"
@@ -107,15 +137,34 @@
     "prompt": "Write `sorted_intersection(A, B)` where `A` and `B` are each sorted ascending with no duplicates. Return a new sorted list of the values present in both, using two cursors in a single pass. Do not use set.",
     "starter": "def sorted_intersection(A, B):\n    # your code here\n    return []",
     "solution": "def sorted_intersection(A, B):\n    i = j = 0\n    out = []\n    while i < len(A) and j < len(B):\n        if A[i] == B[j]:\n            out.append(A[i])\n            i += 1\n            j += 1\n        elif A[i] < B[j]:\n            i += 1\n        else:\n            j += 1\n    return out",
-    "banned": ["set("],
-    "tests": "assert sorted_intersection([1, 2, 4, 5, 6], [2, 3, 5, 7]) == [2, 5], sorted_intersection([1, 2, 4, 5, 6], [2, 3, 5, 7])\nassert sorted_intersection([1, 2, 3], [4, 5, 6]) == []\nassert sorted_intersection([], [1]) == []\nassert sorted_intersection([1, 2, 3], [1, 2, 3]) == [1, 2, 3]",
+    "banned": [
+      "set("
+    ],
     "prereqs": [
       "py.u07.intersect.predict"
     ],
     "cue": "On a match, record it and step both cursors; otherwise step the one behind.",
     "syntax": "advance the smaller head",
     "note": "Two sorted inputs let you intersect in one linear pass instead of building a set of one side.",
-    "mapsTo": "LC 349 · Intersection of Two Arrays"
+    "mapsTo": "LC 349 · Intersection of Two Arrays",
+    "cases": [
+      {
+        "call": "sorted_intersection([1, 2, 4, 5, 6], [2, 3, 5, 7])",
+        "expect": "[2, 5]"
+      },
+      {
+        "call": "sorted_intersection([1, 2, 3], [4, 5, 6])",
+        "expect": "[]"
+      },
+      {
+        "call": "sorted_intersection([], [1])",
+        "expect": "[]"
+      },
+      {
+        "call": "sorted_intersection([1, 2, 3], [1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      }
+    ]
   },
   {
     "id": "py.u07.compress.write",
@@ -126,13 +175,34 @@
     "prompt": "Write `compress(s)` that walks string `s` once and, for each maximal run of a character, appends the character followed by its count only when the count is greater than 1. `compress('aaabbc')` returns `'a3b2c'`.",
     "starter": "def compress(s):\n    # your code here\n    return ''",
     "solution": "def compress(s):\n    i = 0\n    res = ''\n    while i < len(s):\n        j = i\n        while j < len(s) and s[j] == s[i]:\n            j += 1\n        res += s[i]\n        if j - i > 1:\n            res += str(j - i)\n        i = j\n    return res",
-    "tests": "assert compress('aaabbc') == 'a3b2c', compress('aaabbc')\nassert compress('') == ''\nassert compress('abc') == 'abc'\nassert compress('aabb') == 'a2b2'\nassert compress('a') == 'a'",
     "prereqs": [
       "py.u07.rle.write"
     ],
     "cue": "Same skip-run walk as run-length encoding, but append the count only when the run is longer than one.",
     "syntax": "if j - i > 1",
-    "mapsTo": "pattern behind LC 443 · String Compression (LC 443 packs counts in place; this returns a new string)"
+    "mapsTo": "pattern behind LC 443 · String Compression (LC 443 packs counts in place; this returns a new string)",
+    "cases": [
+      {
+        "call": "compress('aaabbc')",
+        "expect": "'a3b2c'"
+      },
+      {
+        "call": "compress('')",
+        "expect": "''"
+      },
+      {
+        "call": "compress('abc')",
+        "expect": "'abc'"
+      },
+      {
+        "call": "compress('aabb')",
+        "expect": "'a2b2'"
+      },
+      {
+        "call": "compress('a')",
+        "expect": "'a'"
+      }
+    ]
   },
   {
     "id": "py.u07.converge.predict",
@@ -158,7 +228,11 @@
     "prompt": "Write `reverse_in_place(a)` that reverses list `a` in place using two indices that start at the ends and move inward, and returns `a`. Do not use slicing, list.reverse, or reversed.",
     "starter": "def reverse_in_place(a):\n    # your code here\n    return a",
     "solution": "def reverse_in_place(a):\n    i = 0\n    j = len(a) - 1\n    while i < j:\n        a[i], a[j] = a[j], a[i]\n        i += 1\n        j -= 1\n    return a",
-    "banned": ["::", ".reverse(", "reversed("],
+    "banned": [
+      "::",
+      ".reverse(",
+      "reversed("
+    ],
     "tests": "assert reverse_in_place([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_in_place([1, 2, 3, 4])\nassert reverse_in_place([1, 2, 3]) == [3, 2, 1]\nassert reverse_in_place([]) == []\nassert reverse_in_place([9]) == [9]\nb = [1, 2]\nassert reverse_in_place(b) is b and b == [2, 1], b",
     "prereqs": [
       "py.u07.converge.predict"
@@ -177,13 +251,42 @@
     "prompt": "Write `is_palindrome(a)` that returns True if list `a` reads the same forward and backward, using two indices moving inward from the ends. Do not reverse the list or compare it to its reverse.",
     "starter": "def is_palindrome(a):\n    # your code here\n    return False",
     "solution": "def is_palindrome(a):\n    i = 0\n    j = len(a) - 1\n    while i < j:\n        if a[i] != a[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
-    "banned": ["::", ".reverse(", "reversed("],
-    "tests": "assert is_palindrome([1, 2, 1]) == True, is_palindrome([1, 2, 1])\nassert is_palindrome([1, 2, 2, 1]) == True\nassert is_palindrome([1, 2, 3]) == False\nassert is_palindrome([]) == True\nassert is_palindrome([7]) == True\nassert is_palindrome([1, 2, 2, 3]) == False",
+    "banned": [
+      "::",
+      ".reverse(",
+      "reversed("
+    ],
     "prereqs": [
       "py.u07.reverse-inplace.write"
     ],
     "cue": "Compare the two ends; the moment they differ it is not a palindrome.",
     "syntax": "return False on the first mismatch",
-    "mapsTo": "pattern behind LC 125 · Valid Palindrome (LC 125 first strips non-alphanumerics and lowercases)"
+    "mapsTo": "pattern behind LC 125 · Valid Palindrome (LC 125 first strips non-alphanumerics and lowercases)",
+    "cases": [
+      {
+        "call": "is_palindrome([1, 2, 1])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([1, 2, 2, 1])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([1, 2, 3])",
+        "expect": "False"
+      },
+      {
+        "call": "is_palindrome([])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([7])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([1, 2, 2, 3])",
+        "expect": "False"
+      }
+    ]
   }
 ]

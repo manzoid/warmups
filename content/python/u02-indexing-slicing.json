@@ -10,9 +10,24 @@
     "prompt": "Write `last(a)` returning the final element of list `a`. Build the index from the length: the last position is `len(a) - 1`.",
     "starter": "def last(a):\n    # your code here\n    pass\n",
     "solution": "def last(a):\n    return a[len(a) - 1]\n",
-    "tests": "assert last([3, 1, 2]) == 2, last([3, 1, 2])\nassert last([9]) == 9\nassert last(['a', 'b']) == 'b'\n",
-    "banned": ["[-"],
-    "prereqs": []
+    "banned": [
+      "[-"
+    ],
+    "prereqs": [],
+    "cases": [
+      {
+        "call": "last([3, 1, 2])",
+        "expect": "2"
+      },
+      {
+        "call": "last([9])",
+        "expect": "9"
+      },
+      {
+        "call": "last(['a', 'b'])",
+        "expect": "'b'"
+      }
+    ]
   },
   {
     "id": "py.u02.last.negindex",
@@ -25,7 +40,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30, 40]\na[-1]",
     "expected": "40",
-    "prereqs": ["py.u02.last.raw"]
+    "prereqs": [
+      "py.u02.last.raw"
+    ]
   },
   {
     "id": "py.u02.kth_from_end",
@@ -38,7 +55,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = ['a', 'b', 'c', 'd']\nk = 3\na[-k]",
     "expected": "'b'",
-    "prereqs": ["py.u02.last.negindex"]
+    "prereqs": [
+      "py.u02.last.negindex"
+    ]
   },
   {
     "id": "py.u02.ring",
@@ -51,7 +70,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3]\ni = 7\na[i % len(a)]",
     "expected": "2",
-    "prereqs": ["py.u02.last.raw"]
+    "prereqs": [
+      "py.u02.last.raw"
+    ]
   },
   {
     "id": "py.u02.subrange.raw",
@@ -64,9 +85,26 @@
     "prompt": "Write `subrange(a, i, j)` returning a new list of the elements from index `i` up to but not including `j`. Do not use slicing.",
     "starter": "def subrange(a, i, j):\n    # your code here\n    pass\n",
     "solution": "def subrange(a, i, j):\n    sub = []\n    for t in range(i, j):\n        sub.append(a[t])\n    return sub\n",
-    "tests": "assert subrange([0, 1, 2, 3, 4], 1, 4) == [1, 2, 3], subrange([0, 1, 2, 3, 4], 1, 4)\nassert subrange([0, 1, 2, 3, 4], 2, 2) == []\nassert subrange([0, 1, 2, 3, 4], 0, 5) == [0, 1, 2, 3, 4]\n",
-    "banned": ["[:", ":]", "::"],
-    "prereqs": []
+    "banned": [
+      "[:",
+      ":]",
+      "::"
+    ],
+    "prereqs": [],
+    "cases": [
+      {
+        "call": "subrange([0, 1, 2, 3, 4], 1, 4)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "subrange([0, 1, 2, 3, 4], 2, 2)",
+        "expect": "[]"
+      },
+      {
+        "call": "subrange([0, 1, 2, 3, 4], 0, 5)",
+        "expect": "[0, 1, 2, 3, 4]"
+      }
+    ]
   },
   {
     "id": "py.u02.subrange.slice",
@@ -79,7 +117,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5]\na[2:5]",
     "expected": "[2, 3, 4]",
-    "prereqs": ["py.u02.subrange.raw"]
+    "prereqs": [
+      "py.u02.subrange.raw"
+    ]
   },
   {
     "id": "py.u02.prefix",
@@ -92,7 +132,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5]\na[:3]",
     "expected": "[0, 1, 2]",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.suffix",
@@ -105,7 +147,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5]\na[3:]",
     "expected": "[3, 4, 5]",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.slice.clamp",
@@ -118,7 +162,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3, 4]\na[3:1]",
     "expected": "[]",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.swap.predict",
@@ -131,7 +177,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a = [10, 20, 30, 40]\na[0], a[3] = a[3], a[0]\na",
     "expected": "[40, 20, 30, 10]",
-    "prereqs": ["py.u02.last.raw"]
+    "prereqs": [
+      "py.u02.last.raw"
+    ]
   },
   {
     "id": "py.u02.reverse.raw",
@@ -144,10 +192,37 @@
     "prompt": "Write `reverse_range(a, i, j)` that reverses the elements of list `a` from index `i` up to but not including `j`, in place, using two indices walking toward each other. Return `a`. Do not use slicing or `reversed()`.",
     "starter": "def reverse_range(a, i, j):\n    # your code here\n    return a\n",
     "solution": "def reverse_range(a, i, j):\n    lo, hi = i, j - 1\n    while lo < hi:\n        a[lo], a[hi] = a[hi], a[lo]\n        lo += 1\n        hi -= 1\n    return a\n",
-    "tests": "assert reverse_range([1, 2, 3, 4, 5], 1, 4) == [1, 4, 3, 2, 5], reverse_range([1, 2, 3, 4, 5], 1, 4)\nassert reverse_range([1, 2, 3, 4], 0, 4) == [4, 3, 2, 1]\nassert reverse_range([1, 2, 3], 1, 1) == [1, 2, 3]\nassert reverse_range([7], 0, 1) == [7]\nassert reverse_range([], 0, 0) == []\n",
-    "banned": ["[::-1]", "reversed(", ".reverse("],
+    "banned": [
+      "[::-1]",
+      "reversed(",
+      ".reverse("
+    ],
     "mapsTo": "LC 344 · Reverse String",
-    "prereqs": ["py.u02.swap.predict"]
+    "prereqs": [
+      "py.u02.swap.predict"
+    ],
+    "cases": [
+      {
+        "call": "reverse_range([1, 2, 3, 4, 5], 1, 4)",
+        "expect": "[1, 4, 3, 2, 5]"
+      },
+      {
+        "call": "reverse_range([1, 2, 3, 4], 0, 4)",
+        "expect": "[4, 3, 2, 1]"
+      },
+      {
+        "call": "reverse_range([1, 2, 3], 1, 1)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "reverse_range([7], 0, 1)",
+        "expect": "[7]"
+      },
+      {
+        "call": "reverse_range([], 0, 0)",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u02.reverse.slice",
@@ -160,7 +235,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3, 4]\na[::-1]",
     "expected": "[4, 3, 2, 1]",
-    "prereqs": ["py.u02.reverse.raw"]
+    "prereqs": [
+      "py.u02.reverse.raw"
+    ]
   },
   {
     "id": "py.u02.reverse.none",
@@ -173,7 +250,9 @@
     "prompt": "What is the value of `b`?",
     "snippet": "a = [1, 2, 3]\nb = a.reverse()\nb",
     "expected": "None",
-    "prereqs": ["py.u02.reverse.raw"]
+    "prereqs": [
+      "py.u02.reverse.raw"
+    ]
   },
   {
     "id": "py.u02.palindrome",
@@ -186,10 +265,37 @@
     "prompt": "Write `is_palindrome(a)` returning True if list `a` reads the same forward and backward. Use two pointers; do not reverse the list.",
     "starter": "def is_palindrome(a):\n    # your code here\n    pass\n",
     "solution": "def is_palindrome(a):\n    lo, hi = 0, len(a) - 1\n    while lo < hi:\n        if a[lo] != a[hi]:\n            return False\n        lo += 1\n        hi -= 1\n    return True\n",
-    "tests": "assert is_palindrome([1, 2, 3, 2, 1]) == True, is_palindrome([1, 2, 3, 2, 1])\nassert is_palindrome([1, 2, 2, 1]) == True\nassert is_palindrome([1, 2, 3]) == False\nassert is_palindrome([]) == True\nassert is_palindrome([5]) == True\n",
-    "banned": ["[::-1]", "reversed(", ".reverse("],
+    "banned": [
+      "[::-1]",
+      "reversed(",
+      ".reverse("
+    ],
     "mapsTo": "pattern behind LC 125 · Valid Palindrome",
-    "prereqs": ["py.u02.reverse.raw"]
+    "prereqs": [
+      "py.u02.reverse.raw"
+    ],
+    "cases": [
+      {
+        "call": "is_palindrome([1, 2, 3, 2, 1])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([1, 2, 2, 1])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([1, 2, 3])",
+        "expect": "False"
+      },
+      {
+        "call": "is_palindrome([])",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome([5])",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u02.stride.raw",
@@ -202,9 +308,24 @@
     "prompt": "Write `every_kth(a, k)` returning a new list with `a[0]`, `a[k]`, `a[2k]`, and so on. Do not use extended slicing.",
     "starter": "def every_kth(a, k):\n    # your code here\n    pass\n",
     "solution": "def every_kth(a, k):\n    out = []\n    for t in range(0, len(a), k):\n        out.append(a[t])\n    return out\n",
-    "tests": "assert every_kth([0, 1, 2, 3, 4, 5, 6], 2) == [0, 2, 4, 6], every_kth([0, 1, 2, 3, 4, 5, 6], 2)\nassert every_kth([0, 1, 2, 3, 4, 5, 6], 3) == [0, 3, 6]\nassert every_kth([0, 1, 2], 1) == [0, 1, 2]\n",
-    "banned": ["::"],
-    "prereqs": []
+    "banned": [
+      "::"
+    ],
+    "prereqs": [],
+    "cases": [
+      {
+        "call": "every_kth([0, 1, 2, 3, 4, 5, 6], 2)",
+        "expect": "[0, 2, 4, 6]"
+      },
+      {
+        "call": "every_kth([0, 1, 2, 3, 4, 5, 6], 3)",
+        "expect": "[0, 3, 6]"
+      },
+      {
+        "call": "every_kth([0, 1, 2], 1)",
+        "expect": "[0, 1, 2]"
+      }
+    ]
   },
   {
     "id": "py.u02.stride.slice",
@@ -217,7 +338,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5, 6, 7]\na[::2]",
     "expected": "[0, 2, 4, 6]",
-    "prereqs": ["py.u02.stride.raw"]
+    "prereqs": [
+      "py.u02.stride.raw"
+    ]
   },
   {
     "id": "py.u02.stride.backward",
@@ -230,7 +353,10 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5, 6, 7]\na[::-2]",
     "expected": "[7, 5, 3, 1]",
-    "prereqs": ["py.u02.stride.raw", "py.u02.reverse.slice"]
+    "prereqs": [
+      "py.u02.stride.raw",
+      "py.u02.reverse.slice"
+    ]
   },
   {
     "id": "py.u02.window.raw",
@@ -243,9 +369,28 @@
     "prompt": "Write `window(a, i, k)` returning a new list of the `k` elements starting at index `i`. Do not use slicing.",
     "starter": "def window(a, i, k):\n    # your code here\n    pass\n",
     "solution": "def window(a, i, k):\n    out = []\n    for t in range(k):\n        out.append(a[i + t])\n    return out\n",
-    "tests": "assert window([10, 20, 30, 40, 50], 1, 3) == [20, 30, 40], window([10, 20, 30, 40, 50], 1, 3)\nassert window([10, 20, 30, 40, 50], 0, 2) == [10, 20]\nassert window([10, 20, 30, 40, 50], 3, 1) == [40]\n",
-    "banned": ["[:", ":]", "::"],
-    "prereqs": ["py.u02.subrange.raw"]
+    "banned": [
+      "[:",
+      ":]",
+      "::"
+    ],
+    "prereqs": [
+      "py.u02.subrange.raw"
+    ],
+    "cases": [
+      {
+        "call": "window([10, 20, 30, 40, 50], 1, 3)",
+        "expect": "[20, 30, 40]"
+      },
+      {
+        "call": "window([10, 20, 30, 40, 50], 0, 2)",
+        "expect": "[10, 20]"
+      },
+      {
+        "call": "window([10, 20, 30, 40, 50], 3, 1)",
+        "expect": "[40]"
+      }
+    ]
   },
   {
     "id": "py.u02.window.slice",
@@ -258,7 +403,10 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30, 40, 50]\ni, k = 1, 3\na[i:i+k]",
     "expected": "[20, 30, 40]",
-    "prereqs": ["py.u02.window.raw", "py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.window.raw",
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.window.maxsum",
@@ -271,10 +419,25 @@
     "prompt": "Write `max_window_sum(a, k)` returning the largest sum of any `k` consecutive elements of `a`. Do not re-sum each window from scratch.",
     "starter": "def max_window_sum(a, k):\n    # your code here\n    pass\n",
     "solution": "def max_window_sum(a, k):\n    s = 0\n    for t in range(k):\n        s += a[t]\n    best = s\n    for i in range(1, len(a) - k + 1):\n        s += a[i + k - 1] - a[i - 1]\n        if s > best:\n            best = s\n    return best\n",
-    "tests": "assert max_window_sum([1, 2, 3, 4, 5], 2) == 9, max_window_sum([1, 2, 3, 4, 5], 2)\nassert max_window_sum([2, 1, 5, 1, 3, 2], 3) == 9\nassert max_window_sum([5], 1) == 5\n",
     "note": "Big-O is a rough count of steps as the input grows: O(n) means the work grows in step with the list length n. Sliding the running sum touches each element about once (O(n)); re-summing every window from scratch does O(n*k) work.",
     "mapsTo": "LC 643 · Maximum Average Subarray I",
-    "prereqs": ["py.u02.window.raw"]
+    "prereqs": [
+      "py.u02.window.raw"
+    ],
+    "cases": [
+      {
+        "call": "max_window_sum([1, 2, 3, 4, 5], 2)",
+        "expect": "9"
+      },
+      {
+        "call": "max_window_sum([2, 1, 5, 1, 3, 2], 3)",
+        "expect": "9"
+      },
+      {
+        "call": "max_window_sum([5], 1)",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u02.chunks",
@@ -287,8 +450,24 @@
     "prompt": "Write `chunks(a, k)` returning a list of consecutive `k`-length sublists of `a` (the last may be shorter).",
     "starter": "def chunks(a, k):\n    # your code here\n    pass\n",
     "solution": "def chunks(a, k):\n    return [a[i:i + k] for i in range(0, len(a), k)]\n",
-    "tests": "assert chunks([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]], chunks([1, 2, 3, 4, 5], 2)\nassert chunks([1, 2, 3, 4], 2) == [[1, 2], [3, 4]]\nassert chunks([1, 2, 3], 5) == [[1, 2, 3]]\n",
-    "prereqs": ["py.u02.window.slice", "py.u02.stride.slice"]
+    "prereqs": [
+      "py.u02.window.slice",
+      "py.u02.stride.slice"
+    ],
+    "cases": [
+      {
+        "call": "chunks([1, 2, 3, 4, 5], 2)",
+        "expect": "[[1, 2], [3, 4], [5]]"
+      },
+      {
+        "call": "chunks([1, 2, 3, 4], 2)",
+        "expect": "[[1, 2], [3, 4]]"
+      },
+      {
+        "call": "chunks([1, 2, 3], 5)",
+        "expect": "[[1, 2, 3]]"
+      }
+    ]
   },
   {
     "id": "py.u02.midpoint",
@@ -301,9 +480,31 @@
     "prompt": "Write `midpoint(lo, hi)` returning the index halfway between `lo` and `hi`, rounded down. `(lo + hi) // 2` is banned because `lo + hi` can overflow a fixed-width int; use the overflow-safe form that adds half the gap to `lo`.",
     "starter": "def midpoint(lo, hi):\n    # your code here\n    pass\n",
     "solution": "def midpoint(lo, hi):\n    return lo + (hi - lo) // 2\n",
-    "tests": "assert midpoint(0, 10) == 5, midpoint(0, 10)\nassert midpoint(3, 4) == 3\nassert midpoint(2, 2) == 2\nassert midpoint(0, 7) == 3\n",
-    "banned": ["lo + hi", "hi + lo", "lo+hi", "hi+lo"],
+    "banned": [
+      "lo + hi",
+      "hi + lo",
+      "lo+hi",
+      "hi+lo"
+    ],
     "note": "Adding half the gap guards against lo+hi overflowing a fixed-width int in C/Java; a safe habit even where ints are unbounded.",
-    "prereqs": []
+    "prereqs": [],
+    "cases": [
+      {
+        "call": "midpoint(0, 10)",
+        "expect": "5"
+      },
+      {
+        "call": "midpoint(3, 4)",
+        "expect": "3"
+      },
+      {
+        "call": "midpoint(2, 2)",
+        "expect": "2"
+      },
+      {
+        "call": "midpoint(0, 7)",
+        "expect": "3"
+      }
+    ]
   }
 ]

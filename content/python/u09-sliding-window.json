@@ -24,7 +24,9 @@
     "expected": "8",
     "cue": "Add the first k elements the loop visits.",
     "syntax": "range(k)",
-    "prereqs": ["py.u09.slide.sum.predict"]
+    "prereqs": [
+      "py.u09.slide.sum.predict"
+    ]
   },
   {
     "id": "py.u09.fixed.slide.predict",
@@ -37,7 +39,9 @@
     "expected": "8",
     "cue": "Sum the first window, then slide and track the running max.",
     "syntax": "s += nums[i] - nums[i - k]",
-    "prereqs": ["py.u09.fixed.prime.predict"]
+    "prereqs": [
+      "py.u09.fixed.prime.predict"
+    ]
   },
   {
     "id": "py.u09.fixed.maxsum.write",
@@ -46,14 +50,31 @@
     "concept": "max sum over size-k blocks",
     "kind": "write",
     "prompt": "Write `max_sum_k(nums, k)` returning the largest sum of any contiguous block of exactly `k` elements. Assume 1 <= k <= len(nums). Maintain a running sum with an O(1) slide; do not recompute each block.",
-    "banned": ["sum("],
+    "banned": [
+      "sum("
+    ],
     "starter": "def max_sum_k(nums, k):\n    # your code here\n    pass",
     "solution": "def max_sum_k(nums, k):\n    s = 0\n    for i in range(k):\n        s += nums[i]\n    best = s\n    for i in range(k, len(nums)):\n        s += nums[i] - nums[i - k]\n        if s > best:\n            best = s\n    return best",
-    "tests": "assert max_sum_k([1, 3, 2, 6, 1], 2) == 8, max_sum_k([1, 3, 2, 6, 1], 2)\nassert max_sum_k([2, 3], 2) == 5, max_sum_k([2, 3], 2)\nassert max_sum_k([5, -1, 5, -1, 5], 1) == 5, max_sum_k([5, -1, 5, -1, 5], 1)",
     "cue": "Sum the first k elements, then slide: add the entering element, drop the one k back.",
     "syntax": "range(k, len(nums))",
     "note": "Sliding the running sum keeps the whole scan O(n); re-summing each block from scratch would be O(n*k).",
-    "prereqs": ["py.u09.fixed.slide.predict"]
+    "prereqs": [
+      "py.u09.fixed.slide.predict"
+    ],
+    "cases": [
+      {
+        "call": "max_sum_k([1, 3, 2, 6, 1], 2)",
+        "expect": "8"
+      },
+      {
+        "call": "max_sum_k([2, 3], 2)",
+        "expect": "5"
+      },
+      {
+        "call": "max_sum_k([5, -1, 5, -1, 5], 1)",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u09.fixed.slice-prime.predict",
@@ -66,7 +87,9 @@
     "expected": "6",
     "cue": "Add the elements the slice selects.",
     "syntax": "sum(nums[:k])",
-    "prereqs": ["py.u09.fixed.prime.predict"]
+    "prereqs": [
+      "py.u09.fixed.prime.predict"
+    ]
   },
   {
     "id": "py.u09.fixed.maxavg.write",
@@ -77,11 +100,23 @@
     "prompt": "Write `max_average(nums, k)` returning the maximum average of any contiguous block of exactly `k` elements, as a float. Assume 1 <= k <= len(nums). Slide the window in O(1); do not re-sum each block. Using `sum()` once to prime the first window is fine; just do not re-sum every block.",
     "starter": "def max_average(nums, k):\n    # your code here\n    pass",
     "solution": "def max_average(nums, k):\n    s = sum(nums[:k])\n    best = s\n    for i in range(k, len(nums)):\n        s += nums[i] - nums[i - k]\n        if s > best:\n            best = s\n    return best / k",
-    "tests": "assert max_average([1, 12, -5, -6, 50, 3], 4) == 12.75, max_average([1, 12, -5, -6, 50, 3], 4)\nassert max_average([5], 1) == 5.0, max_average([5], 1)",
     "cue": "Track the best size-k sum with an O(1) slide, then convert to an average at the end.",
     "syntax": "best / k float division",
     "mapsTo": "LC 643 · Maximum Average Subarray I",
-    "prereqs": ["py.u09.fixed.maxsum.write", "py.u09.fixed.slice-prime.predict"]
+    "prereqs": [
+      "py.u09.fixed.maxsum.write",
+      "py.u09.fixed.slice-prime.predict"
+    ],
+    "cases": [
+      {
+        "call": "max_average([1, 12, -5, -6, 50, 3], 4)",
+        "expect": "12.75"
+      },
+      {
+        "call": "max_average([5], 1)",
+        "expect": "5.0"
+      }
+    ]
   },
   {
     "id": "py.u09.var.shrink.predict",
@@ -95,7 +130,9 @@
     "cue": "The window sum starts above target. Remove nums[left] and step left forward until the sum drops to target or below.",
     "syntax": "s -= nums[left]; left += 1",
     "note": "This is just the shrink half of a variable window, on its own. left only ever moves forward, so over the whole scan it advances at most n times total.",
-    "prereqs": ["py.u09.slide.sum.predict"]
+    "prereqs": [
+      "py.u09.slide.sum.predict"
+    ]
   },
   {
     "id": "py.u09.var.grow-shrink.predict",
@@ -108,7 +145,9 @@
     "expected": "3",
     "cue": "Walk right forward; shrink left while the running sum exceeds target, tracking window length.",
     "syntax": "right - left + 1 window length",
-    "prereqs": ["py.u09.var.shrink.predict"]
+    "prereqs": [
+      "py.u09.var.shrink.predict"
+    ]
   },
   {
     "id": "py.u09.var.longest-cap.write",
@@ -119,10 +158,25 @@
     "prompt": "Write `longest_cap(nums, target)` returning the length of the longest contiguous subarray whose sum is at most `target`. All values are non-negative. Use two pointers with an O(1) running sum.",
     "starter": "def longest_cap(nums, target):\n    # your code here\n    pass",
     "solution": "def longest_cap(nums, target):\n    left = 0\n    s = 0\n    best = 0\n    for right in range(len(nums)):\n        s += nums[right]\n        while s > target:\n            s -= nums[left]\n            left += 1\n        if right - left + 1 > best:\n            best = right - left + 1\n    return best",
-    "tests": "assert longest_cap([2, 1, 5, 1, 3, 2], 8) == 3, longest_cap([2, 1, 5, 1, 3, 2], 8)\nassert longest_cap([1, 1, 1], 10) == 3, longest_cap([1, 1, 1], 10)\nassert longest_cap([5, 5, 5], 4) == 0, longest_cap([5, 5, 5], 4)",
     "cue": "Two pointers: grow right, shrink left while the running sum passes target.",
     "syntax": "while s > target",
-    "prereqs": ["py.u09.var.grow-shrink.predict"]
+    "prereqs": [
+      "py.u09.var.grow-shrink.predict"
+    ],
+    "cases": [
+      {
+        "call": "longest_cap([2, 1, 5, 1, 3, 2], 8)",
+        "expect": "3"
+      },
+      {
+        "call": "longest_cap([1, 1, 1], 10)",
+        "expect": "3"
+      },
+      {
+        "call": "longest_cap([5, 5, 5], 4)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u09.var.minsize.write",
@@ -133,11 +187,26 @@
     "prompt": "Write `min_subarray_len(nums, target)` returning the length of the shortest contiguous subarray whose sum is at least `target`, or 0 if none exists. All values are positive. Use two pointers.",
     "starter": "def min_subarray_len(nums, target):\n    # your code here\n    pass",
     "solution": "def min_subarray_len(nums, target):\n    left = 0\n    s = 0\n    best = 0\n    for right in range(len(nums)):\n        s += nums[right]\n        while s >= target:\n            length = right - left + 1\n            if best == 0 or length < best:\n                best = length\n            s -= nums[left]\n            left += 1\n    return best",
-    "tests": "assert min_subarray_len([2, 3, 1, 2, 4, 3], 7) == 2, min_subarray_len([2, 3, 1, 2, 4, 3], 7)\nassert min_subarray_len([1, 1, 1, 1], 100) == 0, min_subarray_len([1, 1, 1, 1], 100)\nassert min_subarray_len([1, 4, 4], 8) == 2, min_subarray_len([1, 4, 4], 8)",
     "cue": "Two pointers: expand right, then shrink left while still at or above target, keeping the min length.",
     "syntax": "while s >= target",
     "mapsTo": "LC 209 · Minimum Size Subarray Sum",
-    "prereqs": ["py.u09.var.grow-shrink.predict"]
+    "prereqs": [
+      "py.u09.var.grow-shrink.predict"
+    ],
+    "cases": [
+      {
+        "call": "min_subarray_len([2, 3, 1, 2, 4, 3], 7)",
+        "expect": "2"
+      },
+      {
+        "call": "min_subarray_len([1, 1, 1, 1], 100)",
+        "expect": "0"
+      },
+      {
+        "call": "min_subarray_len([1, 4, 4], 8)",
+        "expect": "2"
+      }
+    ]
   },
   {
     "id": "py.u09.countmap.enter.predict",
@@ -150,7 +219,9 @@
     "expected": "{'b': 2, 'c': 1}",
     "cue": "Track each dict count as chars enter, then as 'a' decrements and gets deleted.",
     "syntax": "dict.get(key, 0)",
-    "prereqs": ["py.u09.slide.sum.predict"]
+    "prereqs": [
+      "py.u09.slide.sum.predict"
+    ]
   },
   {
     "id": "py.u09.countmap.norepeat.predict",
@@ -163,7 +234,10 @@
     "expected": "3",
     "cue": "Trace the count-map; shrink left while the just-added char's count is above one.",
     "syntax": "count[c] > 1 condition",
-    "prereqs": ["py.u09.countmap.enter.predict", "py.u09.var.grow-shrink.predict"]
+    "prereqs": [
+      "py.u09.countmap.enter.predict",
+      "py.u09.var.grow-shrink.predict"
+    ]
   },
   {
     "id": "py.u09.countmap.norepeat.write",
@@ -174,11 +248,30 @@
     "prompt": "Write `length_of_longest_substring(s)` returning the length of the longest substring of `s` with no repeated character. Carry a count-map of the window; grow right and shrink left.",
     "starter": "def length_of_longest_substring(s):\n    # your code here\n    pass",
     "solution": "def length_of_longest_substring(s):\n    count = {}\n    left = 0\n    best = 0\n    for right in range(len(s)):\n        c = s[right]\n        count[c] = count.get(c, 0) + 1\n        while count[c] > 1:\n            count[s[left]] -= 1\n            left += 1\n        if right - left + 1 > best:\n            best = right - left + 1\n    return best",
-    "tests": "assert length_of_longest_substring(\"abcabcbb\") == 3, length_of_longest_substring(\"abcabcbb\")\nassert length_of_longest_substring(\"bbbbb\") == 1, length_of_longest_substring(\"bbbbb\")\nassert length_of_longest_substring(\"\") == 0, length_of_longest_substring(\"\")\nassert length_of_longest_substring(\"pwwkew\") == 3, length_of_longest_substring(\"pwwkew\")",
     "cue": "Carry a window count-map; grow right, shrink left while the current char repeats.",
     "syntax": "dict.get(c, 0) + 1",
     "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
-    "prereqs": ["py.u09.countmap.norepeat.predict"]
+    "prereqs": [
+      "py.u09.countmap.norepeat.predict"
+    ],
+    "cases": [
+      {
+        "call": "length_of_longest_substring('abcabcbb')",
+        "expect": "3"
+      },
+      {
+        "call": "length_of_longest_substring('bbbbb')",
+        "expect": "1"
+      },
+      {
+        "call": "length_of_longest_substring('')",
+        "expect": "0"
+      },
+      {
+        "call": "length_of_longest_substring('pwwkew')",
+        "expect": "3"
+      }
+    ]
   },
   {
     "id": "py.u09.atmostk.predict",
@@ -191,7 +284,9 @@
     "expected": "3",
     "cue": "Shrink left while the count-map holds more than k keys, tracking the longest span.",
     "syntax": "len(count)",
-    "prereqs": ["py.u09.countmap.enter.predict"]
+    "prereqs": [
+      "py.u09.countmap.enter.predict"
+    ]
   },
   {
     "id": "py.u09.atmostk.write",
@@ -202,11 +297,30 @@
     "prompt": "Write `longest_at_most_k_distinct(s, k)` returning the length of the longest substring of `s` containing at most `k` distinct characters. Carry a count-map of the window.",
     "starter": "def longest_at_most_k_distinct(s, k):\n    # your code here\n    pass",
     "solution": "def longest_at_most_k_distinct(s, k):\n    count = {}\n    left = 0\n    best = 0\n    for right in range(len(s)):\n        c = s[right]\n        count[c] = count.get(c, 0) + 1\n        while len(count) > k:\n            count[s[left]] -= 1\n            if count[s[left]] == 0:\n                del count[s[left]]\n            left += 1\n        if right - left + 1 > best:\n            best = right - left + 1\n    return best",
-    "tests": "assert longest_at_most_k_distinct(\"eceba\", 2) == 3, longest_at_most_k_distinct(\"eceba\", 2)\nassert longest_at_most_k_distinct(\"aa\", 1) == 2, longest_at_most_k_distinct(\"aa\", 1)\nassert longest_at_most_k_distinct(\"\", 2) == 0, longest_at_most_k_distinct(\"\", 2)\nassert longest_at_most_k_distinct(\"abaccc\", 2) == 4, longest_at_most_k_distinct(\"abaccc\", 2)",
     "cue": "Count distinct chars in a window map; shrink left while it holds more than k, deleting keys at zero.",
     "syntax": "del count[key] when it hits 0",
     "mapsTo": "LC 340 · Longest Substring with At Most K Distinct Characters",
-    "prereqs": ["py.u09.atmostk.predict"]
+    "prereqs": [
+      "py.u09.atmostk.predict"
+    ],
+    "cases": [
+      {
+        "call": "longest_at_most_k_distinct('eceba', 2)",
+        "expect": "3"
+      },
+      {
+        "call": "longest_at_most_k_distinct('aa', 1)",
+        "expect": "2"
+      },
+      {
+        "call": "longest_at_most_k_distinct('', 2)",
+        "expect": "0"
+      },
+      {
+        "call": "longest_at_most_k_distinct('abaccc', 2)",
+        "expect": "4"
+      }
+    ]
   },
   {
     "id": "py.u09.countmap.counter.predict",
@@ -219,7 +333,9 @@
     "expected": "True",
     "cue": "Compare the two as multisets, ignoring order.",
     "syntax": "collections.Counter",
-    "prereqs": ["py.u09.countmap.enter.predict"]
+    "prereqs": [
+      "py.u09.countmap.enter.predict"
+    ]
   },
   {
     "id": "py.u09.anagrams.write",
@@ -228,14 +344,32 @@
     "concept": "fixed window anagram match",
     "kind": "write",
     "prompt": "Write `find_anagrams(s, p)` returning a list of the start indices of every substring of `s` that is an anagram of `p`, in increasing order. Slide a fixed window of size len(p), updating a count-map in O(1) per step.",
-    "banned": ["sorted("],
+    "banned": [
+      "sorted("
+    ],
     "starter": "def find_anagrams(s, p):\n    # your code here\n    pass",
     "solution": "from collections import Counter\n\ndef find_anagrams(s, p):\n    k = len(p)\n    if k > len(s):\n        return []\n    need = Counter(p)\n    window = Counter(s[:k])\n    res = []\n    if window == need:\n        res.append(0)\n    for i in range(k, len(s)):\n        window[s[i]] += 1\n        window[s[i - k]] -= 1\n        if window[s[i - k]] == 0:\n            del window[s[i - k]]\n        if window == need:\n            res.append(i - k + 1)\n    return res",
-    "tests": "assert find_anagrams(\"cbaebabacd\", \"abc\") == [0, 6], find_anagrams(\"cbaebabacd\", \"abc\")\nassert find_anagrams(\"abab\", \"ab\") == [0, 1, 2], find_anagrams(\"abab\", \"ab\")\nassert find_anagrams(\"a\", \"ab\") == [], find_anagrams(\"a\", \"ab\")",
     "cue": "Slide a fixed len(p) window, comparing its counts against p's at each step.",
     "syntax": "Counter(s[:k])",
     "mapsTo": "LC 438 · Find All Anagrams in a String",
-    "prereqs": ["py.u09.fixed.slide.predict", "py.u09.countmap.counter.predict"]
+    "prereqs": [
+      "py.u09.fixed.slide.predict",
+      "py.u09.countmap.counter.predict"
+    ],
+    "cases": [
+      {
+        "call": "find_anagrams('cbaebabacd', 'abc')",
+        "expect": "[0, 6]"
+      },
+      {
+        "call": "find_anagrams('abab', 'ab')",
+        "expect": "[0, 1, 2]"
+      },
+      {
+        "call": "find_anagrams('a', 'ab')",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u09.minwindow.missing.predict",
@@ -249,7 +383,9 @@
     "cue": "missing counts required chars not yet covered; it drops only when the entering char is one still needed (its need is positive). A surplus char pushes its need below zero and leaves missing alone.",
     "syntax": "need.get(c, 0) > 0",
     "note": "One integer replaces a full count-map comparison: missing == 0 means every required char is covered, in O(1) per step.",
-    "prereqs": ["py.u09.countmap.enter.predict"]
+    "prereqs": [
+      "py.u09.countmap.enter.predict"
+    ]
   },
   {
     "id": "py.u09.minwindow.write",
@@ -260,11 +396,32 @@
     "prompt": "Write `min_window(s, t)` returning the shortest substring of `s` that contains every character of `t` including multiplicity, or \"\" if none exists. Use a sliding window; keep each slide O(1).",
     "starter": "def min_window(s, t):\n    # your code here\n    pass",
     "solution": "def min_window(s, t):\n    if not t or not s:\n        return \"\"\n    need = {}\n    for i in range(len(t)):\n        c = t[i]\n        need[c] = need.get(c, 0) + 1\n    missing = len(t)\n    left = 0\n    best_l = 0\n    best_len = 0\n    for right in range(len(s)):\n        c = s[right]\n        if need.get(c, 0) > 0:\n            missing -= 1\n        need[c] = need.get(c, 0) - 1\n        while missing == 0:\n            if best_len == 0 or right - left + 1 < best_len:\n                best_len = right - left + 1\n                best_l = left\n            need[s[left]] += 1\n            if need[s[left]] > 0:\n                missing += 1\n            left += 1\n    return s[best_l:best_l + best_len]",
-    "tests": "assert min_window(\"ADOBECODEBANC\", \"ABC\") == \"BANC\", min_window(\"ADOBECODEBANC\", \"ABC\")\nassert min_window(\"a\", \"a\") == \"a\", min_window(\"a\", \"a\")\nassert min_window(\"a\", \"aa\") == \"\", min_window(\"a\", \"aa\")\nassert min_window(\"a\", \"b\") == \"\", min_window(\"a\", \"b\")",
     "cue": "Expand right until every needed char is covered, then shrink left to the shortest cover.",
     "syntax": "dict.get(c, 0)",
     "mapsTo": "LC 76 · Minimum Window Substring",
     "note": "The missing counter reduces 'is t fully covered?' to an O(1) test each step, instead of comparing whole count-maps.",
-    "prereqs": ["py.u09.atmostk.write", "py.u09.countmap.norepeat.write", "py.u09.minwindow.missing.predict"]
+    "prereqs": [
+      "py.u09.atmostk.write",
+      "py.u09.countmap.norepeat.write",
+      "py.u09.minwindow.missing.predict"
+    ],
+    "cases": [
+      {
+        "call": "min_window('ADOBECODEBANC', 'ABC')",
+        "expect": "'BANC'"
+      },
+      {
+        "call": "min_window('a', 'a')",
+        "expect": "'a'"
+      },
+      {
+        "call": "min_window('a', 'aa')",
+        "expect": "''"
+      },
+      {
+        "call": "min_window('a', 'b')",
+        "expect": "''"
+      }
+    ]
   }
 ]

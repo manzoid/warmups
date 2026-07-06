@@ -77,9 +77,11 @@
     "kind": "write",
     "prompt": "Write `char_freq(s)` returning a dict that maps each character in `s` to the number of times it appears.",
     "starter": "def char_freq(s):\n    # your code here\n    pass",
-    "banned": ["Counter", ".count("],
+    "banned": [
+      "Counter",
+      ".count("
+    ],
     "solution": "def char_freq(s):\n    counts = {}\n    for c in s:\n        counts[c] = counts.get(c, 0) + 1\n    return counts",
-    "tests": "assert char_freq(\"aab\") == {\"a\": 2, \"b\": 1}, char_freq(\"aab\")\nassert char_freq(\"\") == {}, char_freq(\"\")\nassert char_freq(\"xxx\") == {\"x\": 3}, char_freq(\"xxx\")",
     "prereqs": [
       "py.u03.charloop.forc",
       "py.u03.dict.counter"
@@ -87,7 +89,21 @@
     "cue": "One pass, bump a running count per character.",
     "syntax": "dict.get(key, 0)",
     "note": "A dict keyed by character is the standard frequency count and runs in O(n) time (the work grows in step with the input length); collections.Counter wraps exactly this loop.",
-    "mapsTo": "pattern behind LC 383 · Ransom Note"
+    "mapsTo": "pattern behind LC 383 · Ransom Note",
+    "cases": [
+      {
+        "call": "char_freq('aab')",
+        "expect": "{'a': 2, 'b': 1}"
+      },
+      {
+        "call": "char_freq('')",
+        "expect": "{}"
+      },
+      {
+        "call": "char_freq('xxx')",
+        "expect": "{'x': 3}"
+      }
+    ]
   },
   {
     "id": "py.u03.count.vowels",
@@ -97,14 +113,38 @@
     "kind": "write",
     "prompt": "Write `count_vowels(s)` returning the number of vowel characters (a, e, i, o, u) in `s`, counting both uppercase and lowercase.",
     "starter": "def count_vowels(s):\n    # your code here\n    pass",
-    "banned": ["sum(", ".count("],
+    "banned": [
+      "sum(",
+      ".count("
+    ],
     "solution": "def count_vowels(s):\n    n = 0\n    for c in s:\n        if c in \"aeiouAEIOU\":\n            n += 1\n    return n",
-    "tests": "assert count_vowels(\"Banana\") == 3\nassert count_vowels(\"AEIOU\") == 5\nassert count_vowels(\"HELLO\") == 2\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
     "prereqs": [
       "py.u03.charloop.forc"
     ],
     "cue": "Loop once, incrementing when the character is a vowel of either case.",
-    "syntax": "membership against a both-case vowel set"
+    "syntax": "membership against a both-case vowel set",
+    "cases": [
+      {
+        "call": "count_vowels('Banana')",
+        "expect": "3"
+      },
+      {
+        "call": "count_vowels('AEIOU')",
+        "expect": "5"
+      },
+      {
+        "call": "count_vowels('HELLO')",
+        "expect": "2"
+      },
+      {
+        "call": "count_vowels('xyz')",
+        "expect": "0"
+      },
+      {
+        "call": "count_vowels('')",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u03.enumerate.pairs",
@@ -130,13 +170,30 @@
     "prompt": "Write `first_vowel_index(s)` returning the index of the first vowel (a, e, i, o, u) in `s`, or -1 if there is none.",
     "starter": "def first_vowel_index(s):\n    # your code here\n    pass",
     "solution": "def first_vowel_index(s):\n    for i, c in enumerate(s):\n        if c in \"aeiou\":\n            return i\n    return -1",
-    "tests": "assert first_vowel_index(\"xyzapple\") == 3\nassert first_vowel_index(\"aeiou\") == 0\nassert first_vowel_index(\"bcd\") == -1\nassert first_vowel_index(\"\") == -1",
     "prereqs": [
       "py.u03.enumerate.pairs",
       "py.u03.count.vowels"
     ],
     "cue": "Scan with index and return as soon as you hit a vowel.",
-    "syntax": "enumerate(seq) -> (i, item)"
+    "syntax": "enumerate(seq) -> (i, item)",
+    "cases": [
+      {
+        "call": "first_vowel_index('xyzapple')",
+        "expect": "3"
+      },
+      {
+        "call": "first_vowel_index('aeiou')",
+        "expect": "0"
+      },
+      {
+        "call": "first_vowel_index('bcd')",
+        "expect": "-1"
+      },
+      {
+        "call": "first_vowel_index('')",
+        "expect": "-1"
+      }
+    ]
   },
   {
     "id": "py.u03.classify.range",
@@ -172,14 +229,31 @@
     "kind": "write",
     "prompt": "Write `count_digits(s)` returning how many characters of `s` are digits 0-9. Do not use `str.isdigit`.",
     "starter": "def count_digits(s):\n    # your code here\n    pass",
-    "banned": [".isdigit(", "sum(", ".count("],
+    "banned": [
+      ".isdigit(",
+      "sum(",
+      ".count("
+    ],
     "solution": "def count_digits(s):\n    n = 0\n    for c in s:\n        if '0' <= c <= '9':\n            n += 1\n    return n",
-    "tests": "assert count_digits(\"a1b2c3\") == 3\nassert count_digits(\"abc\") == 0\nassert count_digits(\"2024\") == 4",
     "prereqs": [
       "py.u03.classify.range"
     ],
     "cue": "One pass, count characters that fall in the digit range.",
-    "syntax": "chained comparison a <= x <= b"
+    "syntax": "chained comparison a <= x <= b",
+    "cases": [
+      {
+        "call": "count_digits('a1b2c3')",
+        "expect": "3"
+      },
+      {
+        "call": "count_digits('abc')",
+        "expect": "0"
+      },
+      {
+        "call": "count_digits('2024')",
+        "expect": "4"
+      }
+    ]
   },
   {
     "id": "py.u03.classify.digitsum",
@@ -189,14 +263,31 @@
     "kind": "write",
     "prompt": "Write `sum_digits(s)` returning the sum of the numeric values of the digit characters in `s`; ignore non-digit characters. Do not use `int`.",
     "starter": "def sum_digits(s):\n    # your code here\n    pass",
-    "banned": ["int(", "sum(", ".count("],
+    "banned": [
+      "int(",
+      "sum(",
+      ".count("
+    ],
     "solution": "def sum_digits(s):\n    total = 0\n    for c in s:\n        if '0' <= c <= '9':\n            total += ord(c) - ord('0')\n    return total",
-    "tests": "assert sum_digits(\"a1b2c3\") == 6\nassert sum_digits(\"abc\") == 0\nassert sum_digits(\"111\") == 3",
     "prereqs": [
       "py.u03.classify.digitval"
     ],
     "cue": "Add each digit's numeric value as you scan.",
-    "syntax": "ord() difference from '0'"
+    "syntax": "ord() difference from '0'",
+    "cases": [
+      {
+        "call": "sum_digits('a1b2c3')",
+        "expect": "6"
+      },
+      {
+        "call": "sum_digits('abc')",
+        "expect": "0"
+      },
+      {
+        "call": "sum_digits('111')",
+        "expect": "3"
+      }
+    ]
   },
   {
     "id": "py.u03.classify.isalnum",
@@ -249,14 +340,29 @@
     "kind": "write",
     "prompt": "Write `only_letters(s)` returning a new string containing only the alphabetic characters of `s`, in order.",
     "starter": "def only_letters(s):\n    # your code here\n    pass",
-    "banned": [".isalpha("],
+    "banned": [
+      ".isalpha("
+    ],
     "solution": "def only_letters(s):\n    parts = []\n    for c in s:\n        if ('a' <= c <= 'z') or ('A' <= c <= 'Z'):\n            parts.append(c)\n    return \"\".join(parts)",
-    "tests": "assert only_letters(\"a1b2c3\") == \"abc\"\nassert only_letters(\"Hello, World!\") == \"HelloWorld\"\nassert only_letters(\"123\") == \"\"",
     "prereqs": [
       "py.u03.build.parts"
     ],
     "cue": "Keep alphabetic characters, drop the rest, then join.",
-    "syntax": "\"\".join(collected)"
+    "syntax": "\"\".join(collected)",
+    "cases": [
+      {
+        "call": "only_letters('a1b2c3')",
+        "expect": "'abc'"
+      },
+      {
+        "call": "only_letters('Hello, World!')",
+        "expect": "'HelloWorld'"
+      },
+      {
+        "call": "only_letters('123')",
+        "expect": "''"
+      }
+    ]
   },
   {
     "id": "py.u03.build.caesar",
@@ -267,12 +373,29 @@
     "prompt": "Write `shift_letters(s, k)` returning `s` with each lowercase letter advanced `k` positions in the alphabet, wrapping from z back to a. Leave every other character unchanged.",
     "starter": "def shift_letters(s, k):\n    # your code here\n    pass",
     "solution": "def shift_letters(s, k):\n    parts = []\n    for c in s:\n        if 'a' <= c <= 'z':\n            idx = (ord(c) - ord('a') + k) % 26\n            parts.append(chr(ord('a') + idx))\n        else:\n            parts.append(c)\n    return \"\".join(parts)",
-    "tests": "assert shift_letters(\"abc\", 1) == \"bcd\"\nassert shift_letters(\"xyz\", 3) == \"abc\"\nassert shift_letters(\"hello, world\", 0) == \"hello, world\"\nassert shift_letters(\"a b\", 1) == \"b c\"",
     "prereqs": [
       "py.u03.build.parts"
     ],
     "cue": "Map each lowercase letter to a 0-25 index, shift, wrap, convert back.",
-    "syntax": "% 26 wraps the alphabet"
+    "syntax": "% 26 wraps the alphabet",
+    "cases": [
+      {
+        "call": "shift_letters('abc', 1)",
+        "expect": "'bcd'"
+      },
+      {
+        "call": "shift_letters('xyz', 3)",
+        "expect": "'abc'"
+      },
+      {
+        "call": "shift_letters('hello, world', 0)",
+        "expect": "'hello, world'"
+      },
+      {
+        "call": "shift_letters('a b', 1)",
+        "expect": "'b c'"
+      }
+    ]
   },
   {
     "id": "py.u03.build.comprehension",
@@ -310,16 +433,36 @@
     "kind": "write",
     "prompt": "Write `reverse(s)` returning the characters of `s` in opposite order. Do not use slicing or `reversed`.",
     "starter": "def reverse(s):\n    # your code here\n    pass",
-    "banned": ["[::-1]", "reversed("],
+    "banned": [
+      "[::-1]",
+      "reversed("
+    ],
     "solution": "def reverse(s):\n    out = \"\"\n    for i in range(len(s) - 1, -1, -1):\n        out += s[i]\n    return out",
-    "tests": "assert reverse(\"abc\") == \"cba\"\nassert reverse(\"\") == \"\"\nassert reverse(\"a\") == \"a\"\nassert reverse(\"hello\") == \"olleh\"",
     "prereqs": [
       "py.u03.reverse.range"
     ],
     "cue": "Build the result by indexing from the last character to the first.",
     "syntax": "range(stop, -1, -1) counts down",
     "note": "out += c rebuilds the whole string each pass (O(n^2)); collecting chars in a list and joining once is O(n).",
-    "mapsTo": "LC 344 · Reverse String"
+    "mapsTo": "LC 344 · Reverse String",
+    "cases": [
+      {
+        "call": "reverse('abc')",
+        "expect": "'cba'"
+      },
+      {
+        "call": "reverse('')",
+        "expect": "''"
+      },
+      {
+        "call": "reverse('a')",
+        "expect": "'a'"
+      },
+      {
+        "call": "reverse('hello')",
+        "expect": "'olleh'"
+      }
+    ]
   },
   {
     "id": "py.u03.reverse.slice",
@@ -357,15 +500,39 @@
     "kind": "write",
     "prompt": "Write `is_palindrome(s)` returning True if `s` reads the same forwards and backwards. Use two pointers converging from the ends; do not use slicing.",
     "starter": "def is_palindrome(s):\n    # your code here\n    pass",
-    "banned": ["[::-1]", "reversed("],
+    "banned": [
+      "[::-1]",
+      "reversed("
+    ],
     "solution": "def is_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        if s[i] != s[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
-    "tests": "assert is_palindrome(\"racecar\") == True\nassert is_palindrome(\"abba\") == True\nassert is_palindrome(\"abc\") == False\nassert is_palindrome(\"\") == True\nassert is_palindrome(\"a\") == True",
     "prereqs": [
       "py.u03.palindrome.mirror"
     ],
     "cue": "Two pointers from both ends, stepping inward while they match.",
     "syntax": "converging while-loop with two indices",
-    "note": "Converging pointers check in place with O(1) extra space, versus building a reversed copy to compare."
+    "note": "Converging pointers check in place with O(1) extra space, versus building a reversed copy to compare.",
+    "cases": [
+      {
+        "call": "is_palindrome('racecar')",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome('abba')",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome('abc')",
+        "expect": "False"
+      },
+      {
+        "call": "is_palindrome('')",
+        "expect": "True"
+      },
+      {
+        "call": "is_palindrome('a')",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u03.palindrome.slice",
@@ -391,16 +558,40 @@
     "kind": "write",
     "prompt": "Write `is_clean_palindrome(s)` returning True if `s` is a palindrome when considering only alphanumeric characters and ignoring case. Use two pointers that skip non-alphanumeric characters.",
     "starter": "def is_clean_palindrome(s):\n    # your code here\n    pass",
-    "banned": ["[::-1]", "reversed("],
+    "banned": [
+      "[::-1]",
+      "reversed("
+    ],
     "solution": "def is_clean_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        while i < j and not s[i].isalnum():\n            i += 1\n        while i < j and not s[j].isalnum():\n            j -= 1\n        if s[i].lower() != s[j].lower():\n            return False\n        i += 1\n        j -= 1\n    return True",
-    "tests": "assert is_clean_palindrome(\"A man, a plan, a canal: Panama\") == True\nassert is_clean_palindrome(\"race a car\") == False\nassert is_clean_palindrome(\"\") == True\nassert is_clean_palindrome(\".,\") == True\nassert is_clean_palindrome(\"Ab_a\") == True",
     "prereqs": [
       "py.u03.palindrome.twopointer",
       "py.u03.classify.isalnum"
     ],
     "cue": "Two pointers, but skip non-alphanumeric characters and ignore case before comparing.",
     "syntax": "str.isalnum() / str.lower()",
-    "mapsTo": "LC 125 · Valid Palindrome"
+    "mapsTo": "LC 125 · Valid Palindrome",
+    "cases": [
+      {
+        "call": "is_clean_palindrome('A man, a plan, a canal: Panama')",
+        "expect": "True"
+      },
+      {
+        "call": "is_clean_palindrome('race a car')",
+        "expect": "False"
+      },
+      {
+        "call": "is_clean_palindrome('')",
+        "expect": "True"
+      },
+      {
+        "call": "is_clean_palindrome('.,')",
+        "expect": "True"
+      },
+      {
+        "call": "is_clean_palindrome('Ab_a')",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u03.find.builtin",
@@ -454,12 +645,33 @@
     "prompt": "Write `strip_ends(s)` returning `s` without its first and last characters. Return the empty string for strings of length 0 or 1.",
     "starter": "def strip_ends(s):\n    # your code here\n    pass",
     "solution": "def strip_ends(s):\n    if len(s) <= 1:\n        return \"\"\n    return s[1:-1]",
-    "tests": "assert strip_ends(\"hello\") == \"ell\"\nassert strip_ends(\"ab\") == \"\"\nassert strip_ends(\"a\") == \"\"\nassert strip_ends(\"\") == \"\"\nassert strip_ends(\"abcde\") == \"bcd\"",
     "prereqs": [
       "py.u03.slice.extract"
     ],
     "cue": "Slice off the first and last, but guard the short cases.",
-    "syntax": "negative indices in slices"
+    "syntax": "negative indices in slices",
+    "cases": [
+      {
+        "call": "strip_ends('hello')",
+        "expect": "'ell'"
+      },
+      {
+        "call": "strip_ends('ab')",
+        "expect": "''"
+      },
+      {
+        "call": "strip_ends('a')",
+        "expect": "''"
+      },
+      {
+        "call": "strip_ends('')",
+        "expect": "''"
+      },
+      {
+        "call": "strip_ends('abcde')",
+        "expect": "'bcd'"
+      }
+    ]
   },
   {
     "id": "py.u03.find.membership",
@@ -484,16 +696,40 @@
     "kind": "write",
     "prompt": "Write `my_find(s, p)` returning the index of the first occurrence of `p` in `s`, or -1 if `p` does not occur. An empty pattern matches at index 0. Do not use `str.find`, `str.index`, or the `in` operator.",
     "starter": "def my_find(s, p):\n    # your code here\n    pass",
-    "banned": [".find(", ".index("],
+    "banned": [
+      ".find(",
+      ".index("
+    ],
     "solution": "def my_find(s, p):\n    n, m = len(s), len(p)\n    for i in range(n - m + 1):\n        k = 0\n        while k < m and s[i + k] == p[k]:\n            k += 1\n        if k == m:\n            return i\n    return -1",
-    "tests": "assert my_find(\"hello\", \"ll\") == 2\nassert my_find(\"hello\", \"z\") == -1\nassert my_find(\"hello\", \"\") == 0\nassert my_find(\"aaa\", \"aa\") == 0\nassert my_find(\"abcabc\", \"cab\") == 2",
     "prereqs": [
       "py.u03.charloop.index"
     ],
     "cue": "Try each start position, comparing the pattern character by character.",
     "syntax": "nested loop over start offsets",
     "note": "This naive scan is O(n*m); KMP and Boyer-Moore reuse earlier comparisons to skip ahead.",
-    "mapsTo": "LC 28 · Find the Index of the First Occurrence in a String"
+    "mapsTo": "LC 28 · Find the Index of the First Occurrence in a String",
+    "cases": [
+      {
+        "call": "my_find('hello', 'll')",
+        "expect": "2"
+      },
+      {
+        "call": "my_find('hello', 'z')",
+        "expect": "-1"
+      },
+      {
+        "call": "my_find('hello', '')",
+        "expect": "0"
+      },
+      {
+        "call": "my_find('aaa', 'aa')",
+        "expect": "0"
+      },
+      {
+        "call": "my_find('abcabc', 'cab')",
+        "expect": "2"
+      }
+    ]
   },
   {
     "id": "py.u03.myjoin.write",
@@ -503,14 +739,33 @@
     "kind": "write",
     "prompt": "Write `my_join(parts, sep)` returning the strings in `parts` concatenated with `sep` between adjacent items (no trailing separator). Return the empty string for an empty list. Do not use `str.join`.",
     "starter": "def my_join(parts, sep):\n    # your code here\n    pass",
-    "banned": [".join("],
+    "banned": [
+      ".join("
+    ],
     "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out",
-    "tests": "assert my_join([], \"-\") == \"\"\nassert my_join([\"a\"], \"-\") == \"a\"\nassert my_join([\"a\", \"b\", \"c\"], \"-\") == \"a-b-c\"\nassert my_join([\"x\", \"y\"], \"\") == \"xy\"",
     "prereqs": [
       "py.u03.charloop.index"
     ],
     "cue": "Seed with the first item, then prepend the separator before each remaining one.",
-    "syntax": "range(1, len(parts))"
+    "syntax": "range(1, len(parts))",
+    "cases": [
+      {
+        "call": "my_join([], '-')",
+        "expect": "''"
+      },
+      {
+        "call": "my_join(['a'], '-')",
+        "expect": "'a'"
+      },
+      {
+        "call": "my_join(['a', 'b', 'c'], '-')",
+        "expect": "'a-b-c'"
+      },
+      {
+        "call": "my_join(['x', 'y'], '')",
+        "expect": "'xy'"
+      }
+    ]
   },
   {
     "id": "py.u03.myjoin.edge",
@@ -535,14 +790,37 @@
     "kind": "write",
     "prompt": "Write `my_split(s, sep)` where `sep` is a single character: return the list of substrings of `s` separated by `sep`. Adjacent separators produce empty strings, and splitting the empty string returns a list with one empty string. Do not use `str.split`.",
     "starter": "def my_split(s, sep):\n    # your code here\n    pass",
-    "banned": [".split("],
+    "banned": [
+      ".split("
+    ],
     "solution": "def my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out",
-    "tests": "assert my_split(\"a,b,c\", \",\") == [\"a\", \"b\", \"c\"]\nassert my_split(\"a,,b\", \",\") == [\"a\", \"\", \"b\"]\nassert my_split(\"\", \",\") == [\"\"]\nassert my_split(\"abc\", \",\") == [\"abc\"]\nassert my_split(\",x\", \",\") == [\"\", \"x\"]",
     "prereqs": [
       "py.u03.myjoin.write"
     ],
     "cue": "Accumulate into a buffer, flush on each separator, then flush the last piece.",
-    "syntax": "+= builds the current piece"
+    "syntax": "+= builds the current piece",
+    "cases": [
+      {
+        "call": "my_split('a,b,c', ',')",
+        "expect": "['a', 'b', 'c']"
+      },
+      {
+        "call": "my_split('a,,b', ',')",
+        "expect": "['a', '', 'b']"
+      },
+      {
+        "call": "my_split('', ',')",
+        "expect": "['']"
+      },
+      {
+        "call": "my_split('abc', ',')",
+        "expect": "['abc']"
+      },
+      {
+        "call": "my_split(',x', ',')",
+        "expect": "['', 'x']"
+      }
+    ]
   },
   {
     "id": "py.u03.mysplit.edge",
@@ -568,13 +846,30 @@
     "prompt": "Given `my_join` and `my_split` from earlier, write `round_trips(s, sep)` returning True if `my_join(my_split(s, sep), sep) == s`. `sep` is a single character.",
     "starter": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    # your code here\n    pass",
     "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    return my_join(my_split(s, sep), sep) == s",
-    "tests": "assert round_trips(\"a,b,c\", \",\") == True\nassert round_trips(\"a,,b\", \",\") == True\nassert round_trips(\"\", \",\") == True\nassert round_trips(\"no-seps-here\", \",\") == True",
     "prereqs": [
       "py.u03.myjoin.write",
       "py.u03.mysplit.write"
     ],
     "cue": "Split then join, and check you recovered the original.",
-    "syntax": "compose the two helpers"
+    "syntax": "compose the two helpers",
+    "cases": [
+      {
+        "call": "round_trips('a,b,c', ',')",
+        "expect": "True"
+      },
+      {
+        "call": "round_trips('a,,b', ',')",
+        "expect": "True"
+      },
+      {
+        "call": "round_trips('', ',')",
+        "expect": "True"
+      },
+      {
+        "call": "round_trips('no-seps-here', ',')",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u03.sugar.splitjoin",

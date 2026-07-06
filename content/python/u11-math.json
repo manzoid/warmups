@@ -20,7 +20,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "x = 7\nx % 2",
     "expected": "1",
-    "prereqs": ["py.u11.mod.wrap"],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "Remainder by 2 separates odd from even.",
     "syntax": "% 2"
   },
@@ -33,7 +35,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "-7 % 3",
     "expected": "2",
-    "prereqs": ["py.u11.mod.wrap"],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "In Python the remainder takes the sign of the divisor.",
     "syntax": "% remainder",
     "note": "This is the unit's trap. C and JS give -1 (sign follows the dividend). For a safe non-negative index there, write ((x % n) + n) % n."
@@ -47,7 +51,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "n = 1234\nn % 10",
     "expected": "4",
-    "prereqs": ["py.u11.mod.wrap"],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "The final digit is the remainder by 10.",
     "syntax": "% 10"
   },
@@ -60,7 +66,10 @@
     "prompt": "What is the value of `j`?",
     "snippet": "i = 0\nn = 5\nj = (i - 1) % n\nj",
     "expected": "4",
-    "prereqs": ["py.u11.mod.wrap", "py.u11.mod.negwrap"],
+    "prereqs": [
+      "py.u11.mod.wrap",
+      "py.u11.mod.negwrap"
+    ],
     "cue": "Step back one, then let the remainder wrap it around.",
     "syntax": "% remainder"
   },
@@ -73,11 +82,26 @@
     "prompt": "Write `next_index(i, k, n)` returning the position `k` steps forward from `i` in a ring of `n` slots, wrapping past the end.",
     "starter": "def next_index(i, k, n):\n    # your code here\n    pass",
     "solution": "def next_index(i, k, n):\n    return (i + k) % n",
-    "tests": "assert next_index(3, 4, 5) == 2, next_index(3, 4, 5)\nassert next_index(4, 1, 5) == 0, next_index(4, 1, 5)\nassert next_index(0, 0, 5) == 0, next_index(0, 0, 5)",
-    "prereqs": ["py.u11.mod.wrap"],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "Advance the position, then wrap it back with the remainder by n.",
     "syntax": "% remainder",
-    "mapsTo": "pattern behind LC 622 · Design Circular Queue"
+    "mapsTo": "pattern behind LC 622 · Design Circular Queue",
+    "cases": [
+      {
+        "call": "next_index(3, 4, 5)",
+        "expect": "2"
+      },
+      {
+        "call": "next_index(4, 1, 5)",
+        "expect": "0"
+      },
+      {
+        "call": "next_index(0, 0, 5)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u11.intdiv.floor",
@@ -88,7 +112,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "1234 // 10",
     "expected": "123",
-    "prereqs": ["py.u11.mod.lastdigit"],
+    "prereqs": [
+      "py.u11.mod.lastdigit"
+    ],
     "cue": "Integer division drops the last digit.",
     "syntax": "// floor division"
   },
@@ -101,7 +127,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "-7 // 2",
     "expected": "-4",
-    "prereqs": ["py.u11.intdiv.floor"],
+    "prereqs": [
+      "py.u11.intdiv.floor"
+    ],
     "cue": "Floor division rounds down, not toward zero.",
     "syntax": "// floor division"
   },
@@ -114,7 +142,10 @@
     "prompt": "What does this evaluate to?",
     "snippet": "divmod(17, 5)",
     "expected": "(3, 2)",
-    "prereqs": ["py.u11.intdiv.floor", "py.u11.mod.lastdigit"],
+    "prereqs": [
+      "py.u11.intdiv.floor",
+      "py.u11.mod.lastdigit"
+    ],
     "cue": "One call returns the quotient and remainder together.",
     "syntax": "divmod(a, b)",
     "note": "One trip instead of computing a // b and a % b separately. Unpack it: q, r = divmod(a, b)."
@@ -128,7 +159,9 @@
     "prompt": "What is the value of `pos`?",
     "snippet": "idx = 7\ncols = 3\npos = divmod(idx, cols)\npos",
     "expected": "(2, 1)",
-    "prereqs": ["py.u11.divmod"],
+    "prereqs": [
+      "py.u11.divmod"
+    ],
     "cue": "Divide the flat index by the width to get the row and the leftover.",
     "syntax": "divmod(idx, cols)"
   },
@@ -141,12 +174,31 @@
     "prompt": "Write `reverse_int(n)` for `n >= 0` that returns the integer with its decimal digits reversed. `reverse_int(1234)` is `4321`.",
     "starter": "def reverse_int(n):\n    # your code here\n    pass",
     "solution": "def reverse_int(n):\n    r = 0\n    while n:\n        r = r * 10 + n % 10\n        n //= 10\n    return r",
-    "banned": ["str(", "[::-1]"],
-    "tests": "assert reverse_int(1234) == 4321, reverse_int(1234)\nassert reverse_int(100) == 1, reverse_int(100)\nassert reverse_int(0) == 0, reverse_int(0)",
-    "prereqs": ["py.u11.intdiv.floor", "py.u11.mod.lastdigit"],
+    "banned": [
+      "str(",
+      "[::-1]"
+    ],
+    "prereqs": [
+      "py.u11.intdiv.floor",
+      "py.u11.mod.lastdigit"
+    ],
     "cue": "Take the last digit off and stack it onto a growing result.",
     "syntax": "n % 10 and n //= 10",
-    "mapsTo": "LC 7 · Reverse Integer"
+    "mapsTo": "LC 7 · Reverse Integer",
+    "cases": [
+      {
+        "call": "reverse_int(1234)",
+        "expect": "4321"
+      },
+      {
+        "call": "reverse_int(100)",
+        "expect": "1"
+      },
+      {
+        "call": "reverse_int(0)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u11.intdiv.digitsum",
@@ -157,12 +209,29 @@
     "prompt": "Write `digit_sum(n)` for `n >= 0` that returns the sum of its decimal digits. `digit_sum(1234)` is `10`.",
     "starter": "def digit_sum(n):\n    # your code here\n    pass",
     "solution": "def digit_sum(n):\n    s = 0\n    while n:\n        s += n % 10\n        n //= 10\n    return s",
-    "banned": ["str("],
-    "tests": "assert digit_sum(1234) == 10, digit_sum(1234)\nassert digit_sum(0) == 0, digit_sum(0)\nassert digit_sum(9) == 9, digit_sum(9)",
-    "prereqs": ["py.u11.intdiv.revnum"],
+    "banned": [
+      "str("
+    ],
+    "prereqs": [
+      "py.u11.intdiv.revnum"
+    ],
     "cue": "Take each digit off the end and add it to a running total.",
     "syntax": "n % 10 and n //= 10",
-    "mapsTo": "pattern behind LC 258 · Add Digits"
+    "mapsTo": "pattern behind LC 258 · Add Digits",
+    "cases": [
+      {
+        "call": "digit_sum(1234)",
+        "expect": "10"
+      },
+      {
+        "call": "digit_sum(0)",
+        "expect": "0"
+      },
+      {
+        "call": "digit_sum(9)",
+        "expect": "9"
+      }
+    ]
   },
   {
     "id": "py.u11.horner.index",
@@ -173,7 +242,9 @@
     "prompt": "What is the value of `h`?",
     "snippet": "a = [1, 2, 3, 4]\nh = 0\nfor i in range(len(a)):\n    h = h * 10 + a[i]\nh",
     "expected": "1234",
-    "prereqs": ["py.u11.intdiv.revnum"],
+    "prereqs": [
+      "py.u11.intdiv.revnum"
+    ],
     "cue": "Walk the indices, scaling the accumulator by 10 before adding each digit at a[i].",
     "syntax": "for i in range(len(a)): a[i]"
   },
@@ -186,7 +257,9 @@
     "prompt": "What is the value of `h`?",
     "snippet": "h = 0\nfor d in [1, 2, 3, 4]:\n    h = h * 10 + d\nh",
     "expected": "1234",
-    "prereqs": ["py.u11.horner.index"],
+    "prereqs": [
+      "py.u11.horner.index"
+    ],
     "cue": "for-each hands you each element directly; scale the accumulator by 10 before adding it.",
     "syntax": "for d in a"
   },
@@ -199,12 +272,30 @@
     "prompt": "Write `to_int(digits)` that combines a list of decimal digits (most significant first) into the integer they represent. `to_int([1, 2, 3, 4])` is `1234`; `to_int([])` is `0`.",
     "starter": "def to_int(digits):\n    # your code here\n    pass",
     "solution": "def to_int(digits):\n    h = 0\n    for i in range(len(digits)):\n        h = h * 10 + digits[i]\n    return h",
-    "banned": ["str(", ".join("],
-    "tests": "assert to_int([1, 2, 3, 4]) == 1234, to_int([1, 2, 3, 4])\nassert to_int([]) == 0, to_int([])\nassert to_int([0, 5]) == 5, to_int([0, 5])",
-    "prereqs": ["py.u11.horner.index"],
+    "banned": [
+      "str(",
+      ".join("
+    ],
+    "prereqs": [
+      "py.u11.horner.index"
+    ],
     "cue": "Walk left to right, scaling the running total by 10 before adding each digit.",
     "syntax": "acc = acc * base + d",
-    "mapsTo": "pattern behind LC 8 · String to Integer (atoi)"
+    "mapsTo": "pattern behind LC 8 · String to Integer (atoi)",
+    "cases": [
+      {
+        "call": "to_int([1, 2, 3, 4])",
+        "expect": "1234"
+      },
+      {
+        "call": "to_int([])",
+        "expect": "0"
+      },
+      {
+        "call": "to_int([0, 5])",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u11.horner.hash",
@@ -215,11 +306,26 @@
     "prompt": "Write `str_hash(s)` that combines the string into one integer with `h = h * 31 + ord(ch)` over each character, starting from `h = 0`. `str_hash('abc')` is `96354`.",
     "starter": "def str_hash(s):\n    # your code here\n    pass",
     "solution": "def str_hash(s):\n    h = 0\n    for i in range(len(s)):\n        h = h * 31 + ord(s[i])\n    return h",
-    "tests": "assert str_hash('abc') == 96354, str_hash('abc')\nassert str_hash('') == 0, str_hash('')\nassert str_hash('a') == 97, str_hash('a')",
-    "prereqs": ["py.u11.horner.parse"],
+    "prereqs": [
+      "py.u11.horner.parse"
+    ],
     "cue": "Loop over indices, folding each character's code point into the accumulator.",
     "syntax": "ord(s[i])",
-    "note": "`ord(ch)` gives a character's numeric code (ord('a') is 97). Multiplying the running total by 31 before adding the next code mixes the characters together so different strings rarely land on the same number."
+    "note": "`ord(ch)` gives a character's numeric code (ord('a') is 97). Multiplying the running total by 31 before adding the next code mixes the characters together so different strings rarely land on the same number.",
+    "cases": [
+      {
+        "call": "str_hash('abc')",
+        "expect": "96354"
+      },
+      {
+        "call": "str_hash('')",
+        "expect": "0"
+      },
+      {
+        "call": "str_hash('a')",
+        "expect": "97"
+      }
+    ]
   },
   {
     "id": "py.u11.gcd.loop.predict",
@@ -230,7 +336,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a, b = 48, 18\nwhile b:\n    a, b = b, a % b\na",
     "expected": "6",
-    "prereqs": ["py.u11.mod.wrap"],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "Trace the loop, swapping in the remainder until the second reaches zero.",
     "syntax": "% remainder"
   },
@@ -243,12 +351,30 @@
     "prompt": "Write `gcd(a, b)` returning the greatest common divisor using the Euclidean remainder loop. Do not use `math.gcd`.",
     "starter": "def gcd(a, b):\n    # your code here\n    pass",
     "solution": "def gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a",
-    "banned": ["math.gcd", "import"],
-    "tests": "assert gcd(48, 18) == 6, gcd(48, 18)\nassert gcd(7, 0) == 7, gcd(7, 0)\nassert gcd(13, 17) == 1, gcd(13, 17)",
-    "prereqs": ["py.u11.gcd.loop.predict"],
+    "banned": [
+      "math.gcd",
+      "import"
+    ],
+    "prereqs": [
+      "py.u11.gcd.loop.predict"
+    ],
     "cue": "Loop until the second number is zero, replacing the pair with (b, remainder).",
     "syntax": "tuple swap: a, b = b, r",
-    "mapsTo": "pattern behind LC 1071 · Greatest Common Divisor of Strings"
+    "mapsTo": "pattern behind LC 1071 · Greatest Common Divisor of Strings",
+    "cases": [
+      {
+        "call": "gcd(48, 18)",
+        "expect": "6"
+      },
+      {
+        "call": "gcd(7, 0)",
+        "expect": "7"
+      },
+      {
+        "call": "gcd(13, 17)",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u11.gcd.lcm",
@@ -259,11 +385,27 @@
     "prompt": "Given `gcd`, write `lcm(a, b)` for positive `a`, `b` returning the least common multiple.",
     "starter": "def gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a\n\n\ndef lcm(a, b):\n    # your code here\n    pass",
     "solution": "def gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a\n\n\ndef lcm(a, b):\n    return a // gcd(a, b) * b",
-    "tests": "assert lcm(4, 6) == 12, lcm(4, 6)\nassert lcm(3, 5) == 15, lcm(3, 5)\nassert lcm(6, 6) == 6, lcm(6, 6)",
-    "prereqs": ["py.u11.gcd.write", "py.u11.intdiv.floor"],
+    "prereqs": [
+      "py.u11.gcd.write",
+      "py.u11.intdiv.floor"
+    ],
     "cue": "Combine the product with the gcd, dividing first to keep the number small.",
     "syntax": "// floor division",
-    "note": "a // gcd * b never forms the full a * b, so it dodges overflow in fixed-width languages."
+    "note": "a // gcd * b never forms the full a * b, so it dodges overflow in fixed-width languages.",
+    "cases": [
+      {
+        "call": "lcm(4, 6)",
+        "expect": "12"
+      },
+      {
+        "call": "lcm(3, 5)",
+        "expect": "15"
+      },
+      {
+        "call": "lcm(6, 6)",
+        "expect": "6"
+      }
+    ]
   },
   {
     "id": "py.u11.minmax.clamp",
@@ -274,11 +416,28 @@
     "prompt": "Write `clamp(x, lo, hi)` (with `lo <= hi`) returning `x` bounded into `[lo, hi]`, without an if-chain.",
     "starter": "def clamp(x, lo, hi):\n    # your code here\n    pass",
     "solution": "def clamp(x, lo, hi):\n    return max(lo, min(x, hi))",
-    "banned": ["if "],
-    "tests": "assert clamp(15, 0, 10) == 10, clamp(15, 0, 10)\nassert clamp(-3, 0, 10) == 0, clamp(-3, 0, 10)\nassert clamp(5, 0, 10) == 5, clamp(5, 0, 10)",
-    "prereqs": ["py.u11.mod.wrap"],
+    "banned": [
+      "if "
+    ],
+    "prereqs": [
+      "py.u11.mod.wrap"
+    ],
     "cue": "Cap the upper end, then floor the lower end by nesting the two built-ins.",
-    "syntax": "max(a, b), min(a, b)"
+    "syntax": "max(a, b), min(a, b)",
+    "cases": [
+      {
+        "call": "clamp(15, 0, 10)",
+        "expect": "10"
+      },
+      {
+        "call": "clamp(-3, 0, 10)",
+        "expect": "0"
+      },
+      {
+        "call": "clamp(5, 0, 10)",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u11.bits.parity",
@@ -289,7 +448,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "12 & 1",
     "expected": "0",
-    "prereqs": ["py.u11.mod.parity"],
+    "prereqs": [
+      "py.u11.mod.parity"
+    ],
     "cue": "The lowest bit alone decides odd or even.",
     "syntax": "x & 1",
     "note": "A bit is one binary digit, 0 or 1; a whole number is stored as a row of bits standing for the places ..., 8, 4, 2, 1. `&` lines two numbers up bit by bit and keeps a 1 only where both have a 1, so `x & 1` looks at just the lowest bit (the 1s place): 1 for odd, 0 for even."
@@ -303,7 +464,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "12 >> 1",
     "expected": "6",
-    "prereqs": ["py.u11.intdiv.floor"],
+    "prereqs": [
+      "py.u11.intdiv.floor"
+    ],
     "cue": "Shifting right by one drops the lowest bit.",
     "syntax": ">> right shift",
     "note": "x >> 1 floors a divide by 2 for x >= 0, and a shift is often cheaper than a divide on the CPU."
@@ -317,7 +480,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "12 & (12 - 1)",
     "expected": "8",
-    "prereqs": ["py.u11.bits.parity"],
+    "prereqs": [
+      "py.u11.bits.parity"
+    ],
     "cue": "Subtracting one turns the lowest set bit and everything below it, then AND masks them off.",
     "syntax": "x & (x - 1)",
     "note": "x & (x - 1) clears exactly the lowest set bit. Repeat it and you visit one set bit per step: that is the popcount loop, and x & (x-1) == 0 is the power-of-two test."
@@ -331,7 +496,9 @@
     "prompt": "What is the value of `is_pow2`?",
     "snippet": "x = 16\nis_pow2 = (x & (x - 1)) == 0\nis_pow2",
     "expected": "True",
-    "prereqs": ["py.u11.bits.clearlow"],
+    "prereqs": [
+      "py.u11.bits.clearlow"
+    ],
     "cue": "A single-bit number becomes zero once its lone bit is cleared.",
     "syntax": "x & (x - 1)",
     "note": "Keep the parens. In Python & binds tighter than ==, but in C/Java == binds tighter, so `x & (x-1) == 0` there reads as `x & ((x-1)==0)`. Parenthesize and it reads the same everywhere.",
@@ -346,13 +513,31 @@
     "prompt": "Write `popcount(x)` for `x >= 0` returning the number of set bits, by clearing the lowest set bit each step. Do not use `bin` or `bit_count`.",
     "starter": "def popcount(x):\n    # your code here\n    pass",
     "solution": "def popcount(x):\n    c = 0\n    while x:\n        x &= x - 1\n        c += 1\n    return c",
-    "banned": ["bin(", "bit_count"],
-    "tests": "assert popcount(12) == 2, popcount(12)\nassert popcount(0) == 0, popcount(0)\nassert popcount(7) == 3, popcount(7)",
-    "prereqs": ["py.u11.bits.clearlow"],
+    "banned": [
+      "bin(",
+      "bit_count"
+    ],
+    "prereqs": [
+      "py.u11.bits.clearlow"
+    ],
     "cue": "Count how many times you can clear the lowest set bit before hitting zero.",
     "syntax": "x & (x - 1)",
     "note": "This loop runs once per set bit, so it is O(popcount), not O(bit width). `bin(x).count('1')` or `x.bit_count()` is the shortcut once you have done it by hand.",
-    "mapsTo": "LC 191 · Number of 1 Bits"
+    "mapsTo": "LC 191 · Number of 1 Bits",
+    "cases": [
+      {
+        "call": "popcount(12)",
+        "expect": "2"
+      },
+      {
+        "call": "popcount(0)",
+        "expect": "0"
+      },
+      {
+        "call": "popcount(7)",
+        "expect": "3"
+      }
+    ]
   },
   {
     "id": "py.u11.bits.shiftone",
@@ -363,7 +548,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "1 << 3",
     "expected": "8",
-    "prereqs": ["py.u11.bits.half"],
+    "prereqs": [
+      "py.u11.bits.half"
+    ],
     "cue": "Left shift slides the lone 1 up by that many places.",
     "syntax": "1 << k",
     "note": "`1 << k` is the number with a single 1 in position k, so `1 << 0` is 1, `1 << 1` is 2, `1 << 3` is 8. It doubles once per shift, the mirror of the `>> 1` halving."
@@ -377,7 +564,9 @@
     "prompt": "What is the value of `mask`?",
     "snippet": "mask = 0\nmask |= 1 << 1\nmask |= 1 << 3\nmask",
     "expected": "10",
-    "prereqs": ["py.u11.bits.shiftone"],
+    "prereqs": [
+      "py.u11.bits.shiftone"
+    ],
     "cue": "Each |= turns one bit on and leaves the rest as they were; add up the places you set.",
     "syntax": "mask |= 1 << k",
     "note": "`|` keeps a 1 wherever either side has a 1, so `mask |= 1 << k` switches bit k on without disturbing the others. Here bits 1 and 3 (the 2s and 8s places) are set, giving 2 + 8 = 10."
@@ -391,11 +580,26 @@
     "prompt": "Write `contains(nums, target)` returning whether `target` is present among the small non-negative ints in `nums`, using an integer as a bitset (bit `k` set means `k` is present).",
     "starter": "def contains(nums, target):\n    # your code here\n    pass",
     "solution": "def contains(nums, target):\n    mask = 0\n    for i in range(len(nums)):\n        mask |= 1 << nums[i]\n    return bool((mask >> target) & 1)",
-    "tests": "assert contains([0, 1, 3], 3) == True, contains([0, 1, 3], 3)\nassert contains([0, 1, 3], 2) == False, contains([0, 1, 3], 2)\nassert contains([], 0) == False, contains([], 0)",
-    "prereqs": ["py.u11.bits.setbit"],
+    "prereqs": [
+      "py.u11.bits.setbit"
+    ],
     "cue": "Set one bit per value at its index, then read back the bit at the target position.",
     "syntax": "1 << k, |= to set",
-    "note": "Reading back, `(mask >> target) & 1` slides bit `target` down to the 1s place and checks it. Packing small non-negative ints into one integer this way lets a single number stand in for a set."
+    "note": "Reading back, `(mask >> target) & 1` slides bit `target` down to the 1s place and checks it. Packing small non-negative ints into one integer this way lets a single number stand in for a set.",
+    "cases": [
+      {
+        "call": "contains([0, 1, 3], 3)",
+        "expect": "True"
+      },
+      {
+        "call": "contains([0, 1, 3], 2)",
+        "expect": "False"
+      },
+      {
+        "call": "contains([], 0)",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u11.bits.xorfold",
@@ -406,7 +610,9 @@
     "prompt": "What is the value of `x`?",
     "snippet": "x = 0\nfor v in [2, 3, 2]:\n    x ^= v\nx",
     "expected": "3",
-    "prereqs": ["py.u11.bits.parity"],
+    "prereqs": [
+      "py.u11.bits.parity"
+    ],
     "cue": "XOR of a value with itself is zero, and order does not matter. Combine them all with XOR and watch the repeats cancel.",
     "syntax": "x ^= v",
     "note": "a ^ a == 0 and a ^ 0 == a, so XOR-ing a whole list makes every value that appears an even number of times vanish."
@@ -420,12 +626,32 @@
     "prompt": "Write `single_number(nums)` where every value appears exactly twice except one that appears once; return that one. Use O(1) extra space.",
     "starter": "def single_number(nums):\n    # your code here\n    pass",
     "solution": "def single_number(nums):\n    x = 0\n    for i in range(len(nums)):\n        x ^= nums[i]\n    return x",
-    "banned": ["set(", "Counter", "dict(", "{"],
-    "tests": "assert single_number([2, 3, 2]) == 3, single_number([2, 3, 2])\nassert single_number([4]) == 4, single_number([4])\nassert single_number([7, 1, 7, 2, 2, 1, 9]) == 9, single_number([7, 1, 7, 2, 2, 1, 9])",
-    "prereqs": ["py.u11.bits.xorfold"],
+    "banned": [
+      "set(",
+      "Counter",
+      "dict(",
+      "{"
+    ],
+    "prereqs": [
+      "py.u11.bits.xorfold"
+    ],
     "cue": "Combine every element with the same operator that cancels equal pairs; the survivor is the loner.",
     "syntax": "x ^= nums[i]",
     "note": "The paired values cancel to zero and the lone value is left, all in one pass with no extra structure. A hash-set count would work too but needs O(n) space.",
-    "mapsTo": "LC 136 · Single Number"
+    "mapsTo": "LC 136 · Single Number",
+    "cases": [
+      {
+        "call": "single_number([2, 3, 2])",
+        "expect": "3"
+      },
+      {
+        "call": "single_number([4])",
+        "expect": "4"
+      },
+      {
+        "call": "single_number([7, 1, 7, 2, 2, 1, 9])",
+        "expect": "9"
+      }
+    ]
   }
 ]

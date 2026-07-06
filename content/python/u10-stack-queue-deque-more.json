@@ -23,13 +23,35 @@
     "prompt": "Write `to_binary(n)` returning the binary form of a non-negative integer `n` as a string, built by pushing remainders onto a stack and popping them off. Return `'0'` for `n == 0`. Do not use `bin()` or format strings.",
     "starter": "def to_binary(n):\n    # your code here\n    pass",
     "solution": "def to_binary(n):\n    if n == 0:\n        return '0'\n    st = []\n    while n > 0:\n        st.append(n % 2)\n        n //= 2\n    out = []\n    while st:\n        out.append(str(st.pop()))\n    return ''.join(out)",
-    "tests": "assert to_binary(13) == '1101', to_binary(13)\nassert to_binary(0) == '0'\nassert to_binary(1) == '1'\nassert to_binary(8) == '1000'",
-    "banned": ["bin(", "format(", "f'", "f\""],
+    "banned": [
+      "bin(",
+      "format(",
+      "f'",
+      "f\""
+    ],
     "prereqs": [
       "py.u10.stack.list.predict"
     ],
     "cue": "Remainders come out least-significant first; a stack flips them back.",
-    "syntax": "n % 2 and n //= 2"
+    "syntax": "n % 2 and n //= 2",
+    "cases": [
+      {
+        "call": "to_binary(13)",
+        "expect": "'1101'"
+      },
+      {
+        "call": "to_binary(0)",
+        "expect": "'0'"
+      },
+      {
+        "call": "to_binary(1)",
+        "expect": "'1'"
+      },
+      {
+        "call": "to_binary(8)",
+        "expect": "'1000'"
+      }
+    ]
   },
   {
     "id": "py.u10.minstack.write",
@@ -57,14 +79,31 @@
     "prompt": "Write `daily_temps(temps)` returning a list where position `i` holds how many days until a warmer temperature than `temps[i]`, or `0` if none follows. One pass.",
     "starter": "def daily_temps(temps):\n    # your code here\n    pass",
     "solution": "def daily_temps(temps):\n    res = [0] * len(temps)\n    st = []\n    for i in range(len(temps)):\n        t = temps[i]\n        while st and temps[st[-1]] < t:\n            j = st.pop()\n            res[j] = i - j\n        st.append(i)\n    return res",
-    "tests": "assert daily_temps([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0], daily_temps([73,74,75,71,69,72,76,73])\nassert daily_temps([30,40,50,60]) == [1,1,1,0]\nassert daily_temps([60,50,40]) == [0,0,0]\nassert daily_temps([]) == []",
     "prereqs": [
       "py.u10.nge.write"
     ],
     "cue": "Hold indices whose warmer day hasn't arrived; a hotter reading settles them.",
     "syntax": "for i in range(len(temps))",
     "note": "The stored value is an index, so the answer is a distance i - j, not the temperature itself.",
-    "mapsTo": "LC 739 · Daily Temperatures"
+    "mapsTo": "LC 739 · Daily Temperatures",
+    "cases": [
+      {
+        "call": "daily_temps([73, 74, 75, 71, 69, 72, 76, 73])",
+        "expect": "[1, 1, 4, 2, 1, 1, 0, 0]"
+      },
+      {
+        "call": "daily_temps([30, 40, 50, 60])",
+        "expect": "[1, 1, 1, 0]"
+      },
+      {
+        "call": "daily_temps([60, 50, 40])",
+        "expect": "[0, 0, 0]"
+      },
+      {
+        "call": "daily_temps([])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u10.queue2stacks.write",

@@ -95,16 +95,35 @@
     "concept": "sum via accumulator",
     "kind": "write",
     "prompt": "Write `my_sum(a)` returning the sum of list `a`. Do not use the built-in `sum`.",
-    "banned": [" sum("],
+    "banned": [
+      " sum("
+    ],
     "starter": "def my_sum(a):\n    total = 0\n    for i in range(len(a)):\n        pass  # your code here\n    return total",
     "solution": "def my_sum(a):\n    total = 0\n    for i in range(len(a)):\n        total += a[i]\n    return total",
-    "tests": "assert my_sum([]) == 0, my_sum([])\nassert my_sum([5]) == 5, my_sum([5])\nassert my_sum([3, 1, 4, 1, 5]) == 14, my_sum([3, 1, 4, 1, 5])\nassert my_sum([-2, 2, -3]) == -3, my_sum([-2, 2, -3])",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
     ],
     "cue": "Keep one running total, updated once per element as you index `a[i]`.",
     "syntax": "for i in range(len(a))",
-    "note": "We start with indexed loops on purpose: a[i] with an explicit counter is what a list really is, and it carries over to C and to interview mechanics. The for-each and comprehension shortcuts come next."
+    "note": "We start with indexed loops on purpose: a[i] with an explicit counter is what a list really is, and it carries over to C and to interview mechanics. The for-each and comprehension shortcuts come next.",
+    "cases": [
+      {
+        "call": "my_sum([])",
+        "expect": "0"
+      },
+      {
+        "call": "my_sum([5])",
+        "expect": "5"
+      },
+      {
+        "call": "my_sum([3, 1, 4, 1, 5])",
+        "expect": "14"
+      },
+      {
+        "call": "my_sum([-2, 2, -3])",
+        "expect": "-3"
+      }
+    ]
   },
   {
     "id": "py.u01.accumulate.foreach.predict",
@@ -145,12 +164,29 @@
     "prompt": "Write `my_product(a)` returning the product of every element in list `a`. `my_product([])` is 1.",
     "starter": "def my_product(a):\n    # your code here\n    pass",
     "solution": "def my_product(a):\n    p = 1\n    for i in range(len(a)):\n        p *= a[i]\n    return p",
-    "tests": "assert my_product([]) == 1, my_product([])\nassert my_product([5]) == 5, my_product([5])\nassert my_product([2, 3, 4]) == 24, my_product([2, 3, 4])\nassert my_product([0, 9]) == 0, my_product([0, 9])",
     "prereqs": [
       "py.u01.accumulate.product.predict"
     ],
     "cue": "Keep one running product; it starts at 1.",
-    "syntax": "*= accumulates"
+    "syntax": "*= accumulates",
+    "cases": [
+      {
+        "call": "my_product([])",
+        "expect": "1"
+      },
+      {
+        "call": "my_product([5])",
+        "expect": "5"
+      },
+      {
+        "call": "my_product([2, 3, 4])",
+        "expect": "24"
+      },
+      {
+        "call": "my_product([0, 9])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u01.accumulate.sum-builtin",
@@ -189,15 +225,30 @@
     "concept": "max value via compare-and-keep",
     "kind": "write",
     "prompt": "Write `my_max(a)` returning the largest element of non-empty list `a`. Do not use the built-in `max`.",
-    "banned": [" max("],
+    "banned": [
+      " max("
+    ],
     "starter": "def my_max(a):\n    # your code here\n    pass",
     "solution": "def my_max(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] > best:\n            best = a[i]\n    return best",
-    "tests": "assert my_max([5]) == 5, my_max([5])\nassert my_max([3, 7, 2, 9, 4]) == 9, my_max([3, 7, 2, 9, 4])\nassert my_max([-1, -9, -3]) == -1, my_max([-1, -9, -3])",
     "prereqs": [
       "py.u01.extreme.max.predict"
     ],
     "cue": "Seed from the first element, then compare-and-keep.",
-    "syntax": "start the loop at index 1"
+    "syntax": "start the loop at index 1",
+    "cases": [
+      {
+        "call": "my_max([5])",
+        "expect": "5"
+      },
+      {
+        "call": "my_max([3, 7, 2, 9, 4])",
+        "expect": "9"
+      },
+      {
+        "call": "my_max([-1, -9, -3])",
+        "expect": "-1"
+      }
+    ]
   },
   {
     "id": "py.u01.extreme.min",
@@ -206,15 +257,30 @@
     "concept": "min value via compare-and-keep",
     "kind": "write",
     "prompt": "Write `my_min(a)` returning the smallest element of non-empty list `a`. Do not use the built-in `min`.",
-    "banned": [" min("],
+    "banned": [
+      " min("
+    ],
     "starter": "def my_min(a):\n    # your code here\n    pass",
     "solution": "def my_min(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] < best:\n            best = a[i]\n    return best",
-    "tests": "assert my_min([5]) == 5, my_min([5])\nassert my_min([3, 7, 2, 9, 4]) == 2, my_min([3, 7, 2, 9, 4])\nassert my_min([-1, -9, -3]) == -9, my_min([-1, -9, -3])",
     "prereqs": [
       "py.u01.extreme.max"
     ],
     "cue": "Like max, but flip the comparison.",
-    "syntax": "x < best comparison"
+    "syntax": "x < best comparison",
+    "cases": [
+      {
+        "call": "my_min([5])",
+        "expect": "5"
+      },
+      {
+        "call": "my_min([3, 7, 2, 9, 4])",
+        "expect": "2"
+      },
+      {
+        "call": "my_min([-1, -9, -3])",
+        "expect": "-9"
+      }
+    ]
   },
   {
     "id": "py.u01.extreme.argmax.predict",
@@ -238,16 +304,31 @@
     "concept": "argmax (index of the max)",
     "kind": "write",
     "prompt": "Write `argmax(a)` returning the index of the largest element of non-empty list `a`, the first such index on ties. Do not use the built-in `max`.",
-    "banned": [" max("],
+    "banned": [
+      " max("
+    ],
     "starter": "def argmax(a):\n    # your code here\n    pass",
     "solution": "def argmax(a):\n    mi = 0\n    for i in range(1, len(a)):\n        if a[i] > a[mi]:\n            mi = i\n    return mi",
-    "tests": "assert argmax([5]) == 0, argmax([5])\nassert argmax([3, 7, 2, 9, 4]) == 3, argmax([3, 7, 2, 9, 4])\nassert argmax([4, 4, 2]) == 0, argmax([4, 4, 2])",
     "prereqs": [
       "py.u01.extreme.argmax.predict",
       "py.u01.extreme.max"
     ],
     "cue": "Keep an index and compare `a[i]` against the kept one.",
-    "syntax": "range(1, len(a))"
+    "syntax": "range(1, len(a))",
+    "cases": [
+      {
+        "call": "argmax([5])",
+        "expect": "0"
+      },
+      {
+        "call": "argmax([3, 7, 2, 9, 4])",
+        "expect": "3"
+      },
+      {
+        "call": "argmax([4, 4, 2])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u01.extreme.argmax-key",
@@ -286,12 +367,25 @@
     "prompt": "Write `count_greater(a, t)` returning how many elements of `a` are strictly greater than `t`.",
     "starter": "def count_greater(a, t):\n    # your code here\n    pass",
     "solution": "def count_greater(a, t):\n    c = 0\n    for i in range(len(a)):\n        if a[i] > t:\n            c += 1\n    return c",
-    "tests": "assert count_greater([], 0) == 0, count_greater([], 0)\nassert count_greater([1, 5, 2, 8, 3, 9], 3) == 3, count_greater([1, 5, 2, 8, 3, 9], 3)\nassert count_greater([1, 2], 5) == 0, count_greater([1, 2], 5)",
     "prereqs": [
       "py.u01.count.predicate.predict"
     ],
     "cue": "Bump a counter each time the test passes.",
-    "syntax": "> comparison"
+    "syntax": "> comparison",
+    "cases": [
+      {
+        "call": "count_greater([], 0)",
+        "expect": "0"
+      },
+      {
+        "call": "count_greater([1, 5, 2, 8, 3, 9], 3)",
+        "expect": "3"
+      },
+      {
+        "call": "count_greater([1, 2], 5)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u01.count.sugar",
@@ -330,12 +424,29 @@
     "prompt": "Write `is_sorted(a)` returning True if `a` is in non-decreasing order, else False. Empty and single-element lists are sorted.",
     "starter": "def is_sorted(a):\n    # your code here\n    pass",
     "solution": "def is_sorted(a):\n    for i in range(1, len(a)):\n        if a[i] < a[i-1]:\n            return False\n    return True",
-    "tests": "assert is_sorted([]) == True, is_sorted([])\nassert is_sorted([5]) == True, is_sorted([5])\nassert is_sorted([1, 2, 2, 3]) == True, is_sorted([1, 2, 2, 3])\nassert is_sorted([1, 3, 2]) == False, is_sorted([1, 3, 2])",
     "prereqs": [
       "py.u01.neighbor.rises.predict"
     ],
     "cue": "Bail on the first out-of-order adjacent pair.",
-    "syntax": "range(1, len(a))"
+    "syntax": "range(1, len(a))",
+    "cases": [
+      {
+        "call": "is_sorted([])",
+        "expect": "True"
+      },
+      {
+        "call": "is_sorted([5])",
+        "expect": "True"
+      },
+      {
+        "call": "is_sorted([1, 2, 2, 3])",
+        "expect": "True"
+      },
+      {
+        "call": "is_sorted([1, 3, 2])",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u01.neighbor.diffs",
@@ -346,12 +457,29 @@
     "prompt": "Write `diffs(a)` returning a list whose element `i` is `a[i] - a[i-1]`. For a list of length `n` the result has length `n-1`.",
     "starter": "def diffs(a):\n    # your code here\n    pass",
     "solution": "def diffs(a):\n    out = []\n    for i in range(1, len(a)):\n        out.append(a[i] - a[i-1])\n    return out",
-    "tests": "assert diffs([]) == [], diffs([])\nassert diffs([5]) == [], diffs([5])\nassert diffs([10, 20, 30]) == [10, 10], diffs([10, 20, 30])\nassert diffs([3, 1]) == [-2], diffs([3, 1])",
     "prereqs": [
       "py.u01.neighbor.rises.predict"
     ],
     "cue": "Append each adjacent difference; result is one shorter.",
-    "syntax": "a[i] - a[i-1]"
+    "syntax": "a[i] - a[i-1]",
+    "cases": [
+      {
+        "call": "diffs([])",
+        "expect": "[]"
+      },
+      {
+        "call": "diffs([5])",
+        "expect": "[]"
+      },
+      {
+        "call": "diffs([10, 20, 30])",
+        "expect": "[10, 10]"
+      },
+      {
+        "call": "diffs([3, 1])",
+        "expect": "[-2]"
+      }
+    ]
   },
   {
     "id": "py.u01.neighbor.zip.predict",
@@ -392,13 +520,30 @@
     "prompt": "Write `has_equal_k_apart(a, k)` returning True if some `a[i] == a[i+k]`, else False.",
     "starter": "def has_equal_k_apart(a, k):\n    # your code here\n    pass",
     "solution": "def has_equal_k_apart(a, k):\n    for i in range(len(a) - k):\n        if a[i] == a[i+k]:\n            return True\n    return False",
-    "tests": "assert has_equal_k_apart([1, 2, 1], 2) == True, has_equal_k_apart([1, 2, 1], 2)\nassert has_equal_k_apart([1, 2, 3], 1) == False, has_equal_k_apart([1, 2, 3], 1)\nassert has_equal_k_apart([1, 1], 1) == True, has_equal_k_apart([1, 1], 1)\nassert has_equal_k_apart([1, 2, 3], 5) == False, has_equal_k_apart([1, 2, 3], 5)",
     "prereqs": [
       "py.u01.offset.compare.predict"
     ],
     "cue": "Scan indices where `i+k` stays in range.",
     "syntax": "range(len(a) - k)",
-    "mapsTo": "pattern behind LC 219 · Contains Duplicate II"
+    "mapsTo": "pattern behind LC 219 · Contains Duplicate II",
+    "cases": [
+      {
+        "call": "has_equal_k_apart([1, 2, 1], 2)",
+        "expect": "True"
+      },
+      {
+        "call": "has_equal_k_apart([1, 2, 3], 1)",
+        "expect": "False"
+      },
+      {
+        "call": "has_equal_k_apart([1, 1], 1)",
+        "expect": "True"
+      },
+      {
+        "call": "has_equal_k_apart([1, 2, 3], 5)",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u01.map.square.predict",
@@ -422,12 +567,25 @@
     "prompt": "Write `squares(a)` returning a new list with each element of `a` squared, in order.",
     "starter": "def squares(a):\n    # your code here\n    pass",
     "solution": "def squares(a):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i] * a[i])\n    return out",
-    "tests": "assert squares([]) == [], squares([])\nassert squares([1, 2, 3, 4]) == [1, 4, 9, 16], squares([1, 2, 3, 4])\nassert squares([-2]) == [4], squares([-2])",
     "prereqs": [
       "py.u01.map.square.predict"
     ],
     "cue": "Build a fresh list, appending each transformed element.",
-    "syntax": "list.append(value)"
+    "syntax": "list.append(value)",
+    "cases": [
+      {
+        "call": "squares([])",
+        "expect": "[]"
+      },
+      {
+        "call": "squares([1, 2, 3, 4])",
+        "expect": "[1, 4, 9, 16]"
+      },
+      {
+        "call": "squares([-2])",
+        "expect": "[4]"
+      }
+    ]
   },
   {
     "id": "py.u01.map.strlen",
@@ -438,12 +596,25 @@
     "prompt": "Write `lengths(words)` returning a list of the length of each string in `words`, in order.",
     "starter": "def lengths(words):\n    # your code here\n    pass",
     "solution": "def lengths(words):\n    out = []\n    for i in range(len(words)):\n        out.append(len(words[i]))\n    return out",
-    "tests": "assert lengths([]) == [], lengths([])\nassert lengths(['a', 'bb', 'ccc']) == [1, 2, 3], lengths(['a', 'bb', 'ccc'])\nassert lengths(['', 'xy']) == [0, 2], lengths(['', 'xy'])",
     "prereqs": [
       "py.u01.map.square"
     ],
     "cue": "Append the size of each string in turn.",
-    "syntax": "len(s)"
+    "syntax": "len(s)",
+    "cases": [
+      {
+        "call": "lengths([])",
+        "expect": "[]"
+      },
+      {
+        "call": "lengths(['a', 'bb', 'ccc'])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "lengths(['', 'xy'])",
+        "expect": "[0, 2]"
+      }
+    ]
   },
   {
     "id": "py.u01.map.comprehension.predict",
@@ -482,12 +653,25 @@
     "prompt": "Write `keep_even(a)` returning a new list with only the even numbers of `a`, in their original order.",
     "starter": "def keep_even(a):\n    # your code here\n    pass",
     "solution": "def keep_even(a):\n    out = []\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            out.append(a[i])\n    return out",
-    "tests": "assert keep_even([]) == [], keep_even([])\nassert keep_even([1, 2, 3, 4, 5, 6]) == [2, 4, 6], keep_even([1, 2, 3, 4, 5, 6])\nassert keep_even([1, 3]) == [], keep_even([1, 3])",
     "prereqs": [
       "py.u01.filter.evens.predict"
     ],
     "cue": "Append only elements passing the even test.",
-    "syntax": "x % 2 == 0"
+    "syntax": "x % 2 == 0",
+    "cases": [
+      {
+        "call": "keep_even([])",
+        "expect": "[]"
+      },
+      {
+        "call": "keep_even([1, 2, 3, 4, 5, 6])",
+        "expect": "[2, 4, 6]"
+      },
+      {
+        "call": "keep_even([1, 3])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u01.filter.comprehension.predict",
@@ -529,14 +713,27 @@
     "prompt": "Write `sum_even(a)` returning the sum of the even numbers in `a`. Returns 0 when none match.",
     "starter": "def sum_even(a):\n    # your code here\n    pass",
     "solution": "def sum_even(a):\n    s = 0\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            s += a[i]\n    return s",
-    "tests": "assert sum_even([]) == 0, sum_even([])\nassert sum_even([1, 2, 3, 4, 5, 6]) == 12, sum_even([1, 2, 3, 4, 5, 6])\nassert sum_even([1, 3]) == 0, sum_even([1, 3])",
     "prereqs": [
       "py.u01.condaccum.sumeven.predict",
       "py.u01.filter.evens",
       "py.u01.accumulate.sum"
     ],
     "cue": "Combine a filter test with a running total.",
-    "syntax": "x % 2 == 0"
+    "syntax": "x % 2 == 0",
+    "cases": [
+      {
+        "call": "sum_even([])",
+        "expect": "0"
+      },
+      {
+        "call": "sum_even([1, 2, 3, 4, 5, 6])",
+        "expect": "12"
+      },
+      {
+        "call": "sum_even([1, 3])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u01.condaccum.sugar",
@@ -575,12 +772,25 @@
     "prompt": "Write `flatten(ll)`, taking a list of lists, returning one flat list with all elements in order.",
     "starter": "def flatten(ll):\n    # your code here\n    pass",
     "solution": "def flatten(ll):\n    flat = []\n    for i in range(len(ll)):\n        for j in range(len(ll[i])):\n            flat.append(ll[i][j])\n    return flat",
-    "tests": "assert flatten([]) == [], flatten([])\nassert flatten([[1, 2], [3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6], flatten([[1, 2], [3], [4, 5, 6]])\nassert flatten([[], [1]]) == [1], flatten([[], [1]])",
     "prereqs": [
       "py.u01.flatten.raw.predict"
     ],
     "cue": "Loop the sublists, then loop each sublist's elements.",
-    "syntax": "nested for-loops"
+    "syntax": "nested for-loops",
+    "cases": [
+      {
+        "call": "flatten([])",
+        "expect": "[]"
+      },
+      {
+        "call": "flatten([[1, 2], [3], [4, 5, 6]])",
+        "expect": "[1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "call": "flatten([[], [1]])",
+        "expect": "[1]"
+      }
+    ]
   },
   {
     "id": "py.u01.flatten.comprehension.predict",
@@ -619,12 +829,25 @@
     "prompt": "Write `dot(a, b)` for two equal-length lists, returning the sum of `a[i] * b[i]`.",
     "starter": "def dot(a, b):\n    # your code here\n    pass",
     "solution": "def dot(a, b):\n    s = 0\n    for i in range(len(a)):\n        s += a[i] * b[i]\n    return s",
-    "tests": "assert dot([], []) == 0, dot([], [])\nassert dot([1, 2, 3], [4, 5, 6]) == 32, dot([1, 2, 3], [4, 5, 6])\nassert dot([2], [3]) == 6, dot([2], [3])",
     "prereqs": [
       "py.u01.parallel.dot.predict"
     ],
     "cue": "Walk one index across both lists, summing products.",
-    "syntax": "a[i] * b[i]"
+    "syntax": "a[i] * b[i]",
+    "cases": [
+      {
+        "call": "dot([], [])",
+        "expect": "0"
+      },
+      {
+        "call": "dot([1, 2, 3], [4, 5, 6])",
+        "expect": "32"
+      },
+      {
+        "call": "dot([2], [3])",
+        "expect": "6"
+      }
+    ]
   },
   {
     "id": "py.u01.parallel.add",
@@ -635,12 +858,25 @@
     "prompt": "Write `add_lists(a, b)` for two equal-length lists, returning a new list where element `i` is `a[i] + b[i]`.",
     "starter": "def add_lists(a, b):\n    # your code here\n    pass",
     "solution": "def add_lists(a, b):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i] + b[i])\n    return out",
-    "tests": "assert add_lists([], []) == [], add_lists([], [])\nassert add_lists([1, 2, 3], [4, 5, 6]) == [5, 7, 9], add_lists([1, 2, 3], [4, 5, 6])\nassert add_lists([10], [-1]) == [9], add_lists([10], [-1])",
     "prereqs": [
       "py.u01.parallel.dot.predict"
     ],
     "cue": "Walk one index across both lists, appending sums.",
-    "syntax": "a[i] + b[i]"
+    "syntax": "a[i] + b[i]",
+    "cases": [
+      {
+        "call": "add_lists([], [])",
+        "expect": "[]"
+      },
+      {
+        "call": "add_lists([1, 2, 3], [4, 5, 6])",
+        "expect": "[5, 7, 9]"
+      },
+      {
+        "call": "add_lists([10], [-1])",
+        "expect": "[9]"
+      }
+    ]
   },
   {
     "id": "py.u01.parallel.zip.predict",
@@ -666,12 +902,25 @@
     "prompt": "Write `interleave(a, b)` for two equal-length lists, returning `[a[0], b[0], a[1], b[1], ...]`.",
     "starter": "def interleave(a, b):\n    # your code here\n    pass",
     "solution": "def interleave(a, b):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i])\n        out.append(b[i])\n    return out",
-    "tests": "assert interleave([], []) == [], interleave([], [])\nassert interleave([1, 2, 3], [4, 5, 6]) == [1, 4, 2, 5, 3, 6], interleave([1, 2, 3], [4, 5, 6])\nassert interleave([1], [2]) == [1, 2], interleave([1], [2])",
     "prereqs": [
       "py.u01.parallel.dot"
     ],
     "cue": "At each index, take from a, then from b.",
-    "syntax": "list.append twice per index"
+    "syntax": "list.append twice per index",
+    "cases": [
+      {
+        "call": "interleave([], [])",
+        "expect": "[]"
+      },
+      {
+        "call": "interleave([1, 2, 3], [4, 5, 6])",
+        "expect": "[1, 4, 2, 5, 3, 6]"
+      },
+      {
+        "call": "interleave([1], [2])",
+        "expect": "[1, 2]"
+      }
+    ]
   },
   {
     "id": "py.u01.enumerate.predict",
@@ -723,15 +972,32 @@
     "concept": "reverse via backward loop",
     "kind": "write",
     "prompt": "Write `reverse_list(a)` returning a new list with the elements of `a` in reverse order. Do not use `reversed`, `.reverse()`, or slice-reversal `a[::-1]`.",
-    "banned": ["reversed(", ".reverse(", "[::-1]"],
+    "banned": [
+      "reversed(",
+      ".reverse(",
+      "[::-1]"
+    ],
     "starter": "def reverse_list(a):\n    # your code here\n    pass",
     "solution": "def reverse_list(a):\n    out = []\n    for i in range(len(a) - 1, -1, -1):\n        out.append(a[i])\n    return out",
-    "tests": "assert reverse_list([]) == [], reverse_list([])\nassert reverse_list([7]) == [7], reverse_list([7])\nassert reverse_list([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_list([1, 2, 3, 4])",
     "prereqs": [
       "py.u01.reverse.raw.predict"
     ],
     "cue": "Loop indices from last to first, appending each.",
-    "syntax": "range(start, stop, step) with negative step"
+    "syntax": "range(start, stop, step) with negative step",
+    "cases": [
+      {
+        "call": "reverse_list([])",
+        "expect": "[]"
+      },
+      {
+        "call": "reverse_list([7])",
+        "expect": "[7]"
+      },
+      {
+        "call": "reverse_list([1, 2, 3, 4])",
+        "expect": "[4, 3, 2, 1]"
+      }
+    ]
   },
   {
     "id": "py.u01.reverse.sugar.predict",
@@ -800,13 +1066,30 @@
     "prompt": "Write `window_sums(a, k)` returning a list with the sum of each contiguous window of length `k` in `a`. For a list of length `n` there are `n-k+1` windows (empty list when `k > n`).",
     "starter": "def window_sums(a, k):\n    # your code here\n    pass",
     "solution": "def window_sums(a, k):\n    out = []\n    for i in range(len(a) - k + 1):\n        total = 0\n        for j in range(i, i + k):\n            total += a[j]\n        out.append(total)\n    return out",
-    "tests": "assert window_sums([1, 2, 3, 4, 5], 3) == [6, 9, 12], window_sums([1, 2, 3, 4, 5], 3)\nassert window_sums([1, 2, 3], 3) == [6], window_sums([1, 2, 3], 3)\nassert window_sums([5], 1) == [5], window_sums([5], 1)\nassert window_sums([1, 2], 3) == [], window_sums([1, 2], 3)",
     "prereqs": [
       "py.u01.fencepost.windows.predict",
       "py.u01.accumulate.sum"
     ],
     "cue": "For each window start, sum its k elements.",
     "syntax": "range(len(a) - k + 1)",
-    "note": "Big-O names how the work grows with the input size n: O(n) means the work grows in step with n, O(n*k) means about n times k as much. This re-sums every window from scratch, which is O(n*k). A rolling sum that adds the entering element and drops the leaving one does it in O(n)."
+    "note": "Big-O names how the work grows with the input size n: O(n) means the work grows in step with n, O(n*k) means about n times k as much. This re-sums every window from scratch, which is O(n*k). A rolling sum that adds the entering element and drops the leaving one does it in O(n).",
+    "cases": [
+      {
+        "call": "window_sums([1, 2, 3, 4, 5], 3)",
+        "expect": "[6, 9, 12]"
+      },
+      {
+        "call": "window_sums([1, 2, 3], 3)",
+        "expect": "[6]"
+      },
+      {
+        "call": "window_sums([5], 1)",
+        "expect": "[5]"
+      },
+      {
+        "call": "window_sums([1, 2], 3)",
+        "expect": "[]"
+      }
+    ]
   }
 ]

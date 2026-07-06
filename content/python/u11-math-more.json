@@ -8,12 +8,37 @@
     "prompt": "Write `is_prime(n)` returning True if `n` is prime and False otherwise. Trial-divide by candidates up to the square root of `n`. Do not use any library.",
     "starter": "def is_prime(n):\n    # your code here\n    pass",
     "solution": "def is_prime(n):\n    if n < 2:\n        return False\n    i = 2\n    while i * i <= n:\n        if n % i == 0:\n            return False\n        i += 1\n    return True",
-    "banned": ["import"],
-    "tests": "assert is_prime(2) == True, is_prime(2)\nassert is_prime(1) == False, is_prime(1)\nassert is_prime(97) == True, is_prime(97)\nassert is_prime(100) == False, is_prime(100)\nassert is_prime(0) == False, is_prime(0)",
+    "banned": [
+      "import"
+    ],
     "cue": "A divisor larger than the square root pairs with a smaller one, so stop testing at i * i > n. A remainder of 0 means it divides.",
     "syntax": "n % i == 0",
-    "prereqs": ["py.u11.mod.parity"],
-    "mapsTo": "pattern behind LC 204 · Count Primes"
+    "prereqs": [
+      "py.u11.mod.parity"
+    ],
+    "mapsTo": "pattern behind LC 204 · Count Primes",
+    "cases": [
+      {
+        "call": "is_prime(2)",
+        "expect": "True"
+      },
+      {
+        "call": "is_prime(1)",
+        "expect": "False"
+      },
+      {
+        "call": "is_prime(97)",
+        "expect": "True"
+      },
+      {
+        "call": "is_prime(100)",
+        "expect": "False"
+      },
+      {
+        "call": "is_prime(0)",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u11.power.write",
@@ -24,11 +49,34 @@
     "prompt": "Write `int_pow(base, exp)` for `exp >= 0` returning `base` raised to `exp`, built by a multiply loop. Do not use `**` or `pow`.",
     "starter": "def int_pow(base, exp):\n    # your code here\n    pass",
     "solution": "def int_pow(base, exp):\n    result = 1\n    for _ in range(exp):\n        result *= base\n    return result",
-    "banned": ["**", " pow(", ".pow("],
-    "tests": "assert int_pow(2, 10) == 1024, int_pow(2, 10)\nassert int_pow(5, 0) == 1, int_pow(5, 0)\nassert int_pow(3, 3) == 27, int_pow(3, 3)\nassert int_pow(7, 1) == 7, int_pow(7, 1)",
+    "banned": [
+      "**",
+      " pow(",
+      ".pow("
+    ],
     "cue": "Start the accumulator at 1 (the empty product) and multiply by base once per exponent step.",
     "syntax": "result *= base",
-    "prereqs": ["py.u11.horner.build"]
+    "prereqs": [
+      "py.u11.horner.build"
+    ],
+    "cases": [
+      {
+        "call": "int_pow(2, 10)",
+        "expect": "1024"
+      },
+      {
+        "call": "int_pow(5, 0)",
+        "expect": "1"
+      },
+      {
+        "call": "int_pow(3, 3)",
+        "expect": "27"
+      },
+      {
+        "call": "int_pow(7, 1)",
+        "expect": "7"
+      }
+    ]
   },
   {
     "id": "py.u11.isqrt.write",
@@ -39,12 +87,42 @@
     "prompt": "Write `isqrt(n)` for `n >= 0` returning the floor of its square root: the largest integer `i` with `i * i <= n`. Do not use `math.isqrt`, `**`, or `sqrt`.",
     "starter": "def isqrt(n):\n    # your code here\n    pass",
     "solution": "def isqrt(n):\n    i = 0\n    while (i + 1) * (i + 1) <= n:\n        i += 1\n    return i",
-    "banned": ["import", "**"],
-    "tests": "assert isqrt(0) == 0, isqrt(0)\nassert isqrt(1) == 1, isqrt(1)\nassert isqrt(15) == 3, isqrt(15)\nassert isqrt(16) == 4, isqrt(16)\nassert isqrt(24) == 4, isqrt(24)\nassert isqrt(25) == 5, isqrt(25)",
+    "banned": [
+      "import",
+      "**"
+    ],
     "cue": "Advance i while the next square still fits under n; the last i that fits is the floor root.",
     "syntax": "(i + 1) * (i + 1) <= n",
-    "prereqs": ["py.u11.intdiv.floor"],
-    "mapsTo": "LC 69 · Sqrt(x)"
+    "prereqs": [
+      "py.u11.intdiv.floor"
+    ],
+    "mapsTo": "LC 69 · Sqrt(x)",
+    "cases": [
+      {
+        "call": "isqrt(0)",
+        "expect": "0"
+      },
+      {
+        "call": "isqrt(1)",
+        "expect": "1"
+      },
+      {
+        "call": "isqrt(15)",
+        "expect": "3"
+      },
+      {
+        "call": "isqrt(16)",
+        "expect": "4"
+      },
+      {
+        "call": "isqrt(24)",
+        "expect": "4"
+      },
+      {
+        "call": "isqrt(25)",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u11.base.write",
@@ -55,12 +133,33 @@
     "prompt": "Write `to_base(n, b)` for `n >= 0` and `b >= 2` returning the list of `n`'s digits in base `b`, most significant first. `to_base(0, 2)` is `[0]`; `to_base(13, 2)` is `[1, 1, 0, 1]`.",
     "starter": "def to_base(n, b):\n    # your code here\n    pass",
     "solution": "def to_base(n, b):\n    if n == 0:\n        return [0]\n    digits = []\n    while n:\n        digits.append(n % b)\n        n //= b\n    digits.reverse()\n    return digits",
-    "banned": ["import"],
-    "tests": "assert to_base(13, 2) == [1, 1, 0, 1], to_base(13, 2)\nassert to_base(0, 2) == [0], to_base(0, 2)\nassert to_base(255, 16) == [15, 15], to_base(255, 16)\nassert to_base(7, 10) == [7], to_base(7, 10)",
+    "banned": [
+      "import"
+    ],
     "cue": "Same digit-by-digit loop as reversing a number, but the modulus is b, not 10. That gives least-significant first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and n //= b",
-    "prereqs": ["py.u11.intdiv.revnum"],
-    "mapsTo": "pattern behind LC 504 · Base 7"
+    "prereqs": [
+      "py.u11.intdiv.revnum"
+    ],
+    "mapsTo": "pattern behind LC 504 · Base 7",
+    "cases": [
+      {
+        "call": "to_base(13, 2)",
+        "expect": "[1, 1, 0, 1]"
+      },
+      {
+        "call": "to_base(0, 2)",
+        "expect": "[0]"
+      },
+      {
+        "call": "to_base(255, 16)",
+        "expect": "[15, 15]"
+      },
+      {
+        "call": "to_base(7, 10)",
+        "expect": "[7]"
+      }
+    ]
   },
   {
     "id": "py.u11.power.sqfold",
@@ -71,7 +170,9 @@
     "prompt": "What is the value of `squares`?",
     "snippet": "base = 2\nsquares = []\nfor _ in range(4):\n    squares.append(base)\n    base *= base\nsquares",
     "expected": "[2, 4, 16, 256]",
-    "prereqs": ["py.u11.power.write"],
+    "prereqs": [
+      "py.u11.power.write"
+    ],
     "cue": "Each pass squares what you had, so the reachable exponent doubles: 2^1, 2^2, 2^4, 2^8.",
     "syntax": "base *= base",
     "note": "Squaring k times reaches exponent 2^k. Combining only the squares whose bit is set in the exponent turns a linear multiply loop into a log-time one."
@@ -85,12 +186,36 @@
     "prompt": "Write `fast_pow(base, exp)` for `exp >= 0` returning `base` to the `exp` in O(log exp) multiplies. Do not use `**` or `pow`.",
     "starter": "def fast_pow(base, exp):\n    # your code here\n    pass",
     "solution": "def fast_pow(base, exp):\n    result = 1\n    while exp:\n        if exp & 1:\n            result *= base\n        base *= base\n        exp >>= 1\n    return result",
-    "tests": "assert fast_pow(2, 10) == 1024, fast_pow(2, 10)\nassert fast_pow(5, 0) == 1, fast_pow(5, 0)\nassert fast_pow(3, 3) == 27, fast_pow(3, 3)\nassert fast_pow(7, 1) == 7, fast_pow(7, 1)\nassert fast_pow(10, 5) == 100000, fast_pow(10, 5)",
-    "prereqs": ["py.u11.power.write", "py.u11.power.sqfold"],
+    "prereqs": [
+      "py.u11.power.write",
+      "py.u11.power.sqfold"
+    ],
     "cue": "Read the exponent bit by bit: square the base every step, and fold it into the result only when the low bit is set.",
     "syntax": "exp & 1, base *= base, exp >>= 1",
     "note": "The exponent's binary digits pick which squares to multiply in, so the loop runs about log2(exp) times instead of exp times.",
-    "mapsTo": "LC 50 · Pow(x, n)"
+    "mapsTo": "LC 50 · Pow(x, n)",
+    "cases": [
+      {
+        "call": "fast_pow(2, 10)",
+        "expect": "1024"
+      },
+      {
+        "call": "fast_pow(5, 0)",
+        "expect": "1"
+      },
+      {
+        "call": "fast_pow(3, 3)",
+        "expect": "27"
+      },
+      {
+        "call": "fast_pow(7, 1)",
+        "expect": "7"
+      },
+      {
+        "call": "fast_pow(10, 5)",
+        "expect": "100000"
+      }
+    ]
   },
   {
     "id": "py.u11.float.imprecise",
@@ -114,7 +239,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "round(2.5)",
     "expected": "2",
-    "prereqs": ["py.u11.float.imprecise"],
+    "prereqs": [
+      "py.u11.float.imprecise"
+    ],
     "cue": "A .5 tie does not always round up in Python.",
     "syntax": "round(x)",
     "note": "Python's round uses banker's rounding: an exact .5 rounds to the nearest even integer, so round(2.5) is 2 and round(3.5) is 4. It keeps a long column of roundings from drifting upward. To always round half up, add 0.5 and take the floor, or use the decimal module."

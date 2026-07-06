@@ -36,12 +36,25 @@
     "prompt": "Write `double_all(a)` returning a new list where each element of `a` is doubled. Iterate by index with `for i in range(len(a))`.",
     "starter": "def double_all(a):\n    # your code here\n    pass",
     "solution": "def double_all(a):\n    out = [0] * len(a)\n    for i in range(len(a)):\n        out[i] = a[i] * 2\n    return out",
-    "tests": "assert double_all([1, 2, 3]) == [2, 4, 6], double_all([1, 2, 3])\nassert double_all([]) == []\nassert double_all([5]) == [10]",
     "prereqs": [
       "py.u10.iterate.index.predict"
     ],
     "cue": "Make an output list, fill each index from the matching input index.",
-    "syntax": "for i in range(len(a))"
+    "syntax": "for i in range(len(a))",
+    "cases": [
+      {
+        "call": "double_all([1, 2, 3])",
+        "expect": "[2, 4, 6]"
+      },
+      {
+        "call": "double_all([])",
+        "expect": "[]"
+      },
+      {
+        "call": "double_all([5])",
+        "expect": "[10]"
+      }
+    ]
   },
   {
     "id": "py.u10.stack.push",
@@ -176,13 +189,30 @@
     "prompt": "Write `eval_rpn(tokens)` that evaluates a list of reverse-Polish-notation tokens and returns the integer result. Each token is either an operator string (`'+'`, `'-'`, `'*'`, `'/'`) or an integer string. Use integer division that truncates toward zero (`int(a / b)`). Use a list as a stack.",
     "starter": "def eval_rpn(tokens):\n    # your code here\n    pass",
     "solution": "def eval_rpn(tokens):\n    st = []\n    for i in range(len(tokens)):\n        t = tokens[i]\n        if t in ('+', '-', '*', '/'):\n            b = st.pop()\n            a = st.pop()\n            if t == '+': st.append(a + b)\n            elif t == '-': st.append(a - b)\n            elif t == '*': st.append(a * b)\n            else: st.append(int(a / b))\n        else:\n            st.append(int(t))\n    return st.pop()",
-    "tests": "assert eval_rpn(['2','1','+','3','*']) == 9, eval_rpn(['2','1','+','3','*'])\nassert eval_rpn(['4','13','5','/','+']) == 6\nassert eval_rpn(['5']) == 5\nassert eval_rpn(['-7','2','/']) == -3, eval_rpn(['-7','2','/'])",
     "prereqs": [
       "py.u10.trunc.div.predict"
     ],
     "cue": "Scan tokens; on an operator pop two operands and push the result.",
     "syntax": "list.pop() / list.append(x)",
-    "mapsTo": "LC 150 · Evaluate Reverse Polish Notation"
+    "mapsTo": "LC 150 · Evaluate Reverse Polish Notation",
+    "cases": [
+      {
+        "call": "eval_rpn(['2', '1', '+', '3', '*'])",
+        "expect": "9"
+      },
+      {
+        "call": "eval_rpn(['4', '13', '5', '/', '+'])",
+        "expect": "6"
+      },
+      {
+        "call": "eval_rpn(['5'])",
+        "expect": "5"
+      },
+      {
+        "call": "eval_rpn(['-7', '2', '/'])",
+        "expect": "-3"
+      }
+    ]
   },
   {
     "id": "py.u10.parens.predict",
@@ -240,14 +270,27 @@
     "prompt": "Write `nge(nums)` returning a list where position `i` holds the nearest element after `i` that is greater than `nums[i]`, or `-1` if none exists. One pass, O(n).",
     "starter": "def nge(nums):\n    # your code here\n    pass",
     "solution": "def nge(nums):\n    res = [-1] * len(nums)\n    st = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while st and nums[st[-1]] < x:\n            res[st.pop()] = x\n        st.append(i)\n    return res",
-    "tests": "assert nge([2,1,2,4,3]) == [4, 2, 4, -1, -1], nge([2,1,2,4,3])\nassert nge([1,2,3]) == [2, 3, -1]\nassert nge([3,2,1]) == [-1, -1, -1]",
     "prereqs": [
       "py.u10.nge.predict"
     ],
     "cue": "Hold a stack of unresolved indices; a larger element settles them.",
     "syntax": "for i in range(len(nums))",
     "note": "This is a monotonic stack: the values it holds stay in order (here decreasing), so a bigger element clears every smaller one below it. Each index is pushed and popped at most once, so the whole scan is O(n). LC 496 is the two-array version: build the next-greater answer for one array with this exact scan, then look up a second array's values in it. This single-array scan is the core.",
-    "mapsTo": "pattern behind LC 496 · Next Greater Element I"
+    "mapsTo": "pattern behind LC 496 · Next Greater Element I",
+    "cases": [
+      {
+        "call": "nge([2, 1, 2, 4, 3])",
+        "expect": "[4, 2, 4, -1, -1]"
+      },
+      {
+        "call": "nge([1, 2, 3])",
+        "expect": "[2, 3, -1]"
+      },
+      {
+        "call": "nge([3, 2, 1])",
+        "expect": "[-1, -1, -1]"
+      }
+    ]
   },
   {
     "id": "py.u10.nge.enumerate.predict",
@@ -448,13 +491,26 @@
     "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, left to right. One pass, O(n).",
     "starter": "from collections import deque\n\ndef maxwin(nums, k):\n    # your code here\n    pass",
     "solution": "from collections import deque\n\ndef maxwin(nums, k):\n    d = deque()\n    out = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while d and nums[d[-1]] <= x:\n            d.pop()\n        d.append(i)\n        if d[0] <= i - k:\n            d.popleft()\n        if i >= k - 1:\n            out.append(nums[d[0]])\n    return out",
-    "tests": "assert maxwin([1,3,-1,-3,5,3,6,7], 3) == [3, 3, 5, 5, 6, 7], maxwin([1,3,-1,-3,5,3,6,7], 3)\nassert maxwin([1], 1) == [1]\nassert maxwin([9,8,7], 2) == [9, 8]",
     "prereqs": [
       "py.u10.maxwin.predict"
     ],
     "cue": "Keep a deque of indices whose values fall from front to back; drop the front once it leaves the window.",
     "syntax": "deque[0] front index",
     "note": "Each index enters and leaves the deque once, so it is O(n), not O(nk) re-scanning each window.",
-    "mapsTo": "LC 239 · Sliding Window Maximum"
+    "mapsTo": "LC 239 · Sliding Window Maximum",
+    "cases": [
+      {
+        "call": "maxwin([1, 3, -1, -3, 5, 3, 6, 7], 3)",
+        "expect": "[3, 3, 5, 5, 6, 7]"
+      },
+      {
+        "call": "maxwin([1], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "maxwin([9, 8, 7], 2)",
+        "expect": "[9, 8]"
+      }
+    ]
   }
 ]

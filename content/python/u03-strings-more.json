@@ -7,13 +7,40 @@
     "kind": "write",
     "prompt": "Write `first_unique(s)` returning the index of the first character in `s` that appears exactly once, or -1 if there is none.",
     "starter": "def first_unique(s):\n    # your code here\n    pass",
-    "banned": ["Counter", ".count("],
+    "banned": [
+      "Counter",
+      ".count("
+    ],
     "solution": "def first_unique(s):\n    counts = {}\n    for c in s:\n        counts[c] = counts.get(c, 0) + 1\n    for i, c in enumerate(s):\n        if counts[c] == 1:\n            return i\n    return -1",
-    "tests": "assert first_unique(\"leetcode\") == 0\nassert first_unique(\"loveleetcode\") == 2\nassert first_unique(\"aabb\") == -1\nassert first_unique(\"\") == -1\nassert first_unique(\"z\") == 0",
-    "prereqs": ["py.u03.freq.build", "py.u03.enumerate.pairs"],
+    "prereqs": [
+      "py.u03.freq.build",
+      "py.u03.enumerate.pairs"
+    ],
     "cue": "Count every character first, then scan in order for the first count of one.",
     "syntax": "two passes: build counts, then find",
-    "mapsTo": "LC 387 · First Unique Character in a String"
+    "mapsTo": "LC 387 · First Unique Character in a String",
+    "cases": [
+      {
+        "call": "first_unique('leetcode')",
+        "expect": "0"
+      },
+      {
+        "call": "first_unique('loveleetcode')",
+        "expect": "2"
+      },
+      {
+        "call": "first_unique('aabb')",
+        "expect": "-1"
+      },
+      {
+        "call": "first_unique('')",
+        "expect": "-1"
+      },
+      {
+        "call": "first_unique('z')",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u03.anagram",
@@ -23,13 +50,41 @@
     "kind": "write",
     "prompt": "Write `is_anagram(a, b)` returning True if `b` is a rearrangement of the characters of `a`. Do not sort.",
     "starter": "def is_anagram(a, b):\n    # your code here\n    pass",
-    "banned": ["sorted(", ".sort(", "Counter", ".count("],
+    "banned": [
+      "sorted(",
+      ".sort(",
+      "Counter",
+      ".count("
+    ],
     "solution": "def is_anagram(a, b):\n    if len(a) != len(b):\n        return False\n    counts = {}\n    for c in a:\n        counts[c] = counts.get(c, 0) + 1\n    for c in b:\n        if counts.get(c, 0) == 0:\n            return False\n        counts[c] -= 1\n    return True",
-    "tests": "assert is_anagram(\"listen\", \"silent\") == True\nassert is_anagram(\"rat\", \"car\") == False\nassert is_anagram(\"\", \"\") == True\nassert is_anagram(\"aabb\", \"bbaa\") == True\nassert is_anagram(\"a\", \"ab\") == False",
-    "prereqs": ["py.u03.freq.build"],
+    "prereqs": [
+      "py.u03.freq.build"
+    ],
     "cue": "Tally one string, then draw down that tally with the other.",
     "syntax": "dict.get(key, 0) counts",
-    "mapsTo": "LC 242 · Valid Anagram"
+    "mapsTo": "LC 242 · Valid Anagram",
+    "cases": [
+      {
+        "call": "is_anagram('listen', 'silent')",
+        "expect": "True"
+      },
+      {
+        "call": "is_anagram('rat', 'car')",
+        "expect": "False"
+      },
+      {
+        "call": "is_anagram('', '')",
+        "expect": "True"
+      },
+      {
+        "call": "is_anagram('aabb', 'bbaa')",
+        "expect": "True"
+      },
+      {
+        "call": "is_anagram('a', 'ab')",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u03.swapcase",
@@ -39,12 +94,39 @@
     "kind": "write",
     "prompt": "Write `swap_case(s)` returning `s` with each lowercase letter made uppercase and each uppercase letter made lowercase; leave other characters unchanged. Do not use `str.swapcase`, `str.upper`, or `str.lower`.",
     "starter": "def swap_case(s):\n    # your code here\n    pass",
-    "banned": [".swapcase(", ".upper(", ".lower("],
+    "banned": [
+      ".swapcase(",
+      ".upper(",
+      ".lower("
+    ],
     "solution": "def swap_case(s):\n    parts = []\n    for c in s:\n        if 'a' <= c <= 'z':\n            parts.append(chr(ord(c) - 32))\n        elif 'A' <= c <= 'Z':\n            parts.append(chr(ord(c) + 32))\n        else:\n            parts.append(c)\n    return \"\".join(parts)",
-    "tests": "assert swap_case(\"Hello\") == \"hELLO\"\nassert swap_case(\"abc\") == \"ABC\"\nassert swap_case(\"AB3c\") == \"ab3C\"\nassert swap_case(\"\") == \"\"\nassert swap_case(\"123\") == \"123\"",
-    "prereqs": ["py.u03.build.caesar"],
+    "prereqs": [
+      "py.u03.build.caesar"
+    ],
     "cue": "The two cases sit a fixed distance apart in the code table; add or subtract it.",
-    "syntax": "ord(c) / chr(n) with a 32 offset"
+    "syntax": "ord(c) / chr(n) with a 32 offset",
+    "cases": [
+      {
+        "call": "swap_case('Hello')",
+        "expect": "'hELLO'"
+      },
+      {
+        "call": "swap_case('abc')",
+        "expect": "'ABC'"
+      },
+      {
+        "call": "swap_case('AB3c')",
+        "expect": "'ab3C'"
+      },
+      {
+        "call": "swap_case('')",
+        "expect": "''"
+      },
+      {
+        "call": "swap_case('123')",
+        "expect": "'123'"
+      }
+    ]
   },
   {
     "id": "py.u03.reverse.words",
@@ -55,11 +137,31 @@
     "prompt": "Write `reverse_words(s)` returning `s` with the space-separated words in reverse order. Single spaces separate words and there are no leading or trailing spaces.",
     "starter": "def reverse_words(s):\n    # your code here\n    pass",
     "solution": "def reverse_words(s):\n    words = s.split(\" \")\n    return \" \".join(words[::-1])",
-    "tests": "assert reverse_words(\"the sky is blue\") == \"blue is sky the\"\nassert reverse_words(\"hello\") == \"hello\"\nassert reverse_words(\"a b c\") == \"c b a\"\nassert reverse_words(\"\") == \"\"",
-    "prereqs": ["py.u03.sugar.splitjoin", "py.u03.reverse.slice"],
+    "prereqs": [
+      "py.u03.sugar.splitjoin",
+      "py.u03.reverse.slice"
+    ],
     "cue": "Split into words, reverse that list, then join back with spaces.",
     "syntax": "str.split(\" \") / \" \".join(...)",
-    "mapsTo": "LC 151 · Reverse Words in a String"
+    "mapsTo": "LC 151 · Reverse Words in a String",
+    "cases": [
+      {
+        "call": "reverse_words('the sky is blue')",
+        "expect": "'blue is sky the'"
+      },
+      {
+        "call": "reverse_words('hello')",
+        "expect": "'hello'"
+      },
+      {
+        "call": "reverse_words('a b c')",
+        "expect": "'c b a'"
+      },
+      {
+        "call": "reverse_words('')",
+        "expect": "''"
+      }
+    ]
   },
   {
     "id": "py.u03.prefix.check",
@@ -69,12 +171,38 @@
     "kind": "write",
     "prompt": "Write `starts_with(s, p)` returning True if `s` begins with the prefix `p`. Compare character by character; do not use `str.startswith` or slicing.",
     "starter": "def starts_with(s, p):\n    # your code here\n    pass",
-    "banned": [".startswith(", "[:"],
+    "banned": [
+      ".startswith(",
+      "[:"
+    ],
     "solution": "def starts_with(s, p):\n    if len(p) > len(s):\n        return False\n    for i in range(len(p)):\n        if s[i] != p[i]:\n            return False\n    return True",
-    "tests": "assert starts_with(\"hello\", \"he\") == True\nassert starts_with(\"hello\", \"hello\") == True\nassert starts_with(\"hello\", \"world\") == False\nassert starts_with(\"hi\", \"hello\") == False\nassert starts_with(\"abc\", \"\") == True",
-    "prereqs": ["py.u03.find.scan"],
+    "prereqs": [
+      "py.u03.find.scan"
+    ],
     "cue": "Walk the prefix, comparing each character to the same position in the string.",
-    "syntax": "s[i] != p[i] comparison"
+    "syntax": "s[i] != p[i] comparison",
+    "cases": [
+      {
+        "call": "starts_with('hello', 'he')",
+        "expect": "True"
+      },
+      {
+        "call": "starts_with('hello', 'hello')",
+        "expect": "True"
+      },
+      {
+        "call": "starts_with('hello', 'world')",
+        "expect": "False"
+      },
+      {
+        "call": "starts_with('hi', 'hello')",
+        "expect": "False"
+      },
+      {
+        "call": "starts_with('abc', '')",
+        "expect": "True"
+      }
+    ]
   },
   {
     "id": "py.u03.build.removevowels",
@@ -84,12 +212,35 @@
     "kind": "write",
     "prompt": "Write `remove_vowels(s)` returning a new string with every lowercase vowel (a, e, i, o, u) removed, keeping all other characters in order.",
     "starter": "def remove_vowels(s):\n    # your code here\n    pass",
-    "banned": [".replace(", ".translate("],
+    "banned": [
+      ".replace(",
+      ".translate("
+    ],
     "solution": "def remove_vowels(s):\n    parts = []\n    for c in s:\n        if c not in \"aeiou\":\n            parts.append(c)\n    return \"\".join(parts)",
-    "tests": "assert remove_vowels(\"banana\") == \"bnn\"\nassert remove_vowels(\"xyz\") == \"xyz\"\nassert remove_vowels(\"aeiou\") == \"\"\nassert remove_vowels(\"\") == \"\"",
-    "prereqs": ["py.u03.build.filter", "py.u03.count.vowels"],
+    "prereqs": [
+      "py.u03.build.filter",
+      "py.u03.count.vowels"
+    ],
     "cue": "Keep the characters that are not vowels, then join them.",
-    "syntax": "c not in \"aeiou\""
+    "syntax": "c not in \"aeiou\"",
+    "cases": [
+      {
+        "call": "remove_vowels('banana')",
+        "expect": "'bnn'"
+      },
+      {
+        "call": "remove_vowels('xyz')",
+        "expect": "'xyz'"
+      },
+      {
+        "call": "remove_vowels('aeiou')",
+        "expect": "''"
+      },
+      {
+        "call": "remove_vowels('')",
+        "expect": "''"
+      }
+    ]
   },
   {
     "id": "py.u03.ord.tochar",
@@ -100,7 +251,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "n = 4\nchr(ord('a') + n)",
     "expected": "'e'",
-    "prereqs": ["py.u03.ord.basics"],
+    "prereqs": [
+      "py.u03.ord.basics"
+    ],
     "cue": "Add the offset onto the base letter's code point, then convert back.",
     "syntax": "chr(ord('a') + n)"
   },
@@ -113,7 +266,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"one two three four\"\nlen(s.split(\" \"))",
     "expected": "4",
-    "prereqs": ["py.u03.sugar.splitjoin"],
+    "prereqs": [
+      "py.u03.sugar.splitjoin"
+    ],
     "cue": "Splitting on the separator yields one field per word.",
     "syntax": "len(str.split(sep))"
   },
@@ -126,7 +281,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"abc\"\ntry:\n    s[0] = \"x\"\n    r = \"ok\"\nexcept TypeError:\n    r = \"TypeError\"\nr",
     "expected": "'TypeError'",
-    "prereqs": ["py.u03.charloop.index"],
+    "prereqs": [
+      "py.u03.charloop.index"
+    ],
     "cue": "You can read s[0] but ask whether you can assign to it.",
     "syntax": "s[i] = x on a str",
     "note": "Python strings cannot be mutated in place; build a new string (collect chars, then join) instead of assigning to s[i]."
@@ -140,7 +297,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"a  b\"\n[s.split(\" \"), s.split()]",
     "expected": "[['a', '', 'b'], ['a', 'b']]",
-    "prereqs": ["py.u03.sugar.splitjoin"],
+    "prereqs": [
+      "py.u03.sugar.splitjoin"
+    ],
     "cue": "Compare splitting on one explicit space against the no-argument call.",
     "syntax": "str.split(sep) vs str.split()",
     "note": "split(sep) splits on every separator and keeps empty fields; split() with no argument splits on runs of whitespace and drops the empties."

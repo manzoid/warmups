@@ -68,13 +68,28 @@
     "prompt": "Write `char_frequency(s)` that returns a dict mapping each character in `s` to how many times it appears. Do not use collections.Counter.",
     "starter": "def char_frequency(s):\n    # your code here\n    pass",
     "solution": "def char_frequency(s):\n    freq = {}\n    for i in range(len(s)):\n        ch = s[i]\n        if ch in freq:\n            freq[ch] += 1\n        else:\n            freq[ch] = 1\n    return freq",
-    "tests": "assert char_frequency(\"aabbbc\") == {'a': 2, 'b': 3, 'c': 1}, char_frequency(\"aabbbc\")\nassert char_frequency(\"\") == {}, char_frequency(\"\")\nassert char_frequency(\"z\") == {'z': 1}, char_frequency(\"z\")",
     "prereqs": [
       "py.u04.freq.raw.predict"
     ],
     "cue": "Loop indices; branch on whether the char is already a key.",
     "syntax": "dict[k] increment",
-    "banned": ["Counter"]
+    "banned": [
+      "Counter"
+    ],
+    "cases": [
+      {
+        "call": "char_frequency('aabbbc')",
+        "expect": "{'a': 2, 'b': 3, 'c': 1}"
+      },
+      {
+        "call": "char_frequency('')",
+        "expect": "{}"
+      },
+      {
+        "call": "char_frequency('z')",
+        "expect": "{'z': 1}"
+      }
+    ]
   },
   {
     "id": "py.u04.freq.get.predict",
@@ -231,10 +246,22 @@
     "starter": "def two_sum(nums, target):\n    # your code here\n    pass",
     "solution": "def two_sum(nums, target):\n    seen = {}\n    for i in range(len(nums)):\n        x = nums[i]\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return None",
     "cases": [
-      { "call": "two_sum([2, 7, 11, 15], 9)", "expect": "[0, 1]" },
-      { "call": "two_sum([3, 2, 4], 6)", "expect": "[1, 2]" },
-      { "call": "two_sum([3, 3], 6)", "expect": "[0, 1]" },
-      { "call": "two_sum([1, 2], 10)", "expect": "None" }
+      {
+        "call": "two_sum([2, 7, 11, 15], 9)",
+        "expect": "[0, 1]"
+      },
+      {
+        "call": "two_sum([3, 2, 4], 6)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "two_sum([3, 3], 6)",
+        "expect": "[0, 1]"
+      },
+      {
+        "call": "two_sum([1, 2], 10)",
+        "expect": "None"
+      }
     ],
     "prereqs": [
       "py.u04.two-sum.predict"
@@ -268,14 +295,27 @@
     "prompt": "Write `group_anagrams(words)` that returns a list of lists grouping words that are anagrams of each other. Preserve first-seen order of groups and of words within a group.",
     "starter": "def group_anagrams(words):\n    # your code here\n    pass",
     "solution": "def group_anagrams(words):\n    groups = {}\n    for i in range(len(words)):\n        w = words[i]\n        key = \"\".join(sorted(w))\n        groups.setdefault(key, []).append(w)\n    return list(groups.values())",
-    "tests": "assert group_anagrams([\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"]) == [[\"eat\", \"tea\", \"ate\"], [\"tan\", \"nat\"], [\"bat\"]], group_anagrams([\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"])\nassert group_anagrams([]) == [], group_anagrams([])\nassert group_anagrams([\"a\"]) == [[\"a\"]], group_anagrams([\"a\"])",
     "prereqs": [
       "py.u04.groupby.setdefault.predict"
     ],
     "cue": "Bucket each word under its sorted-letters signature.",
     "syntax": "\"\".join(sorted(w))",
     "note": "Sorting the letters makes a canonical key: anagrams collide on purpose, non-anagrams never do.",
-    "mapsTo": "LC 49 · Group Anagrams"
+    "mapsTo": "LC 49 · Group Anagrams",
+    "cases": [
+      {
+        "call": "group_anagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])",
+        "expect": "[['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]"
+      },
+      {
+        "call": "group_anagrams([])",
+        "expect": "[]"
+      },
+      {
+        "call": "group_anagrams(['a'])",
+        "expect": "[['a']]"
+      }
+    ]
   },
   {
     "id": "py.u04.first-unique.predict",
@@ -301,14 +341,31 @@
     "prompt": "Write `first_uniq_char(s)` that returns the index of the first character in `s` that appears exactly once, or `-1` if there is none.",
     "starter": "def first_uniq_char(s):\n    # your code here\n    pass",
     "solution": "def first_uniq_char(s):\n    from collections import Counter\n    cnt = Counter(s)\n    for i in range(len(s)):\n        if cnt[s[i]] == 1:\n            return i\n    return -1",
-    "tests": "assert first_uniq_char(\"leetcode\") == 0, first_uniq_char(\"leetcode\")\nassert first_uniq_char(\"loveleetcode\") == 2, first_uniq_char(\"loveleetcode\")\nassert first_uniq_char(\"aabb\") == -1, first_uniq_char(\"aabb\")\nassert first_uniq_char(\"\") == -1, first_uniq_char(\"\")",
     "prereqs": [
       "py.u04.first-unique.predict"
     ],
     "cue": "Precount, then walk indices returning the first singleton.",
     "syntax": "for i in range(len(s)): s[i]",
     "note": "Two passes are required: a single pass can't know an early char is unique until the whole string is counted.",
-    "mapsTo": "LC 387 · First Unique Character in a String"
+    "mapsTo": "LC 387 · First Unique Character in a String",
+    "cases": [
+      {
+        "call": "first_uniq_char('leetcode')",
+        "expect": "0"
+      },
+      {
+        "call": "first_uniq_char('loveleetcode')",
+        "expect": "2"
+      },
+      {
+        "call": "first_uniq_char('aabb')",
+        "expect": "-1"
+      },
+      {
+        "call": "first_uniq_char('')",
+        "expect": "-1"
+      }
+    ]
   },
   {
     "id": "py.u04.index-map.write",
@@ -319,12 +376,25 @@
     "prompt": "Write `index_map(nums)` that returns a dict mapping each value to its index in `nums`. With duplicate values, keep the last index.",
     "starter": "def index_map(nums):\n    # your code here\n    pass",
     "solution": "def index_map(nums):\n    pos = {}\n    for i in range(len(nums)):\n        pos[nums[i]] = i\n    return pos",
-    "tests": "assert index_map([10, 20, 30]) == {10: 0, 20: 1, 30: 2}, index_map([10, 20, 30])\nassert index_map([5, 3, 5]) == {5: 2, 3: 1}, index_map([5, 3, 5])\nassert index_map([]) == {}, index_map([])",
     "prereqs": [
       "py.u04.freq.raw.write"
     ],
     "cue": "Map each value to its index; later writes overwrite earlier.",
-    "syntax": "pos[nums[i]] = i"
+    "syntax": "pos[nums[i]] = i",
+    "cases": [
+      {
+        "call": "index_map([10, 20, 30])",
+        "expect": "{10: 0, 20: 1, 30: 2}"
+      },
+      {
+        "call": "index_map([5, 3, 5])",
+        "expect": "{5: 2, 3: 1}"
+      },
+      {
+        "call": "index_map([])",
+        "expect": "{}"
+      }
+    ]
   },
   {
     "id": "py.u04.index-map.comprehension.predict",
@@ -380,13 +450,28 @@
     "prompt": "Write `dedup(arr)` that returns a list with duplicates removed, keeping the first occurrence of each value in original order. Use a set to track what you have seen.",
     "starter": "def dedup(arr):\n    # your code here\n    pass",
     "solution": "def dedup(arr):\n    seen = set()\n    out = []\n    for i in range(len(arr)):\n        x = arr[i]\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out",
-    "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == [], dedup([])\nassert dedup([1, 1, 1]) == [1], dedup([1, 1, 1])",
     "prereqs": [
       "py.u04.seen.dedup.predict"
     ],
     "cue": "Track seen values in a set; append first occurrences in order.",
     "syntax": "set.add(x)",
-    "banned": ["fromkeys"]
+    "banned": [
+      "fromkeys"
+    ],
+    "cases": [
+      {
+        "call": "dedup([3, 1, 3, 2, 1])",
+        "expect": "[3, 1, 2]"
+      },
+      {
+        "call": "dedup([])",
+        "expect": "[]"
+      },
+      {
+        "call": "dedup([1, 1, 1])",
+        "expect": "[1]"
+      }
+    ]
   },
   {
     "id": "py.u04.contains-dup.predict",

@@ -57,11 +57,28 @@
     "prompt": "Write `count_jewels(jewels, stones)` returning how many characters of `stones` appear in the string `jewels`. Each character of `jewels` is distinct.",
     "starter": "def count_jewels(jewels, stones):\n    # your code here\n    pass",
     "solution": "def count_jewels(jewels, stones):\n    js = set(jewels)\n    count = 0\n    for i in range(len(stones)):\n        if stones[i] in js:\n            count += 1\n    return count",
-    "tests": "assert count_jewels(\"aA\", \"aAAbbbb\") == 3, count_jewels(\"aA\", \"aAAbbbb\")\nassert count_jewels(\"z\", \"ZZ\") == 0, count_jewels(\"z\", \"ZZ\")\nassert count_jewels(\"\", \"abc\") == 0, count_jewels(\"\", \"abc\")\nassert count_jewels(\"xyz\", \"\") == 0, count_jewels(\"xyz\", \"\")",
     "note": "Set membership keeps this O(len(stones)); scanning the jewels string for each stone would be O(len(jewels)*len(stones)).",
     "mapsTo": "LC 771 · Jewels and Stones",
     "prereqs": [
       "py.u05.membership.build_query"
+    ],
+    "cases": [
+      {
+        "call": "count_jewels('aA', 'aAAbbbb')",
+        "expect": "3"
+      },
+      {
+        "call": "count_jewels('z', 'ZZ')",
+        "expect": "0"
+      },
+      {
+        "call": "count_jewels('', 'abc')",
+        "expect": "0"
+      },
+      {
+        "call": "count_jewels('xyz', '')",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -75,9 +92,22 @@
     "prompt": "Write `only_one(a, b)` returning the sorted list of distinct values that appear in exactly one of lists `a` and `b`.",
     "starter": "def only_one(a, b):\n    # your code here\n    pass",
     "solution": "def only_one(a, b):\n    return sorted(set(a) ^ set(b))",
-    "tests": "assert only_one([1, 2, 3], [2, 3, 4]) == [1, 4], only_one([1, 2, 3], [2, 3, 4])\nassert only_one([1, 1], [1]) == [], only_one([1, 1], [1])\nassert only_one([], [5]) == [5], only_one([], [5])",
     "prereqs": [
       "py.u05.setops.symdiff"
+    ],
+    "cases": [
+      {
+        "call": "only_one([1, 2, 3], [2, 3, 4])",
+        "expect": "[1, 4]"
+      },
+      {
+        "call": "only_one([1, 1], [1])",
+        "expect": "[]"
+      },
+      {
+        "call": "only_one([], [5])",
+        "expect": "[5]"
+      }
     ]
   },
   {
@@ -91,9 +121,26 @@
     "prompt": "Write `union_all(lists)` taking a list of lists and returning the sorted list of all distinct values across them.",
     "starter": "def union_all(lists):\n    # your code here\n    pass",
     "solution": "def union_all(lists):\n    out = set()\n    for i in range(len(lists)):\n        out |= set(lists[i])\n    return sorted(out)",
-    "tests": "assert union_all([[1, 2], [2, 3], [3, 4]]) == [1, 2, 3, 4], union_all([[1, 2], [2, 3], [3, 4]])\nassert union_all([]) == [], union_all([])\nassert union_all([[]]) == [], union_all([[]])\nassert union_all([[5, 5], [5]]) == [5], union_all([[5, 5], [5]])",
     "prereqs": [
       "py.u05.setops.union"
+    ],
+    "cases": [
+      {
+        "call": "union_all([[1, 2], [2, 3], [3, 4]])",
+        "expect": "[1, 2, 3, 4]"
+      },
+      {
+        "call": "union_all([])",
+        "expect": "[]"
+      },
+      {
+        "call": "union_all([[]])",
+        "expect": "[]"
+      },
+      {
+        "call": "union_all([[5, 5], [5]])",
+        "expect": "[5]"
+      }
     ]
   }
 ]

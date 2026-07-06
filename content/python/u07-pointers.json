@@ -36,13 +36,28 @@
     "prompt": "Write `total(a)` that returns the sum of all elements in list `a`. Use a while loop with an index you increment yourself. Do not use the built-in sum.",
     "starter": "def total(a):\n    # your code here\n    pass",
     "solution": "def total(a):\n    i = 0\n    s = 0\n    while i < len(a):\n        s += a[i]\n        i += 1\n    return s",
-    "banned": ["sum("],
-    "tests": "assert total([4, 8, 15, 16]) == 43, total([4, 8, 15, 16])\nassert total([]) == 0, total([])\nassert total([5]) == 5, total([5])",
+    "banned": [
+      "sum("
+    ],
     "prereqs": [
       "py.u07.manual-advance.predict"
     ],
     "cue": "Keep a running sum and advance an index yourself.",
-    "syntax": "while i < len(a)"
+    "syntax": "while i < len(a)",
+    "cases": [
+      {
+        "call": "total([4, 8, 15, 16])",
+        "expect": "43"
+      },
+      {
+        "call": "total([])",
+        "expect": "0"
+      },
+      {
+        "call": "total([5])",
+        "expect": "5"
+      }
+    ]
   },
   {
     "id": "py.u07.stride.predict",
@@ -68,13 +83,33 @@
     "prompt": "Write `every_other(a)` that returns a list of the elements of `a` at indices 0, 2, 4, and so on. Advance an index by 2 each step. Do not use slicing.",
     "starter": "def every_other(a):\n    # your code here\n    pass",
     "solution": "def every_other(a):\n    i = 0\n    out = []\n    while i < len(a):\n        out.append(a[i])\n        i += 2\n    return out",
-    "banned": ["::", ":2]"],
-    "tests": "assert every_other([10, 20, 30, 40, 50]) == [10, 30, 50], every_other([10, 20, 30, 40, 50])\nassert every_other([]) == [], every_other([])\nassert every_other([1]) == [1], every_other([1])\nassert every_other([1, 2]) == [1], every_other([1, 2])",
+    "banned": [
+      "::",
+      ":2]"
+    ],
     "prereqs": [
       "py.u07.stride.predict"
     ],
     "cue": "Start at 0 and step the index forward by two each pass.",
-    "syntax": "list.append(x)"
+    "syntax": "list.append(x)",
+    "cases": [
+      {
+        "call": "every_other([10, 20, 30, 40, 50])",
+        "expect": "[10, 30, 50]"
+      },
+      {
+        "call": "every_other([])",
+        "expect": "[]"
+      },
+      {
+        "call": "every_other([1])",
+        "expect": "[1]"
+      },
+      {
+        "call": "every_other([1, 2])",
+        "expect": "[1]"
+      }
+    ]
   },
   {
     "id": "py.u07.stride.slice-sugar",
@@ -115,13 +150,33 @@
     "prompt": "Write `first_nonzero_index(a)` that returns the index of the first nonzero element of `a`, or `len(a)` if every element is zero. Advance an index while the current element is zero.",
     "starter": "def first_nonzero_index(a):\n    # your code here\n    pass",
     "solution": "def first_nonzero_index(a):\n    i = 0\n    while i < len(a) and a[i] == 0:\n        i += 1\n    return i",
-    "banned": ["enumerate", "next("],
-    "tests": "assert first_nonzero_index([0, 0, 5, 0]) == 2, first_nonzero_index([0, 0, 5, 0])\nassert first_nonzero_index([0, 0, 0]) == 3, first_nonzero_index([0, 0, 0])\nassert first_nonzero_index([9]) == 0, first_nonzero_index([9])\nassert first_nonzero_index([]) == 0, first_nonzero_index([])",
+    "banned": [
+      "enumerate",
+      "next("
+    ],
     "prereqs": [
       "py.u07.skip-prefix.predict"
     ],
     "cue": "Advance an index while the element is zero.",
-    "syntax": "and short-circuit evaluation"
+    "syntax": "and short-circuit evaluation",
+    "cases": [
+      {
+        "call": "first_nonzero_index([0, 0, 5, 0])",
+        "expect": "2"
+      },
+      {
+        "call": "first_nonzero_index([0, 0, 0])",
+        "expect": "3"
+      },
+      {
+        "call": "first_nonzero_index([9])",
+        "expect": "0"
+      },
+      {
+        "call": "first_nonzero_index([])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u07.skip-prefix.lstrip-sugar",
@@ -162,13 +217,36 @@
     "prompt": "Write `count_runs(a)` that returns the number of maximal runs of equal consecutive elements in `a`. Use an inner loop to skip past each run.",
     "starter": "def count_runs(a):\n    # your code here\n    pass",
     "solution": "def count_runs(a):\n    i = 0\n    runs = 0\n    while i < len(a):\n        j = i\n        while j < len(a) and a[j] == a[i]:\n            j += 1\n        runs += 1\n        i = j\n    return runs",
-    "banned": ["groupby"],
-    "tests": "assert count_runs([1, 1, 1, 2, 2, 3]) == 3, count_runs([1, 1, 1, 2, 2, 3])\nassert count_runs([]) == 0, count_runs([])\nassert count_runs([5]) == 1, count_runs([5])\nassert count_runs([1, 2, 1]) == 3, count_runs([1, 2, 1])\nassert count_runs([7, 7]) == 1, count_runs([7, 7])",
+    "banned": [
+      "groupby"
+    ],
     "prereqs": [
       "py.u07.skip-run.predict"
     ],
     "cue": "Outer loop opens each run; inner loop skips to the run end.",
-    "syntax": "nested while loops"
+    "syntax": "nested while loops",
+    "cases": [
+      {
+        "call": "count_runs([1, 1, 1, 2, 2, 3])",
+        "expect": "3"
+      },
+      {
+        "call": "count_runs([])",
+        "expect": "0"
+      },
+      {
+        "call": "count_runs([5])",
+        "expect": "1"
+      },
+      {
+        "call": "count_runs([1, 2, 1])",
+        "expect": "3"
+      },
+      {
+        "call": "count_runs([7, 7])",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "py.u07.compact.predict",
@@ -194,7 +272,10 @@
     "prompt": "Write `remove_value(a, val)` that removes every occurrence of `val` from list `a` in place (mutating `a`) and returns the new length. Use a write index. Do not use a list comprehension or list.remove.",
     "starter": "def remove_value(a, val):\n    # your code here\n    pass",
     "solution": "def remove_value(a, val):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != val:\n            a[w] = a[i]\n            w += 1\n    del a[w:]\n    return w",
-    "banned": [".remove(", "[:]"],
+    "banned": [
+      ".remove(",
+      "[:]"
+    ],
     "tests": "a = [3, 2, 2, 3]\nn = remove_value(a, 3)\nassert n == 2 and a == [2, 2], (n, a)\na = [0, 1, 2, 2, 3, 0, 4, 2]\nn = remove_value(a, 2)\nassert n == 5 and a == [0, 1, 3, 0, 4], (n, a)\na = []\nassert remove_value(a, 1) == 0 and a == [], a",
     "prereqs": [
       "py.u07.compact.predict"
@@ -243,13 +324,32 @@
     "prompt": "Write `index_of(a, target)` that returns the index of the first element of `a` equal to `target`, or -1 if `target` is absent. Scan with a manual index. Do not use list.index.",
     "starter": "def index_of(a, target):\n    # your code here\n    pass",
     "solution": "def index_of(a, target):\n    i = 0\n    while i < len(a) and a[i] != target:\n        i += 1\n    return i if i < len(a) else -1",
-    "banned": [".index("],
-    "tests": "assert index_of([4, 5, 6, 5, 7], 5) == 1, index_of([4, 5, 6, 5, 7], 5)\nassert index_of([1, 2, 3], 9) == -1, index_of([1, 2, 3], 9)\nassert index_of([], 1) == -1, index_of([], 1)\nassert index_of([7], 7) == 0, index_of([7], 7)",
+    "banned": [
+      ".index("
+    ],
     "prereqs": [
       "py.u07.find-next.predict"
     ],
     "cue": "Scan with an index until you hit target, else fall off the end.",
-    "syntax": "x if cond else y"
+    "syntax": "x if cond else y",
+    "cases": [
+      {
+        "call": "index_of([4, 5, 6, 5, 7], 5)",
+        "expect": "1"
+      },
+      {
+        "call": "index_of([1, 2, 3], 9)",
+        "expect": "-1"
+      },
+      {
+        "call": "index_of([], 1)",
+        "expect": "-1"
+      },
+      {
+        "call": "index_of([7], 7)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u07.find-next.index-sugar",
@@ -290,15 +390,38 @@
     "prompt": "Write `merge(A, B)` that merges two already-sorted lists into one sorted list, using two cursors in a single pass. Do not concatenate and call sorted.",
     "starter": "def merge(A, B):\n    # your code here\n    pass",
     "solution": "def merge(A, B):\n    i = j = 0\n    out = []\n    while i < len(A) and j < len(B):\n        if A[i] <= B[j]:\n            out.append(A[i])\n            i += 1\n        else:\n            out.append(B[j])\n            j += 1\n    while i < len(A):\n        out.append(A[i])\n        i += 1\n    while j < len(B):\n        out.append(B[j])\n        j += 1\n    return out",
-    "banned": ["sorted("],
-    "tests": "assert merge([1, 3, 5], [2, 4, 6]) == [1, 2, 3, 4, 5, 6], merge([1, 3, 5], [2, 4, 6])\nassert merge([], [1, 2]) == [1, 2], merge([], [1, 2])\nassert merge([1, 2], []) == [1, 2], merge([1, 2], [])\nassert merge([1, 1], [1, 1]) == [1, 1, 1, 1], merge([1, 1], [1, 1])\nassert merge([], []) == [], merge([], [])",
+    "banned": [
+      "sorted("
+    ],
     "prereqs": [
       "py.u07.merge.predict"
     ],
     "cue": "Two cursors: take the smaller head each step, then drain the remainder.",
     "syntax": "while i < len(A) to drain the remainder",
     "note": "The two drain loops matter: once one list ends, the other's tail is already sorted, so append it as-is.",
-    "mapsTo": "pattern behind LC 88 · Merge Sorted Array (LC 88 merges in place from the back; this builds a new list)"
+    "mapsTo": "pattern behind LC 88 · Merge Sorted Array (LC 88 merges in place from the back; this builds a new list)",
+    "cases": [
+      {
+        "call": "merge([1, 3, 5], [2, 4, 6])",
+        "expect": "[1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "call": "merge([], [1, 2])",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "merge([1, 2], [])",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "merge([1, 1], [1, 1])",
+        "expect": "[1, 1, 1, 1]"
+      },
+      {
+        "call": "merge([], [])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u07.rle.predict",
@@ -324,13 +447,32 @@
     "prompt": "Write `rle(s)` that returns the run-length encoding of string `s`: each maximal run of a character becomes that character followed by its count. For example `rle('aaabbc')` returns `'a3b2c1'`.",
     "starter": "def rle(s):\n    # your code here\n    pass",
     "solution": "def rle(s):\n    i = 0\n    res = ''\n    while i < len(s):\n        j = i\n        while j < len(s) and s[j] == s[i]:\n            j += 1\n        res += s[i] + str(j - i)\n        i = j\n    return res",
-    "banned": ["groupby"],
-    "tests": "assert rle('aaabbc') == 'a3b2c1', rle('aaabbc')\nassert rle('') == '', rle('')\nassert rle('x') == 'x1', rle('x')\nassert rle('aab') == 'a2b1', rle('aab')",
+    "banned": [
+      "groupby"
+    ],
     "prereqs": [
       "py.u07.rle.predict"
     ],
     "cue": "For each run, find its end, then append the char and its count.",
-    "syntax": "str(count) to stringify"
+    "syntax": "str(count) to stringify",
+    "cases": [
+      {
+        "call": "rle('aaabbc')",
+        "expect": "'a3b2c1'"
+      },
+      {
+        "call": "rle('')",
+        "expect": "''"
+      },
+      {
+        "call": "rle('x')",
+        "expect": "'x1'"
+      },
+      {
+        "call": "rle('aab')",
+        "expect": "'a2b1'"
+      }
+    ]
   },
   {
     "id": "py.u07.swap.predict",
@@ -372,14 +514,34 @@
     "prompt": "Write `move_zeros(a)` that moves all zeros in list `a` to the end in place, keeping the order of the nonzero elements, and returns `a`. Use a trailing write index and swap forward.",
     "starter": "def move_zeros(a):\n    # your code here\n    pass",
     "solution": "def move_zeros(a):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != 0:\n            a[w], a[i] = a[i], a[w]\n            w += 1\n    return a",
-    "banned": [".sort(", "sorted("],
-    "tests": "assert move_zeros([0, 1, 0, 3, 12]) == [1, 3, 12, 0, 0], move_zeros([0, 1, 0, 3, 12])\nassert move_zeros([0, 0, 0]) == [0, 0, 0], move_zeros([0, 0, 0])\nassert move_zeros([1, 2, 3]) == [1, 2, 3], move_zeros([1, 2, 3])\nassert move_zeros([]) == [], move_zeros([])",
+    "banned": [
+      ".sort(",
+      "sorted("
+    ],
     "prereqs": [
       "py.u07.move-zeros.predict"
     ],
     "cue": "Swap each nonzero forward to a trailing write index.",
     "syntax": "tuple swap x, y = y, x",
     "note": "Swapping forward preserves the original order of the nonzeros (a stable move).",
-    "mapsTo": "LC 283 · Move Zeroes"
+    "mapsTo": "LC 283 · Move Zeroes",
+    "cases": [
+      {
+        "call": "move_zeros([0, 1, 0, 3, 12])",
+        "expect": "[1, 3, 12, 0, 0]"
+      },
+      {
+        "call": "move_zeros([0, 0, 0])",
+        "expect": "[0, 0, 0]"
+      },
+      {
+        "call": "move_zeros([1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "move_zeros([])",
+        "expect": "[]"
+      }
+    ]
   }
 ]

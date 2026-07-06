@@ -11,7 +11,9 @@
     "tests": "if (isPrime(2) !== true) throw new Error('2');\nif (isPrime(1) !== false) throw new Error('1');\nif (isPrime(97) !== true) throw new Error('97');\nif (isPrime(100) !== false) throw new Error('100');\nif (isPrime(0) !== false) throw new Error('0');",
     "cue": "A divisor larger than the square root pairs with a smaller one, so stop the loop at i * i > n. A remainder of 0 means it divides.",
     "syntax": "n % i === 0",
-    "prereqs": ["js.u11.mod.parity"]
+    "prereqs": [
+      "js.u11.mod.parity"
+    ]
   },
   {
     "id": "js.u11.power.write",
@@ -23,7 +25,10 @@
     "starter": "function intPow(base, exp) {\n  // your code here\n}",
     "solution": "function intPow(base, exp) {\n  let result = 1;\n  for (let i = 0; i < exp; i++) result *= base;\n  return result;\n}",
     "tests": "if (intPow(2, 10) !== 1024) throw new Error('2^10');\nif (intPow(5, 0) !== 1) throw new Error('5^0');\nif (intPow(3, 3) !== 27) throw new Error('3^3');\nif (intPow(7, 1) !== 7) throw new Error('7^1');",
-    "banned": ["**", "Math.pow"],
+    "banned": [
+      "**",
+      "Math.pow"
+    ],
     "cue": "Start the accumulator at 1 (the empty product) and multiply by base once per exponent step.",
     "syntax": "result *= base",
     "prereqs": []
@@ -38,11 +43,16 @@
     "starter": "function isqrt(n) {\n  // your code here\n}",
     "solution": "function isqrt(n) {\n  let i = 0;\n  while ((i + 1) * (i + 1) <= n) i++;\n  return i;\n}",
     "tests": "if (isqrt(0) !== 0) throw new Error('0');\nif (isqrt(1) !== 1) throw new Error('1');\nif (isqrt(15) !== 3) throw new Error('15');\nif (isqrt(16) !== 4) throw new Error('16');\nif (isqrt(24) !== 4) throw new Error('24');\nif (isqrt(25) !== 5) throw new Error('25');",
-    "banned": ["Math.sqrt", "**"],
+    "banned": [
+      "Math.sqrt",
+      "**"
+    ],
     "cue": "Advance i while the next square still fits under n; the last i that fits is the floor root.",
     "syntax": "(i + 1) * (i + 1) <= n",
     "mapsTo": "LC 69 · Sqrt(x)",
-    "prereqs": ["js.u11.intdiv.trunc-negative"]
+    "prereqs": [
+      "js.u11.intdiv.trunc-negative"
+    ]
   },
   {
     "id": "js.u11.base.write",
@@ -53,11 +63,30 @@
     "prompt": "Write `toBase(n, b)` for `n >= 0` and `b >= 2` that returns an array of `n`'s digits in base `b`, most significant first. `toBase(0, 2)` is `[0]`; `toBase(13, 2)` is `[1, 1, 0, 1]`.",
     "starter": "function toBase(n, b) {\n  // your code here\n}",
     "solution": "function toBase(n, b) {\n  if (n === 0) return [0];\n  const digits = [];\n  while (n > 0) {\n    digits.push(n % b);\n    n = Math.trunc(n / b);\n  }\n  digits.reverse();\n  return digits;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(toBase(13, 2), [1, 1, 0, 1]);\neq(toBase(0, 2), [0]);\neq(toBase(255, 16), [15, 15]);\neq(toBase(7, 10), [7]);",
     "cue": "The same digit loop as reversing a number, but divide and mod by b, not 10. Taking n % b gives the least-significant digit first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and Math.trunc(n / b)",
     "mapsTo": "pattern behind LC 504 · Base 7",
-    "prereqs": ["js.u11.digits.reverse"]
+    "prereqs": [
+      "js.u11.digits.reverse"
+    ],
+    "cases": [
+      {
+        "call": "toBase(13, 2)",
+        "expect": "[1, 1, 0, 1]"
+      },
+      {
+        "call": "toBase(0, 2)",
+        "expect": "[0]"
+      },
+      {
+        "call": "toBase(255, 16)",
+        "expect": "[15, 15]"
+      },
+      {
+        "call": "toBase(7, 10)",
+        "expect": "[7]"
+      }
+    ]
   },
   {
     "id": "js.u11.bits.single-number",
@@ -73,7 +102,9 @@
     "syntax": "x ^= xs[i]",
     "note": "O(1) extra space means the memory used stays constant as the array grows; here that is just the single accumulator x, no helper set or map.",
     "mapsTo": "LC 136 · Single Number",
-    "prereqs": ["js.u11.bits.xor-fold"]
+    "prereqs": [
+      "js.u11.bits.xor-fold"
+    ]
   },
   {
     "id": "js.u11.power.fast",
@@ -85,12 +116,18 @@
     "starter": "function fastPow(base, exp) {\n  // your code here\n}",
     "solution": "function fastPow(base, exp) {\n  let result = 1;\n  while (exp > 0) {\n    if (exp & 1) result *= base;\n    base *= base;\n    exp = Math.trunc(exp / 2);\n  }\n  return result;\n}",
     "tests": "if (fastPow(2, 10) !== 1024) throw new Error('2^10');\nif (fastPow(3, 0) !== 1) throw new Error('3^0');\nif (fastPow(5, 3) !== 125) throw new Error('5^3');\nif (fastPow(7, 1) !== 7) throw new Error('7^1');\nif (fastPow(2, 0) !== 1) throw new Error('2^0');\nif (fastPow(2, 16) !== 65536) throw new Error('2^16');",
-    "banned": ["**", "Math.pow"],
+    "banned": [
+      "**",
+      "Math.pow"
+    ],
     "cue": "Multiply the result by base only when the current low bit of exp is set, then square base and halve exp.",
     "syntax": "exp & 1 and Math.trunc(exp / 2)",
     "note": "Each step handles one bit of the exponent, so the multiply count is log2(exp) rather than exp.",
     "mapsTo": "LC 50 · Pow(x, n)",
-    "prereqs": ["js.u11.power.write", "js.u11.bits.parity"]
+    "prereqs": [
+      "js.u11.power.write",
+      "js.u11.bits.parity"
+    ]
   },
   {
     "id": "js.u11.bsearch.step",
@@ -103,7 +140,9 @@
     "expected": "3",
     "cue": "Compute the midpoint, compare it to the target, and move lo past it if the target must be to the right.",
     "syntax": "lo + Math.trunc((hi - lo) / 2)",
-    "prereqs": ["js.u11.intdiv.midpoint"]
+    "prereqs": [
+      "js.u11.intdiv.midpoint"
+    ]
   },
   {
     "id": "js.u11.bsearch.write",
@@ -118,6 +157,8 @@
     "cue": "Keep a lo/hi window; compare the midpoint and discard the half that cannot hold the target.",
     "syntax": "lo + Math.trunc((hi - lo) / 2)",
     "mapsTo": "LC 704 · Binary Search",
-    "prereqs": ["js.u11.bsearch.step"]
+    "prereqs": [
+      "js.u11.bsearch.step"
+    ]
   }
 ]

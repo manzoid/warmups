@@ -10,11 +10,38 @@
     "prompt": "Write `rotate_left(a, k)` returning a new list equal to `a` rotated left by `k` positions. `k` may exceed the length. Do not use slicing.",
     "starter": "def rotate_left(a, k):\n    # your code here\n    pass\n",
     "solution": "def rotate_left(a, k):\n    n = len(a)\n    if n == 0:\n        return []\n    k %= n\n    out = []\n    for i in range(n):\n        out.append(a[(i + k) % n])\n    return out\n",
-    "tests": "assert rotate_left([1, 2, 3, 4, 5], 2) == [3, 4, 5, 1, 2], rotate_left([1, 2, 3, 4, 5], 2)\nassert rotate_left([1, 2, 3], 0) == [1, 2, 3]\nassert rotate_left([1, 2, 3], 4) == [2, 3, 1]\nassert rotate_left([], 3) == []\nassert rotate_left([9], 5) == [9]\n",
-    "banned": ["[:", ":]", "::"],
+    "banned": [
+      "[:",
+      ":]",
+      "::"
+    ],
     "note": "LC 189 rotates right by k; rotating left by k is the mirror image (left by k equals right by n - k).",
     "mapsTo": "LC 189 · Rotate Array",
-    "prereqs": ["py.u02.ring"]
+    "prereqs": [
+      "py.u02.ring"
+    ],
+    "cases": [
+      {
+        "call": "rotate_left([1, 2, 3, 4, 5], 2)",
+        "expect": "[3, 4, 5, 1, 2]"
+      },
+      {
+        "call": "rotate_left([1, 2, 3], 0)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "rotate_left([1, 2, 3], 4)",
+        "expect": "[2, 3, 1]"
+      },
+      {
+        "call": "rotate_left([], 3)",
+        "expect": "[]"
+      },
+      {
+        "call": "rotate_left([9], 5)",
+        "expect": "[9]"
+      }
+    ]
   },
   {
     "id": "py.u02.rotate.slice",
@@ -27,8 +54,29 @@
     "prompt": "Write `rotate_left(a, k)` returning `a` rotated left by `k` positions, using slicing. `k` may exceed the length.",
     "starter": "def rotate_left(a, k):\n    # your code here\n    pass\n",
     "solution": "def rotate_left(a, k):\n    if not a:\n        return []\n    k %= len(a)\n    return a[k:] + a[:k]\n",
-    "tests": "assert rotate_left([1, 2, 3, 4, 5], 2) == [3, 4, 5, 1, 2], rotate_left([1, 2, 3, 4, 5], 2)\nassert rotate_left([1, 2, 3], 3) == [1, 2, 3]\nassert rotate_left([1, 2, 3], 4) == [2, 3, 1]\nassert rotate_left([], 2) == []\n",
-    "prereqs": ["py.u02.suffix", "py.u02.prefix", "py.u02.rotate.raw"]
+    "prereqs": [
+      "py.u02.suffix",
+      "py.u02.prefix",
+      "py.u02.rotate.raw"
+    ],
+    "cases": [
+      {
+        "call": "rotate_left([1, 2, 3, 4, 5], 2)",
+        "expect": "[3, 4, 5, 1, 2]"
+      },
+      {
+        "call": "rotate_left([1, 2, 3], 3)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "rotate_left([1, 2, 3], 4)",
+        "expect": "[2, 3, 1]"
+      },
+      {
+        "call": "rotate_left([], 2)",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "py.u02.slice.assign",
@@ -41,7 +89,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "a = [1, 2, 3, 4, 5]\na[1:4] = [9]\na",
     "expected": "[1, 9, 5]",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.oddindices",
@@ -54,7 +104,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5]\na[1::2]",
     "expected": "[1, 3, 5]",
-    "prereqs": ["py.u02.stride.slice"]
+    "prereqs": [
+      "py.u02.stride.slice"
+    ]
   },
   {
     "id": "py.u02.negstride.bounded",
@@ -67,7 +119,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [0, 1, 2, 3, 4, 5, 6]\na[5:1:-1]",
     "expected": "[5, 4, 3, 2]",
-    "prereqs": ["py.u02.stride.backward"]
+    "prereqs": [
+      "py.u02.stride.backward"
+    ]
   },
   {
     "id": "py.u02.negindex.first",
@@ -80,7 +134,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [10, 20, 30]\na[-len(a)]",
     "expected": "10",
-    "prereqs": ["py.u02.last.negindex"]
+    "prereqs": [
+      "py.u02.last.negindex"
+    ]
   },
   {
     "id": "py.u02.dropends.slice",
@@ -93,7 +149,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "a = [1, 2, 3, 4, 5]\na[1:-1]",
     "expected": "[2, 3, 4]",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.middle",
@@ -106,8 +164,27 @@
     "prompt": "Write `middle(a)` returning the center element of list `a`, which always has odd length.",
     "starter": "def middle(a):\n    # your code here\n    pass\n",
     "solution": "def middle(a):\n    return a[len(a) // 2]\n",
-    "tests": "assert middle([1, 2, 3]) == 2, middle([1, 2, 3])\nassert middle([7]) == 7\nassert middle([1, 2, 3, 4, 5]) == 3\nassert middle(['a', 'b', 'c']) == 'b'\n",
-    "prereqs": ["py.u02.midpoint"]
+    "prereqs": [
+      "py.u02.midpoint"
+    ],
+    "cases": [
+      {
+        "call": "middle([1, 2, 3])",
+        "expect": "2"
+      },
+      {
+        "call": "middle([7])",
+        "expect": "7"
+      },
+      {
+        "call": "middle([1, 2, 3, 4, 5])",
+        "expect": "3"
+      },
+      {
+        "call": "middle(['a', 'b', 'c'])",
+        "expect": "'b'"
+      }
+    ]
   },
   {
     "id": "py.u02.binsearch.trace",
@@ -120,7 +197,9 @@
     "prompt": "What is the value of `lo`?",
     "snippet": "a = [1, 3, 5, 7, 9]\ntarget = 7\nlo, hi = 0, len(a) - 1\nmid = lo + (hi - lo) // 2\nif a[mid] < target:\n    lo = mid + 1\nlo",
     "expected": "3",
-    "prereqs": ["py.u02.midpoint"]
+    "prereqs": [
+      "py.u02.midpoint"
+    ]
   },
   {
     "id": "py.u02.binsearch",
@@ -133,11 +212,41 @@
     "prompt": "Write `binary_search(a, target)` returning the index of `target` in the sorted list `a`, or -1 if it is absent. Halve the range each step; do not use `list.index` or `in`.",
     "starter": "def binary_search(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo <= hi:\n        mid = lo + (hi - lo) // 2\n        # your code here: compare a[mid] to target, then narrow lo/hi or return mid\n        pass\n    return -1\n",
     "solution": "def binary_search(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo <= hi:\n        mid = lo + (hi - lo) // 2\n        if a[mid] == target:\n            return mid\n        if a[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n",
-    "tests": "assert binary_search([1, 3, 5, 7, 9], 7) == 3, binary_search([1, 3, 5, 7, 9], 7)\nassert binary_search([1, 3, 5, 7, 9], 1) == 0\nassert binary_search([1, 3, 5, 7, 9], 9) == 4\nassert binary_search([1, 3, 5, 7, 9], 4) == -1\nassert binary_search([], 1) == -1\nassert binary_search([2], 2) == 0\n",
-    "banned": [".index("],
+    "banned": [
+      ".index("
+    ],
     "note": "Each step throws away half the remaining range, so lookup is O(log n) versus a linear O(n) scan.",
     "mapsTo": "LC 704 · Binary Search",
-    "prereqs": ["py.u02.midpoint", "py.u02.binsearch.trace"]
+    "prereqs": [
+      "py.u02.midpoint",
+      "py.u02.binsearch.trace"
+    ],
+    "cases": [
+      {
+        "call": "binary_search([1, 3, 5, 7, 9], 7)",
+        "expect": "3"
+      },
+      {
+        "call": "binary_search([1, 3, 5, 7, 9], 1)",
+        "expect": "0"
+      },
+      {
+        "call": "binary_search([1, 3, 5, 7, 9], 9)",
+        "expect": "4"
+      },
+      {
+        "call": "binary_search([1, 3, 5, 7, 9], 4)",
+        "expect": "-1"
+      },
+      {
+        "call": "binary_search([], 1)",
+        "expect": "-1"
+      },
+      {
+        "call": "binary_search([2], 2)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "py.u02.str.slice",
@@ -150,7 +259,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = 'python'\ns[2:5]",
     "expected": "'tho'",
-    "prereqs": ["py.u02.subrange.slice"]
+    "prereqs": [
+      "py.u02.subrange.slice"
+    ]
   },
   {
     "id": "py.u02.str.immutable",
@@ -163,10 +274,30 @@
     "prompt": "Write `set_char(s, i, c)` returning a new string equal to `s` with the character at index `i` replaced by `c`. Strings are immutable, so `s[i] = c` raises TypeError; build a new string instead. Do not convert to a list.",
     "starter": "def set_char(s, i, c):\n    # your code here\n    pass\n",
     "solution": "def set_char(s, i, c):\n    return s[:i] + c + s[i + 1:]\n",
-    "tests": "assert set_char('cat', 0, 'b') == 'bat', set_char('cat', 0, 'b')\nassert set_char('hello', 4, 'p') == 'hellp'\nassert set_char('a', 0, 'z') == 'z'\n",
-    "banned": ["list(", ".join("],
+    "banned": [
+      "list(",
+      ".join("
+    ],
     "note": "Unlike a list, a string cannot be mutated in place; every 'edit' returns a fresh string.",
-    "prereqs": ["py.u02.str.slice", "py.u02.prefix", "py.u02.suffix"]
+    "prereqs": [
+      "py.u02.str.slice",
+      "py.u02.prefix",
+      "py.u02.suffix"
+    ],
+    "cases": [
+      {
+        "call": "set_char('cat', 0, 'b')",
+        "expect": "'bat'"
+      },
+      {
+        "call": "set_char('hello', 4, 'p')",
+        "expect": "'hellp'"
+      },
+      {
+        "call": "set_char('a', 0, 'z')",
+        "expect": "'z'"
+      }
+    ]
   },
   {
     "id": "py.u02.compact.dedup",
@@ -180,7 +311,10 @@
     "starter": "def remove_duplicates(a):\n    # your code here\n    pass\n",
     "solution": "def remove_duplicates(a):\n    if not a:\n        return 0\n    w = 1\n    for r in range(1, len(a)):\n        if a[r] != a[w - 1]:\n            a[w] = a[r]\n            w += 1\n    return w\n",
     "tests": "a = [1, 1, 2]\nk = remove_duplicates(a)\nassert k == 2 and a[:2] == [1, 2], (k, a)\na = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]\nk = remove_duplicates(a)\nassert k == 5 and a[:5] == [0, 1, 2, 3, 4], (k, a)\na = [1, 2, 3]\nk = remove_duplicates(a)\nassert k == 3 and a[:3] == [1, 2, 3]\na = [7]\nassert remove_duplicates(a) == 1\nassert remove_duplicates([]) == 0\n",
-    "banned": ["set(", "sorted("],
+    "banned": [
+      "set(",
+      "sorted("
+    ],
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
     "prereqs": []
   },
@@ -195,9 +329,34 @@
     "prompt": "Write `move_zeroes(a)` that moves every 0 in list `a` to the end in place, keeping the order of the non-zero elements. Return `a`. Do not use `.count`.",
     "starter": "def move_zeroes(a):\n    # your code here\n    return a\n",
     "solution": "def move_zeroes(a):\n    w = 0\n    for r in range(len(a)):\n        if a[r] != 0:\n            a[w] = a[r]\n            w += 1\n    for i in range(w, len(a)):\n        a[i] = 0\n    return a\n",
-    "tests": "assert move_zeroes([0, 1, 0, 3, 12]) == [1, 3, 12, 0, 0], move_zeroes([0, 1, 0, 3, 12])\nassert move_zeroes([0, 0, 1]) == [1, 0, 0]\nassert move_zeroes([1, 2, 3]) == [1, 2, 3]\nassert move_zeroes([0]) == [0]\nassert move_zeroes([]) == []\n",
-    "banned": [".count("],
+    "banned": [
+      ".count("
+    ],
     "mapsTo": "LC 283 · Move Zeroes",
-    "prereqs": ["py.u02.compact.dedup"]
+    "prereqs": [
+      "py.u02.compact.dedup"
+    ],
+    "cases": [
+      {
+        "call": "move_zeroes([0, 1, 0, 3, 12])",
+        "expect": "[1, 3, 12, 0, 0]"
+      },
+      {
+        "call": "move_zeroes([0, 0, 1])",
+        "expect": "[1, 0, 0]"
+      },
+      {
+        "call": "move_zeroes([1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "move_zeroes([0])",
+        "expect": "[0]"
+      },
+      {
+        "call": "move_zeroes([])",
+        "expect": "[]"
+      }
+    ]
   }
 ]
