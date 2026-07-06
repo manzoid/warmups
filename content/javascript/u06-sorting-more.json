@@ -1,0 +1,81 @@
+[
+  {
+    "id": "js.u06.comparator.desc",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "descending numeric comparator",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[3, 1, 2, 5, 4].sort((a, b) => b - a);",
+    "expected": "[5, 4, 3, 2, 1]",
+    "prereqs": [
+      "js.u06.comparator.numeric"
+    ],
+    "cue": "Flipping the subtraction reverses the order the comparator imposes.",
+    "syntax": "sort((a, b) => b - a)"
+  },
+  {
+    "id": "js.u06.bubble",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "bubble sort",
+    "kind": "write",
+    "prompt": "Write `bubbleSort(a)` that sorts `a` ascending in place and returns it by repeatedly swapping adjacent out-of-order pairs. Do not use the built-in sort.",
+    "starter": "function bubbleSort(a) {\n  // your code here\n}",
+    "solution": "function bubbleSort(a) {\n  for (let i = 0; i < a.length; i++) {\n    for (let j = 0; j < a.length - 1 - i; j++) {\n      if (a[j] > a[j + 1]) {\n        const t = a[j];\n        a[j] = a[j + 1];\n        a[j + 1] = t;\n      }\n    }\n  }\n  return a;\n}",
+    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(bubbleSort([5, 2, 4, 6, 1, 3]), [1, 2, 3, 4, 5, 6])) throw new Error('basic');\nif (!eq(bubbleSort([]), [])) throw new Error('empty');\nif (!eq(bubbleSort([1]), [1])) throw new Error('single');\nif (!eq(bubbleSort([3, 3, 1]), [1, 3, 3])) throw new Error('dups');",
+    "prereqs": [
+      "js.u06.selection"
+    ],
+    "cue": "Each pass walks adjacent pairs, swapping to float the largest to the end.",
+    "syntax": "swap via temp variable"
+  },
+  {
+    "id": "js.u06.sortkey.bylastchar",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "sort by last character",
+    "kind": "write",
+    "prompt": "Write `byLastChar(words)` returning a new array of `words` sorted by their last character in alphabetical order. Equal last characters keep their original order. Do not mutate the input.",
+    "starter": "function byLastChar(words) {\n  // your code here\n}",
+    "solution": "function byLastChar(words) {\n  return words.slice().sort((a, b) => a[a.length - 1].localeCompare(b[b.length - 1]));\n}",
+    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(byLastChar(['cba', 'abc', 'bca']), ['cba', 'bca', 'abc'])) throw new Error('by last char');\nif (!eq(byLastChar(['ax', 'bx', 'c']), ['c', 'ax', 'bx'])) throw new Error('stable ties');\nconst o = ['yz', 'xy'];\nbyLastChar(o);\nif (!eq(o, ['yz', 'xy'])) throw new Error('must not mutate input');",
+    "prereqs": [
+      "js.u06.sortkey.bylen"
+    ],
+    "cue": "Derive each element's last character as the sort key on a copy.",
+    "syntax": "s[s.length - 1] last char"
+  },
+  {
+    "id": "js.u06.topk",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "top-k largest via sort",
+    "kind": "write",
+    "prompt": "Write `topK(nums, k)` returning the `k` largest values of `nums` in descending order. Do not mutate the input. If `k` exceeds the length, return all values sorted descending.",
+    "starter": "function topK(nums, k) {\n  // your code here\n}",
+    "solution": "function topK(nums, k) {\n  return nums.slice().sort((a, b) => b - a).slice(0, k);\n}",
+    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(topK([3, 1, 4, 1, 5, 9, 2], 3), [9, 5, 4])) throw new Error('basic');\nif (!eq(topK([1], 5), [1])) throw new Error('k too big');\nif (!eq(topK([], 3), [])) throw new Error('empty');\nconst o = [2, 1, 3];\ntopK(o, 2);\nif (!eq(o, [2, 1, 3])) throw new Error('must not mutate input');",
+    "prereqs": [
+      "js.u06.comparator.numeric"
+    ],
+    "cue": "Sort a copy descending, then take the first k.",
+    "syntax": "arr.slice().sort((a, b) => b - a)"
+  },
+  {
+    "id": "js.u06.mingap",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "sort then min adjacent gap",
+    "kind": "write",
+    "prompt": "Write `minGap(nums)` returning the smallest difference between any two values in `nums` (length at least 2). Sort a copy so the closest pair is adjacent; do not mutate the input.",
+    "starter": "function minGap(nums) {\n  // your code here\n}",
+    "solution": "function minGap(nums) {\n  const a = nums.slice().sort((x, y) => x - y);\n  let best = Infinity;\n  for (let i = 1; i < a.length; i++) {\n    if (a[i] - a[i - 1] < best) best = a[i] - a[i - 1];\n  }\n  return best;\n}",
+    "tests": "if (minGap([3, 8, 1, 5]) !== 2) throw new Error('basic');\nif (minGap([1, 100, 101]) !== 1) throw new Error('close pair at end');\nif (minGap([5, 5, 9]) !== 0) throw new Error('equal values');\nconst o = [10, 3];\nminGap(o);\nif (JSON.stringify(o) !== JSON.stringify([10, 3])) throw new Error('must not mutate input');",
+    "prereqs": [
+      "js.u06.sweep.dup"
+    ],
+    "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
+    "syntax": "a[i] - a[i - 1] neighbor diff"
+  }
+]

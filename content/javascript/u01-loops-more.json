@@ -1,0 +1,128 @@
+[
+  {
+    "id": "js.u01.accumulate.runningsum.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "prefix sums via running accumulator",
+    "cue": "One accumulator, but record its value after each step.",
+    "syntax": "push inside the loop",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "let a = [3, 1, 4, 1];\nlet out = [];\nlet run = 0;\nfor (const x of a) { run += x; out.push(run); }\nout",
+    "expected": "[3, 4, 8, 9]",
+    "prereqs": [
+      "js.u01.accumulate.sum.predict"
+    ]
+  },
+  {
+    "id": "js.u01.extreme.runningmax",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "running max-so-far as an array",
+    "cue": "Carry a best-so-far and emit it once per element.",
+    "syntax": "seed best at -Infinity",
+    "kind": "write",
+    "prompt": "Implement `runningMax(a)` returning an array whose element `i` is the largest value among `a[0..i]`. `runningMax([])` is `[]`.",
+    "starter": "function runningMax(a) {\n  // your code here\n}",
+    "solution": "function runningMax(a) {\n  const out = [];\n  let best = -Infinity;\n  for (const x of a) {\n    if (x > best) best = x;\n    out.push(best);\n  }\n  return out;\n}",
+    "tests": "if (JSON.stringify(runningMax([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(runningMax([3, 1, 4, 1, 5, 9, 2])) !== JSON.stringify([3, 3, 4, 4, 5, 9, 9])) throw new Error('rmax');\nif (JSON.stringify(runningMax([-2, -5, -1])) !== JSON.stringify([-2, -2, -1])) throw new Error('neg');",
+    "prereqs": [
+      "js.u01.extreme.max.predict",
+      "js.u01.accumulate.runningsum.predict"
+    ]
+  },
+  {
+    "id": "js.u01.count.vowels",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "count matches over a string domain",
+    "cue": "Same tally loop, but the test is membership in a small set.",
+    "syntax": "'aeiou'.includes(ch)",
+    "kind": "write",
+    "prompt": "Implement `countVowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
+    "starter": "function countVowels(s) {\n  // your code here\n}",
+    "solution": "function countVowels(s) {\n  let c = 0;\n  for (const ch of s) if ('aeiou'.includes(ch)) c++;\n  return c;\n}",
+    "tests": "if (countVowels('') !== 0) throw new Error('empty');\nif (countVowels('hello') !== 2) throw new Error('hello');\nif (countVowels('xyz') !== 0) throw new Error('none');\nif (countVowels('aeiou') !== 5) throw new Error('all');",
+    "prereqs": [
+      "js.u01.count.predict"
+    ]
+  },
+  {
+    "id": "js.u01.extreme.closest",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "extreme by a derived key (nearest to target)",
+    "cue": "Compare-and-keep, but rank by distance to the target, not by value.",
+    "syntax": "Math.abs(x - t)",
+    "kind": "write",
+    "prompt": "Implement `closest(a, t)` returning the element of non-empty array `a` nearest to `t` (smallest `Math.abs(x - t)`); on ties keep the first.",
+    "starter": "function closest(a, t) {\n  // your code here\n}",
+    "solution": "function closest(a, t) {\n  let best = a[0];\n  for (let i = 1; i < a.length; i++) if (Math.abs(a[i] - t) < Math.abs(best - t)) best = a[i];\n  return best;\n}",
+    "tests": "if (closest([5], 0) !== 5) throw new Error('single');\nif (closest([10, 4, 7, 1], 5) !== 4) throw new Error('mix');\nif (closest([-3, -1, -8], -2) !== -3) throw new Error('neg tie-first');",
+    "prereqs": [
+      "js.u01.extreme.max.predict"
+    ]
+  },
+  {
+    "id": "js.u01.parallel.matches.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "parallel iterate: count equal positions",
+    "cue": "Walk one index across both arrays and tally where they agree.",
+    "syntax": "a[i] === b[i]",
+    "kind": "predict",
+    "prompt": "What is the value of `c`?",
+    "snippet": "let a = [1, 2, 3, 4];\nlet b = [1, 0, 3, 0];\nlet c = 0;\nfor (let i = 0; i < a.length; i++) if (a[i] === b[i]) c++;\nc",
+    "expected": "2",
+    "prereqs": [
+      "js.u01.parallel.dot.predict"
+    ]
+  },
+  {
+    "id": "js.u01.filter.indices.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "filter collecting indices, not values",
+    "cue": "Push the position when the test holds, not the element.",
+    "syntax": "out.push(i)",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "let a = [5, 2, 7, 1, 9];\nlet out = [];\nfor (let i = 0; i < a.length; i++) if (a[i] > 4) out.push(i);\nout",
+    "expected": "[0, 2, 4]",
+    "prereqs": [
+      "js.u01.filter.evens"
+    ]
+  },
+  {
+    "id": "js.u01.neighbor.maxrise",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "extreme over adjacent differences",
+    "cue": "Track a best-so-far over each adjacent difference.",
+    "syntax": "a[i] - a[i - 1]",
+    "kind": "write",
+    "prompt": "Implement `maxRise(a)` returning the largest increase between consecutive elements (`a[i] - a[i-1]`), or 0 if it never increases. Empty and single-element arrays give 0.",
+    "starter": "function maxRise(a) {\n  // your code here\n}",
+    "solution": "function maxRise(a) {\n  let best = 0;\n  for (let i = 1; i < a.length; i++) {\n    const d = a[i] - a[i - 1];\n    if (d > best) best = d;\n  }\n  return best;\n}",
+    "tests": "if (maxRise([]) !== 0) throw new Error('empty');\nif (maxRise([5]) !== 0) throw new Error('single');\nif (maxRise([1, 5, 2, 10]) !== 8) throw new Error('rise');\nif (maxRise([5, 4, 3]) !== 0) throw new Error('descending');",
+    "prereqs": [
+      "js.u01.neighbor.rises.predict"
+    ]
+  },
+  {
+    "id": "js.u01.reverse.swap",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "reverse in place via two-pointer swap",
+    "cue": "Two indices walking inward, swapping until they meet.",
+    "syntax": "lo < hi loop condition",
+    "kind": "write",
+    "prompt": "Implement `reverseInPlace(a)` that reverses array `a` in place and returns it. Do not build a new array or use `.reverse()` or spread.",
+    "starter": "function reverseInPlace(a) {\n  // your code here\n}",
+    "solution": "function reverseInPlace(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const t = a[lo];\n    a[lo] = a[hi];\n    a[hi] = t;\n    lo++;\n    hi--;\n  }\n  return a;\n}",
+    "tests": "if (JSON.stringify(reverseInPlace([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverseInPlace([7])) !== JSON.stringify([7])) throw new Error('single');\nif (JSON.stringify(reverseInPlace([1, 2, 3, 4])) !== JSON.stringify([4, 3, 2, 1])) throw new Error('even');\nif (JSON.stringify(reverseInPlace([1, 2, 3])) !== JSON.stringify([3, 2, 1])) throw new Error('odd');",
+    "prereqs": [
+      "js.u01.reverse.predict"
+    ]
+  }
+]

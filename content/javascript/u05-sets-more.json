@@ -1,0 +1,80 @@
+[
+  {
+    "id": "js.u05.set.symdiff",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "symmetric difference via two filters",
+    "cue": "Collect A's non-members of B, then B's non-members of A.",
+    "syntax": "arr.concat(other)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const A = new Set([1, 2, 3]);\nconst B = new Set([2, 3, 4]);\n[...A].filter(x => !B.has(x)).concat([...B].filter(x => !A.has(x)));",
+    "expected": "[1, 4]",
+    "prereqs": [
+      "js.u05.set.difference"
+    ]
+  },
+  {
+    "id": "js.u05.set.subset",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "subset test via every + has",
+    "cue": "Ask whether every element of A is also in B.",
+    "syntax": "arr.every(x => set.has(x))",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const A = new Set([1, 2]);\nconst B = new Set([1, 2, 3]);\n[...A].every(x => B.has(x));",
+    "expected": "true",
+    "prereqs": [
+      "js.u05.set.has"
+    ]
+  },
+  {
+    "id": "js.u05.use.jewels",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "membership count against a set",
+    "cue": "Put the jewels in a Set, then count stones found in it.",
+    "syntax": "set.has(x)",
+    "kind": "write",
+    "prompt": "Write `countJewels(jewels, stones)` returning how many characters of `stones` appear in `jewels`. Each character of `jewels` is distinct.",
+    "starter": "function countJewels(jewels, stones) {\n  // your code here\n}",
+    "solution": "function countJewels(jewels, stones) {\n  const set = new Set(jewels);\n  let count = 0;\n  for (const s of stones) if (set.has(s)) count++;\n  return count;\n}",
+    "tests": "if (countJewels('aA', 'aAAbbbb') !== 3) throw new Error('mixed case');\nif (countJewels('z', 'ZZ') !== 0) throw new Error('case sensitive');\nif (countJewels('', 'abc') !== 0) throw new Error('no jewels');\nif (countJewels('xyz', '') !== 0) throw new Error('no stones');",
+    "prereqs": [
+      "js.u05.set.has"
+    ]
+  },
+  {
+    "id": "js.u05.use.symdiff",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "symmetric difference of two arrays",
+    "cue": "Emit A's uniques in A order, then B's uniques in B order.",
+    "syntax": "new Set(arr)",
+    "kind": "write",
+    "prompt": "Write `symmetricDiff(a, b)` returning the distinct values that appear in exactly one array: those only in `a` (in `a`'s order) followed by those only in `b` (in `b`'s order).",
+    "starter": "function symmetricDiff(a, b) {\n  // your code here\n}",
+    "solution": "function symmetricDiff(a, b) {\n  const setA = new Set(a);\n  const setB = new Set(b);\n  const out = [];\n  for (const x of setA) if (!setB.has(x)) out.push(x);\n  for (const x of setB) if (!setA.has(x)) out.push(x);\n  return out;\n}",
+    "tests": "if (JSON.stringify(symmetricDiff([1, 2, 3], [2, 3, 4])) !== JSON.stringify([1, 4])) throw new Error('basic');\nif (JSON.stringify(symmetricDiff([1, 1], [1])) !== JSON.stringify([])) throw new Error('all shared');\nif (JSON.stringify(symmetricDiff([], [5])) !== JSON.stringify([5])) throw new Error('only b');",
+    "prereqs": [
+      "js.u05.set.difference"
+    ]
+  },
+  {
+    "id": "js.u05.use.distinct-count",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "distinct count across arrays",
+    "cue": "Pour every value into one Set and read its size.",
+    "syntax": "set.size",
+    "kind": "write",
+    "prompt": "Write `distinctCount(lists)` taking an array of arrays and returning how many distinct values appear across all of them.",
+    "starter": "function distinctCount(lists) {\n  // your code here\n}",
+    "solution": "function distinctCount(lists) {\n  const all = new Set();\n  for (const lst of lists) for (const x of lst) all.add(x);\n  return all.size;\n}",
+    "tests": "if (distinctCount([[1, 2], [2, 3], [3, 4]]) !== 4) throw new Error('overlap');\nif (distinctCount([]) !== 0) throw new Error('empty');\nif (distinctCount([[5, 5], [5]]) !== 1) throw new Error('all same');",
+    "prereqs": [
+      "js.u05.set.union"
+    ]
+  }
+]

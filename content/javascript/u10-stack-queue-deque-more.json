@@ -1,0 +1,81 @@
+[
+  {
+    "id": "js.u10.reverse.predict",
+    "cue": "A stack hands items back in reverse arrival order.",
+    "syntax": "Array.prototype.pop() removes the last item",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "reverse via a stack (LIFO)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const st = [];\nfor (const c of 'abc') st.push(c);\nlet out = '';\nwhile (st.length) out += st.pop();\nout;",
+    "expected": "cba",
+    "prereqs": [
+      "js.u10.stack.peek-js"
+    ]
+  },
+  {
+    "id": "js.u10.minstack.write",
+    "cue": "Push the running minimum alongside each value so pop restores it for free.",
+    "syntax": "a[a.length - 1] reads the top",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "min stack (auxiliary stack of minima)",
+    "kind": "write",
+    "prompt": "Write a `MinStack` class with `push(x)`, `pop()`, `top()`, and `getMin()`, each O(1). `top` returns the most recent value; `getMin` returns the current minimum. Keep a parallel stack recording the minimum so far at each level.",
+    "starter": "class MinStack {\n  constructor() {\n    this.st = [];\n    this.mins = [];\n  }\n  push(x) {\n    // your code here\n  }\n  pop() {\n    // your code here\n  }\n  top() {\n    // your code here\n  }\n  getMin() {\n    // your code here\n  }\n}",
+    "solution": "class MinStack {\n  constructor() {\n    this.st = [];\n    this.mins = [];\n  }\n  push(x) {\n    this.st.push(x);\n    if (!this.mins.length || x <= this.mins[this.mins.length - 1]) this.mins.push(x);\n    else this.mins.push(this.mins[this.mins.length - 1]);\n  }\n  pop() {\n    this.mins.pop();\n    return this.st.pop();\n  }\n  top() {\n    return this.st[this.st.length - 1];\n  }\n  getMin() {\n    return this.mins[this.mins.length - 1];\n  }\n}",
+    "tests": "const m = new MinStack();\nm.push(3); m.push(5);\nif (m.getMin() !== 3) throw new Error('min should be 3');\nm.push(2); m.push(1);\nif (m.getMin() !== 1) throw new Error('min should be 1');\nif (m.pop() !== 1) throw new Error('pop should be 1');\nif (m.getMin() !== 2) throw new Error('min should be 2');\nif (m.top() !== 2) throw new Error('top should be 2');\nm.pop();\nif (m.getMin() !== 3) throw new Error('min should be 3 again');",
+    "prereqs": [
+      "js.u10.stack.peek-js"
+    ]
+  },
+  {
+    "id": "js.u10.dec2bin.write",
+    "cue": "Remainders come out least-significant first; a stack flips them back.",
+    "syntax": "n % 2 and Math.floor(n / 2)",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "decimal to binary via a stack",
+    "kind": "write",
+    "prompt": "Write `toBinary(n)` returning the binary form of a non-negative integer `n` as a string, built by pushing remainders onto a stack (array) and popping them off. Return `'0'` for `n === 0`. Do not use `toString(2)`.",
+    "starter": "function toBinary(n) {\n  // your code here\n}",
+    "solution": "function toBinary(n) {\n  if (n === 0) return '0';\n  const st = [];\n  while (n > 0) {\n    st.push(n % 2);\n    n = Math.floor(n / 2);\n  }\n  let out = '';\n  while (st.length) out += st.pop();\n  return out;\n}",
+    "tests": "if (toBinary(13) !== '1101') throw new Error('13 -> 1101');\nif (toBinary(0) !== '0') throw new Error('0 -> 0');\nif (toBinary(1) !== '1') throw new Error('1 -> 1');\nif (toBinary(8) !== '1000') throw new Error('8 -> 1000');",
+    "prereqs": [
+      "js.u10.stack.peek-js"
+    ]
+  },
+  {
+    "id": "js.u10.daily-temps.write",
+    "cue": "Hold indices whose warmer day hasn't arrived; a hotter reading settles them.",
+    "syntax": "i - j index gap for the day count",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "daily temperatures (monotonic stack, distance)",
+    "kind": "write",
+    "prompt": "Write `dailyTemps(temps)` returning an array where position `i` holds how many days until a warmer temperature than `temps[i]`, or `0` if none follows. Keep a stack of pending indices. One pass.",
+    "starter": "function dailyTemps(temps) {\n  // your code here\n}",
+    "solution": "function dailyTemps(temps) {\n  const res = new Array(temps.length).fill(0);\n  const st = [];\n  for (let i = 0; i < temps.length; i++) {\n    while (st.length && temps[st[st.length - 1]] < temps[i]) {\n      const j = st.pop();\n      res[j] = i - j;\n    }\n    st.push(i);\n  }\n  return res;\n}",
+    "tests": "if (JSON.stringify(dailyTemps([73,74,75,71,69,72,76,73])) !== JSON.stringify([1,1,4,2,1,1,0,0])) throw new Error('case1');\nif (JSON.stringify(dailyTemps([30,40,50,60])) !== JSON.stringify([1,1,1,0])) throw new Error('increasing');\nif (JSON.stringify(dailyTemps([60,50,40])) !== JSON.stringify([0,0,0])) throw new Error('decreasing');\nif (JSON.stringify(dailyTemps([])) !== JSON.stringify([])) throw new Error('empty');",
+    "prereqs": [
+      "js.u10.nge"
+    ]
+  },
+  {
+    "id": "js.u10.queue-two-stacks.write",
+    "cue": "One stack takes arrivals; pouring it into a second reverses to arrival order.",
+    "syntax": "while (this.inSt.length) pour with pop()",
+    "track": "javascript",
+    "group": "Stack / queue / deque",
+    "concept": "FIFO queue from two stacks",
+    "kind": "write",
+    "prompt": "Write a `Queue` class backed by two arrays used as stacks (`inSt`, `outSt`), with `enqueue(x)` and `dequeue()` returning items in FIFO order. Refill `outSt` from `inSt` only when `outSt` is empty.",
+    "starter": "class Queue {\n  constructor() {\n    this.inSt = [];\n    this.outSt = [];\n  }\n  enqueue(x) {\n    // your code here\n  }\n  dequeue() {\n    // your code here\n  }\n}",
+    "solution": "class Queue {\n  constructor() {\n    this.inSt = [];\n    this.outSt = [];\n  }\n  enqueue(x) {\n    this.inSt.push(x);\n  }\n  dequeue() {\n    if (!this.outSt.length) {\n      while (this.inSt.length) this.outSt.push(this.inSt.pop());\n    }\n    return this.outSt.pop();\n  }\n}",
+    "tests": "const q = new Queue();\nq.enqueue(1); q.enqueue(2); q.enqueue(3);\nif (q.dequeue() !== 1) throw new Error('should be 1');\nq.enqueue(4);\nif (q.dequeue() !== 2) throw new Error('should be 2');\nif (q.dequeue() !== 3) throw new Error('should be 3');\nif (q.dequeue() !== 4) throw new Error('should be 4');",
+    "prereqs": [
+      "js.u10.build.pop"
+    ]
+  }
+]

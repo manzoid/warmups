@@ -1,0 +1,129 @@
+[
+  {
+    "id": "py.u01.accumulate.runningsum.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "prefix sums via running accumulator",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "a = [3, 1, 4, 1]\nout = []\nrun = 0\nfor x in a:\n    run += x\n    out.append(run)\nout",
+    "expected": "[3, 4, 8, 9]",
+    "prereqs": [
+      "py.u01.accumulate.sum.predict"
+    ],
+    "cue": "One accumulator, but record its value after each step.",
+    "syntax": "append inside the loop"
+  },
+  {
+    "id": "py.u01.accumulate.runningmax",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "running max-so-far as a list",
+    "kind": "write",
+    "prompt": "Write `running_max(a)` returning a list whose element `i` is the largest value among `a[0..i]`. `running_max([])` is `[]`.",
+    "starter": "def running_max(a):\n    # your code here\n    pass",
+    "solution": "def running_max(a):\n    out = []\n    best = None\n    for x in a:\n        if best is None or x > best:\n            best = x\n        out.append(best)\n    return out",
+    "tests": "assert running_max([]) == [], running_max([])\nassert running_max([3, 1, 4, 1, 5, 9, 2]) == [3, 3, 4, 4, 5, 9, 9], running_max([3, 1, 4, 1, 5, 9, 2])\nassert running_max([-2, -5, -1]) == [-2, -2, -1], running_max([-2, -5, -1])",
+    "prereqs": [
+      "py.u01.extreme.max",
+      "py.u01.accumulate.runningsum.predict"
+    ],
+    "cue": "Carry a best-so-far and emit it once per element.",
+    "syntax": "append the current best each pass"
+  },
+  {
+    "id": "py.u01.count.vowels",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "count matches over a string domain",
+    "kind": "write",
+    "prompt": "Write `count_vowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
+    "starter": "def count_vowels(s):\n    # your code here\n    pass",
+    "solution": "def count_vowels(s):\n    c = 0\n    for ch in s:\n        if ch in 'aeiou':\n            c += 1\n    return c",
+    "tests": "assert count_vowels('') == 0, count_vowels('')\nassert count_vowels('hello') == 2, count_vowels('hello')\nassert count_vowels('xyz') == 0, count_vowels('xyz')\nassert count_vowels('aeiou') == 5, count_vowels('aeiou')",
+    "prereqs": [
+      "py.u01.count.predicate"
+    ],
+    "cue": "Same tally loop, but the test is membership in a small set.",
+    "syntax": "ch in 'aeiou'"
+  },
+  {
+    "id": "py.u01.extreme.closest",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "extreme by a derived key (nearest to target)",
+    "kind": "write",
+    "prompt": "Write `closest(a, t)` returning the element of non-empty list `a` nearest to `t` (smallest `abs(x - t)`); on ties keep the first.",
+    "starter": "def closest(a, t):\n    # your code here\n    pass",
+    "solution": "def closest(a, t):\n    best = a[0]\n    for x in a[1:]:\n        if abs(x - t) < abs(best - t):\n            best = x\n    return best",
+    "tests": "assert closest([5], 0) == 5, closest([5], 0)\nassert closest([10, 4, 7, 1], 5) == 4, closest([10, 4, 7, 1], 5)\nassert closest([-3, -1, -8], -2) == -3, closest([-3, -1, -8], -2)",
+    "prereqs": [
+      "py.u01.extreme.min"
+    ],
+    "cue": "Compare-and-keep, but rank by distance to the target, not by value.",
+    "syntax": "abs(x - t)"
+  },
+  {
+    "id": "py.u01.parallel.count-equal.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "parallel iterate: count equal positions",
+    "kind": "predict",
+    "prompt": "What is the value of `c`?",
+    "snippet": "a = [1, 2, 3, 4]\nb = [1, 0, 3, 0]\nc = 0\nfor i in range(len(a)):\n    if a[i] == b[i]:\n        c += 1\nc",
+    "expected": "2",
+    "prereqs": [
+      "py.u01.parallel.dot.predict"
+    ],
+    "cue": "Walk one index across both lists and tally where they agree.",
+    "syntax": "a[i] == b[i]"
+  },
+  {
+    "id": "py.u01.neighbor.max-rise",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "extreme over adjacent differences",
+    "kind": "write",
+    "prompt": "Write `max_rise(a)` returning the largest increase between consecutive elements (`a[i] - a[i-1]`), or 0 if it never increases. Empty and single-element lists give 0.",
+    "starter": "def max_rise(a):\n    # your code here\n    pass",
+    "solution": "def max_rise(a):\n    best = 0\n    for i in range(1, len(a)):\n        d = a[i] - a[i-1]\n        if d > best:\n            best = d\n    return best",
+    "tests": "assert max_rise([]) == 0, max_rise([])\nassert max_rise([5]) == 0, max_rise([5])\nassert max_rise([1, 5, 2, 10]) == 8, max_rise([1, 5, 2, 10])\nassert max_rise([5, 4, 3]) == 0, max_rise([5, 4, 3])",
+    "prereqs": [
+      "py.u01.neighbor.diffs",
+      "py.u01.extreme.max"
+    ],
+    "cue": "Track a best-so-far over each adjacent difference.",
+    "syntax": "a[i] - a[i-1]"
+  },
+  {
+    "id": "py.u01.filter.indices.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "filter collecting indices, not values",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "a = [5, 2, 7, 1, 9]\nout = []\nfor i in range(len(a)):\n    if a[i] > 4:\n        out.append(i)\nout",
+    "expected": "[0, 2, 4]",
+    "prereqs": [
+      "py.u01.filter.evens.predict"
+    ],
+    "cue": "Append the position when the test holds, not the element.",
+    "syntax": "append i"
+  },
+  {
+    "id": "py.u01.reverse.swap",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "reverse in place via two-pointer swap",
+    "kind": "write",
+    "prompt": "Write `reverse_in_place(a)` that reverses list `a` in place and returns it. Do not build a new list or use `reversed`, `.reverse()`, or `a[::-1]`.",
+    "starter": "def reverse_in_place(a):\n    # your code here\n    pass",
+    "solution": "def reverse_in_place(a):\n    lo = 0\n    hi = len(a) - 1\n    while lo < hi:\n        a[lo], a[hi] = a[hi], a[lo]\n        lo += 1\n        hi -= 1\n    return a",
+    "tests": "assert reverse_in_place([]) == [], reverse_in_place([])\nassert reverse_in_place([7]) == [7], reverse_in_place([7])\nassert reverse_in_place([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_in_place([1, 2, 3, 4])\nassert reverse_in_place([1, 2, 3]) == [3, 2, 1], reverse_in_place([1, 2, 3])",
+    "prereqs": [
+      "py.u01.reverse.raw"
+    ],
+    "cue": "Two indices walking inward, swapping until they meet.",
+    "syntax": "a[lo], a[hi] = a[hi], a[lo]"
+  }
+]

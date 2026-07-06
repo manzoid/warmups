@@ -1,0 +1,80 @@
+[
+  {
+    "id": "py.u06.bubble.write",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "bubble sort",
+    "kind": "write",
+    "prompt": "Write `bubble_sort(a)` that sorts the list `a` ascending in place and returns it by repeatedly swapping adjacent out-of-order pairs. Do not use the built-in sort.",
+    "starter": "def bubble_sort(a):\n    # your code here\n    pass",
+    "solution": "def bubble_sort(a):\n    n = len(a)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if a[j] > a[j + 1]:\n                a[j], a[j + 1] = a[j + 1], a[j]\n    return a",
+    "tests": "assert bubble_sort([5, 2, 4, 6, 1, 3]) == [1, 2, 3, 4, 5, 6], 'basic'\nassert bubble_sort([]) == [], 'empty'\nassert bubble_sort([1]) == [1], 'single'\nassert bubble_sort([3, 3, 1]) == [1, 3, 3], 'dups'",
+    "prereqs": [
+      "py.u06.selection.write"
+    ],
+    "cue": "Each pass bubbles the largest remaining value to the end via adjacent swaps.",
+    "syntax": "a[j], a[j + 1] = a[j + 1], a[j] swap"
+  },
+  {
+    "id": "py.u06.insertion.pass.predict",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "one insertion-sort step",
+    "kind": "predict",
+    "prompt": "What is the value of `a`?",
+    "snippet": "a = [2, 4, 1, 3]\nkey = a[2]\nj = 1\nwhile j >= 0 and a[j] > key:\n    a[j + 1] = a[j]\n    j -= 1\na[j + 1] = key\na",
+    "expected": "[1, 2, 4, 3]",
+    "prereqs": [
+      "py.u06.insertion.write"
+    ],
+    "cue": "Slide larger prefix elements right, then drop the key into the opened gap.",
+    "syntax": "a[j + 1] = a[j] shift right"
+  },
+  {
+    "id": "py.u06.sortkey.lastchar.predict",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "sort by last character",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "words = ['cba', 'abc', 'bca']\nsorted(words, key=lambda w: w[-1])",
+    "expected": "['cba', 'bca', 'abc']",
+    "prereqs": [
+      "py.u06.sortkey.len.predict"
+    ],
+    "cue": "Order by each word's final character; equal keys keep input order.",
+    "syntax": "key=lambda w: w[-1]"
+  },
+  {
+    "id": "py.u06.topk.write",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "top-k largest via sort",
+    "kind": "write",
+    "prompt": "Write `top_k(nums, k)` returning the `k` largest values of `nums` in descending order. If `k` exceeds the length, return all values sorted descending.",
+    "starter": "def top_k(nums, k):\n    # your code here\n    pass",
+    "solution": "def top_k(nums, k):\n    return sorted(nums, reverse=True)[:k]",
+    "tests": "assert top_k([3, 1, 4, 1, 5, 9, 2], 3) == [9, 5, 4], top_k([3, 1, 4, 1, 5, 9, 2], 3)\nassert top_k([1], 5) == [1], top_k([1], 5)\nassert top_k([], 3) == [], top_k([], 3)\nassert top_k([2, 2, 2], 2) == [2, 2], top_k([2, 2, 2], 2)",
+    "prereqs": [
+      "py.u06.sorted.reverse.predict"
+    ],
+    "cue": "Sort descending, then take the front slice.",
+    "syntax": "sorted(xs, reverse=True)[:k]"
+  },
+  {
+    "id": "py.u06.mingap.write",
+    "track": "python",
+    "group": "Sorting",
+    "concept": "sort then min adjacent gap",
+    "kind": "write",
+    "prompt": "Write `min_gap(nums)` returning the smallest difference between any two values in `nums` (length at least 2). Sort first so the closest pair is adjacent.",
+    "starter": "def min_gap(nums):\n    # your code here\n    pass",
+    "solution": "def min_gap(nums):\n    a = sorted(nums)\n    return min(a[i] - a[i - 1] for i in range(1, len(a)))",
+    "tests": "assert min_gap([3, 8, 1, 5]) == 2, min_gap([3, 8, 1, 5])\nassert min_gap([1, 100, 101]) == 1, min_gap([1, 100, 101])\nassert min_gap([5, 5, 9]) == 0, min_gap([5, 5, 9])\nassert min_gap([10, 3]) == 7, min_gap([10, 3])",
+    "prereqs": [
+      "py.u06.sweep.dup.write"
+    ],
+    "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
+    "syntax": "a[i] - a[i - 1] neighbor diff"
+  }
+]

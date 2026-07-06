@@ -1,0 +1,58 @@
+[
+  {
+    "id": "js.u11.prime.write",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "primality by trial division",
+    "kind": "write",
+    "prompt": "Write `isPrime(n)` that returns true if `n` is prime and false otherwise. Trial-divide by candidates up to the square root of `n`.",
+    "starter": "function isPrime(n) {\n  // your code here\n}",
+    "solution": "function isPrime(n) {\n  if (n < 2) return false;\n  for (let i = 2; i * i <= n; i++) {\n    if (n % i === 0) return false;\n  }\n  return true;\n}",
+    "tests": "if (isPrime(2) !== true) throw new Error('2');\nif (isPrime(1) !== false) throw new Error('1');\nif (isPrime(97) !== true) throw new Error('97');\nif (isPrime(100) !== false) throw new Error('100');\nif (isPrime(0) !== false) throw new Error('0');",
+    "cue": "A divisor larger than the square root pairs with a smaller one, so stop the loop at i * i > n. A remainder of 0 means it divides.",
+    "syntax": "n % i === 0",
+    "prereqs": ["js.u11.mod.parity"]
+  },
+  {
+    "id": "js.u11.power.write",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "integer power via multiply loop",
+    "kind": "write",
+    "prompt": "Write `intPow(base, exp)` for `exp >= 0` that returns `base` raised to `exp`, built by a multiply loop. Do not use `**` or `Math.pow`.",
+    "starter": "function intPow(base, exp) {\n  // your code here\n}",
+    "solution": "function intPow(base, exp) {\n  let result = 1;\n  for (let i = 0; i < exp; i++) result *= base;\n  return result;\n}",
+    "tests": "if (intPow(2, 10) !== 1024) throw new Error('2^10');\nif (intPow(5, 0) !== 1) throw new Error('5^0');\nif (intPow(3, 3) !== 27) throw new Error('3^3');\nif (intPow(7, 1) !== 7) throw new Error('7^1');",
+    "cue": "Start the accumulator at 1 (the empty product) and multiply by base once per exponent step.",
+    "syntax": "result *= base",
+    "prereqs": ["js.u11.horner.abc"]
+  },
+  {
+    "id": "js.u11.isqrt.write",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "integer square root (floor)",
+    "kind": "write",
+    "prompt": "Write `isqrt(n)` for `n >= 0` that returns the floor of its square root: the largest integer `i` with `i * i <= n`. Do not use `Math.sqrt` or `**`.",
+    "starter": "function isqrt(n) {\n  // your code here\n}",
+    "solution": "function isqrt(n) {\n  let i = 0;\n  while ((i + 1) * (i + 1) <= n) i++;\n  return i;\n}",
+    "tests": "if (isqrt(0) !== 0) throw new Error('0');\nif (isqrt(1) !== 1) throw new Error('1');\nif (isqrt(15) !== 3) throw new Error('15');\nif (isqrt(16) !== 4) throw new Error('16');\nif (isqrt(24) !== 4) throw new Error('24');\nif (isqrt(25) !== 5) throw new Error('25');",
+    "cue": "Advance i while the next square still fits under n; the last i that fits is the floor root.",
+    "syntax": "(i + 1) * (i + 1) <= n",
+    "prereqs": ["js.u11.intdiv.trunc-negative"]
+  },
+  {
+    "id": "js.u11.base.write",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "convert integer to base-b digits",
+    "kind": "write",
+    "prompt": "Write `toBase(n, b)` for `n >= 0` and `b >= 2` that returns an array of `n`'s digits in base `b`, most significant first. `toBase(0, 2)` is `[0]`; `toBase(13, 2)` is `[1, 1, 0, 1]`.",
+    "starter": "function toBase(n, b) {\n  // your code here\n}",
+    "solution": "function toBase(n, b) {\n  if (n === 0) return [0];\n  const digits = [];\n  while (n > 0) {\n    digits.push(n % b);\n    n = Math.trunc(n / b);\n  }\n  digits.reverse();\n  return digits;\n}",
+    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(toBase(13, 2), [1, 1, 0, 1]);\neq(toBase(0, 2), [0]);\neq(toBase(255, 16), [15, 15]);\neq(toBase(7, 10), [7]);",
+    "cue": "Same digit-peel loop as reversing a number, but the modulus is b, not 10, and Math.trunc replaces the drop. Peeling gives least-significant first, so reverse at the end. Handle 0 as its own case.",
+    "syntax": "n % b and Math.trunc(n / b)",
+    "prereqs": ["js.u11.digits.reverse"]
+  }
+]

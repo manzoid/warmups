@@ -1,0 +1,80 @@
+[
+  {
+    "id": "py.u04.groupby.firstletter.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "group-by first letter (defaultdict(list))",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "from collections import defaultdict\nwords = [\"apple\", \"banana\", \"avocado\", \"cherry\", \"blueberry\"]\ngroups = defaultdict(list)\nfor w in words:\n    groups[w[0]].append(w)\n[groups[k] for k in sorted(groups)]",
+    "expected": "[['apple', 'avocado'], ['banana', 'blueberry'], ['cherry']]",
+    "prereqs": [
+      "py.u04.groupby.setdefault.predict"
+    ],
+    "cue": "Bucket each word under its first character, then read groups in key order.",
+    "syntax": "defaultdict(list)"
+  },
+  {
+    "id": "py.u04.groupby.parity.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "group-by parity into buckets",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "nums = [1, 2, 3, 4, 5, 6]\ngroups = {}\nfor n in nums:\n    groups.setdefault(n % 2, []).append(n)\n[groups[0], groups[1]]",
+    "expected": "[[2, 4, 6], [1, 3, 5]]",
+    "prereqs": [
+      "py.u04.groupby.setdefault.predict"
+    ],
+    "cue": "Split the numbers into even and odd buckets keyed by the remainder.",
+    "syntax": "n % 2 as the bucket key"
+  },
+  {
+    "id": "py.u04.anagram.counter.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "anagram check via count equality",
+    "kind": "write",
+    "prompt": "Write `is_anagram(s, t)` that returns True if `t` is a rearrangement of the characters of `s`, else False. Compare character counts.",
+    "starter": "def is_anagram(s, t):\n    # your code here\n    pass",
+    "solution": "def is_anagram(s, t):\n    from collections import Counter\n    return Counter(s) == Counter(t)",
+    "tests": "assert is_anagram(\"anagram\", \"nagaram\") is True, is_anagram(\"anagram\", \"nagaram\")\nassert is_anagram(\"rat\", \"car\") is False, is_anagram(\"rat\", \"car\")\nassert is_anagram(\"\", \"\") is True, is_anagram(\"\", \"\")\nassert is_anagram(\"a\", \"ab\") is False, is_anagram(\"a\", \"ab\")",
+    "prereqs": [
+      "py.u04.freq.counter.mostcommon"
+    ],
+    "cue": "Two strings are anagrams exactly when their character tallies match.",
+    "syntax": "Counter(s) == Counter(t)"
+  },
+  {
+    "id": "py.u04.wordcount.get.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "word frequency via .get(k, 0)",
+    "kind": "write",
+    "prompt": "Write `word_count(text)` that returns a dict mapping each whitespace-separated word in `text` to how many times it appears.",
+    "starter": "def word_count(text):\n    # your code here\n    pass",
+    "solution": "def word_count(text):\n    freq = {}\n    for w in text.split():\n        freq[w] = freq.get(w, 0) + 1\n    return freq",
+    "tests": "assert word_count(\"a b a\") == {'a': 2, 'b': 1}, word_count(\"a b a\")\nassert word_count(\"\") == {}, word_count(\"\")\nassert word_count(\"hi\") == {'hi': 1}, word_count(\"hi\")\nassert word_count(\"go go go\") == {'go': 3}, word_count(\"go go go\")",
+    "prereqs": [
+      "py.u04.freq.get.predict"
+    ],
+    "cue": "Split into words, then tally each with a miss-safe read.",
+    "syntax": "str.split()"
+  },
+  {
+    "id": "py.u04.majority.write",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "majority element via counts",
+    "kind": "write",
+    "prompt": "Write `majority(nums)` that returns the value appearing more than `len(nums) // 2` times. Assume such an element always exists.",
+    "starter": "def majority(nums):\n    # your code here\n    pass",
+    "solution": "def majority(nums):\n    from collections import Counter\n    return Counter(nums).most_common(1)[0][0]",
+    "tests": "assert majority([3, 2, 3]) == 3, majority([3, 2, 3])\nassert majority([2, 2, 1, 1, 1, 2, 2]) == 2, majority([2, 2, 1, 1, 1, 2, 2])\nassert majority([1]) == 1, majority([1])",
+    "prereqs": [
+      "py.u04.freq.counter.mostcommon"
+    ],
+    "cue": "Count every value, then take the single most frequent one.",
+    "syntax": "Counter(...).most_common(1)"
+  }
+]
