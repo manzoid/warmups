@@ -136,5 +136,147 @@
     "kind": "write",
     "prompt": "Implement `tally(items)` returning a Map from each item to how many times it appears. Fresh data every time.",
     "generator": "function make() {\n  const pool = ['a', 'b', 'c'];\n  const n = 5 + Math.floor(Math.random() * 4);\n  const items = Array.from({ length: n }, () => pool[Math.floor(Math.random() * pool.length)]);\n  const counts = {};\n  for (const it of items) counts[it] = (counts[it] || 0) + 1;\n  const starter = 'function tally(items) {\\n  // return a Map from item to count\\n}';\n  const solution = 'function tally(items) {\\n  const m = new Map();\\n  for (const it of items) m.set(it, (m.get(it) || 0) + 1);\\n  return m;\\n}';\n  const keys = Object.keys(counts);\n  const checks = keys.map((k) => `if (m.get('${k}') !== ${counts[k]}) throw new Error('wrong count for ${k}');`).join('\\n');\n  const list = items.map((x) => `'${x}'`).join(', ');\n  const tests = `const m = tally([${list}]);\\nif (m.size !== ${keys.length}) throw new Error('wrong size');\\n${checks}`;\n  return { starter, solution, tests };\n}"
+  },
+  {
+    "id": "js.fluency.reversestr",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "reverse a string by hand",
+    "kind": "write",
+    "prompt": "Implement `reverseStr(s)` returning `s` with its characters in reverse order, without using `.reverse`. Fresh data every time.",
+    "banned": [
+      ".reverse"
+    ],
+    "generator": "function make() {\n    const chars = 'abcdefghijklmnopqrstuvwxyz';\n    const n = 4 + Math.floor(Math.random() * 5);\n    let s = '';\n    for (let i = 0; i < n; i++) s += chars[Math.floor(Math.random() * chars.length)];\n    let expected = '';\n    for (let i = s.length - 1; i >= 0; i--) expected += s[i];\n    const starter = 'function reverseStr(s) {\\n  // return s reversed, without .reverse\\n}';\n    const solution = 'function reverseStr(s) {\\n  let out = \"\";\\n  for (let i = s.length - 1; i >= 0; i--) out += s[i];\\n  return out;\\n}';\n    const tests = `if (reverseStr('${s}') !== '${expected}') throw new Error('expected ${expected}');`;\n    return { starter, solution, tests, banned: ['.reverse'] };\n  }"
+  },
+  {
+    "id": "js.fluency.countvowels",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "count vowels in a string",
+    "kind": "write",
+    "prompt": "Implement `countVowels(s)` returning how many characters of `s` are one of a, e, i, o, u. Fresh data every time.",
+    "generator": "function make() {\n    const chars = 'abcdefghijklmnopqrstuvwxyz';\n    const n = 5 + Math.floor(Math.random() * 6);\n    let s = '';\n    for (let i = 0; i < n; i++) s += chars[Math.floor(Math.random() * chars.length)];\n    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);\n    let expected = 0;\n    for (const ch of s) if (vowels.has(ch)) expected++;\n    const starter = 'function countVowels(s) {\\n  // count a, e, i, o, u\\n}';\n    const solution = 'function countVowels(s) {\\n  let n = 0;\\n  for (const ch of s) {\\n    if (ch === \"a\" || ch === \"e\" || ch === \"i\" || ch === \"o\" || ch === \"u\") n++;\\n  }\\n  return n;\\n}';\n    const tests = `if (countVowels('${s}') !== ${expected}) throw new Error('expected ${expected}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.ispalindrome",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "check a palindrome by hand",
+    "kind": "write",
+    "prompt": "Implement `isPalindrome(s)` returning `true` when `s` reads the same forward and backward, else `false`. Fresh data every time.",
+    "generator": "function make() {\n    const chars = 'abc';\n    const rand = (len) => {\n      let r = '';\n      for (let i = 0; i < len; i++) r += chars[Math.floor(Math.random() * chars.length)];\n      return r;\n    };\n    let s;\n    if (Math.random() < 0.5) {\n      const half = rand(1 + Math.floor(Math.random() * 3));\n      const mid = Math.random() < 0.5 ? chars[Math.floor(Math.random() * chars.length)] : '';\n      let back = '';\n      for (let i = half.length - 1; i >= 0; i--) back += half[i];\n      s = half + mid + back;\n    } else {\n      s = rand(3 + Math.floor(Math.random() * 3));\n    }\n    let rev = '';\n    for (let i = s.length - 1; i >= 0; i--) rev += s[i];\n    const expected = s === rev;\n    const starter = 'function isPalindrome(s) {\\n  // return true if s reads the same both ways\\n}';\n    const solution = 'function isPalindrome(s) {\\n  let i = 0, j = s.length - 1;\\n  while (i < j) {\\n    if (s[i] !== s[j]) return false;\\n    i++;\\n    j--;\\n  }\\n  return true;\\n}';\n    const tests = `if (isPalindrome('${s}') !== ${expected}) throw new Error('expected ${expected} for ${s}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.flattenone",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "flatten one level by hand",
+    "kind": "write",
+    "prompt": "Implement `flattenOne(a)` where `a` is an array of arrays, returning one array with the inner elements in order, without using `.flat`. Fresh data every time.",
+    "banned": [
+      ".flat"
+    ],
+    "generator": "function make() {\n    const rows = 2 + Math.floor(Math.random() * 3);\n    const a = [];\n    const expected = [];\n    for (let r = 0; r < rows; r++) {\n      const len = 1 + Math.floor(Math.random() * 3);\n      const row = [];\n      for (let i = 0; i < len; i++) {\n        const v = 1 + Math.floor(Math.random() * 9);\n        row.push(v);\n        expected.push(v);\n      }\n      a.push(row);\n    }\n    const starter = 'function flattenOne(a) {\\n  // return a single array, one level flatter, no .flat\\n}';\n    const solution = 'function flattenOne(a) {\\n  const out = [];\\n  for (const row of a) {\\n    for (const x of row) out.push(x);\\n  }\\n  return out;\\n}';\n    const tests = `if (JSON.stringify(flattenOne(${JSON.stringify(a)})) !== '${JSON.stringify(expected)}') throw new Error('expected ${JSON.stringify(expected)}');`;\n    return { starter, solution, tests, banned: ['.flat'] };\n  }"
+  },
+  {
+    "id": "js.fluency.dedupe",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "dedupe preserving order",
+    "kind": "write",
+    "prompt": "Implement `dedupe(a)` returning a new array with duplicate values removed, keeping the first occurrence of each in order. Fresh data every time.",
+    "generator": "function make() {\n    const n = 5 + Math.floor(Math.random() * 4);\n    const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 4));\n    const expected = [];\n    const seen = new Set();\n    for (const x of a) {\n      if (!seen.has(x)) {\n        seen.add(x);\n        expected.push(x);\n      }\n    }\n    const starter = 'function dedupe(a) {\\n  // keep first occurrence of each value, in order\\n}';\n    const solution = 'function dedupe(a) {\\n  const out = [];\\n  const seen = new Set();\\n  for (const x of a) {\\n    if (!seen.has(x)) {\\n      seen.add(x);\\n      out.push(x);\\n    }\\n  }\\n  return out;\\n}';\n    const tests = `if (JSON.stringify(dedupe(${JSON.stringify(a)})) !== '${JSON.stringify(expected)}') throw new Error('expected ${JSON.stringify(expected)}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.fizzbuzz",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "fizzbuzz into an array",
+    "kind": "write",
+    "prompt": "Implement `fizzbuzz(n)` returning an array of length `n`. For each i from 1 to n use the string \"Fizz\" if i is a multiple of 3, \"Buzz\" if a multiple of 5, \"FizzBuzz\" if both, otherwise the number i as a string. Fresh data every time.",
+    "generator": "function make() {\n    const n = 5 + Math.floor(Math.random() * 12);\n    const expected = [];\n    for (let i = 1; i <= n; i++) {\n      if (i % 15 === 0) expected.push('FizzBuzz');\n      else if (i % 3 === 0) expected.push('Fizz');\n      else if (i % 5 === 0) expected.push('Buzz');\n      else expected.push(String(i));\n    }\n    const starter = 'function fizzbuzz(n) {\\n  // return an array of length n, Fizz/Buzz/FizzBuzz or the number as a string\\n}';\n    const solution = 'function fizzbuzz(n) {\\n  const out = [];\\n  for (let i = 1; i <= n; i++) {\\n    if (i % 15 === 0) out.push(\"FizzBuzz\");\\n    else if (i % 3 === 0) out.push(\"Fizz\");\\n    else if (i % 5 === 0) out.push(\"Buzz\");\\n    else out.push(String(i));\\n  }\\n  return out;\\n}';\n    const tests = `if (JSON.stringify(fizzbuzz(${n})) !== '${JSON.stringify(expected)}') throw new Error('wrong fizzbuzz for n=${n}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.sumdigits",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "sum of digits",
+    "kind": "write",
+    "prompt": "Implement `sumOfDigits(n)` returning the sum of the decimal digits of the non-negative integer `n`. Fresh data every time.",
+    "generator": "function make() {\n    const n = Math.floor(Math.random() * 100000);\n    let expected = 0;\n    let t = n;\n    do {\n      expected += t % 10;\n      t = Math.floor(t / 10);\n    } while (t > 0);\n    const starter = 'function sumOfDigits(n) {\\n  // add up the digits of n\\n}';\n    const solution = 'function sumOfDigits(n) {\\n  let sum = 0;\\n  do {\\n    sum += n % 10;\\n    n = Math.floor(n / 10);\\n  } while (n > 0);\\n  return sum;\\n}';\n    const tests = `if (sumOfDigits(${n}) !== ${expected}) throw new Error('expected ${expected}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.runningtotal",
+    "track": "javascript",
+    "group": "Fluency writes",
+    "concept": "prefix sums",
+    "kind": "write",
+    "prompt": "Implement `runningTotal(a)` returning an array of the same length where each element is the sum of `a` up to and including that index. Fresh data every time.",
+    "generator": "function make() {\n    const n = 4 + Math.floor(Math.random() * 4);\n    const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 9));\n    const expected = [];\n    let s = 0;\n    for (const x of a) {\n      s += x;\n      expected.push(s);\n    }\n    const starter = 'function runningTotal(a) {\\n  // return prefix sums of a\\n}';\n    const solution = 'function runningTotal(a) {\\n  const out = [];\\n  let s = 0;\\n  for (const x of a) {\\n    s += x;\\n    out.push(s);\\n  }\\n  return out;\\n}';\n    const tests = `if (JSON.stringify(runningTotal(${JSON.stringify(a)})) !== '${JSON.stringify(expected)}') throw new Error('expected ${JSON.stringify(expected)}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.twosum",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "two sum",
+    "kind": "write",
+    "mapsTo": "LC 1 · Two Sum",
+    "prompt": "Implement `twoSum(a, target)` returning a pair of distinct indices `[i, j]` such that `a[i] + a[j] === target`. A valid pair is guaranteed to exist. Fresh data every time.",
+    "generator": "function make() {\n    const n = 4 + Math.floor(Math.random() * 4);\n    const set = new Set();\n    while (set.size < n) set.add(1 + Math.floor(Math.random() * 40));\n    const a = [...set];\n    let i = Math.floor(Math.random() * n);\n    let j = Math.floor(Math.random() * n);\n    while (j === i) j = Math.floor(Math.random() * n);\n    const target = a[i] + a[j];\n    const starter = 'function twoSum(a, target) {\\n  // return two distinct indices whose values sum to target\\n}';\n    const solution = 'function twoSum(a, target) {\\n  const seen = new Map();\\n  for (let k = 0; k < a.length; k++) {\\n    const need = target - a[k];\\n    if (seen.has(need)) return [seen.get(need), k];\\n    seen.set(a[k], k);\\n  }\\n  return [];\\n}';\n    const tests = `const _a = ${JSON.stringify(a)};\\nconst _r = twoSum(_a, ${target});\\nif (!Array.isArray(_r) || _r.length !== 2) throw new Error('return an array of two indices');\\nif (_r[0] === _r[1]) throw new Error('indices must be distinct');\\nif (_a[_r[0]] + _a[_r[1]] !== ${target}) throw new Error('values must sum to ${target}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.binarysearch",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "binary search",
+    "kind": "write",
+    "mapsTo": "LC 704 · Binary Search",
+    "prompt": "Implement `binarySearch(a, target)` where `a` is sorted ascending with distinct values, returning the index of `target` or -1 if absent, without using `.indexOf` or `.includes`. Fresh data every time.",
+    "banned": [
+      ".indexOf",
+      ".includes"
+    ],
+    "generator": "function make() {\n    const n = 5 + Math.floor(Math.random() * 5);\n    const set = new Set();\n    while (set.size < n) set.add(1 + Math.floor(Math.random() * 60));\n    const a = [...set].sort((x, y) => x - y);\n    let target;\n    let expected;\n    if (Math.random() < 0.6) {\n      const idx = Math.floor(Math.random() * n);\n      target = a[idx];\n      expected = idx;\n    } else {\n      const present = new Set(a);\n      do {\n        target = 1 + Math.floor(Math.random() * 60);\n      } while (present.has(target));\n      expected = -1;\n    }\n    const starter = 'function binarySearch(a, target) {\\n  // return the index of target, or -1, using binary search\\n}';\n    const solution = 'function binarySearch(a, target) {\\n  let lo = 0, hi = a.length - 1;\\n  while (lo <= hi) {\\n    const mid = (lo + hi) >> 1;\\n    if (a[mid] === target) return mid;\\n    if (a[mid] < target) lo = mid + 1;\\n    else hi = mid - 1;\\n  }\\n  return -1;\\n}';\n    const tests = `if (binarySearch(${JSON.stringify(a)}, ${target}) !== ${expected}) throw new Error('expected ${expected}');`;\n    return { starter, solution, tests, banned: ['.indexOf', '.includes'] };\n  }"
+  },
+  {
+    "id": "js.fluency.maxsubarray",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "maximum subarray (Kadane)",
+    "kind": "write",
+    "mapsTo": "LC 53 · Maximum Subarray",
+    "prompt": "Implement `maxSubArray(a)` returning the largest sum of any non-empty contiguous run of `a`. Fresh data every time.",
+    "generator": "function make() {\n    const n = 5 + Math.floor(Math.random() * 4);\n    const a = Array.from({ length: n }, () => -5 + Math.floor(Math.random() * 11));\n    let best = a[0];\n    let cur = a[0];\n    for (let i = 1; i < a.length; i++) {\n      cur = Math.max(a[i], cur + a[i]);\n      best = Math.max(best, cur);\n    }\n    const starter = 'function maxSubArray(a) {\\n  // return the largest contiguous subarray sum\\n}';\n    const solution = 'function maxSubArray(a) {\\n  let best = a[0];\\n  let cur = a[0];\\n  for (let i = 1; i < a.length; i++) {\\n    cur = Math.max(a[i], cur + a[i]);\\n    best = Math.max(best, cur);\\n  }\\n  return best;\\n}';\n    const tests = `if (maxSubArray(${JSON.stringify(a)}) !== ${best}) throw new Error('expected ${best}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.movezeroes",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "move zeroes to the end",
+    "kind": "write",
+    "mapsTo": "LC 283 · Move Zeroes",
+    "prompt": "Implement `moveZeroes(a)` returning an array with all zeros moved to the end, keeping the order of the non-zero values. Fresh data every time.",
+    "generator": "function make() {\n    const n = 5 + Math.floor(Math.random() * 4);\n    const a = Array.from({ length: n }, () => (Math.random() < 0.4 ? 0 : 1 + Math.floor(Math.random() * 9)));\n    const expected = [];\n    let zeros = 0;\n    for (const x of a) {\n      if (x === 0) zeros++;\n      else expected.push(x);\n    }\n    for (let i = 0; i < zeros; i++) expected.push(0);\n    const starter = 'function moveZeroes(a) {\\n  // return a with zeros at the end, non-zero order preserved\\n}';\n    const solution = 'function moveZeroes(a) {\\n  const out = [];\\n  let zeros = 0;\\n  for (const x of a) {\\n    if (x === 0) zeros++;\\n    else out.push(x);\\n  }\\n  for (let i = 0; i < zeros; i++) out.push(0);\\n  return out;\\n}';\n    const tests = `if (JSON.stringify(moveZeroes(${JSON.stringify(a)})) !== '${JSON.stringify(expected)}') throw new Error('expected ${JSON.stringify(expected)}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.validparens",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "valid parentheses",
+    "kind": "write",
+    "mapsTo": "LC 20 · Valid Parentheses",
+    "prompt": "Implement `validParens(s)` returning `true` when every bracket in `s` (from ()[]{}) is closed by the correct type in the correct order, else `false`. Fresh data every time.",
+    "generator": "function make() {\n    const opens = ['(', '[', '{'];\n    const all = ['(', ')', '[', ']', '{', '}'];\n    const len = 2 + Math.floor(Math.random() * 5);\n    let s = '';\n    for (let i = 0; i < len; i++) s += all[Math.floor(Math.random() * all.length)];\n    const closeOf = { '(': ')', '[': ']', '{': '}' };\n    const openOf = { ')': '(', ']': '[', '}': '{' };\n    const ref = (str) => {\n      const st = [];\n      for (const ch of str) {\n        if (opens.includes(ch)) st.push(ch);\n        else if (st.pop() !== openOf[ch]) return false;\n      }\n      return st.length === 0;\n    };\n    // Nudge toward valid strings sometimes so both outcomes appear.\n    if (Math.random() < 0.4) {\n      const half = [];\n      const stack = [];\n      const m = 1 + Math.floor(Math.random() * 3);\n      for (let i = 0; i < m; i++) {\n        const o = opens[Math.floor(Math.random() * opens.length)];\n        half.push(o);\n        stack.push(o);\n      }\n      while (stack.length) half.push(closeOf[stack.pop()]);\n      s = half.join('');\n    }\n    const expected = ref(s);\n    const starter = 'function validParens(s) {\\n  // return true if the brackets are balanced and correctly nested\\n}';\n    const solution = 'function validParens(s) {\\n  const stack = [];\\n  const open = { \")\": \"(\", \"]\": \"[\", \"}\": \"{\" };\\n  for (const ch of s) {\\n    if (ch === \"(\" || ch === \"[\" || ch === \"{\") stack.push(ch);\\n    else if (stack.pop() !== open[ch]) return false;\\n  }\\n  return stack.length === 0;\\n}';\n    const tests = `if (validParens('${s}') !== ${expected}) throw new Error('expected ${expected} for ${s}');`;\n    return { starter, solution, tests };\n  }"
+  },
+  {
+    "id": "js.fluency.maxwindowsum",
+    "track": "javascript",
+    "group": "Fluency interview reps",
+    "concept": "fixed sliding window max sum",
+    "kind": "write",
+    "mapsTo": "LC 643 · Maximum Average Subarray (fixed window)",
+    "prompt": "Implement `maxWindowSum(a, k)` returning the largest sum of any `k` consecutive elements of `a`. Fresh data every time.",
+    "generator": "function make() {\n    const n = 6 + Math.floor(Math.random() * 4);\n    const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 9));\n    const k = 2 + Math.floor(Math.random() * 3);\n    let sum = 0;\n    for (let i = 0; i < k; i++) sum += a[i];\n    let best = sum;\n    for (let i = k; i < a.length; i++) {\n      sum += a[i] - a[i - k];\n      if (sum > best) best = sum;\n    }\n    const starter = 'function maxWindowSum(a, k) {\\n  // return the largest sum of any k consecutive elements\\n}';\n    const solution = 'function maxWindowSum(a, k) {\\n  let sum = 0;\\n  for (let i = 0; i < k; i++) sum += a[i];\\n  let best = sum;\\n  for (let i = k; i < a.length; i++) {\\n    sum += a[i] - a[i - k];\\n    if (sum > best) best = sum;\\n  }\\n  return best;\\n}';\n    const tests = `if (maxWindowSum(${JSON.stringify(a)}, ${k}) !== ${best}) throw new Error('expected ${best}');`;\n    return { starter, solution, tests };\n  }"
   }
 ]
