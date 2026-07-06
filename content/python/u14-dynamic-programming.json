@@ -1,0 +1,397 @@
+[
+  {
+    "id": "py.u14.dp.fib.rec.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "the Fibonacci recurrence in plain recursion",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def fib(n):\n    if n < 2:\n        return n\n    return fib(n - 1) + fib(n - 2)\n\n[fib(0), fib(1), fib(2), fib(3), fib(4), fib(5), fib(6)]",
+    "expected": "[0, 1, 1, 2, 3, 5, 8]",
+    "prereqs": [],
+    "cue": "Each value is the sum of the two before it, with fib(0) = 0 and fib(1) = 1.",
+    "syntax": "fib(n - 1) + fib(n - 2)",
+    "note": "The recurrence is fib(n) = fib(n - 1) + fib(n - 2), base cases fib(0) = 0 and fib(1) = 1. Plain recursion recomputes the same calls again and again, so its time is O(2^n). The rest of this unit removes that waste."
+  },
+  {
+    "id": "py.u14.dp.fib.table.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "filling a Fibonacci table bottom-up",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "dp = [0, 1, 0, 0, 0, 0, 0]\nfor i in range(2, 7):\n    dp[i] = dp[i - 1] + dp[i - 2]\ndp",
+    "expected": "[0, 1, 1, 2, 3, 5, 8]",
+    "prereqs": [
+      "py.u14.dp.fib.rec.predict"
+    ],
+    "cue": "Seed the first two slots, then fill each later slot from the two just below it.",
+    "syntax": "dp[i] = dp[i - 1] + dp[i - 2]",
+    "note": "Tabulation stores each answer once in an array and fills it from the base cases upward, so every value is computed a single time. This turns the O(2^n) recursion into an O(n) loop."
+  },
+  {
+    "id": "py.u14.dp.fib.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "Fibonacci in O(1) space",
+    "kind": "write",
+    "prompt": "Write `fib(n)` for `n >= 0` returning the nth Fibonacci number, where fib(0) = 0 and fib(1) = 1. Build it bottom-up with a loop, keeping only the last two values instead of a full array.",
+    "mapsTo": "LC 509 · Fibonacci Number",
+    "note": "Only the two most recent values matter, so you can drop the array and keep two variables. Time is O(n) and extra space is O(1). The recurrence is still fib(n) = fib(n - 1) + fib(n - 2).",
+    "starter": "def fib(n):\n    # your code here\n    pass",
+    "solution": "def fib(n):\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b",
+    "prereqs": [
+      "py.u14.dp.fib.table.predict"
+    ],
+    "cue": "Hold the previous two numbers in a pair and slide the pair forward each step.",
+    "syntax": "a, b = b, a + b",
+    "cases": [
+      {
+        "call": "fib(0)",
+        "expect": "0"
+      },
+      {
+        "call": "fib(1)",
+        "expect": "1"
+      },
+      {
+        "call": "fib(2)",
+        "expect": "1"
+      },
+      {
+        "call": "fib(6)",
+        "expect": "8"
+      },
+      {
+        "call": "fib(10)",
+        "expect": "55"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.stairs.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "counting ways to climb with 1 or 2 steps",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def ways(n):\n    if n <= 2:\n        return n\n    return ways(n - 1) + ways(n - 2)\n\n[ways(1), ways(2), ways(3), ways(4)]",
+    "expected": "[1, 2, 3, 5]",
+    "prereqs": [
+      "py.u14.dp.fib.write"
+    ],
+    "cue": "The last hop is either a single step or a double step, so add the counts for the two smaller stairs.",
+    "syntax": "ways(n - 1) + ways(n - 2)",
+    "note": "To reach step n you arrive either from step n - 1 (a single step) or step n - 2 (a double step), so ways(n) = ways(n - 1) + ways(n - 2). That is the Fibonacci recurrence shifted, which is why the counts read 1, 2, 3, 5."
+  },
+  {
+    "id": "py.u14.dp.stairs.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "climbing stairs",
+    "kind": "write",
+    "prompt": "Write `climb_stairs(n)` for `n >= 1` returning the number of distinct ways to reach the top of a staircase of `n` steps, taking 1 or 2 steps at a time. Use a bottom-up loop with O(1) extra space.",
+    "mapsTo": "LC 70 · Climbing Stairs",
+    "note": "The recurrence is climb(n) = climb(n - 1) + climb(n - 2) because the final hop is a 1-step or a 2-step. Carry the last two counts in variables: time O(n), space O(1).",
+    "starter": "def climb_stairs(n):\n    # your code here\n    pass",
+    "solution": "def climb_stairs(n):\n    a, b = 1, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a",
+    "prereqs": [
+      "py.u14.dp.stairs.predict"
+    ],
+    "cue": "Start both running counts at 1, then advance the pair once per step.",
+    "syntax": "a, b = b, a + b",
+    "cases": [
+      {
+        "call": "climb_stairs(1)",
+        "expect": "1"
+      },
+      {
+        "call": "climb_stairs(2)",
+        "expect": "2"
+      },
+      {
+        "call": "climb_stairs(3)",
+        "expect": "3"
+      },
+      {
+        "call": "climb_stairs(4)",
+        "expect": "5"
+      },
+      {
+        "call": "climb_stairs(5)",
+        "expect": "8"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.mincost.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "cheapest cost to reach each step",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "cost = [10, 15, 20]\nn = len(cost)\ndp = [0] * (n + 1)\nfor i in range(2, n + 1):\n    dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2])\ndp",
+    "expected": "[0, 0, 10, 15]",
+    "prereqs": [
+      "py.u14.dp.stairs.write"
+    ],
+    "cue": "You may start free at step 0 or step 1; every later step is reached from one or two below, paying that step's cost.",
+    "syntax": "min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2])",
+    "note": "dp[i] is the cheapest cost to stand on step i. The top is index n, one past the last stair. The recurrence is dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]), with dp[0] = dp[1] = 0 since you may start on either for free."
+  },
+  {
+    "id": "py.u14.dp.mincost.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "min cost climbing stairs",
+    "kind": "write",
+    "prompt": "Write `min_cost_climbing(cost)` returning the least total cost to reach the top of the stairs. `cost[i]` is the price to step off stair `i`; you may start on stair 0 or stair 1, and each move goes up 1 or 2 stairs. The top is just past the last stair.",
+    "mapsTo": "LC 746 · Min Cost Climbing Stairs",
+    "note": "The recurrence is dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]), and the answer is dp[n]. Only the two previous costs are needed, so keep two variables: time O(n), space O(1).",
+    "starter": "def min_cost_climbing(cost):\n    # your code here\n    pass",
+    "solution": "def min_cost_climbing(cost):\n    n = len(cost)\n    a, b = 0, 0\n    for i in range(2, n + 1):\n        a, b = b, min(b + cost[i - 1], a + cost[i - 2])\n    return b",
+    "prereqs": [
+      "py.u14.dp.mincost.predict"
+    ],
+    "cue": "Keep the cheapest cost to reach the last two stairs; each step takes the smaller of arriving from one or two below.",
+    "syntax": "min(b + cost[i - 1], a + cost[i - 2])",
+    "cases": [
+      {
+        "call": "min_cost_climbing([10, 15, 20])",
+        "expect": "15"
+      },
+      {
+        "call": "min_cost_climbing([1, 100, 1, 1, 1, 100, 1, 1, 100, 1])",
+        "expect": "6"
+      },
+      {
+        "call": "min_cost_climbing([1, 2])",
+        "expect": "1"
+      },
+      {
+        "call": "min_cost_climbing([0, 0])",
+        "expect": "0"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.robber.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "max non-adjacent sum, built as a table",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "nums = [2, 7, 9, 3, 1]\ndp = [0] * len(nums)\ndp[0] = nums[0]\ndp[1] = max(nums[0], nums[1])\nfor i in range(2, len(nums)):\n    dp[i] = max(dp[i - 1], dp[i - 2] + nums[i])\ndp",
+    "expected": "[2, 7, 11, 11, 12]",
+    "prereqs": [
+      "py.u14.dp.mincost.write"
+    ],
+    "cue": "At each house you either skip it and keep the previous best, or take it and add the best from two houses back.",
+    "syntax": "max(dp[i - 1], dp[i - 2] + nums[i])",
+    "note": "dp[i] is the best sum using houses 0 through i with no two adjacent. The choice at house i is skip (dp[i - 1]) or rob it (dp[i - 2] + nums[i]), so dp[i] = max(dp[i - 1], dp[i - 2] + nums[i])."
+  },
+  {
+    "id": "py.u14.dp.robber.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "house robber",
+    "kind": "write",
+    "prompt": "Write `rob(nums)` returning the largest sum you can take from the list without taking two adjacent elements. An empty list returns 0. Use a bottom-up loop with O(1) extra space.",
+    "mapsTo": "LC 198 · House Robber",
+    "note": "The recurrence is best(i) = max(best(i - 1), best(i - 2) + nums[i]): skip element i or take it plus the best from two back. Carry the two running bests in variables: time O(n), space O(1).",
+    "starter": "def rob(nums):\n    # your code here\n    pass",
+    "solution": "def rob(nums):\n    prev, curr = 0, 0\n    for i in range(len(nums)):\n        prev, curr = curr, max(curr, prev + nums[i])\n    return curr",
+    "prereqs": [
+      "py.u14.dp.robber.predict"
+    ],
+    "cue": "Track the best without the current element and the best including it, sliding the pair forward.",
+    "syntax": "prev, curr = curr, max(curr, prev + nums[i])",
+    "cases": [
+      {
+        "call": "rob([2, 7, 9, 3, 1])",
+        "expect": "12"
+      },
+      {
+        "call": "rob([1, 2, 3, 1])",
+        "expect": "4"
+      },
+      {
+        "call": "rob([2, 1, 1, 2])",
+        "expect": "4"
+      },
+      {
+        "call": "rob([5])",
+        "expect": "5"
+      },
+      {
+        "call": "rob([])",
+        "expect": "0"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.coins.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "fewest coins per amount, built as a table",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "coins = [1, 2, 5]\namount = 5\nBIG = amount + 1\ndp = [0] + [BIG] * amount\nfor a in range(1, amount + 1):\n    for c in coins:\n        if c <= a:\n            dp[a] = min(dp[a], dp[a - c] + 1)\ndp",
+    "expected": "[0, 1, 1, 2, 2, 1]",
+    "prereqs": [
+      "py.u14.dp.robber.write"
+    ],
+    "cue": "To make amount a, try each coin c and add one coin to the best way of making a - c.",
+    "syntax": "dp[a] = min(dp[a], dp[a - c] + 1)",
+    "note": "dp[a] is the fewest coins to total exactly a, starting from dp[0] = 0 and a sentinel BIG for amounts not yet reachable. The recurrence dp[a] = min over coins c of dp[a - c] + 1 fills the table upward in O(amount * len(coins)) time."
+  },
+  {
+    "id": "py.u14.dp.coins.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "coin change",
+    "kind": "write",
+    "prompt": "Write `coin_change(coins, amount)` returning the fewest coins that total exactly `amount`, or -1 if no combination works. You may use each coin value any number of times. `coin_change(coins, 0)` is 0.",
+    "mapsTo": "LC 322 · Coin Change",
+    "note": "Build dp[0..amount] where dp[a] is the fewest coins for total a. Seed dp[0] = 0 and the rest to a sentinel above any real answer. The recurrence is dp[a] = min over coins c <= a of dp[a - c] + 1. Time O(amount * len(coins)), space O(amount). If dp[amount] is still the sentinel, return -1.",
+    "starter": "def coin_change(coins, amount):\n    # your code here\n    pass",
+    "solution": "def coin_change(coins, amount):\n    BIG = amount + 1\n    dp = [0] + [BIG] * amount\n    for a in range(1, amount + 1):\n        for c in coins:\n            if c <= a:\n                dp[a] = min(dp[a], dp[a - c] + 1)\n    return dp[amount] if dp[amount] <= amount else -1",
+    "prereqs": [
+      "py.u14.dp.coins.predict"
+    ],
+    "cue": "Fill amounts from 1 upward; for each, take the cheapest way over all coins that fit, then check the last slot was reached.",
+    "syntax": "dp[a] = min(dp[a], dp[a - c] + 1)",
+    "cases": [
+      {
+        "call": "coin_change([1, 2, 5], 11)",
+        "expect": "3"
+      },
+      {
+        "call": "coin_change([2], 3)",
+        "expect": "-1"
+      },
+      {
+        "call": "coin_change([2, 5, 10, 1], 27)",
+        "expect": "4"
+      },
+      {
+        "call": "coin_change([1, 2, 5], 0)",
+        "expect": "0"
+      },
+      {
+        "call": "coin_change([], 7)",
+        "expect": "-1"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.grid.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "counting grid paths cell by cell",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "m, n = 3, 3\ndp = [[1] * n for _ in range(m)]\nfor i in range(1, m):\n    for j in range(1, n):\n        dp[i][j] = dp[i - 1][j] + dp[i][j - 1]\ndp",
+    "expected": "[[1, 1, 1], [1, 2, 3], [1, 3, 6]]",
+    "prereqs": [
+      "py.u14.dp.coins.write"
+    ],
+    "cue": "The top row and left column each have one path; every inner cell sums the cell above and the cell to its left.",
+    "syntax": "dp[i][j] = dp[i - 1][j] + dp[i][j - 1]",
+    "note": "dp[i][j] counts the paths reaching that cell moving only right or down. A cell is entered from above or from the left, so dp[i][j] = dp[i - 1][j] + dp[i][j - 1], with the first row and column all 1. Filling the m by n table is O(m * n)."
+  },
+  {
+    "id": "py.u14.dp.grid.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "unique paths in a grid",
+    "kind": "write",
+    "prompt": "Write `unique_paths(m, n)` returning the number of distinct paths from the top-left to the bottom-right of an `m` by `n` grid, moving only right or down. `unique_paths(1, 1)` is 1.",
+    "mapsTo": "LC 62 · Unique Paths",
+    "note": "The recurrence is paths(i, j) = paths(i - 1, j) + paths(i, j - 1), with the top row and left column all 1. You can keep just one row and update it in place, so time is O(m * n) and space is O(n).",
+    "starter": "def unique_paths(m, n):\n    # your code here\n    pass",
+    "solution": "def unique_paths(m, n):\n    row = [1] * n\n    for _ in range(1, m):\n        for j in range(1, n):\n            row[j] += row[j - 1]\n    return row[n - 1]",
+    "prereqs": [
+      "py.u14.dp.grid.predict"
+    ],
+    "cue": "Keep one row of counts; for each next row, add the value to the left into each cell as you sweep right.",
+    "syntax": "row[j] += row[j - 1]",
+    "cases": [
+      {
+        "call": "unique_paths(3, 3)",
+        "expect": "6"
+      },
+      {
+        "call": "unique_paths(3, 7)",
+        "expect": "28"
+      },
+      {
+        "call": "unique_paths(7, 3)",
+        "expect": "28"
+      },
+      {
+        "call": "unique_paths(1, 1)",
+        "expect": "1"
+      },
+      {
+        "call": "unique_paths(1, 10)",
+        "expect": "1"
+      }
+    ]
+  },
+  {
+    "id": "py.u14.dp.lis.predict",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "longest increasing run ending at each index",
+    "kind": "predict",
+    "prompt": "What is the value of `dp`?",
+    "snippet": "nums = [10, 9, 2, 5, 3, 7]\ndp = [1] * len(nums)\nfor i in range(len(nums)):\n    for j in range(i):\n        if nums[j] < nums[i]:\n            dp[i] = max(dp[i], dp[j] + 1)\ndp",
+    "expected": "[1, 1, 1, 2, 2, 3]",
+    "prereqs": [
+      "py.u14.dp.grid.write"
+    ],
+    "cue": "Each length starts at 1, then extends any earlier subsequence whose last value is smaller than the current one.",
+    "syntax": "if nums[j] < nums[i]: dp[i] = max(dp[i], dp[j] + 1)",
+    "note": "dp[i] is the length of the longest increasing subsequence that ends at index i. For each i you look at every earlier j with nums[j] < nums[i] and extend the best of those, so dp[i] = 1 + max(dp[j]). Two nested loops make this O(n^2)."
+  },
+  {
+    "id": "py.u14.dp.lis.write",
+    "track": "python",
+    "group": "Dynamic programming",
+    "concept": "longest increasing subsequence",
+    "kind": "write",
+    "prompt": "Write `length_of_lis(nums)` returning the length of the longest strictly increasing subsequence of `nums`. The elements need not be adjacent but must keep their order. An empty list returns 0. An O(n^2) table is fine.",
+    "mapsTo": "LC 300 · Longest Increasing Subsequence",
+    "note": "Let dp[i] be the longest increasing subsequence ending at index i. The recurrence is dp[i] = 1 + max(dp[j] for j < i with nums[j] < nums[i]), or 1 if none. The answer is max(dp). Time O(n^2), space O(n).",
+    "starter": "def length_of_lis(nums):\n    # your code here\n    pass",
+    "solution": "def length_of_lis(nums):\n    if not nums:\n        return 0\n    dp = [1] * len(nums)\n    for i in range(len(nums)):\n        for j in range(i):\n            if nums[j] < nums[i]:\n                dp[i] = max(dp[i], dp[j] + 1)\n    return max(dp)",
+    "prereqs": [
+      "py.u14.dp.lis.predict"
+    ],
+    "cue": "For each element, extend the best earlier run that ends below it; the answer is the largest length found.",
+    "syntax": "if nums[j] < nums[i]: dp[i] = max(dp[i], dp[j] + 1)",
+    "cases": [
+      {
+        "call": "length_of_lis([10, 9, 2, 5, 3, 7, 101, 18])",
+        "expect": "4"
+      },
+      {
+        "call": "length_of_lis([0, 1, 0, 3, 2, 3])",
+        "expect": "4"
+      },
+      {
+        "call": "length_of_lis([7, 7, 7, 7])",
+        "expect": "1"
+      },
+      {
+        "call": "length_of_lis([4, 10, 4, 3, 8, 9])",
+        "expect": "3"
+      },
+      {
+        "call": "length_of_lis([])",
+        "expect": "0"
+      }
+    ]
+  }
+]

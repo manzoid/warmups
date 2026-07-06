@@ -1,0 +1,339 @@
+[
+  {
+    "id": "py.u13.graph.dict.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "adjacency dict: read a node's neighbors",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "graph = {0: [1, 2], 1: [], 2: [3], 3: []}\n[graph[0], graph[2], len(graph)]",
+    "expected": "[[1, 2], [3], 4]",
+    "prereqs": [],
+    "cue": "graph[node] gives the list of nodes you can step to from that node.",
+    "syntax": "graph[node] neighbor list",
+    "note": "A graph is a set of nodes joined by edges. Here it is stored as a dict that maps each node to a list of its neighbors in a fixed order. graph[0] is [1, 2], so from node 0 you can reach 1 and 2."
+  },
+  {
+    "id": "py.u13.graph.build.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "build an undirected adjacency dict from an edge list",
+    "kind": "predict",
+    "prompt": "What is the value of `graph[0]`?",
+    "snippet": "edges = [[0, 1], [0, 2], [1, 2]]\ngraph = {0: [], 1: [], 2: []}\nfor u, v in edges:\n    graph[u].append(v)\n    graph[v].append(u)\ngraph[0]",
+    "expected": "[1, 2]",
+    "prereqs": [
+      "py.u13.graph.dict.predict"
+    ],
+    "cue": "Undirected means each edge [u, v] adds v under u and u under v.",
+    "syntax": "graph[u].append(v)",
+    "note": "An edge list is another way to give a graph. For an undirected graph, each pair [u, v] gets added twice, once in each direction, so both endpoints list the other as a neighbor."
+  },
+  {
+    "id": "py.u13.graph.dfs.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "depth-first traversal order",
+    "kind": "predict",
+    "prompt": "What is the value of `order`?",
+    "snippet": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}\nvisited = set()\norder = []\ndef go(node):\n    visited.add(node)\n    order.append(node)\n    for nb in graph[node]:\n        if nb not in visited:\n            go(nb)\ngo(0)\norder",
+    "expected": "[0, 1, 3, 2]",
+    "prereqs": [
+      "py.u13.graph.dict.predict"
+    ],
+    "cue": "Depth-first follows the first neighbor all the way down before trying the next.",
+    "syntax": "for nb in graph[node]",
+    "note": "Depth-first search (DFS) walks as far as it can along one branch, then backs up. From 0 it goes to 1, then down to 3, then back up to take 0's other neighbor 2. The visited set stops it from re-entering a node."
+  },
+  {
+    "id": "py.u13.graph.dfs.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "depth-first traversal of a graph",
+    "kind": "write",
+    "prompt": "Write `dfs(graph, start)` that returns the list of nodes in depth-first preorder starting from `start`. `graph` maps each node to a list of neighbors; visit neighbors in that list order. Use a visited set so each node is recorded once.",
+    "mapsTo": "LC 547 · DFS traversal pattern",
+    "note": "Each node and edge is looked at once, so time is O(V + E) for V nodes and E edges. The recursion stack and visited set are O(V).",
+    "starter": "def dfs(graph, start):\n    # your code here\n    return []",
+    "solution": "def dfs(graph, start):\n    visited = set()\n    order = []\n    def go(node):\n        visited.add(node)\n        order.append(node)\n        for nb in graph[node]:\n            if nb not in visited:\n                go(nb)\n    go(start)\n    return order",
+    "prereqs": [
+      "py.u13.graph.dfs.predict"
+    ],
+    "cue": "Record the node, then recurse into each not-yet-visited neighbor in list order.",
+    "syntax": "if nb not in visited: recurse",
+    "cases": [
+      {
+        "setup": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}",
+        "call": "dfs(graph, 0)",
+        "expect": "[0, 1, 3, 2]"
+      },
+      {
+        "setup": "graph = {0: []}",
+        "call": "dfs(graph, 0)",
+        "expect": "[0]"
+      },
+      {
+        "setup": "graph = {0: [1, 2], 1: [], 2: []}",
+        "call": "dfs(graph, 0)",
+        "expect": "[0, 1, 2]"
+      },
+      {
+        "setup": "graph = {0: [1], 1: [2], 2: [0]}",
+        "call": "dfs(graph, 0)",
+        "expect": "[0, 1, 2]"
+      }
+    ]
+  },
+  {
+    "id": "py.u13.graph.bfs.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "breadth-first traversal order",
+    "kind": "predict",
+    "prompt": "What is the value of `order`?",
+    "snippet": "from collections import deque\ngraph = {0: [1, 2], 1: [3], 2: [], 3: []}\nvisited = {0}\norder = []\nq = deque([0])\nwhile q:\n    node = q.popleft()\n    order.append(node)\n    for nb in graph[node]:\n        if nb not in visited:\n            visited.add(nb)\n            q.append(nb)\norder",
+    "expected": "[0, 1, 2, 3]",
+    "prereqs": [
+      "py.u13.graph.dfs.write"
+    ],
+    "cue": "Breadth-first drains a queue, so it finishes all of one node's neighbors before their children.",
+    "syntax": "q.popleft(); q.append(nb)",
+    "note": "Breadth-first search (BFS) uses a queue and visits nodes in order of distance from the start. Here it takes 0, then both of 0's neighbors 1 and 2, then 3. Compare this with the DFS order [0, 1, 3, 2] on the same graph."
+  },
+  {
+    "id": "py.u13.graph.bfs.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "breadth-first traversal of a graph",
+    "kind": "write",
+    "prompt": "Write `bfs(graph, start)` that returns the list of nodes in breadth-first order starting from `start`. `graph` maps each node to a list of neighbors; enqueue neighbors in that list order. Use a queue (collections.deque) and a visited set.",
+    "mapsTo": "LC 1091 · BFS traversal pattern",
+    "note": "Each node enters and leaves the queue once and each edge is scanned once, so time is O(V + E). The queue and visited set are O(V).",
+    "starter": "from collections import deque\n\ndef bfs(graph, start):\n    # your code here\n    return []",
+    "solution": "from collections import deque\n\ndef bfs(graph, start):\n    visited = {start}\n    order = []\n    q = deque([start])\n    while q:\n        node = q.popleft()\n        order.append(node)\n        for nb in graph[node]:\n            if nb not in visited:\n                visited.add(nb)\n                q.append(nb)\n    return order",
+    "prereqs": [
+      "py.u13.graph.bfs.predict"
+    ],
+    "cue": "Mark a node visited when you enqueue it; pop from the front and record it.",
+    "syntax": "q.popleft() then append new neighbors",
+    "cases": [
+      {
+        "setup": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}",
+        "call": "bfs(graph, 0)",
+        "expect": "[0, 1, 2, 3]"
+      },
+      {
+        "setup": "graph = {0: []}",
+        "call": "bfs(graph, 0)",
+        "expect": "[0]"
+      },
+      {
+        "setup": "graph = {0: [1, 2, 3], 1: [], 2: [], 3: []}",
+        "call": "bfs(graph, 0)",
+        "expect": "[0, 1, 2, 3]"
+      },
+      {
+        "setup": "graph = {0: [1], 1: [2], 2: [0]}",
+        "call": "bfs(graph, 0)",
+        "expect": "[0, 1, 2]"
+      }
+    ]
+  },
+  {
+    "id": "py.u13.graph.reach.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "reachability between two nodes",
+    "kind": "write",
+    "prompt": "Write `can_reach(graph, start, target)` that returns True if there is a path from `start` to `target` following the edges in `graph`, otherwise False. A node reaches itself. `graph` maps each node to a list of neighbors. Use DFS or BFS with a visited set.",
+    "mapsTo": "LC 1971 · Find if Path Exists in Graph",
+    "note": "In the worst case you touch every node and edge once, so time is O(V + E) and extra space is O(V) for the visited set and stack.",
+    "starter": "def can_reach(graph, start, target):\n    # your code here\n    return False",
+    "solution": "def can_reach(graph, start, target):\n    visited = set()\n    def go(node):\n        if node == target:\n            return True\n        visited.add(node)\n        for nb in graph[node]:\n            if nb not in visited:\n                if go(nb):\n                    return True\n        return False\n    return go(start)",
+    "prereqs": [
+      "py.u13.graph.bfs.write"
+    ],
+    "cue": "Return True the moment you land on the target; otherwise search each unvisited neighbor.",
+    "syntax": "if node == target: return True",
+    "cases": [
+      {
+        "setup": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}",
+        "call": "can_reach(graph, 0, 3)",
+        "expect": "True"
+      },
+      {
+        "setup": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}",
+        "call": "can_reach(graph, 3, 0)",
+        "expect": "False"
+      },
+      {
+        "setup": "graph = {0: [1, 2], 1: [3], 2: [], 3: []}",
+        "call": "can_reach(graph, 0, 0)",
+        "expect": "True"
+      },
+      {
+        "setup": "graph = {0: [1], 1: [], 2: [3], 3: []}",
+        "call": "can_reach(graph, 0, 3)",
+        "expect": "False"
+      }
+    ]
+  },
+  {
+    "id": "py.u13.graph.components.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "count connected components",
+    "kind": "write",
+    "prompt": "Write `count_components(n, edges)` where nodes are 0..n-1 and `edges` is a list of undirected pairs [u, v]. Return the number of connected components. Build an adjacency dict, then start one traversal per unvisited node and count how many traversals you begin.",
+    "mapsTo": "LC 323 · Number of Connected Components",
+    "note": "Building the graph is O(V + E) and the traversals together visit each node and edge once, so time is O(V + E) with O(V) extra space.",
+    "starter": "def count_components(n, edges):\n    # your code here\n    return 0",
+    "solution": "def count_components(n, edges):\n    graph = {i: [] for i in range(n)}\n    for u, v in edges:\n        graph[u].append(v)\n        graph[v].append(u)\n    visited = set()\n    def go(node):\n        visited.add(node)\n        for nb in graph[node]:\n            if nb not in visited:\n                go(nb)\n    count = 0\n    for i in range(n):\n        if i not in visited:\n            count += 1\n            go(i)\n    return count",
+    "prereqs": [
+      "py.u13.graph.build.predict",
+      "py.u13.graph.reach.write"
+    ],
+    "cue": "Each time you find an unvisited node, that is a new component; traverse it to mark the rest.",
+    "syntax": "for i in range(n): if unvisited, count and traverse",
+    "cases": [
+      {
+        "call": "count_components(5, [[0, 1], [1, 2], [3, 4]])",
+        "expect": "2"
+      },
+      {
+        "call": "count_components(5, [[0, 1], [1, 2], [2, 3], [3, 4]])",
+        "expect": "1"
+      },
+      {
+        "call": "count_components(4, [])",
+        "expect": "4"
+      },
+      {
+        "call": "count_components(1, [])",
+        "expect": "1"
+      }
+    ]
+  },
+  {
+    "id": "py.u13.grid.offsets.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "the four grid neighbor offsets",
+    "kind": "predict",
+    "prompt": "What is the value of `res`?",
+    "snippet": "grid = [[1, 0, 1],\n        [1, 1, 0],\n        [0, 0, 1]]\nr, c = 1, 1\noffsets = [(-1, 0), (1, 0), (0, -1), (0, 1)]\nres = []\nfor dr, dc in offsets:\n    res.append(grid[r + dr][c + dc])\nres",
+    "expected": "[0, 0, 1, 0]",
+    "prereqs": [
+      "py.u13.graph.components.write"
+    ],
+    "cue": "The four offsets step up, down, left, and right from cell (r, c).",
+    "syntax": "grid[r + dr][c + dc]",
+    "note": "A grid acts like a graph where each cell's neighbors are the four cells above, below, left, and right. Adding each (dr, dc) offset to (r, c) reaches those four neighbors."
+  },
+  {
+    "id": "py.u13.grid.bounds.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "checking a cell is inside the grid",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "grid = [[1, 0], [0, 1]]\nrows, cols = len(grid), len(grid[0])\ndef in_bounds(r, c):\n    return 0 <= r < rows and 0 <= c < cols\n[in_bounds(0, 0), in_bounds(2, 0), in_bounds(1, 1), in_bounds(-1, 0)]",
+    "expected": "[True, False, True, False]",
+    "prereqs": [
+      "py.u13.grid.offsets.predict"
+    ],
+    "cue": "A cell is valid only when both its row and column fall inside the grid.",
+    "syntax": "0 <= r < rows and 0 <= c < cols",
+    "note": "Before reading a neighbor cell you must check it is on the board. rows is the number of rows and cols the number of columns; a row or column index outside 0..size-1 is off the grid."
+  },
+  {
+    "id": "py.u13.grid.islands.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "count islands in a grid",
+    "kind": "write",
+    "prompt": "Write `num_islands(grid)` where `grid` is a 2D list of 0s and 1s. Return the number of islands: groups of 1s connected up, down, left, or right. From each new 1, flood its whole island (mark it visited) so you count each island once.",
+    "mapsTo": "LC 200 · Number of Islands",
+    "note": "Each cell is visited a constant number of times, so time is O(rows * cols) and the visited set plus recursion stack are O(rows * cols) in the worst case.",
+    "starter": "def num_islands(grid):\n    # your code here\n    return 0",
+    "solution": "def num_islands(grid):\n    if not grid:\n        return 0\n    rows, cols = len(grid), len(grid[0])\n    visited = set()\n    def sink(r, c):\n        if r < 0 or r >= rows or c < 0 or c >= cols:\n            return\n        if grid[r][c] == 0 or (r, c) in visited:\n            return\n        visited.add((r, c))\n        sink(r - 1, c)\n        sink(r + 1, c)\n        sink(r, c - 1)\n        sink(r, c + 1)\n    count = 0\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == 1 and (r, c) not in visited:\n                count += 1\n                sink(r, c)\n    return count",
+    "prereqs": [
+      "py.u13.grid.bounds.predict"
+    ],
+    "cue": "Scan every cell; on an unvisited 1, add one to the count and flood the four directions.",
+    "syntax": "sink(r-1, c), sink(r+1, c), sink(r, c-1), sink(r, c+1)",
+    "cases": [
+      {
+        "call": "num_islands([[1, 1, 0, 0, 0], [1, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 1]])",
+        "expect": "3"
+      },
+      {
+        "call": "num_islands([[0, 0], [0, 0]])",
+        "expect": "0"
+      },
+      {
+        "call": "num_islands([[1, 1], [1, 1]])",
+        "expect": "1"
+      },
+      {
+        "call": "num_islands([[1]])",
+        "expect": "1"
+      },
+      {
+        "call": "num_islands([[1, 0, 1, 0, 1]])",
+        "expect": "3"
+      }
+    ]
+  },
+  {
+    "id": "py.u13.grid.floodfill.predict",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "why flood fill needs a same-color guard",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "image = [[1, 1, 0],\n         [1, 1, 0],\n         [0, 0, 1]]\nsr, sc, color = 0, 0, 1\n[image[sr][sc], image[sr][sc] == color]",
+    "expected": "[1, True]",
+    "prereqs": [
+      "py.u13.grid.islands.write"
+    ],
+    "cue": "Compare the start pixel with the fill color before doing any work.",
+    "syntax": "image[sr][sc] == color",
+    "note": "Flood fill repaints the region of same-colored pixels connected to (sr, sc). If the fill color already equals the start pixel there is nothing to change, and skipping this check would let the recursion revisit filled cells forever."
+  },
+  {
+    "id": "py.u13.grid.floodfill.write",
+    "track": "python",
+    "group": "Graphs & grids",
+    "concept": "flood fill a region of a grid",
+    "kind": "write",
+    "prompt": "Write `flood_fill(image, sr, sc, color)` that repaints the region of pixels connected to (sr, sc) that share its starting color, changing them to `color`, and returns the modified `image`. Connection is up, down, left, or right. If the start pixel already equals `color`, return the image unchanged.",
+    "mapsTo": "LC 733 · Flood Fill",
+    "note": "Each pixel is repainted at most once, so time is O(rows * cols) and the recursion stack is O(rows * cols) in the worst case.",
+    "starter": "def flood_fill(image, sr, sc, color):\n    # your code here\n    return image",
+    "solution": "def flood_fill(image, sr, sc, color):\n    old = image[sr][sc]\n    if old == color:\n        return image\n    rows, cols = len(image), len(image[0])\n    def fill(r, c):\n        if r < 0 or r >= rows or c < 0 or c >= cols:\n            return\n        if image[r][c] != old:\n            return\n        image[r][c] = color\n        fill(r - 1, c)\n        fill(r + 1, c)\n        fill(r, c - 1)\n        fill(r, c + 1)\n    fill(sr, sc)\n    return image",
+    "prereqs": [
+      "py.u13.grid.floodfill.predict"
+    ],
+    "cue": "Remember the starting color; repaint only cells that still hold it, then recurse to their four neighbors.",
+    "syntax": "if image[r][c] != old: return",
+    "cases": [
+      {
+        "call": "flood_fill([[1, 1, 1], [1, 1, 0], [1, 0, 1]], 1, 1, 2)",
+        "expect": "[[2, 2, 2], [2, 2, 0], [2, 0, 1]]"
+      },
+      {
+        "call": "flood_fill([[0, 0, 0], [0, 0, 0]], 0, 0, 2)",
+        "expect": "[[2, 2, 2], [2, 2, 2]]"
+      },
+      {
+        "call": "flood_fill([[0, 0, 0], [0, 1, 1]], 1, 1, 1)",
+        "expect": "[[0, 0, 0], [0, 1, 1]]"
+      },
+      {
+        "call": "flood_fill([[5]], 0, 0, 9)",
+        "expect": "[[9]]"
+      }
+    ]
+  }
+]
