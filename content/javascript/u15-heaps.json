@@ -1,0 +1,331 @@
+[
+  {
+    "id": "js.u15.heap.index.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "a heap lives in an array; index math links parents and children",
+    "cue": "Use the child formulas: from index i, the two children sit at 2 i plus 1 and 2 i plus 2.",
+    "syntax": "2 * i + 1 and 2 * i + 2",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const heap = [1, 3, 5, 7, 9, 6];\nconst i = 1;\n[heap[i], heap[2 * i + 1], heap[2 * i + 2]];",
+    "expected": "[3, 7, 9]",
+    "note": "A binary heap is a flat array. The smallest value sits at index 0, and a parent at index i is never larger than its children at 2i+1 and 2i+2. Here the parent 3 is no larger than its children 7 and 9.",
+    "prereqs": []
+  },
+  {
+    "id": "js.u15.heap.siftup.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "sift up climbs a new item while it is smaller than its parent",
+    "cue": "The new value 2 starts at the end; swap it with its parent whenever the parent is larger, and stop once the parent is no larger.",
+    "syntax": "parent index is Math.floor((i - 1) / 2)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const data = [1, 3, 8, 5];\ndata.push(2);\nlet i = data.length - 1;\nwhile (i > 0) {\n  const parent = Math.floor((i - 1) / 2);\n  if (data[parent] <= data[i]) break;\n  const tmp = data[parent];\n  data[parent] = data[i];\n  data[i] = tmp;\n  i = parent;\n}\ndata;",
+    "expected": "[1, 2, 8, 5, 3]",
+    "note": "Sifting up is how push keeps a heap valid: a new item climbs until its parent is no larger. The climb is at most the height of the heap, so O(log n) swaps.",
+    "prereqs": [
+      "js.u15.heap.index.predict"
+    ]
+  },
+  {
+    "id": "js.u15.heap.push.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "push adds an item then sifts it up",
+    "cue": "Add val with this.data.push, then let it climb: while it is smaller than its parent, swap the two and set i to the parent index.",
+    "syntax": "const parent = Math.floor((i - 1) / 2)",
+    "kind": "write",
+    "prompt": "A MinHeap keeps its smallest value at the front, stored in the array `this.data`. Complete `push(val)` so it appends `val` and then sifts it up until every parent is no larger than its children. `pop`, `peek`, and `size` are already written. Return `this`.",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n  push(val) {\n    // your code here: add val at the end, then sift it up\n    // while it is smaller than its parent\n  }\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n}",
+    "cases": [
+      {
+        "setup": "const h = new MinHeap(); [5, 3, 8, 1, 9, 2].forEach(x => h.push(x)); const out = []; while (h.size() > 0) out.push(h.pop());",
+        "call": "out",
+        "expect": "[1, 2, 3, 5, 8, 9]"
+      },
+      {
+        "setup": "const h = new MinHeap(); h.push(42);",
+        "call": "h.peek()",
+        "expect": "42"
+      },
+      {
+        "setup": "const h = new MinHeap(); [4, 4, 4].forEach(x => h.push(x)); const out = []; while (h.size() > 0) out.push(h.pop());",
+        "call": "out",
+        "expect": "[4, 4, 4]"
+      },
+      {
+        "setup": "const h = new MinHeap(); [3, 1, 2].forEach(x => h.push(x));",
+        "call": "h.peek()",
+        "expect": "1"
+      }
+    ],
+    "note": "One push does O(log n) work: the new item climbs at most the height of the heap.",
+    "prereqs": [
+      "js.u15.heap.siftup.predict"
+    ]
+  },
+  {
+    "id": "js.u15.heap.siftdown.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "pop removes the front, then sifts the moved item down",
+    "cue": "The front value 1 leaves; the last value moves to the front and sinks, each step swapping with its smaller child.",
+    "syntax": "compare data[l] and data[r] to pick the smaller child",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\nconst h = new MinHeap();\nh.data = [1, 3, 2, 7, 8, 4];\nconst popped = h.pop();\n[popped, h.data];",
+    "expected": "[1, [2, 3, 4, 7, 8]]",
+    "note": "Pop returns the smallest value (the front), then repairs the heap by sinking the moved item past its smaller child, O(log n) steps.",
+    "prereqs": [
+      "js.u15.heap.push.write"
+    ]
+  },
+  {
+    "id": "js.u15.heap.pop.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "pop removes the front then sifts down",
+    "cue": "Save data[0] to return. Move the last item to the front, then sink it: keep swapping with the smaller of its two children until neither child is smaller.",
+    "syntax": "children at 2 * i + 1 and 2 * i + 2",
+    "kind": "write",
+    "prompt": "Complete `pop()` on the MinHeap so it removes and returns the smallest value, which is always at the front. Move the last item to the front and sift it down past its smaller child until the heap property holds again. Return `undefined` for an empty heap. `push`, `peek`, and `size` are already written.",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    // your code here: save data[0] to return, move the last item to the\n    // front, then sift it down past its smaller child until the heap is valid\n  }\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}",
+    "cases": [
+      {
+        "setup": "const h = new MinHeap(); [5, 3, 8, 1, 9, 2].forEach(x => h.push(x)); const out = []; while (h.size() > 0) out.push(h.pop());",
+        "call": "out",
+        "expect": "[1, 2, 3, 5, 8, 9]"
+      },
+      {
+        "setup": "const h = new MinHeap();",
+        "call": "h.pop()",
+        "expect": "undefined"
+      },
+      {
+        "setup": "const h = new MinHeap(); h.push(7);",
+        "call": "h.pop()",
+        "expect": "7"
+      },
+      {
+        "setup": "const h = new MinHeap(); [5, 3, 8, 1].forEach(x => h.push(x));",
+        "call": "[h.pop(), h.pop(), h.peek()]",
+        "expect": "[1, 3, 5]"
+      },
+      {
+        "setup": "const h = new MinHeap(); [2, 1].forEach(x => h.push(x));",
+        "call": "[h.pop(), h.size()]",
+        "expect": "[1, 1]"
+      }
+    ],
+    "note": "Pop is O(log n): the sunk item drops at most the height of the heap.",
+    "prereqs": [
+      "js.u15.heap.siftdown.predict"
+    ]
+  },
+  {
+    "id": "js.u15.heap.heapsort.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "popping repeatedly yields values in sorted order",
+    "cue": "Each pop removes the current smallest, so reading them out one by one gives an ascending list.",
+    "syntax": "while (h.size() > 0)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\nconst h = new MinHeap();\n[5, 3, 8, 1, 9, 2].forEach(x => h.push(x));\nconst out = [];\nwhile (h.size() > 0) out.push(h.pop());\nout;",
+    "expected": "[1, 2, 3, 5, 8, 9]",
+    "note": "A min-heap works as a priority queue: push in any order, and popping always returns the smallest value that remains.",
+    "prereqs": [
+      "js.u15.heap.pop.write"
+    ]
+  },
+  {
+    "id": "js.u15.heap.kthlargest.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "a size-k min-heap keeps the k largest values seen so far",
+    "cue": "Whenever the heap grows past k, pop the smallest; the front is then the k-th largest of everything pushed.",
+    "syntax": "if (h.size() > k) h.pop()",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\nconst h = new MinHeap();\nconst nums = [3, 2, 1, 5, 6, 4];\nconst k = 2;\nfor (const x of nums) {\n  h.push(x);\n  if (h.size() > k) h.pop();\n}\nh.peek();",
+    "expected": "5",
+    "note": "Keeping only k items makes each push and pop O(log k), so a full scan is O(n log k) time and O(k) space.",
+    "prereqs": [
+      "js.u15.heap.heapsort.predict"
+    ]
+  },
+  {
+    "id": "js.u15.heap.kthlargest.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "kth largest with a size-k min-heap",
+    "cue": "Push each number; whenever the heap holds more than k, pop the smallest. The value left at the front is the answer.",
+    "syntax": "h.push(x); if (h.size() > k) h.pop()",
+    "kind": "write",
+    "prompt": "Write `kthLargest(nums, k)` that returns the k-th largest value in `nums`, counting from the largest, so k=1 is the maximum. Use the `MinHeap` (already defined) holding at most k values.",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kthLargest(nums, k) {\n  // your code here\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kthLargest(nums, k) {\n  const h = new MinHeap();\n  for (const x of nums) {\n    h.push(x);\n    if (h.size() > k) h.pop();\n  }\n  return h.peek();\n}",
+    "cases": [
+      {
+        "setup": "const nums = [3, 2, 1, 5, 6, 4];",
+        "call": "kthLargest(nums, 2)",
+        "expect": "5"
+      },
+      {
+        "setup": "const nums = [3, 2, 3, 1, 2, 4, 5, 5, 6];",
+        "call": "kthLargest(nums, 4)",
+        "expect": "4"
+      },
+      {
+        "call": "kthLargest([1], 1)",
+        "expect": "1"
+      },
+      {
+        "setup": "const nums = [7, 10, 4, 3, 20, 15];",
+        "call": "kthLargest(nums, 1)",
+        "expect": "20"
+      }
+    ],
+    "note": "Each push and pop is O(log k) on a heap of size k, so the whole pass is O(n log k) time and O(k) space, cheaper than sorting all n values.",
+    "mapsTo": "LC 215 · Kth Largest Element in an Array",
+    "prereqs": [
+      "js.u15.heap.kthlargest.predict"
+    ]
+  },
+  {
+    "id": "js.u15.heap.ksmallest.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "k smallest by popping a heap of every value",
+    "cue": "Push every number into the heap, then pop k times; each pop hands back the next smallest in order.",
+    "syntax": "for (let i = 0; i < k; i++) out.push(h.pop())",
+    "kind": "write",
+    "prompt": "Write `kSmallest(nums, k)` that returns the `k` smallest values of `nums`, sorted ascending. Push all values into the `MinHeap` (already defined), then pop `k` times.",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(nums, k) {\n  // your code here\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(nums, k) {\n  const h = new MinHeap();\n  for (const x of nums) h.push(x);\n  const out = [];\n  for (let i = 0; i < k; i++) out.push(h.pop());\n  return out;\n}",
+    "cases": [
+      {
+        "call": "kSmallest([3, 1, 2], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "kSmallest([5, 4, 3, 2, 1], 3)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "kSmallest([9, 7, 8], 1)",
+        "expect": "[7]"
+      },
+      {
+        "call": "kSmallest([2, 2, 1, 1], 3)",
+        "expect": "[1, 1, 2]"
+      },
+      {
+        "call": "kSmallest([3, 1, 2], 3)",
+        "expect": "[1, 2, 3]"
+      }
+    ],
+    "note": "Building the heap is O(n log n) here (n pushes) and each of the k pops is O(log n), so the result comes out already sorted.",
+    "prereqs": [
+      "js.u15.heap.kthlargest.write"
+    ]
+  },
+  {
+    "id": "js.u15.heap.topk.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "top k frequent via a size-k heap keyed by count",
+    "cue": "Count each value first, then keep a size-k heap of the highest counts; break ties toward the smaller value so the output order is fixed.",
+    "syntax": "pack the count and the value into one number before pushing",
+    "kind": "write",
+    "prompt": "Write `topKFrequent(nums, k)` that returns the `k` values that appear most often. Assume every number is an integer from 0 to 999. Return them sorted by count descending, and for equal counts by value ascending, so the result is fully determined. Use the `MinHeap` (already defined).",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction topKFrequent(nums, k) {\n  // your code here\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction topKFrequent(nums, k) {\n  const counts = new Map();\n  for (const x of nums) counts.set(x, (counts.get(x) || 0) + 1);\n  const h = new MinHeap();\n  for (const [val, count] of counts) {\n    h.push(count * 1000 + (999 - val));\n    if (h.size() > k) h.pop();\n  }\n  const out = [];\n  while (h.size() > 0) out.push(999 - (h.pop() % 1000));\n  out.reverse();\n  return out;\n}",
+    "cases": [
+      {
+        "call": "topKFrequent([1, 1, 1, 2, 2, 3], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "topKFrequent([1], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "topKFrequent([1, 2, 2, 3, 3], 2)",
+        "expect": "[2, 3]"
+      },
+      {
+        "call": "topKFrequent([5, 5, 5, 4, 4, 6], 2)",
+        "expect": "[5, 4]"
+      },
+      {
+        "call": "topKFrequent([1, 1, 2, 3], 3)",
+        "expect": "[1, 2, 3]"
+      }
+    ],
+    "note": "A size-k heap keeps the pass at O(n log k). This MinHeap compares plain numbers, so the reference packs each (count, value) into one number that orders by count first and value second.",
+    "mapsTo": "LC 347 · Top K Frequent Elements",
+    "prereqs": [
+      "js.u15.heap.ksmallest.write"
+    ]
+  },
+  {
+    "id": "js.u15.heap.laststone.predict",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "negating values turns a min-heap into a max-heap",
+    "cue": "Each stone is pushed as its negative, so the smallest stored number stands for the heaviest stone; negate again on the way out.",
+    "syntax": "h.push(-s) then -h.pop()",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\nconst h = new MinHeap();\n[2, 7, 4, 1, 8, 1].forEach(s => h.push(-s));\nconst a = -h.pop();\nconst b = -h.pop();\n[a, b];",
+    "expected": "[8, 7]",
+    "note": "This MinHeap always pops the smallest number. Pushing negatives flips the order, so popping returns the largest original value: a max-heap for free.",
+    "prereqs": [
+      "js.u15.heap.pop.write"
+    ]
+  },
+  {
+    "id": "js.u15.heap.laststone.write",
+    "track": "javascript",
+    "group": "Heaps & priority queues",
+    "concept": "smash the two heaviest stones using a max-heap",
+    "cue": "Store negatives so each pop gives the next heaviest. Take the two heaviest; if they differ, push the negative of their difference back; repeat until one or zero stones remain.",
+    "syntax": "while (h.size() > 1) { const a = -h.pop(); const b = -h.pop(); ... }",
+    "kind": "write",
+    "prompt": "Write `lastStoneWeight(stones)` that repeatedly takes the two heaviest stones and smashes them: if they weigh the same both are destroyed, otherwise the lighter is destroyed and the heavier keeps the difference. Return the weight of the last stone, or 0 if none remain. Use the `MinHeap` (already defined), storing negatives so the smallest number is the heaviest stone.",
+    "starter": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction lastStoneWeight(stones) {\n  // your code here\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.data = [];\n  }\n  size() {\n    return this.data.length;\n  }\n  peek() {\n    return this.data[0];\n  }\n  push(val) {\n    this.data.push(val);\n    let i = this.data.length - 1;\n    while (i > 0) {\n      const parent = Math.floor((i - 1) / 2);\n      if (this.data[parent] <= this.data[i]) break;\n      const tmp = this.data[parent];\n      this.data[parent] = this.data[i];\n      this.data[i] = tmp;\n      i = parent;\n    }\n    return this;\n  }\n  pop() {\n    if (this.data.length === 0) return undefined;\n    const top = this.data[0];\n    const last = this.data.pop();\n    if (this.data.length > 0) {\n      this.data[0] = last;\n      let i = 0;\n      const n = this.data.length;\n      while (true) {\n        let smallest = i;\n        const l = 2 * i + 1;\n        const r = 2 * i + 2;\n        if (l < n && this.data[l] < this.data[smallest]) smallest = l;\n        if (r < n && this.data[r] < this.data[smallest]) smallest = r;\n        if (smallest === i) break;\n        const tmp = this.data[i];\n        this.data[i] = this.data[smallest];\n        this.data[smallest] = tmp;\n        i = smallest;\n      }\n    }\n    return top;\n  }\n}\n\nfunction lastStoneWeight(stones) {\n  const h = new MinHeap();\n  for (const s of stones) h.push(-s);\n  while (h.size() > 1) {\n    const a = -h.pop();\n    const b = -h.pop();\n    if (a !== b) h.push(-(a - b));\n  }\n  return h.size() > 0 ? -h.peek() : 0;\n}",
+    "cases": [
+      {
+        "call": "lastStoneWeight([2, 7, 4, 1, 8, 1])",
+        "expect": "1"
+      },
+      {
+        "call": "lastStoneWeight([1])",
+        "expect": "1"
+      },
+      {
+        "call": "lastStoneWeight([])",
+        "expect": "0"
+      },
+      {
+        "call": "lastStoneWeight([2, 2])",
+        "expect": "0"
+      },
+      {
+        "call": "lastStoneWeight([3, 7, 2])",
+        "expect": "2"
+      }
+    ],
+    "note": "Each smash does a constant number of O(log n) heap operations, so the whole process is O(n log n).",
+    "mapsTo": "LC 1046 · Last Stone Weight",
+    "prereqs": [
+      "js.u15.heap.laststone.predict"
+    ]
+  }
+]

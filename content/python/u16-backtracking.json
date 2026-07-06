@@ -1,0 +1,301 @@
+[
+  {
+    "id": "py.u16.bt.countdown.predict",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "a recursive function that builds a list",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def collect(n):\n    if n == 0:\n        return [0]\n    return [n] + collect(n - 1)\n\ncollect(3)",
+    "expected": "[3, 2, 1, 0]",
+    "prereqs": [],
+    "cue": "The base case returns a one-element list; each other call adds its own number in front of the smaller result.",
+    "syntax": "return [n] + collect(n - 1)",
+    "note": "Recursion solves a problem by calling itself on a smaller input and combining the answer. The base case (here n == 0) stops the calls; without one the recursion never ends."
+  },
+  {
+    "id": "py.u16.bt.choicetree.predict",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "the include / exclude choice tree",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def subs(nums):\n    if not nums:\n        return [[]]\n    first, rest = nums[0], nums[1:]\n    without = subs(rest)\n    with_first = [[first] + s for s in without]\n    return without + with_first\n\nsubs([1, 2])",
+    "expected": "[[], [2], [1], [1, 2]]",
+    "prereqs": [
+      "py.u16.bt.countdown.predict"
+    ],
+    "cue": "For each element there are two branches: the results that leave it out, then those same results with it added in front.",
+    "syntax": "without + with_first",
+    "note": "Every subset problem is a series of yes/no choices: for each element you either include it or exclude it. Two choices per element gives 2 to the n subsets in total."
+  },
+  {
+    "id": "py.u16.bt.leaves.predict",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "counting the leaves of a binary choice tree",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def count(nums):\n    if not nums:\n        return 1\n    return count(nums[1:]) + count(nums[1:])\n\ncount([1, 2, 3])",
+    "expected": "8",
+    "prereqs": [
+      "py.u16.bt.choicetree.predict"
+    ],
+    "cue": "Each element doubles the number of paths, and one empty list counts as a single path.",
+    "syntax": "count(nums[1:]) + count(nums[1:])",
+    "note": "Each element splits every path into two, so the choice tree over n elements has 2 to the n leaves. This is why generating all subsets is O(n * 2^n) work."
+  },
+  {
+    "id": "py.u16.bt.subsets.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "generate all subsets (power set)",
+    "kind": "write",
+    "prompt": "Write `subsets(nums)` that returns every subset of the list `nums`, including the empty subset and the full list. The subsets may come out in any order. Assume the values are distinct. Use backtracking.",
+    "mapsTo": "LC 78 · Subsets",
+    "note": "The choose / explore / un-choose pattern: append an element (choose), recurse to extend the current subset (explore), then pop it (un-choose) so the next branch starts clean. There are 2 to the n subsets and each takes O(n) to copy, so time is O(n * 2^n).",
+    "starter": "def subsets(nums):\n    # your code here\n    return []",
+    "solution": "def subsets(nums):\n    res = []\n    path = []\n    def backtrack(start):\n        res.append(path[:])\n        for i in range(start, len(nums)):\n            path.append(nums[i])\n            backtrack(i + 1)\n            path.pop()\n    backtrack(0)\n    return res",
+    "banned": [
+      "itertools"
+    ],
+    "prereqs": [
+      "py.u16.bt.leaves.predict"
+    ],
+    "cue": "Keep a running `path`; record a copy at every call, then try each later element in turn, adding it before the recursive call and removing it after.",
+    "syntax": "path.append(x); backtrack(i + 1); path.pop()",
+    "cases": [
+      {
+        "call": "subsets([1, 2, 3])",
+        "check": "sorted(map(sorted, _)) == [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]"
+      },
+      {
+        "call": "subsets([])",
+        "check": "sorted(map(sorted, _)) == [[]]"
+      },
+      {
+        "call": "subsets([1])",
+        "check": "sorted(map(sorted, _)) == [[], [1]]"
+      },
+      {
+        "call": "subsets([1, 2])",
+        "check": "sorted(map(sorted, _)) == [[], [1], [1, 2], [2]]"
+      }
+    ]
+  },
+  {
+    "id": "py.u16.bt.backtrack.predict",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "the choose / explore / un-choose pattern with a shared path",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def permute(nums):\n    res = []\n    path = []\n    used = [False] * len(nums)\n    def backtrack():\n        if len(path) == len(nums):\n            res.append(path[:])\n            return\n        for i in range(len(nums)):\n            if used[i]:\n                continue\n            used[i] = True\n            path.append(nums[i])\n            backtrack()\n            path.pop()\n            used[i] = False\n    backtrack()\n    return res\n\npermute([1, 2])",
+    "expected": "[[1, 2], [2, 1]]",
+    "prereqs": [
+      "py.u16.bt.subsets.write"
+    ],
+    "cue": "The first branch fixes the first number, walks all the way to a full arrangement, then unwinds and fixes the other number first.",
+    "syntax": "used[i] = True ... path.pop(); used[i] = False",
+    "note": "One shared `path` is mutated in place. Each step chooses an unused element, explores by recursing, then un-chooses by undoing both the append and the used flag. Appending `path[:]` stores a copy so later changes do not corrupt saved answers."
+  },
+  {
+    "id": "py.u16.bt.permute.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "generate all permutations",
+    "kind": "write",
+    "prompt": "Write `permute(nums)` that returns every ordering (permutation) of the list `nums`. The orderings may come out in any order. Assume the values are distinct. Use backtracking.",
+    "mapsTo": "LC 46 · Permutations",
+    "note": "Track which indices are already used. Choose an unused value, explore the rest, then un-choose it before trying the next. There are n! orderings each of length n, so time is O(n * n!).",
+    "starter": "def permute(nums):\n    # your code here\n    return []",
+    "solution": "def permute(nums):\n    res = []\n    path = []\n    used = [False] * len(nums)\n    def backtrack():\n        if len(path) == len(nums):\n            res.append(path[:])\n            return\n        for i in range(len(nums)):\n            if used[i]:\n                continue\n            used[i] = True\n            path.append(nums[i])\n            backtrack()\n            path.pop()\n            used[i] = False\n    backtrack()\n    return res",
+    "banned": [
+      "itertools"
+    ],
+    "prereqs": [
+      "py.u16.bt.backtrack.predict"
+    ],
+    "cue": "A `used` flag per index prevents repeats; record a copy of `path` once it reaches full length, and reset the flag when you pop.",
+    "syntax": "if used[i]: continue",
+    "cases": [
+      {
+        "call": "permute([1, 2, 3])",
+        "check": "sorted(_) == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]"
+      },
+      {
+        "call": "permute([])",
+        "check": "sorted(_) == [[]]"
+      },
+      {
+        "call": "permute([1])",
+        "check": "sorted(_) == [[1]]"
+      },
+      {
+        "call": "permute([1, 2])",
+        "check": "sorted(_) == [[1, 2], [2, 1]]"
+      }
+    ]
+  },
+  {
+    "id": "py.u16.bt.combine.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "generate all k-size combinations",
+    "kind": "write",
+    "prompt": "Write `combine(n, k)` that returns every combination of `k` numbers chosen from 1 to n (inclusive). Order within a combination does not matter and the combinations may come out in any order. Use backtracking.",
+    "mapsTo": "LC 77 · Combinations",
+    "note": "A `start` index keeps combinations moving forward so you never repeat a number or produce the same set twice. Choose a number, explore from the next index, then un-choose. Stop a branch as soon as `path` reaches length k.",
+    "starter": "def combine(n, k):\n    # your code here\n    return []",
+    "solution": "def combine(n, k):\n    res = []\n    path = []\n    def backtrack(start):\n        if len(path) == k:\n            res.append(path[:])\n            return\n        for i in range(start, n + 1):\n            path.append(i)\n            backtrack(i + 1)\n            path.pop()\n    backtrack(1)\n    return res",
+    "banned": [
+      "itertools"
+    ],
+    "prereqs": [
+      "py.u16.bt.permute.write"
+    ],
+    "cue": "Pass a starting number so each choice only looks at larger numbers; record a copy once `path` has k of them.",
+    "syntax": "for i in range(start, n + 1)",
+    "cases": [
+      {
+        "call": "combine(4, 2)",
+        "check": "sorted(map(sorted, _)) == [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]"
+      },
+      {
+        "call": "combine(2, 0)",
+        "check": "sorted(map(sorted, _)) == [[]]"
+      },
+      {
+        "call": "combine(1, 1)",
+        "check": "sorted(map(sorted, _)) == [[1]]"
+      },
+      {
+        "call": "combine(3, 3)",
+        "check": "sorted(map(sorted, _)) == [[1, 2, 3]]"
+      }
+    ]
+  },
+  {
+    "id": "py.u16.bt.combsum.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "combination sum with reuse allowed",
+    "kind": "write",
+    "prompt": "Write `combination_sum(candidates, target)` that returns every unique combination of numbers from `candidates` that adds up to `target`. The same number may be used any number of times. Assume the candidates are distinct positive integers. Combinations may come out in any order. Use backtracking.",
+    "mapsTo": "LC 39 · Combination Sum",
+    "note": "Recurse with the same index (not i + 1) to allow reusing a number, and never look backward so each combination is counted once. Track the remaining amount: succeed when it hits 0, abandon the branch when it goes negative.",
+    "starter": "def combination_sum(candidates, target):\n    # your code here\n    return []",
+    "solution": "def combination_sum(candidates, target):\n    res = []\n    path = []\n    def backtrack(start, remaining):\n        if remaining == 0:\n            res.append(path[:])\n            return\n        if remaining < 0:\n            return\n        for i in range(start, len(candidates)):\n            path.append(candidates[i])\n            backtrack(i, remaining - candidates[i])\n            path.pop()\n    backtrack(0, target)\n    return res",
+    "banned": [
+      "itertools"
+    ],
+    "prereqs": [
+      "py.u16.bt.combine.write"
+    ],
+    "cue": "Subtract each chosen number from the remaining target; recurse from the same index so it can be picked again, and prune once the remaining amount drops below zero.",
+    "syntax": "backtrack(i, remaining - candidates[i])",
+    "cases": [
+      {
+        "call": "combination_sum([2, 3, 6, 7], 7)",
+        "check": "sorted(map(sorted, _)) == [[2, 2, 3], [7]]"
+      },
+      {
+        "call": "combination_sum([2, 3, 5], 8)",
+        "check": "sorted(map(sorted, _)) == [[2, 2, 2, 2], [2, 3, 3], [3, 5]]"
+      },
+      {
+        "call": "combination_sum([2], 1)",
+        "check": "_ == []"
+      },
+      {
+        "call": "combination_sum([1], 2)",
+        "check": "sorted(map(sorted, _)) == [[1, 1]]"
+      }
+    ]
+  },
+  {
+    "id": "py.u16.bt.parenchoice.predict",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "pruning invalid branches with running counts",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "def gen(n):\n    res = []\n    def bt(s, open_count, close_count):\n        if len(s) == 2 * n:\n            res.append(s)\n            return\n        if open_count < n:\n            bt(s + '(', open_count + 1, close_count)\n        if close_count < open_count:\n            bt(s + ')', open_count, close_count + 1)\n    bt('', 0, 0)\n    return res\n\ngen(2)",
+    "expected": "['(())', '()()']",
+    "prereqs": [
+      "py.u16.bt.combsum.write"
+    ],
+    "cue": "Only add an open bracket while some remain, and only add a close bracket while unmatched opens exist; the first branch keeps opening first.",
+    "syntax": "if close_count < open_count",
+    "note": "Backtracking gets faster when you cut off branches that cannot lead to a valid answer. Here the two count checks never let a close bracket appear without a matching open, so no invalid string is ever built."
+  },
+  {
+    "id": "py.u16.bt.parens.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "generate all valid parenthesis strings",
+    "kind": "write",
+    "prompt": "Write `generate_parentheses(n)` that returns every string of `n` pairs of parentheses that is well formed (every open bracket is matched by a later close bracket). The strings may come out in any order. Use backtracking.",
+    "mapsTo": "LC 22 · Generate Parentheses",
+    "note": "Choose the next character under two rules: add '(' only while opens used is below n, add ')' only while closes are behind opens. Explore by recursing on the longer string; the string is rebuilt each call so there is nothing to un-choose. Record a result when the length reaches 2n.",
+    "starter": "def generate_parentheses(n):\n    # your code here\n    return []",
+    "solution": "def generate_parentheses(n):\n    res = []\n    def backtrack(s, open_count, close_count):\n        if len(s) == 2 * n:\n            res.append(s)\n            return\n        if open_count < n:\n            backtrack(s + '(', open_count + 1, close_count)\n        if close_count < open_count:\n            backtrack(s + ')', open_count, close_count + 1)\n    backtrack('', 0, 0)\n    return res",
+    "prereqs": [
+      "py.u16.bt.parenchoice.predict"
+    ],
+    "cue": "Carry counts of opens and closes used so far; only open while below n, only close while closes trail opens, and save the string when it is full length.",
+    "syntax": "if open_count < n: ... if close_count < open_count: ...",
+    "cases": [
+      {
+        "call": "generate_parentheses(2)",
+        "check": "sorted(_) == ['(())', '()()']"
+      },
+      {
+        "call": "generate_parentheses(1)",
+        "check": "sorted(_) == ['()']"
+      },
+      {
+        "call": "generate_parentheses(0)",
+        "check": "sorted(_) == ['']"
+      },
+      {
+        "call": "generate_parentheses(3)",
+        "check": "sorted(_) == ['((()))', '(()())', '(())()', '()(())', '()()()']"
+      }
+    ]
+  },
+  {
+    "id": "py.u16.bt.subsetsdup.write",
+    "track": "python",
+    "group": "Backtracking & recursion",
+    "concept": "subsets when the input has duplicates",
+    "kind": "write",
+    "prompt": "Write `subsets_with_dup(nums)` that returns every unique subset of `nums`, which may contain repeated values. No two returned subsets should be equal, and they may come out in any order. Use backtracking.",
+    "mapsTo": "LC 90 · Subsets II",
+    "note": "Sort first so equal values sit together. Within one call, skip a value equal to the previous one you already tried at this level: that is the choose / explore / un-choose pattern plus a skip rule that stops duplicate subsets. Still up to O(n * 2^n).",
+    "starter": "def subsets_with_dup(nums):\n    # your code here\n    return []",
+    "solution": "def subsets_with_dup(nums):\n    nums = sorted(nums)\n    res = []\n    path = []\n    def backtrack(start):\n        res.append(path[:])\n        for i in range(start, len(nums)):\n            if i > start and nums[i] == nums[i - 1]:\n                continue\n            path.append(nums[i])\n            backtrack(i + 1)\n            path.pop()\n    backtrack(0)\n    return res",
+    "banned": [
+      "itertools"
+    ],
+    "prereqs": [
+      "py.u16.bt.subsets.write"
+    ],
+    "cue": "After sorting, inside each call skip any value equal to the one just to its left so a duplicate is not chosen twice at the same position.",
+    "syntax": "if i > start and nums[i] == nums[i - 1]: continue",
+    "cases": [
+      {
+        "call": "subsets_with_dup([1, 2, 2])",
+        "check": "sorted(map(sorted, _)) == [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]"
+      },
+      {
+        "call": "subsets_with_dup([])",
+        "check": "sorted(map(sorted, _)) == [[]]"
+      },
+      {
+        "call": "subsets_with_dup([1, 1])",
+        "check": "sorted(map(sorted, _)) == [[], [1], [1, 1]]"
+      }
+    ]
+  }
+]

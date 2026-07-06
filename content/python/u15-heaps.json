@@ -1,0 +1,306 @@
+[
+  {
+    "id": "py.u15.heap.push.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "heappush and heappop basics",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nh = []\nheapq.heappush(h, 5)\nheapq.heappush(h, 1)\nheapq.heappush(h, 3)\n[heapq.heappop(h), heapq.heappop(h)]",
+    "expected": "[1, 3]",
+    "prereqs": [],
+    "cue": "heappush adds a value; heappop always removes and returns the smallest value in the heap.",
+    "syntax": "heapq.heappush(h, x); heapq.heappop(h)",
+    "note": "A list becomes a min-heap when you only touch it through heapq. heappop is O(log n) and always hands back the current minimum, so two pops give the two smallest values in order."
+  },
+  {
+    "id": "py.u15.heap.heapify.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "heapify makes the min the first element",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nnums = [5, 1, 3, 2, 4]\nheapq.heapify(nums)\nnums[0]",
+    "expected": "1",
+    "prereqs": [
+      "py.u15.heap.push.predict"
+    ],
+    "cue": "heapify rearranges the list in place so the smallest value sits at index 0.",
+    "syntax": "heapq.heapify(nums); nums[0]",
+    "note": "heapify turns any list into a min-heap in O(n), faster than pushing one at a time. After it, nums[0] is the minimum, though the rest of the list is only partially ordered."
+  },
+  {
+    "id": "py.u15.heap.heapsort.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "popping a heap yields ascending order",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nnums = [5, 1, 3, 2, 4]\nheapq.heapify(nums)\n[heapq.heappop(nums) for _ in range(len(nums))]",
+    "expected": "[1, 2, 3, 4, 5]",
+    "prereqs": [
+      "py.u15.heap.heapify.predict"
+    ],
+    "cue": "Each heappop removes the current minimum, so popping until empty walks the values from small to large.",
+    "syntax": "[heapq.heappop(nums) for _ in range(len(nums))]",
+    "note": "Popping a heap of n items one by one is heapsort: n pops at O(log n) each, so O(n log n) overall to drain it in sorted order."
+  },
+  {
+    "id": "py.u15.heap.maxneg.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "max-heap by negating values",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nh = []\nfor x in [5, 1, 3]:\n    heapq.heappush(h, -x)\n-heapq.heappop(h)",
+    "expected": "5",
+    "prereqs": [
+      "py.u15.heap.heapsort.predict"
+    ],
+    "cue": "Pushing each value negated flips the order, so the smallest stored number is the largest original one; negate again on the way out.",
+    "syntax": "heapq.heappush(h, -x); -heapq.heappop(h)",
+    "note": "heapq only offers a min-heap. Storing -x turns the smallest slot into the largest original value: negate going in, negate coming out. This is the standard max-heap trick."
+  },
+  {
+    "id": "py.u15.heap.maxneg2.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "popping the two largest via negation",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nh = []\nfor x in [4, 2, 7, 1]:\n    heapq.heappush(h, -x)\n[-heapq.heappop(h), -heapq.heappop(h)]",
+    "expected": "[7, 4]",
+    "prereqs": [
+      "py.u15.heap.maxneg.predict"
+    ],
+    "cue": "With negated values in the heap, the two smallest stored numbers are the two largest originals; negate each result.",
+    "syntax": "-heapq.heappop(h)",
+    "note": "The same negation trick lets you peel off the largest values in order. Here two pops give the two biggest originals, useful whenever a problem repeatedly wants the current maximum."
+  },
+  {
+    "id": "py.u15.heap.ksmallest.write",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "k smallest values",
+    "kind": "write",
+    "prompt": "Write `k_smallest(nums, k)` that returns the k smallest values of `nums` as a list sorted in ascending order. You may use `heapq.nsmallest` or maintain a heap. Assume 0 <= k <= len(nums).",
+    "note": "heapq.nsmallest(k, nums) runs in O(n log k): it keeps only k candidates in a heap while scanning, cheaper than fully sorting when k is small.",
+    "starter": "import heapq\n\ndef k_smallest(nums, k):\n    # your code here\n    return []",
+    "solution": "import heapq\n\ndef k_smallest(nums, k):\n    return heapq.nsmallest(k, nums)",
+    "prereqs": [
+      "py.u15.heap.heapsort.predict"
+    ],
+    "cue": "heapq has a helper that returns the k smallest items already in ascending order.",
+    "syntax": "heapq.nsmallest(k, nums)",
+    "cases": [
+      {
+        "call": "k_smallest([5, 1, 3, 2, 4], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "k_smallest([5, 1, 3, 2, 4], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "k_smallest([5, 1, 3, 2, 4], 5)",
+        "expect": "[1, 2, 3, 4, 5]"
+      },
+      {
+        "call": "k_smallest([3, 3, 1, 2], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "k_smallest([7], 1)",
+        "expect": "[7]"
+      }
+    ]
+  },
+  {
+    "id": "py.u15.heap.nlargest.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "heapq.nlargest",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "import heapq\nheapq.nlargest(2, [5, 1, 3, 2, 4])",
+    "expected": "[5, 4]",
+    "prereqs": [
+      "py.u15.heap.ksmallest.write"
+    ],
+    "cue": "nlargest returns the top k values ordered from biggest to smallest.",
+    "syntax": "heapq.nlargest(k, iterable)",
+    "note": "nlargest is the mirror of nsmallest and also O(n log k). It returns the k biggest values in descending order."
+  },
+  {
+    "id": "py.u15.heap.kthlargest.write",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "kth largest via a size-k min-heap",
+    "kind": "write",
+    "prompt": "Write `kth_largest(nums, k)` that returns the kth largest value in `nums` (k counting from 1, so k=1 is the maximum). Keep a min-heap of size k: push each value, and once the heap has more than k items pop the smallest, so the heap holds the k largest seen and its root is the answer. Assume 1 <= k <= len(nums).",
+    "mapsTo": "LC 215 · Kth Largest Element in an Array",
+    "note": "Holding only the k largest in a min-heap costs O(n log k) time and O(k) space, better than sorting the whole array when k is small. The heap root is the smallest of those k, which is the kth largest overall.",
+    "starter": "import heapq\n\ndef kth_largest(nums, k):\n    # your code here\n    return 0",
+    "solution": "import heapq\n\ndef kth_largest(nums, k):\n    h = []\n    for x in nums:\n        heapq.heappush(h, x)\n        if len(h) > k:\n            heapq.heappop(h)\n    return h[0]",
+    "prereqs": [
+      "py.u15.heap.nlargest.predict"
+    ],
+    "cue": "Push every value, and whenever the heap grows past k, pop its smallest so only the k largest survive; the root is then the kth largest.",
+    "syntax": "if len(h) > k: heapq.heappop(h)",
+    "cases": [
+      {
+        "call": "kth_largest([3, 2, 1, 5, 6, 4], 2)",
+        "expect": "5"
+      },
+      {
+        "call": "kth_largest([3, 2, 3, 1, 2, 4, 5, 5, 6], 4)",
+        "expect": "4"
+      },
+      {
+        "call": "kth_largest([1], 1)",
+        "expect": "1"
+      },
+      {
+        "call": "kth_largest([3, 1, 2], 3)",
+        "expect": "1"
+      },
+      {
+        "call": "kth_largest([7, 7, 7], 2)",
+        "expect": "7"
+      }
+    ]
+  },
+  {
+    "id": "py.u15.heap.topkfreq.predict",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "ordering by count desc then value asc",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "from collections import Counter\nnums = [3, 3, 2, 2, 1]\ncnt = Counter(nums)\nsorted(cnt, key=lambda v: (-cnt[v], v))",
+    "expected": "[2, 3, 1]",
+    "prereqs": [
+      "py.u15.heap.kthlargest.write"
+    ],
+    "cue": "The key sorts by count from high to low; among equal counts the smaller value comes first.",
+    "syntax": "key=lambda v: (-cnt[v], v)",
+    "note": "The key (-count, value) gives a total order: highest count wins, and ties break by the smaller value. That total order is what makes a 'top k' result deterministic when counts collide."
+  },
+  {
+    "id": "py.u15.heap.topkfreq.write",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "top k frequent values",
+    "kind": "write",
+    "prompt": "Write `top_k_frequent(nums, k)` that returns the k values that appear most often in `nums`. Order the result by count from high to low, breaking ties by the smaller value first (so the output is fully determined). Use `collections.Counter` to count and a heap (for example `heapq.nlargest` with a key). Assume 1 <= k <= number of distinct values.",
+    "mapsTo": "LC 347 · Top K Frequent Elements",
+    "note": "Counting is O(n); heapq.nlargest with the key (count, -value) keeps a size-k heap for O(n log k). Ranking by (count desc, value asc) makes tied counts break the same way every run, so the result is deterministic.",
+    "starter": "import heapq\nfrom collections import Counter\n\ndef top_k_frequent(nums, k):\n    # your code here\n    return []",
+    "solution": "import heapq\nfrom collections import Counter\n\ndef top_k_frequent(nums, k):\n    cnt = Counter(nums)\n    return heapq.nlargest(k, cnt, key=lambda v: (cnt[v], -v))",
+    "prereqs": [
+      "py.u15.heap.topkfreq.predict"
+    ],
+    "cue": "Count with Counter, then take the top k by the key (count, -value) so higher counts and, on ties, smaller values come first.",
+    "syntax": "heapq.nlargest(k, cnt, key=lambda v: (cnt[v], -v))",
+    "cases": [
+      {
+        "call": "top_k_frequent([1, 1, 1, 2, 2, 3], 2)",
+        "expect": "[1, 2]"
+      },
+      {
+        "call": "top_k_frequent([1], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "top_k_frequent([3, 3, 2, 2, 1], 2)",
+        "expect": "[2, 3]"
+      },
+      {
+        "call": "top_k_frequent([4, 4, 4, 5, 5, 6, 6, 6], 3)",
+        "expect": "[4, 6, 5]"
+      },
+      {
+        "call": "top_k_frequent([7, 7, 8], 1)",
+        "expect": "[7]"
+      }
+    ]
+  },
+  {
+    "id": "py.u15.heap.laststone.write",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "last stone weight with a max-heap",
+    "kind": "write",
+    "prompt": "Write `last_stone_weight(stones)` that returns one int. Repeatedly take the two heaviest stones and smash them: if they weigh the same both are destroyed, otherwise a stone of the weight difference goes back. Return the weight of the last stone left, or 0 if none remain. Use a max-heap by negating the weights. `stones` holds non-negative ints and may be empty.",
+    "mapsTo": "LC 1046 · Last Stone Weight",
+    "note": "Each smash does a couple of heap operations at O(log n), and there are at most n smashes, so total time is O(n log n). Negating weights turns heapq's min-heap into the max-heap the problem needs.",
+    "starter": "import heapq\n\ndef last_stone_weight(stones):\n    # your code here\n    return 0",
+    "solution": "import heapq\n\ndef last_stone_weight(stones):\n    h = [-s for s in stones]\n    heapq.heapify(h)\n    while len(h) > 1:\n        a = -heapq.heappop(h)\n        b = -heapq.heappop(h)\n        if a != b:\n            heapq.heappush(h, -(a - b))\n    return -h[0] if h else 0",
+    "prereqs": [
+      "py.u15.heap.maxneg2.predict"
+    ],
+    "cue": "Heapify the negated weights; each round pop the two largest, and if they differ push back their negated difference.",
+    "syntax": "heapq.heapify(h); -(a - b)",
+    "cases": [
+      {
+        "call": "last_stone_weight([2, 7, 4, 1, 8, 1])",
+        "expect": "1"
+      },
+      {
+        "call": "last_stone_weight([1])",
+        "expect": "1"
+      },
+      {
+        "call": "last_stone_weight([1, 1])",
+        "expect": "0"
+      },
+      {
+        "call": "last_stone_weight([3, 7, 2])",
+        "expect": "2"
+      },
+      {
+        "call": "last_stone_weight([])",
+        "expect": "0"
+      }
+    ]
+  },
+  {
+    "id": "py.u15.heap.mergek.write",
+    "track": "python",
+    "group": "Heaps & priority queues",
+    "concept": "merge k sorted lists",
+    "kind": "write",
+    "prompt": "Write `merge_k(lists)` that takes a list of already-sorted lists and returns one merged list sorted in ascending order. Use a heap so you always take the smallest available value next (for example `heapq.merge`). `lists` may be empty or contain empty lists.",
+    "mapsTo": "LC 23 · Merge k Sorted Lists (array form)",
+    "note": "A heap over the k list fronts merges all n values in O(n log k). heapq.merge does exactly this, streaming the smallest current head each step without concatenating and re-sorting.",
+    "starter": "import heapq\n\ndef merge_k(lists):\n    # your code here\n    return []",
+    "solution": "import heapq\n\ndef merge_k(lists):\n    return list(heapq.merge(*lists))",
+    "prereqs": [
+      "py.u15.heap.ksmallest.write"
+    ],
+    "cue": "heapq has a helper that merges several sorted iterables into one sorted stream; spread the lists into it and collect the result.",
+    "syntax": "list(heapq.merge(*lists))",
+    "cases": [
+      {
+        "call": "merge_k([[1, 4, 5], [1, 3, 4], [2, 6]])",
+        "expect": "[1, 1, 2, 3, 4, 4, 5, 6]"
+      },
+      {
+        "call": "merge_k([])",
+        "expect": "[]"
+      },
+      {
+        "call": "merge_k([[]])",
+        "expect": "[]"
+      },
+      {
+        "call": "merge_k([[1], [2], [3]])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "merge_k([[1, 2, 3]])",
+        "expect": "[1, 2, 3]"
+      }
+    ]
+  }
+]

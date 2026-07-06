@@ -1,0 +1,290 @@
+[
+  {
+    "id": "js.u16.bt.choice.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "each element doubles the number of paths",
+    "cue": "At every element the function calls itself twice, once for each choice, until it runs out of elements.",
+    "syntax": "a recursive call that branches in two",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function count(nums, i) {\n  if (i === nums.length) return 1;\n  return count(nums, i + 1) + count(nums, i + 1);\n}\ncount([10, 20, 30], 0);",
+    "expected": "8",
+    "note": "For each element you either take it or skip it: two choices per element, so three elements give 2 * 2 * 2 = 8 paths. This is the shape of every subset problem.",
+    "prereqs": []
+  },
+  {
+    "id": "js.u16.bt.collect.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "build all subsets by adding the first element to each subset of the rest",
+    "cue": "Work out the subsets of the tail first, then make a second copy with the first element added in front.",
+    "syntax": "[...rest, ...rest.map(s => [first, ...s])]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function subs(nums) {\n  if (nums.length === 0) return [[]];\n  const first = nums[0];\n  const rest = subs(nums.slice(1));\n  return [...rest, ...rest.map(s => [first, ...s])];\n}\nsubs([1, 2]);",
+    "expected": "[[], [2], [1], [1, 2]]",
+    "note": "The subsets of [1, 2] are the subsets of [2] plus those same subsets with 1 added. The empty subset is always the base case.",
+    "prereqs": [
+      "js.u16.bt.choice.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.unchoose.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "pop after recursing restores the path to what it was",
+    "cue": "Every push is undone by a pop after the recursive call returns, so track the length that gets recorded at each entry.",
+    "syntax": "path.push(...); backtrack(...); path.pop();",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const path = [];\nconst seen = [];\nfunction backtrack(start, nums) {\n  seen.push(path.length);\n  for (let i = start; i < nums.length; i++) {\n    path.push(nums[i]);\n    backtrack(i + 1, nums);\n    path.pop();\n  }\n}\nbacktrack(0, [1, 2]);\n[seen, path];",
+    "expected": "[[0, 1, 2, 1], []]",
+    "note": "Because each push is paired with a pop, the path returns to empty by the end. Choose, explore, then un-choose is the pattern behind every backtracking search.",
+    "prereqs": [
+      "js.u16.bt.collect.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.subtrace.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "the search records the empty set first, then grows each branch",
+    "cue": "Follow the calls in order: record the path on entry, then for each element push it, recurse, and pop before trying the next.",
+    "syntax": "res.push(path.slice()) on entry",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function subsets(nums) {\n  const res = [];\n  const path = [];\n  function backtrack(start) {\n    res.push(path.slice());\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]);\n      backtrack(i + 1);\n      path.pop();\n    }\n  }\n  backtrack(0);\n  return res;\n}\nsubsets([1, 2]);",
+    "expected": "[[], [1], [1, 2], [2]]",
+    "note": "Each call first records where it is, then dives deeper. The empty set comes out first because it is recorded before any element is chosen.",
+    "prereqs": [
+      "js.u16.bt.unchoose.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.permcount.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "permutations pick from the unused elements each step",
+    "cue": "The first slot has three choices, the next has the two left, the last has one. Multiply them.",
+    "syntax": "skip an index that is already used",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function count(nums, used) {\n  if (used.length === nums.length) return 1;\n  let total = 0;\n  for (let i = 0; i < nums.length; i++) {\n    if (used.includes(i)) continue;\n    total += count(nums, [...used, i]);\n  }\n  return total;\n}\ncount([1, 2, 3], []);",
+    "expected": "6",
+    "note": "A full arrangement uses every element once, so the counts are 3 * 2 * 1 = 6. Order matters here, which is what separates permutations from subsets.",
+    "prereqs": [
+      "js.u16.bt.unchoose.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.parens.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "a partial string is legal only while closes never pass opens",
+    "cue": "Add a close only when there are more opens than closes so far, and add an open only while opens are below n.",
+    "syntax": "open < n and close < open guards",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function gen(n) {\n  const res = [];\n  function bt(cur, open, close) {\n    if (cur.length === 2 * n) { res.push(cur); return; }\n    if (open < n) bt(cur + '(', open + 1, close);\n    if (close < open) bt(cur + ')', open, close + 1);\n  }\n  bt('', 0, 0);\n  return res;\n}\ngen(1);",
+    "expected": "['()']",
+    "note": "The two guards prune anything that could not become balanced, so the search only ever builds valid strings. For n = 1 the single answer is ().",
+    "prereqs": [
+      "js.u16.bt.permcount.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.subsets.write",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "all subsets of an array",
+    "cue": "Record a copy of the current path at every call, then for each later element add it, recurse from the next index, and remove it.",
+    "syntax": "record path.slice() at every node, loop i from start",
+    "kind": "write",
+    "prompt": "Write `subsets(nums)` that returns every subset of `nums` (the power set), each as an array. `nums` has distinct values. The subsets may come back in any order. For `[]` return `[[]]`.",
+    "starter": "function subsets(nums) {\n  // your code here\n}",
+    "solution": "function subsets(nums) {\n  const res = [];\n  const path = [];\n  function backtrack(start) {\n    res.push(path.slice());\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]);\n      backtrack(i + 1);\n      path.pop();\n    }\n  }\n  backtrack(0);\n  return res;\n}",
+    "cases": [
+      {
+        "call": "subsets([1, 2, 3])",
+        "check": "JSON.stringify(_.map(s => s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[],[1],[2],[3],[1,2],[1,3],[2,3],[1,2,3]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "subsets([])",
+        "check": "JSON.stringify(_) === JSON.stringify([[]])"
+      },
+      {
+        "call": "subsets([1])",
+        "check": "JSON.stringify(_.map(s => s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[],[1]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "subsets([7, 8])",
+        "check": "JSON.stringify(_.map(s => s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[],[7],[8],[7,8]].map(s=>JSON.stringify(s)).sort())"
+      }
+    ],
+    "note": "Choose an element, explore deeper from the next index, then un-choose by popping. There are 2^n subsets, so the work is O(n * 2^n).",
+    "mapsTo": "LC 78 · Subsets",
+    "prereqs": [
+      "js.u16.bt.collect.predict",
+      "js.u16.bt.subtrace.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.permute.write",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "all orderings of an array",
+    "cue": "When the path holds every element, record it; otherwise loop over the elements not yet used, adding and later removing each.",
+    "syntax": "track which indexes are used; stop when path is full",
+    "kind": "write",
+    "prompt": "Write `permute(nums)` that returns every ordering of `nums`, each as an array. `nums` has distinct values. The orderings may come back in any order, but each inner array must be a real ordering. For `[]` return `[[]]`.",
+    "starter": "function permute(nums) {\n  // your code here\n}",
+    "solution": "function permute(nums) {\n  const res = [];\n  const path = [];\n  const used = new Array(nums.length).fill(false);\n  function backtrack() {\n    if (path.length === nums.length) {\n      res.push(path.slice());\n      return;\n    }\n    for (let i = 0; i < nums.length; i++) {\n      if (used[i]) continue;\n      used[i] = true;\n      path.push(nums[i]);\n      backtrack();\n      path.pop();\n      used[i] = false;\n    }\n  }\n  backtrack();\n  return res;\n}",
+    "cases": [
+      {
+        "call": "permute([1, 2, 3])",
+        "check": "JSON.stringify(_.map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "permute([])",
+        "check": "JSON.stringify(_) === JSON.stringify([[]])"
+      },
+      {
+        "call": "permute([1])",
+        "check": "JSON.stringify(_) === JSON.stringify([[1]])"
+      },
+      {
+        "call": "permute([1, 2])",
+        "check": "JSON.stringify(_.map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[1,2],[2,1]].map(s=>JSON.stringify(s)).sort())"
+      }
+    ],
+    "note": "Choose an unused element, explore, then un-choose by freeing it again. There are n! orderings, so the work is O(n * n!).",
+    "mapsTo": "LC 46 · Permutations",
+    "prereqs": [
+      "js.u16.bt.permcount.predict",
+      "js.u16.bt.subsets.write"
+    ]
+  },
+  {
+    "id": "js.u16.bt.combine.write",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "all fixed-size combinations of 1..n",
+    "cue": "Record the path once it holds k numbers; otherwise loop from the current start up to n, adding a number and recursing from the next one.",
+    "syntax": "stop when path length reaches k; recurse from i + 1",
+    "kind": "write",
+    "prompt": "Write `combine(n, k)` that returns every combination of `k` numbers chosen from `1..n`, each as an array. The combinations may come back in any order. Numbers within a combination must not repeat.",
+    "starter": "function combine(n, k) {\n  // your code here\n}",
+    "solution": "function combine(n, k) {\n  const res = [];\n  const path = [];\n  function backtrack(start) {\n    if (path.length === k) {\n      res.push(path.slice());\n      return;\n    }\n    for (let i = start; i <= n; i++) {\n      path.push(i);\n      backtrack(i + 1);\n      path.pop();\n    }\n  }\n  backtrack(1);\n  return res;\n}",
+    "cases": [
+      {
+        "call": "combine(4, 2)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "combine(1, 1)",
+        "check": "JSON.stringify(_) === JSON.stringify([[1]])"
+      },
+      {
+        "call": "combine(3, 3)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[1,2,3]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "combine(3, 1)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[1],[2],[3]].map(s=>JSON.stringify(s)).sort())"
+      }
+    ],
+    "note": "Choose a number, explore from the next value so nothing repeats and order does not vary, then un-choose. This is the subsets pattern with a size limit, O(k * C(n, k)).",
+    "mapsTo": "LC 77 · Combinations",
+    "prereqs": [
+      "js.u16.bt.subsets.write"
+    ]
+  },
+  {
+    "id": "js.u16.bt.combsum.predict",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "reuse comes from recursing at the same index",
+    "cue": "Subtract the chosen value from what is left; record when it hits zero and abandon a branch once it goes below zero.",
+    "syntax": "recurse from i, subtracting candidates[i]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "function combinationSum(candidates, target) {\n  const res = [];\n  const path = [];\n  function backtrack(start, remaining) {\n    if (remaining === 0) { res.push(path.slice()); return; }\n    if (remaining < 0) return;\n    for (let i = start; i < candidates.length; i++) {\n      path.push(candidates[i]);\n      backtrack(i, remaining - candidates[i]);\n      path.pop();\n    }\n  }\n  backtrack(0, target);\n  return res;\n}\ncombinationSum([2, 3], 6);",
+    "expected": "[[2, 2, 2], [3, 3]]",
+    "note": "Staying at the same index lets a number repeat, so 2 + 2 + 2 and 3 + 3 both reach 6. Recursing from the current index (not the next) is what allows reuse.",
+    "prereqs": [
+      "js.u16.bt.combine.write"
+    ]
+  },
+  {
+    "id": "js.u16.bt.combsum.write",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "combinations that sum to a target, reuse allowed",
+    "cue": "Subtract the chosen number from what remains; record the path at zero, give up below zero, and recurse from the same index so a number can repeat.",
+    "syntax": "recurse from i (not i + 1) to allow reuse",
+    "kind": "write",
+    "prompt": "Write `combinationSum(candidates, target)` that returns every unique combination of `candidates` that adds up to `target`, each as an array. Each candidate may be used any number of times. `candidates` has distinct positive values. The combinations may come back in any order. When none exist, return `[]`.",
+    "starter": "function combinationSum(candidates, target) {\n  // your code here\n}",
+    "solution": "function combinationSum(candidates, target) {\n  const res = [];\n  const path = [];\n  function backtrack(start, remaining) {\n    if (remaining === 0) {\n      res.push(path.slice());\n      return;\n    }\n    if (remaining < 0) return;\n    for (let i = start; i < candidates.length; i++) {\n      path.push(candidates[i]);\n      backtrack(i, remaining - candidates[i]);\n      path.pop();\n    }\n  }\n  backtrack(0, target);\n  return res;\n}",
+    "cases": [
+      {
+        "call": "combinationSum([2, 3, 6, 7], 7)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[2,2,3],[7]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "combinationSum([2], 1)",
+        "check": "JSON.stringify(_) === JSON.stringify([])"
+      },
+      {
+        "call": "combinationSum([2, 3, 5], 8)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[2,2,2,2],[2,3,3],[3,5]].map(s=>JSON.stringify(s)).sort())"
+      },
+      {
+        "call": "combinationSum([3], 9)",
+        "check": "JSON.stringify(_.map(s=>s.slice().sort((a,b)=>a-b)).map(s=>JSON.stringify(s)).sort()) === JSON.stringify([[3,3,3]].map(s=>JSON.stringify(s)).sort())"
+      }
+    ],
+    "note": "Choose a candidate, explore from the same index so it can repeat, then un-choose. Recursing from the current index (not the next) both allows reuse and stops the same set appearing in a different order.",
+    "mapsTo": "LC 39 · Combination Sum",
+    "prereqs": [
+      "js.u16.bt.combsum.predict"
+    ]
+  },
+  {
+    "id": "js.u16.bt.parens.write",
+    "track": "javascript",
+    "group": "Backtracking & recursion",
+    "concept": "all valid parenthesis strings of n pairs",
+    "cue": "Grow the string one character at a time: add an open while opens are below n, add a close only while closes trail opens, and record it at length 2n.",
+    "syntax": "guard with open < n and close < open",
+    "kind": "write",
+    "prompt": "Write `generateParentheses(n)` that returns every string of `n` pairs of parentheses that is well-formed, in any order. For `n = 0` return `['']`.",
+    "starter": "function generateParentheses(n) {\n  // your code here\n}",
+    "solution": "function generateParentheses(n) {\n  const res = [];\n  function backtrack(current, open, close) {\n    if (current.length === 2 * n) {\n      res.push(current);\n      return;\n    }\n    if (open < n) backtrack(current + '(', open + 1, close);\n    if (close < open) backtrack(current + ')', open, close + 1);\n  }\n  backtrack('', 0, 0);\n  return res;\n}",
+    "cases": [
+      {
+        "call": "generateParentheses(2)",
+        "check": "JSON.stringify(_.slice().sort()) === JSON.stringify(['(())','()()'].slice().sort())"
+      },
+      {
+        "call": "generateParentheses(0)",
+        "check": "JSON.stringify(_) === JSON.stringify([''])"
+      },
+      {
+        "call": "generateParentheses(1)",
+        "check": "JSON.stringify(_.slice().sort()) === JSON.stringify(['()'].slice().sort())"
+      },
+      {
+        "call": "generateParentheses(3)",
+        "check": "JSON.stringify(_.slice().sort()) === JSON.stringify(['((()))','(()())','(())()','()(())','()()()'].slice().sort())"
+      }
+    ],
+    "note": "The two guards are the choose step: they only ever build a string that can still become balanced, so no invalid string is generated and none needs discarding. The count is the nth Catalan number.",
+    "mapsTo": "LC 22 · Generate Parentheses",
+    "prereqs": [
+      "js.u16.bt.parens.predict",
+      "js.u16.bt.combsum.write"
+    ]
+  }
+]
