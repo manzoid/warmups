@@ -1506,12 +1506,38 @@ const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as c
 // the exercise's own tests, which call the function with real inputs (including
 // the failing case), so codeviz steps through an actual run and the bug is
 // visible where it happens.
+// A predict snippet's value is its trailing EXPRESSION, which codeviz evaluates
+// and discards — so a bare snippet like `-7 % 3` traces to nothing (no vars, no
+// output). Wrap that trailing expression in print()/console.log() so codeviz
+// actually SHOWS the value the learner is predicting. Multi-statement snippets
+// still show their variables AND now print the final answer.
+function vizPredictCode(snippet: string, track: Track): string {
+  const lines = snippet.split('\n');
+  let i = lines.length - 1;
+  while (i >= 0 && lines[i].trim() === '') i--;
+  if (i < 0) return snippet;
+  const last = lines[i];
+  const t = last.trim();
+  const looksLikeStatement =
+    /^\s/.test(last) || // indented (inside a block)
+    t.endsWith(':') ||
+    t.endsWith(',') ||
+    /^(for|if|elif|else|while|def|class|return|import|from|with|try|except|finally|raise|assert|print|console\.|const |let |var |del |global |nonlocal |pass|break|continue)\b/.test(t) ||
+    /^[A-Za-z_$][\w$.[\]'" ]*\s(?:=|\+=|-=|\*=|\/=|%=|\|\|=|\?\?=)\s/.test(t); // assignment
+  if (looksLikeStatement) return snippet;
+  lines[i] = track === 'python' ? `print(${t})` : `console.log(${t})`;
+  return lines.join('\n');
+}
+
 function vizCode(
   ex: Exercise,
   input: string,
   failingCase?: RunResult['failingCase'],
 ): string {
-  if (ex.kind !== 'write') return ex.snippet ?? input;
+  if (ex.kind !== 'write') {
+    const snip = ex.snippet ?? input;
+    return ex.kind === 'predict' ? vizPredictCode(snip, ex.track) : snip;
+  }
   const sep =
     ex.track === 'python'
       ? '\n\n# --- driving your code with a test case ---\n'
