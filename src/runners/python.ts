@@ -198,9 +198,24 @@ __wu_json.dumps({"passed": __wu_passed, "actual": repr(__wu_actual)})
   }
 }
 
+/**
+ * Pyodide surfaces a Python exception as a full traceback whose frames are all
+ * internal (`_pyodide/_base.py`, `<exec>`) with misleading line numbers — ugly
+ * and unhelpful. Keep just the final `ExceptionType: message` line, which is the
+ * useful signal (e.g. `AssertionError: 6` when a test fails).
+ */
+function cleanTraceback(raw: string): string {
+  const lines = raw
+    .split('\n')
+    .map((l) => l.replace(/\s+$/, ''))
+    .filter((l) => l.length > 0);
+  if (lines.length === 0) return raw.trim();
+  return lines[lines.length - 1];
+}
+
 function formatError(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  return String(err);
+  const raw = err instanceof Error ? err.message : String(err);
+  return cleanTraceback(raw);
 }
 
 export const pythonRunner: Runner = {

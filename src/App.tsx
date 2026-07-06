@@ -466,16 +466,16 @@ function ResultView({ result, maxRung }: { result: RunResult; maxRung: number })
   let label: string;
   if (!result.passed) {
     color = theme.bad;
-    label = '✗ Fail — will repeat soon';
+    label = '✗ Fail';
   } else if (maxRung >= 3) {
     color = theme.bad;
-    label = '✓ Pass, but assisted — will repeat soon';
+    label = '✓ Pass (with help)';
   } else if (maxRung >= 1) {
     color = theme.accent;
-    label = '✓ Pass with a hint — repeats sooner';
+    label = '✓ Pass (with a hint)';
   } else {
     color = theme.good;
-    label = '✓ Pass — scheduled further out';
+    label = '✓ Pass';
   }
   return (
     <div style={{ marginTop: '1rem' }}>
