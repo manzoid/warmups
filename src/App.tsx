@@ -85,6 +85,9 @@ export default function App() {
   // Practice queue: an explicit set the learner chose to drill (from a group or
   // a history filter). Null = no active practice set (show the picker).
   const [queue, setQueue] = useState<Exercise[] | null>(null);
+  // When true, the Practice view shows the browsable interview-problems roster
+  // instead of the picker (so opening "Interview problems" isn't a blind drill).
+  const [problemBrowse, setProblemBrowse] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [queueLabel, setQueueLabel] = useState('');
 
@@ -218,6 +221,7 @@ export default function App() {
   const startPractice = useCallback(
     (exs: Exercise[], label: string) => {
       setView('practice');
+      setProblemBrowse(false);
       setQueue(exs);
       setQIndex(0);
       setQueueLabel(label);
@@ -247,6 +251,7 @@ export default function App() {
       setPick(null);
       setResult(null);
       setFluencyEx(null);
+      setProblemBrowse(false);
     }
   };
 
@@ -405,8 +410,18 @@ export default function App() {
               ))}
 
             {view === 'practice' &&
-              (queue == null ? (
-                <PracticePicker exercises={exercises} onStart={startPractice} />
+              (problemBrowse ? (
+                <InterviewBrowser
+                  exercises={exercises}
+                  onStart={startPractice}
+                  onBack={() => setProblemBrowse(false)}
+                />
+              ) : queue == null ? (
+                <PracticePicker
+                  exercises={exercises}
+                  onStart={startPractice}
+                  onBrowseProblems={() => setProblemBrowse(true)}
+                />
               ) : pick ? (
                 <ExerciseView
                   key={pick.exercise.id}
@@ -543,9 +558,11 @@ function Nav({
 function PracticePicker({
   exercises,
   onStart,
+  onBrowseProblems,
 }: {
   exercises: Exercise[];
   onStart: (exs: Exercise[], label: string) => void;
+  onBrowseProblems: () => void;
 }) {
   const groups = useMemo(() => {
     const m = new Map<string, number>();
@@ -563,10 +580,10 @@ function PracticePicker({
         {problems.length > 0 && (
           <button
             style={styles.btn}
-            onClick={() => onStart(problems, 'Interview problems (LC)')}
-            title="Only the LeetCode/NeetCode-tagged problems"
+            onClick={onBrowseProblems}
+            title="Browse the LeetCode/NeetCode-tagged problems and pick one"
           >
-            Interview problems ({problems.length})
+            Browse interview problems ({problems.length})
           </button>
         )}
       </div>
@@ -581,6 +598,104 @@ function PracticePicker({
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+// A browsable roster of the interview-tagged problems, so opening "interview
+// problems" shows the real problems to pick from rather than dropping the
+// learner into a blind 100-long linear drill starting at the most trivial item.
+function InterviewBrowser({
+  exercises,
+  onStart,
+  onBack,
+}: {
+  exercises: Exercise[];
+  onStart: (exs: Exercise[], label: string) => void;
+  onBack: () => void;
+}) {
+  const { marquee, patterns, all } = useMemo(() => {
+    const tagged = exercises.filter((e) => e.mapsTo);
+    // Group by the LC problem so a problem with both a predict and a write shows
+    // as one row (drilling it runs all its variants).
+    type Group = { lc: number; name: string; isPattern: boolean; exs: Exercise[] };
+    const byKey = new Map<string, Group>();
+    for (const ex of tagged) {
+      const raw = ex.mapsTo as string;
+      const isPattern = /^pattern behind/i.test(raw);
+      const lcMatch = raw.match(/LC\s+(\d+)/i);
+      const lc = lcMatch ? Number(lcMatch[1]) : Number.POSITIVE_INFINITY;
+      // Name: the part after the "· " separator, else the whole label.
+      const dot = raw.indexOf('·');
+      const name = (dot >= 0 ? raw.slice(dot + 1) : raw).trim();
+      const key = `${isPattern ? 'p' : 'm'}:${lc}:${name}`;
+      if (!byKey.has(key)) byKey.set(key, { lc, name, isPattern, exs: [] });
+      byKey.get(key)!.exs.push(ex);
+    }
+    const groups = [...byKey.values()].sort((a, b) => a.lc - b.lc);
+    return {
+      marquee: groups.filter((g) => !g.isPattern),
+      patterns: groups.filter((g) => g.isPattern),
+      all: tagged,
+    };
+  }, [exercises]);
+
+  const kindsLabel = (exs: Exercise[]) => {
+    const kinds = [...new Set(exs.map((e) => e.kind))];
+    return kinds.join(' + ');
+  };
+
+  const row = (g: { lc: number; name: string; exs: Exercise[] }) => (
+    <div
+      key={`${g.lc}:${g.name}`}
+      style={{
+        ...styles.row,
+        justifyContent: 'space-between',
+        padding: '7px 0',
+        borderBottom: `1px solid ${theme.border}`,
+        gap: 8,
+      }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <span style={{ ...styles.pill, marginRight: 8, color: theme.accent, borderColor: theme.accent }}>
+          LC {Number.isFinite(g.lc) ? g.lc : '—'}
+        </span>
+        <span>{g.name}</span>
+        <span style={{ ...styles.pill, marginLeft: 8 }}>{kindsLabel(g.exs)}</span>
+      </div>
+      <button style={styles.btnGhost} onClick={() => onStart(g.exs, `LC ${g.lc} · ${g.name}`)}>
+        Drill{g.exs.length > 1 ? ` (${g.exs.length})` : ''}
+      </button>
+    </div>
+  );
+
+  return (
+    <div style={styles.panel}>
+      <div style={{ ...styles.row, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+        <p style={{ ...styles.label, margin: 0 }}>
+          Interview problems — {marquee.length} named + {patterns.length} warm-up patterns
+        </p>
+        <div style={{ ...styles.row, gap: 8 }}>
+          <button style={styles.btn} onClick={() => onStart(all, 'Interview problems')}>
+            Drill all in order ({all.length})
+          </button>
+          <button style={styles.btnGhost} onClick={onBack}>
+            ← Sets
+          </button>
+        </div>
+      </div>
+
+      <p style={{ ...styles.label, margin: '1rem 0 0.2rem' }}>Named LeetCode problems</p>
+      <div>{marquee.map(row)}</div>
+
+      {patterns.length > 0 && (
+        <>
+          <p style={{ ...styles.label, margin: '1.2rem 0 0.2rem' }}>
+            Warm-up patterns (the mechanic behind a problem)
+          </p>
+          <div>{patterns.map(row)}</div>
+        </>
+      )}
     </div>
   );
 }
