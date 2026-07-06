@@ -13,6 +13,37 @@
     "syntax": "a[i - 1] indexing"
   },
   {
+    "id": "py.u10.iterate.index.predict",
+    "track": "python",
+    "group": "Stack / queue / deque",
+    "concept": "index-first array walk (a[i])",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "a = [10, 20, 30]\ntotal = 0\nfor i in range(len(a)):\n    total += a[i]\ntotal",
+    "expected": "60",
+    "prereqs": [
+      "py.u10.stack.topindex.predict"
+    ],
+    "cue": "Walk positions 0 through len-1, reading each slot by index.",
+    "syntax": "range(len(a)) with a[i]"
+  },
+  {
+    "id": "py.u10.iterate.index.write",
+    "track": "python",
+    "group": "Stack / queue / deque",
+    "concept": "index-first fill (write a[i])",
+    "kind": "write",
+    "prompt": "Write `double_all(a)` returning a new list where each element of `a` is doubled. Iterate by index with `for i in range(len(a))`.",
+    "starter": "def double_all(a):\n    # your code here\n    pass",
+    "solution": "def double_all(a):\n    out = [0] * len(a)\n    for i in range(len(a)):\n        out[i] = a[i] * 2\n    return out",
+    "tests": "assert double_all([1, 2, 3]) == [2, 4, 6], double_all([1, 2, 3])\nassert double_all([]) == []\nassert double_all([5]) == [10]",
+    "prereqs": [
+      "py.u10.iterate.index.predict"
+    ],
+    "cue": "Make an output list, fill each index from the matching input index.",
+    "syntax": "for i in range(len(a))"
+  },
+  {
     "id": "py.u10.stack.push",
     "track": "python",
     "group": "Stack / queue / deque",
@@ -35,7 +66,7 @@
     "concept": "peek reads a[top-1]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "a = [None] * 5\ntop = 0\nfor x in (1, 2, 3):\n    a[top] = x\n    top += 1\na[top - 1]",
+    "snippet": "a = [None] * 5\ntop = 0\nvals = [1, 2, 3]\nfor i in range(len(vals)):\n    a[top] = vals[i]\n    top += 1\na[top - 1]",
     "expected": "3",
     "prereqs": [
       "py.u10.stack.push"
@@ -66,7 +97,7 @@
     "concept": "decrement first, then read",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "a = [None] * 5\ntop = 0\nfor x in (1, 2, 3):\n    a[top] = x\n    top += 1\ntop -= 1\nv = a[top]\n(v, top)",
+    "snippet": "a = [None] * 5\ntop = 0\nvals = [1, 2, 3]\nfor i in range(len(vals)):\n    a[top] = vals[i]\n    top += 1\ntop -= 1\nv = a[top]\n(v, top)",
     "expected": "(3, 2)",
     "prereqs": [
       "py.u10.stack.peek"
@@ -129,7 +160,7 @@
     "kind": "write",
     "prompt": "Write `eval_rpn(tokens)` that evaluates a list of reverse-Polish-notation tokens and returns the integer result. Each token is either an operator string (`'+'`, `'-'`, `'*'`, `'/'`) or an integer string. Use integer division that truncates toward zero (`int(a / b)`). Use a list as a stack.",
     "starter": "def eval_rpn(tokens):\n    # your code here\n    pass",
-    "solution": "def eval_rpn(tokens):\n    st = []\n    for t in tokens:\n        if t in ('+', '-', '*', '/'):\n            b = st.pop()\n            a = st.pop()\n            if t == '+': st.append(a + b)\n            elif t == '-': st.append(a - b)\n            elif t == '*': st.append(a * b)\n            else: st.append(int(a / b))\n        else:\n            st.append(int(t))\n    return st.pop()",
+    "solution": "def eval_rpn(tokens):\n    st = []\n    for i in range(len(tokens)):\n        t = tokens[i]\n        if t in ('+', '-', '*', '/'):\n            b = st.pop()\n            a = st.pop()\n            if t == '+': st.append(a + b)\n            elif t == '-': st.append(a - b)\n            elif t == '*': st.append(a * b)\n            else: st.append(int(a / b))\n        else:\n            st.append(int(t))\n    return st.pop()",
     "tests": "assert eval_rpn(['2','1','+','3','*']) == 9, eval_rpn(['2','1','+','3','*'])\nassert eval_rpn(['4','13','5','/','+']) == 6\nassert eval_rpn(['5']) == 5",
     "prereqs": [
       "py.u10.stack.list.predict"
@@ -144,7 +175,7 @@
     "concept": "match brackets with a stack",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for c in s:\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st\n[valid('()[]{}'), valid('([)]'), valid('(')]",
+    "snippet": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for i in range(len(s)):\n        c = s[i]\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st\n[valid('()[]{}'), valid('([)]'), valid('(')]",
     "expected": "[True, False, False]",
     "prereqs": [
       "py.u10.stack.list.predict"
@@ -160,7 +191,7 @@
     "kind": "write",
     "prompt": "Write `valid(s)` that returns True when the brackets in `s` (`()[]{}`) are balanced and correctly nested, False otherwise. Use a stack.",
     "starter": "def valid(s):\n    # your code here\n    pass",
-    "solution": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for c in s:\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st",
+    "solution": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for i in range(len(s)):\n        c = s[i]\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st",
     "tests": "assert valid('()[]{}') is True\nassert valid('([)]') is False\nassert valid('(') is False\nassert valid('') is True\nassert valid(']') is False",
     "prereqs": [
       "py.u10.parens.predict"
@@ -175,7 +206,7 @@
     "concept": "monotonic stack trace",
     "kind": "predict",
     "prompt": "What is the value of `res`?",
-    "snippet": "nums = [2, 1, 2]\nres = [-1] * len(nums)\nst = []\nfor i, x in enumerate(nums):\n    while st and nums[st[-1]] < x:\n        res[st.pop()] = x\n    st.append(i)\nres",
+    "snippet": "nums = [2, 1, 2]\nres = [-1] * len(nums)\nst = []\nfor i in range(len(nums)):\n    x = nums[i]\n    while st and nums[st[-1]] < x:\n        res[st.pop()] = x\n    st.append(i)\nres",
     "expected": "[-1, 2, -1]",
     "prereqs": [
       "py.u10.stack.list.predict"
@@ -191,24 +222,25 @@
     "kind": "write",
     "prompt": "Write `nge(nums)` returning a list where position `i` holds the nearest element after `i` that is greater than `nums[i]`, or `-1` if none exists. Keep a stack of indices whose answers are still pending. One pass, O(n).",
     "starter": "def nge(nums):\n    # your code here\n    pass",
-    "solution": "def nge(nums):\n    res = [-1] * len(nums)\n    st = []\n    for i, x in enumerate(nums):\n        while st and nums[st[-1]] < x:\n            res[st.pop()] = x\n        st.append(i)\n    return res",
+    "solution": "def nge(nums):\n    res = [-1] * len(nums)\n    st = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while st and nums[st[-1]] < x:\n            res[st.pop()] = x\n        st.append(i)\n    return res",
     "tests": "assert nge([2,1,2,4,3]) == [4, 2, 4, -1, -1], nge([2,1,2,4,3])\nassert nge([1,2,3]) == [2, 3, -1]\nassert nge([3,2,1]) == [-1, -1, -1]",
     "prereqs": [
       "py.u10.nge.predict"
     ],
     "cue": "Hold a stack of unresolved indices; a larger element settles them.",
-    "syntax": "enumerate(nums)"
+    "syntax": "for i in range(len(nums))"
   },
   {
     "id": "py.u10.nge.enumerate.predict",
     "track": "python",
     "group": "Stack / queue / deque",
-    "concept": "enumerate gives (index, value)",
+    "concept": "enumerate: sugar for range(len(a)) with a[i]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "list(enumerate(['a', 'b', 'c']))",
     "expected": "[(0, 'a'), (1, 'b'), (2, 'c')]",
     "prereqs": [
+      "py.u10.iterate.index.predict",
       "py.u10.nge.write"
     ],
     "cue": "Pair each item with its position, counting from 0.",
@@ -236,7 +268,7 @@
     "concept": "circular buffer wrap",
     "kind": "predict",
     "prompt": "What is the value of `a`?",
-    "snippet": "n = 3\na = [None] * n\nhead = 0\nsize = 0\nfor x in (10, 20, 30):\n    a[(head + size) % n] = x\n    size += 1\nv = a[head]\nhead = (head + 1) % n\nsize -= 1\na[(head + size) % n] = 40\nsize += 1\na",
+    "snippet": "n = 3\na = [None] * n\nhead = 0\nsize = 0\nvals = [10, 20, 30]\nfor i in range(len(vals)):\n    a[(head + size) % n] = vals[i]\n    size += 1\nv = a[head]\nhead = (head + 1) % n\nsize -= 1\na[(head + size) % n] = 40\nsize += 1\na",
     "expected": "[40, 20, 30]",
     "prereqs": [
       "py.u10.queue.count.predict"
@@ -346,7 +378,7 @@
     "kind": "write",
     "prompt": "Write `bfs_order(graph, start)` returning the list of nodes in breadth-first visitation order from `start`. `graph` maps each node to a list of neighbors. Use `collections.deque` as the frontier and mark a node seen when you enqueue it.",
     "starter": "from collections import deque\n\ndef bfs_order(graph, start):\n    # your code here\n    pass",
-    "solution": "from collections import deque\n\ndef bfs_order(graph, start):\n    q = deque([start])\n    seen = {start}\n    order = []\n    while q:\n        node = q.popleft()\n        order.append(node)\n        for nb in graph[node]:\n            if nb not in seen:\n                seen.add(nb)\n                q.append(nb)\n    return order",
+    "solution": "from collections import deque\n\ndef bfs_order(graph, start):\n    q = deque([start])\n    seen = {start}\n    order = []\n    while q:\n        node = q.popleft()\n        order.append(node)\n        neighbors = graph[node]\n        for k in range(len(neighbors)):\n            nb = neighbors[k]\n            if nb not in seen:\n                seen.add(nb)\n                q.append(nb)\n    return order",
     "tests": "g = {0:[1,2], 1:[2], 2:[0,3], 3:[3]}\nassert bfs_order(g, 0) == [0, 1, 2, 3], bfs_order(g, 0)\ng2 = {'a':['b','c'], 'b':[], 'c':['a']}\nassert bfs_order(g2, 'a') == ['a', 'b', 'c']",
     "prereqs": [
       "py.u10.deque.builtin.predict"
@@ -361,7 +393,7 @@
     "concept": "monotonic deque trace",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "from collections import deque\nnums = [1, 3, -1]\nd = deque()\nfor i, x in enumerate(nums):\n    while d and nums[d[-1]] <= x:\n        d.pop()\n    d.append(i)\nlist(d)",
+    "snippet": "from collections import deque\nnums = [1, 3, -1]\nd = deque()\nfor i in range(len(nums)):\n    x = nums[i]\n    while d and nums[d[-1]] <= x:\n        d.pop()\n    d.append(i)\nlist(d)",
     "expected": "[1, 2]",
     "prereqs": [
       "py.u10.deque.builtin.predict"
@@ -377,7 +409,7 @@
     "kind": "write",
     "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, left to right. Keep a monotonic `deque` of candidate indices. One pass, O(n).",
     "starter": "from collections import deque\n\ndef maxwin(nums, k):\n    # your code here\n    pass",
-    "solution": "from collections import deque\n\ndef maxwin(nums, k):\n    d = deque()\n    out = []\n    for i, x in enumerate(nums):\n        while d and nums[d[-1]] <= x:\n            d.pop()\n        d.append(i)\n        if d[0] <= i - k:\n            d.popleft()\n        if i >= k - 1:\n            out.append(nums[d[0]])\n    return out",
+    "solution": "from collections import deque\n\ndef maxwin(nums, k):\n    d = deque()\n    out = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while d and nums[d[-1]] <= x:\n            d.pop()\n        d.append(i)\n        if d[0] <= i - k:\n            d.popleft()\n        if i >= k - 1:\n            out.append(nums[d[0]])\n    return out",
     "tests": "assert maxwin([1,3,-1,-3,5,3,6,7], 3) == [3, 3, 5, 5, 6, 7], maxwin([1,3,-1,-3,5,3,6,7], 3)\nassert maxwin([1], 1) == [1]\nassert maxwin([9,8,7], 2) == [9, 8]",
     "prereqs": [
       "py.u10.maxwin.predict"

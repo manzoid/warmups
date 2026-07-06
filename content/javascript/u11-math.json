@@ -32,10 +32,10 @@
     "concept": "parity via % 2",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const xs = [10, 7, 4, 3];\nxs.map(x => x % 2);",
+    "snippet": "const xs = [10, 7, 4, 3];\nconst out = [];\nfor (let i = 0; i < xs.length; i++) out.push(xs[i] % 2);\nout;",
     "expected": "[0, 1, 0, 1]",
-    "cue": "Map each element to its remainder by two.",
-    "syntax": "arr.map(fn)",
+    "cue": "Walk each index and record that element's remainder by two.",
+    "syntax": "for (let i = 0; i < xs.length; i++)",
     "prereqs": []
   },
   {
@@ -153,10 +153,10 @@
     "concept": "polynomial hash via Horner",
     "kind": "predict",
     "prompt": "What is the value of `h`?",
-    "snippet": "let h = 0;\nfor (const ch of 'abc') h = h * 31 + ch.charCodeAt(0);\nh;",
+    "snippet": "let h = 0;\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) h = h * 31 + s.charCodeAt(i);\nh;",
     "expected": "96354",
-    "cue": "Walk the loop, updating the accumulator once per character.",
-    "syntax": "ch.charCodeAt(0)",
+    "cue": "Walk each index, updating the accumulator once per character.",
+    "syntax": "s.charCodeAt(i)",
     "prereqs": []
   },
   {
@@ -167,10 +167,10 @@
     "kind": "write",
     "prompt": "Write `parseNum(s)` that turns a string of decimal digits into its integer value using `h = h * 10 + digit`. Do not use `Number`, `parseInt`, or `parseFloat`.",
     "starter": "function parseNum(s) {\n  // your code here\n}",
-    "solution": "function parseNum(s) {\n  let h = 0;\n  for (const ch of s) h = h * 10 + (ch.charCodeAt(0) - 48);\n  return h;\n}",
+    "solution": "function parseNum(s) {\n  let h = 0;\n  for (let i = 0; i < s.length; i++) h = h * 10 + (s.charCodeAt(i) - 48);\n  return h;\n}",
     "tests": "if (parseNum('0') !== 0) throw new Error('0');\nif (parseNum('1234') !== 1234) throw new Error('1234');\nif (parseNum('7') !== 7) throw new Error('7');\nif (parseNum('1000') !== 1000) throw new Error('1000');",
     "cue": "Fold digits left to right, subtracting the code of '0' to get each digit.",
-    "syntax": "ch.charCodeAt(0)",
+    "syntax": "s.charCodeAt(i)",
     "prereqs": ["js.u11.horner.abc"]
   },
   {
@@ -276,10 +276,10 @@
     "kind": "write",
     "prompt": "Write `runningMax(xs)` for a non-empty array that returns its largest element by scanning and keeping the best so far. Do not use `Math.max` or spread.",
     "starter": "function runningMax(xs) {\n  // your code here\n}",
-    "solution": "function runningMax(xs) {\n  let best = xs[0];\n  for (const x of xs) if (x > best) best = x;\n  return best;\n}",
+    "solution": "function runningMax(xs) {\n  let best = xs[0];\n  for (let i = 0; i < xs.length; i++) if (xs[i] > best) best = xs[i];\n  return best;\n}",
     "tests": "if (runningMax([3, 1, 4, 1, 5, 9, 2]) !== 9) throw new Error('a');\nif (runningMax([-5, -2, -9]) !== -2) throw new Error('b');\nif (runningMax([7]) !== 7) throw new Error('c');",
     "cue": "Seed with the first element, then scan and keep whichever is larger.",
-    "syntax": "for (const x of xs)",
+    "syntax": "for (let i = 0; i < xs.length; i++)",
     "prereqs": ["js.u11.clamp.predict"]
   },
   {
@@ -289,9 +289,9 @@
     "concept": "parity via low bit",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "[12, 7].map(x => x & 1);",
+    "snippet": "const xs = [12, 7];\nconst out = [];\nfor (let i = 0; i < xs.length; i++) out.push(xs[i] & 1);\nout;",
     "expected": "[0, 1]",
-    "cue": "The lowest bit tells even from odd.",
+    "cue": "The lowest bit tells even from odd; walk each index and record it.",
     "syntax": "x & 1",
     "prereqs": ["js.u11.mod.parity"]
   },
@@ -357,10 +357,10 @@
     "kind": "write",
     "prompt": "Write `buildMask(nums)` where `nums` is an array of small non-negative integers, returning an integer whose bit `k` is set for each `k` in `nums`. `buildMask([0, 1, 3])` is `11`.",
     "starter": "function buildMask(nums) {\n  // your code here\n}",
-    "solution": "function buildMask(nums) {\n  let m = 0;\n  for (const k of nums) m |= 1 << k;\n  return m;\n}",
+    "solution": "function buildMask(nums) {\n  let m = 0;\n  for (let i = 0; i < nums.length; i++) m |= 1 << nums[i];\n  return m;\n}",
     "tests": "if (buildMask([0, 1, 3]) !== 11) throw new Error('a');\nif (buildMask([]) !== 0) throw new Error('b');\nif (buildMask([2]) !== 4) throw new Error('c');\nif (buildMask([0, 0]) !== 1) throw new Error('d');",
-    "cue": "For each number, OR in a 1 shifted to that bit position.",
-    "syntax": "1 << k",
+    "cue": "For each index, OR in a 1 shifted to that number's bit position.",
+    "syntax": "1 << nums[i]",
     "prereqs": ["js.u11.bits.clear-lowest"]
   }
 ]

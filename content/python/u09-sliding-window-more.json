@@ -6,7 +6,7 @@
     "concept": "min sum over size-k blocks",
     "kind": "predict",
     "prompt": "What is the value of `worst`?",
-    "snippet": "nums = [4, 2, 1, 7, 5]\nk = 2\ns = sum(nums[:k])\nworst = s\nfor i in range(k, len(nums)):\n    s += nums[i] - nums[i - k]\n    if s < worst:\n        worst = s\nworst",
+    "snippet": "nums = [4, 2, 1, 7, 5]\nk = 2\ns = 0\nfor i in range(k):\n    s += nums[i]\nworst = s\nfor i in range(k, len(nums)):\n    s += nums[i] - nums[i - k]\n    if s < worst:\n        worst = s\nworst",
     "expected": "3",
     "cue": "Prime the first window, then slide and keep the smallest sum seen.",
     "syntax": "if s < worst",
@@ -20,10 +20,10 @@
     "kind": "write",
     "prompt": "Write `max_vowels(s, k)` returning the largest number of vowels (from 'aeiou') in any substring of `s` of length exactly `k`. Assume 1 <= k <= len(s). Slide a running count in O(1); do not recount each window.",
     "starter": "def max_vowels(s, k):\n    # your code here\n    pass",
-    "solution": "def max_vowels(s, k):\n    vowels = set('aeiou')\n    c = sum(1 for ch in s[:k] if ch in vowels)\n    best = c\n    for i in range(k, len(s)):\n        if s[i] in vowels:\n            c += 1\n        if s[i - k] in vowels:\n            c -= 1\n        if c > best:\n            best = c\n    return best",
+    "solution": "def max_vowels(s, k):\n    vowels = set('aeiou')\n    c = 0\n    for i in range(k):\n        if s[i] in vowels:\n            c += 1\n    best = c\n    for i in range(k, len(s)):\n        if s[i] in vowels:\n            c += 1\n        if s[i - k] in vowels:\n            c -= 1\n        if c > best:\n            best = c\n    return best",
     "tests": "assert max_vowels('abciiidef', 3) == 3, max_vowels('abciiidef', 3)\nassert max_vowels('aeiou', 2) == 2, max_vowels('aeiou', 2)\nassert max_vowels('leetcode', 3) == 2, max_vowels('leetcode', 3)\nassert max_vowels('b', 1) == 0, max_vowels('b', 1)",
     "cue": "The aggregate is a vowel count, not a sum: on each slide add one if the entering char is a vowel, drop one if the leaving char was.",
-    "syntax": "ch in set('aeiou')",
+    "syntax": "s[i] in set('aeiou')",
     "prereqs": ["py.u09.fixed.maxsum.write"]
   },
   {

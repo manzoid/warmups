@@ -158,17 +158,30 @@
     "syntax": "n % 10 and n //= 10"
   },
   {
+    "id": "py.u11.horner.index",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "Horner fold, indexed loop",
+    "kind": "predict",
+    "prompt": "What is the value of `h`?",
+    "snippet": "a = [1, 2, 3, 4]\nh = 0\nfor i in range(len(a)):\n    h = h * 10 + a[i]\nh",
+    "expected": "1234",
+    "prereqs": ["py.u11.intdiv.revnum"],
+    "cue": "Walk the indices, scaling the accumulator by 10 before adding each digit at a[i].",
+    "syntax": "for i in range(len(a)): a[i]"
+  },
+  {
     "id": "py.u11.horner.build",
     "track": "python",
     "group": "Programming math",
-    "concept": "Horner fold in base 10",
+    "concept": "Horner fold, for-each shorthand",
     "kind": "predict",
     "prompt": "What is the value of `h`?",
     "snippet": "h = 0\nfor d in [1, 2, 3, 4]:\n    h = h * 10 + d\nh",
     "expected": "1234",
-    "prereqs": ["py.u11.intdiv.revnum"],
-    "cue": "Walk the list, scaling the accumulator by 10 before adding each digit.",
-    "syntax": "acc = acc * base + d"
+    "prereqs": ["py.u11.horner.index"],
+    "cue": "for-each hands you each element directly; scale the accumulator by 10 before adding it.",
+    "syntax": "for d in a"
   },
   {
     "id": "py.u11.horner.parse",
@@ -178,9 +191,9 @@
     "kind": "write",
     "prompt": "Write `to_int(digits)` that folds a list of decimal digits (most significant first) into the integer they represent. `to_int([1, 2, 3, 4])` is `1234`; `to_int([])` is `0`.",
     "starter": "def to_int(digits):\n    # your code here\n    pass",
-    "solution": "def to_int(digits):\n    h = 0\n    for d in digits:\n        h = h * 10 + d\n    return h",
+    "solution": "def to_int(digits):\n    h = 0\n    for i in range(len(digits)):\n        h = h * 10 + digits[i]\n    return h",
     "tests": "assert to_int([1, 2, 3, 4]) == 1234, to_int([1, 2, 3, 4])\nassert to_int([]) == 0, to_int([])\nassert to_int([0, 5]) == 5, to_int([0, 5])",
-    "prereqs": ["py.u11.horner.build"],
+    "prereqs": ["py.u11.horner.index"],
     "cue": "Fold left over the digits, scaling by 10 each step.",
     "syntax": "acc = acc * base + d"
   },
@@ -192,11 +205,11 @@
     "kind": "write",
     "prompt": "Write `str_hash(s)` that folds the string into one integer with `h = h * 31 + ord(ch)` over each character, starting from `h = 0`. `str_hash('abc')` is `96354`.",
     "starter": "def str_hash(s):\n    # your code here\n    pass",
-    "solution": "def str_hash(s):\n    h = 0\n    for ch in s:\n        h = h * 31 + ord(ch)\n    return h",
+    "solution": "def str_hash(s):\n    h = 0\n    for i in range(len(s)):\n        h = h * 31 + ord(s[i])\n    return h",
     "tests": "assert str_hash('abc') == 96354, str_hash('abc')\nassert str_hash('') == 0, str_hash('')\nassert str_hash('a') == 97, str_hash('a')",
     "prereqs": ["py.u11.horner.parse"],
-    "cue": "Loop over characters, folding each code point into the accumulator.",
-    "syntax": "ord(ch)"
+    "cue": "Loop over indices, folding each character's code point into the accumulator.",
+    "syntax": "ord(s[i])"
   },
   {
     "id": "py.u11.gcd.loop.predict",
@@ -327,10 +340,10 @@
     "kind": "write",
     "prompt": "Write `contains(nums, target)` that packs the small non-negative ints of `nums` into one integer used as a set (bit `k` means `k` is present), then returns whether `target` is present.",
     "starter": "def contains(nums, target):\n    # your code here\n    pass",
-    "solution": "def contains(nums, target):\n    mask = 0\n    for n in nums:\n        mask |= 1 << n\n    return bool((mask >> target) & 1)",
+    "solution": "def contains(nums, target):\n    mask = 0\n    for i in range(len(nums)):\n        mask |= 1 << nums[i]\n    return bool((mask >> target) & 1)",
     "tests": "assert contains([0, 1, 3], 3) == True, contains([0, 1, 3], 3)\nassert contains([0, 1, 3], 2) == False, contains([0, 1, 3], 2)\nassert contains([], 0) == False, contains([], 0)",
     "prereqs": ["py.u11.bits.parity"],
-    "cue": "Set one bit per value, then read back the bit at the target position.",
+    "cue": "Set one bit per value at its index, then read back the bit at the target position.",
     "syntax": "1 << k, |= to set"
   }
 ]

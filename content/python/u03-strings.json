@@ -16,12 +16,14 @@
     "id": "py.u03.charloop.forc",
     "track": "python",
     "group": "Strings",
-    "concept": "iterate chars directly",
+    "concept": "for-each over chars (shorthand for index loop)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"banana\"\nn = 0\nfor c in s:\n    if c in \"aeiou\":\n        n += 1\nn",
     "expected": "3",
-    "prereqs": [],
+    "prereqs": [
+      "py.u03.charloop.index"
+    ],
     "cue": "Walk the string and count characters that meet the test.",
     "syntax": "c in \"aeiou\" membership"
   },
@@ -195,9 +197,11 @@
     "concept": "accumulate parts then join",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "parts = []\nfor c in \"abc\":\n    parts.append(c.upper())\n\"\".join(parts)",
+    "snippet": "s = \"abc\"\nparts = []\nfor i in range(len(s)):\n    parts.append(s[i].upper())\n\"\".join(parts)",
     "expected": "'ABC'",
-    "prereqs": [],
+    "prereqs": [
+      "py.u03.charloop.index"
+    ],
     "cue": "Collect transformed characters, then join them.",
     "syntax": "\"\".join(parts)"
   },
@@ -381,6 +385,21 @@
     "syntax": "str.find(sub)"
   },
   {
+    "id": "py.u03.slice.indexrange",
+    "track": "python",
+    "group": "Strings",
+    "concept": "bounded-index substring build",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"abcdef\"\nout = \"\"\nfor i in range(1, 4):\n    out += s[i]\nout",
+    "expected": "'bcd'",
+    "prereqs": [
+      "py.u03.charloop.index"
+    ],
+    "cue": "Loop the index from the start bound up to but not including the end bound.",
+    "syntax": "range(start, stop) bounded loop"
+  },
+  {
     "id": "py.u03.slice.extract",
     "track": "python",
     "group": "Strings",
@@ -389,7 +408,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"abcdef\"\n[s[1:4], s[4:100]]",
     "expected": "['bcd', 'ef']",
-    "prereqs": [],
+    "prereqs": [
+      "py.u03.slice.indexrange"
+    ],
     "cue": "Slices stop before the end index and clamp past the length.",
     "syntax": "s[i:j] end-exclusive"
   },
@@ -448,11 +469,13 @@
     "kind": "write",
     "prompt": "Write `my_join(parts, sep)` returning the strings in `parts` concatenated with `sep` between adjacent items (no trailing separator). Return the empty string for an empty list. Do not use `str.join`.",
     "starter": "def my_join(parts, sep):\n    # your code here\n    pass",
-    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out",
+    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out",
     "tests": "assert my_join([], \"-\") == \"\"\nassert my_join([\"a\"], \"-\") == \"a\"\nassert my_join([\"a\", \"b\", \"c\"], \"-\") == \"a-b-c\"\nassert my_join([\"x\", \"y\"], \"\") == \"xy\"",
-    "prereqs": [],
+    "prereqs": [
+      "py.u03.charloop.index"
+    ],
     "cue": "Seed with the first item, then prepend the separator before each remaining one.",
-    "syntax": "list[1:] tail slice"
+    "syntax": "range(1, len(parts))"
   },
   {
     "id": "py.u03.myjoin.edge",
@@ -461,7 +484,7 @@
     "concept": "join edge cases",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\n[my_join([], \"-\"), my_join([\"a\"], \"-\")]",
+    "snippet": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out\n\n[my_join([], \"-\"), my_join([\"a\"], \"-\")]",
     "expected": "['', 'a']",
     "prereqs": [
       "py.u03.myjoin.write"
@@ -507,8 +530,8 @@
     "concept": "split/join round-trip",
     "kind": "write",
     "prompt": "Given `my_join` and `my_split` from earlier, write `round_trips(s, sep)` returning True if `my_join(my_split(s, sep), sep) == s`. `sep` is a single character.",
-    "starter": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    # your code here\n    pass",
-    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for p in parts[1:]:\n        out += sep + p\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    return my_join(my_split(s, sep), sep) == s",
+    "starter": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    # your code here\n    pass",
+    "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out\n\ndef my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out\n\ndef round_trips(s, sep):\n    return my_join(my_split(s, sep), sep) == s",
     "tests": "assert round_trips(\"a,b,c\", \",\") == True\nassert round_trips(\"a,,b\", \",\") == True\nassert round_trips(\"\", \",\") == True\nassert round_trips(\"no-seps-here\", \",\") == True",
     "prereqs": [
       "py.u03.myjoin.write",

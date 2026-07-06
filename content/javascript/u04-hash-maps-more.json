@@ -23,7 +23,7 @@
     "syntax": "[...map.values()]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const words = ['ant', 'bee', 'ape', 'bat'];\nconst m = new Map();\nfor (const w of words) {\n  const k = w[0];\n  if (!m.has(k)) m.set(k, []);\n  m.get(k).push(w);\n}\n[...m.values()];",
+    "snippet": "const words = ['ant', 'bee', 'ape', 'bat'];\nconst m = new Map();\nfor (let i = 0; i < words.length; i++) {\n  const w = words[i];\n  const k = w[0];\n  if (!m.has(k)) m.set(k, []);\n  m.get(k).push(w);\n}\n[...m.values()];",
     "expected": "[[\"ant\", \"ape\"], [\"bee\", \"bat\"]]",
     "prereqs": [
       "js.u04.groupby.buckets"
@@ -39,7 +39,7 @@
     "kind": "write",
     "prompt": "Write `isAnagram(s, t)` that returns `true` if `t` is a rearrangement of `s`'s characters, else `false`.",
     "starter": "function isAnagram(s, t) {\n  // your code here\n}",
-    "solution": "function isAnagram(s, t) {\n  if (s.length !== t.length) return false;\n  const cnt = {};\n  for (const ch of s) cnt[ch] = (cnt[ch] || 0) + 1;\n  for (const ch of t) {\n    if (!cnt[ch]) return false;\n    cnt[ch]--;\n  }\n  return true;\n}",
+    "solution": "function isAnagram(s, t) {\n  if (s.length !== t.length) return false;\n  const cnt = {};\n  for (let i = 0; i < s.length; i++) cnt[s[i]] = (cnt[s[i]] || 0) + 1;\n  for (let i = 0; i < t.length; i++) {\n    const ch = t[i];\n    if (!cnt[ch]) return false;\n    cnt[ch]--;\n  }\n  return true;\n}",
     "tests": "if (isAnagram('anagram', 'nagaram') !== true) throw new Error('anagram');\nif (isAnagram('rat', 'car') !== false) throw new Error('not anagram');\nif (isAnagram('', '') !== true) throw new Error('empty');\nif (isAnagram('a', 'ab') !== false) throw new Error('length mismatch');",
     "prereqs": [
       "js.u04.freq.write"
@@ -55,7 +55,7 @@
     "kind": "write",
     "prompt": "Write `majority(nums)` that returns the value appearing more than `nums.length / 2` times. Assume such an element always exists.",
     "starter": "function majority(nums) {\n  // your code here\n}",
-    "solution": "function majority(nums) {\n  const m = new Map();\n  let best = null, bestCount = 0;\n  for (const x of nums) {\n    const c = (m.get(x) || 0) + 1;\n    m.set(x, c);\n    if (c > bestCount) { bestCount = c; best = x; }\n  }\n  return best;\n}",
+    "solution": "function majority(nums) {\n  const m = new Map();\n  let best = null, bestCount = 0;\n  for (let i = 0; i < nums.length; i++) {\n    const x = nums[i];\n    const c = (m.get(x) || 0) + 1;\n    m.set(x, c);\n    if (c > bestCount) { bestCount = c; best = x; }\n  }\n  return best;\n}",
     "tests": "if (majority([3, 2, 3]) !== 3) throw new Error('basic');\nif (majority([2, 2, 1, 1, 1, 2, 2]) !== 2) throw new Error('longer');\nif (majority([1]) !== 1) throw new Error('single');",
     "prereqs": [
       "js.u04.freq.map"
@@ -71,7 +71,7 @@
     "kind": "write",
     "prompt": "Write `wordCount(text)` that returns an object mapping each whitespace-separated word in `text` to how many times it appears.",
     "starter": "function wordCount(text) {\n  // your code here\n}",
-    "solution": "function wordCount(text) {\n  const freq = {};\n  for (const w of text.split(/\\s+/).filter(Boolean)) freq[w] = (freq[w] || 0) + 1;\n  return freq;\n}",
+    "solution": "function wordCount(text) {\n  const freq = {};\n  const words = text.split(/\\s+/).filter(Boolean);\n  for (let i = 0; i < words.length; i++) freq[words[i]] = (freq[words[i]] || 0) + 1;\n  return freq;\n}",
     "tests": "if (JSON.stringify(wordCount('a b a')) !== JSON.stringify({ a: 2, b: 1 })) throw new Error('basic');\nif (JSON.stringify(wordCount('')) !== JSON.stringify({})) throw new Error('empty');\nif (wordCount('hi').hi !== 1) throw new Error('single');\nif (wordCount('go go go').go !== 3) throw new Error('repeat');",
     "prereqs": [
       "js.u04.obj.count"

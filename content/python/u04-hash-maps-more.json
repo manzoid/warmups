@@ -6,7 +6,7 @@
     "concept": "group-by first letter (defaultdict(list))",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "from collections import defaultdict\nwords = [\"apple\", \"banana\", \"avocado\", \"cherry\", \"blueberry\"]\ngroups = defaultdict(list)\nfor w in words:\n    groups[w[0]].append(w)\n[groups[k] for k in sorted(groups)]",
+    "snippet": "from collections import defaultdict\nwords = [\"apple\", \"banana\", \"avocado\", \"cherry\", \"blueberry\"]\ngroups = defaultdict(list)\nfor i in range(len(words)):\n    w = words[i]\n    groups[w[0]].append(w)\n[groups[k] for k in sorted(groups)]",
     "expected": "[['apple', 'avocado'], ['banana', 'blueberry'], ['cherry']]",
     "prereqs": [
       "py.u04.groupby.setdefault.predict"
@@ -21,7 +21,7 @@
     "concept": "group-by parity into buckets",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "nums = [1, 2, 3, 4, 5, 6]\ngroups = {}\nfor n in nums:\n    groups.setdefault(n % 2, []).append(n)\n[groups[0], groups[1]]",
+    "snippet": "nums = [1, 2, 3, 4, 5, 6]\ngroups = {}\nfor i in range(len(nums)):\n    n = nums[i]\n    groups.setdefault(n % 2, []).append(n)\n[groups[0], groups[1]]",
     "expected": "[[2, 4, 6], [1, 3, 5]]",
     "prereqs": [
       "py.u04.groupby.setdefault.predict"
@@ -53,12 +53,12 @@
     "kind": "write",
     "prompt": "Write `word_count(text)` that returns a dict mapping each whitespace-separated word in `text` to how many times it appears.",
     "starter": "def word_count(text):\n    # your code here\n    pass",
-    "solution": "def word_count(text):\n    freq = {}\n    for w in text.split():\n        freq[w] = freq.get(w, 0) + 1\n    return freq",
+    "solution": "def word_count(text):\n    freq = {}\n    words = text.split()\n    for i in range(len(words)):\n        w = words[i]\n        freq[w] = freq.get(w, 0) + 1\n    return freq",
     "tests": "assert word_count(\"a b a\") == {'a': 2, 'b': 1}, word_count(\"a b a\")\nassert word_count(\"\") == {}, word_count(\"\")\nassert word_count(\"hi\") == {'hi': 1}, word_count(\"hi\")\nassert word_count(\"go go go\") == {'go': 3}, word_count(\"go go go\")",
     "prereqs": [
       "py.u04.freq.get.predict"
     ],
-    "cue": "Split into words, then tally each with a miss-safe read.",
+    "cue": "Split into words, then tally each by index with a miss-safe read.",
     "syntax": "str.split()"
   },
   {

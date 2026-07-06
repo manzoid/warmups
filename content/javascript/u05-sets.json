@@ -51,7 +51,7 @@
     "kind": "write",
     "prompt": "Complete `add(key)` on `HashSet`: add `key` only if it is not already present. Return `this`.",
     "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    // your code here\n    return this;\n  }\n}",
-    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return this;\n    b.push(key);\n    return this;\n  }\n}",
+    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n}",
     "tests": "const s = new HashSet();\ns.add('cat');\ns.add('cat');\nconst b = s.buckets[s._hash('cat')];\nif (b.length !== 1) throw new Error('duplicate add must not grow the chain');\nif (b[0] !== 'cat') throw new Error('should store the key');",
     "prereqs": ["js.u05.build.boolset.delete"]
   },
@@ -61,11 +61,11 @@
     "group": "Sets",
     "concept": "hash set membership via chain scan",
     "cue": "Hash to the bucket, then scan its chain for the key.",
-    "syntax": "for (const x of arr)",
+    "syntax": "for (let i = 0; i < arr.length; i++)",
     "kind": "write",
     "prompt": "Complete `has(key)` on `HashSet`: return `true` if `key` is present, `false` otherwise.",
-    "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    // your code here\n  }\n}",
-    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return true;\n    return false;\n  }\n}",
+    "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    // your code here\n  }\n}",
+    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return true;\n    return false;\n  }\n}",
     "tests": "const s = new HashSet();\ns.add('cat');\ns.add('dog');\nif (s.has('cat') !== true) throw new Error('cat present');\nif (s.has('dog') !== true) throw new Error('dog present');\nif (s.has('cow') !== false) throw new Error('cow absent');",
     "prereqs": ["js.u05.build.hashset.add"]
   },
@@ -78,8 +78,8 @@
     "syntax": "arr.splice(i, 1)",
     "kind": "write",
     "prompt": "Complete `delete(key)` on `HashSet`: remove `key` if present; return `true` if something was removed, `false` otherwise.",
-    "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return true;\n    return false;\n  }\n  delete(key) {\n    // your code here\n  }\n}",
-    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const k of b) if (k === key) return true;\n    return false;\n  }\n  delete(key) {\n    const b = this.buckets[this._hash(key)];\n    const i = b.indexOf(key);\n    if (i === -1) return false;\n    b.splice(i, 1);\n    return true;\n  }\n}",
+    "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return true;\n    return false;\n  }\n  delete(key) {\n    // your code here\n  }\n}",
+    "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return true;\n    return false;\n  }\n  delete(key) {\n    const b = this.buckets[this._hash(key)];\n    const i = b.indexOf(key);\n    if (i === -1) return false;\n    b.splice(i, 1);\n    return true;\n  }\n}",
     "tests": "const s = new HashSet();\ns.add('cat');\nif (s.delete('cat') !== true) throw new Error('delete present -> true');\nif (s.has('cat') !== false) throw new Error('after delete, absent');\nif (s.delete('cat') !== false) throw new Error('delete missing -> false');",
     "prereqs": ["js.u05.build.hashset.has"]
   },
@@ -249,7 +249,7 @@
     "kind": "write",
     "prompt": "Write `dedupe(a)` that returns the distinct elements of array `a` in first-seen order.",
     "starter": "function dedupe(a) {\n  // your code here\n}",
-    "solution": "function dedupe(a) {\n  const seen = new Set();\n  const out = [];\n  for (const x of a) {\n    if (!seen.has(x)) {\n      seen.add(x);\n      out.push(x);\n    }\n  }\n  return out;\n}",
+    "solution": "function dedupe(a) {\n  const seen = new Set();\n  const out = [];\n  for (let i = 0; i < a.length; i++) {\n    const x = a[i];\n    if (!seen.has(x)) {\n      seen.add(x);\n      out.push(x);\n    }\n  }\n  return out;\n}",
     "tests": "if (JSON.stringify(dedupe([3, 1, 3, 2, 1])) !== JSON.stringify([3, 1, 2])) throw new Error('order-preserving distinct');\nif (JSON.stringify(dedupe([])) !== JSON.stringify([])) throw new Error('empty stays empty');\nif (JSON.stringify(dedupe(['a', 'a', 'b'])) !== JSON.stringify(['a', 'b'])) throw new Error('strings');",
     "prereqs": ["js.u05.set.dedup-order"]
   },
@@ -263,7 +263,7 @@
     "kind": "write",
     "prompt": "Write `hasDuplicate(a)` that returns `true` if any element of `a` appears more than once, else `false`. Return as soon as the first repeat is seen; use a Set.",
     "starter": "function hasDuplicate(a) {\n  // your code here\n}",
-    "solution": "function hasDuplicate(a) {\n  const seen = new Set();\n  for (const x of a) {\n    if (seen.has(x)) return true;\n    seen.add(x);\n  }\n  return false;\n}",
+    "solution": "function hasDuplicate(a) {\n  const seen = new Set();\n  for (let i = 0; i < a.length; i++) {\n    const x = a[i];\n    if (seen.has(x)) return true;\n    seen.add(x);\n  }\n  return false;\n}",
     "tests": "if (hasDuplicate([1, 2, 3, 2]) !== true) throw new Error('has a duplicate');\nif (hasDuplicate([1, 2, 3]) !== false) throw new Error('all distinct');\nif (hasDuplicate([]) !== false) throw new Error('empty -> false');\nif (hasDuplicate([7]) !== false) throw new Error('single -> false');",
     "prereqs": ["js.u05.set.has-duplicate"]
   },
@@ -277,7 +277,7 @@
     "kind": "write",
     "prompt": "Write `intersect(a, b)` that returns the distinct values present in both arrays, in the order they first appear in `a`. Use a Set for membership tests against `b`.",
     "starter": "function intersect(a, b) {\n  // your code here\n}",
-    "solution": "function intersect(a, b) {\n  const setB = new Set(b);\n  const seen = new Set();\n  const out = [];\n  for (const x of a) {\n    if (setB.has(x) && !seen.has(x)) {\n      seen.add(x);\n      out.push(x);\n    }\n  }\n  return out;\n}",
+    "solution": "function intersect(a, b) {\n  const setB = new Set(b);\n  const seen = new Set();\n  const out = [];\n  for (let i = 0; i < a.length; i++) {\n    const x = a[i];\n    if (setB.has(x) && !seen.has(x)) {\n      seen.add(x);\n      out.push(x);\n    }\n  }\n  return out;\n}",
     "tests": "if (JSON.stringify(intersect([1, 2, 2, 3], [2, 3, 4])) !== JSON.stringify([2, 3])) throw new Error('common, distinct, a-order');\nif (JSON.stringify(intersect([1, 2], [3, 4])) !== JSON.stringify([])) throw new Error('disjoint -> empty');",
     "prereqs": ["js.u05.set.intersection"]
   },

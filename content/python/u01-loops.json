@@ -6,11 +6,11 @@
     "concept": "sum via accumulator",
     "kind": "predict",
     "prompt": "What is the value of `total`?",
-    "snippet": "a = [3, 1, 4, 1, 5]\ntotal = 0\nfor x in a:\n    total += x\ntotal",
+    "snippet": "a = [3, 1, 4, 1, 5]\ntotal = 0\nfor i in range(len(a)):\n    total += a[i]\ntotal",
     "expected": "14",
     "prereqs": [],
-    "cue": "Walk the loop and track `total`.",
-    "syntax": "+= adds in place"
+    "cue": "Index the list with `range(len(a))` and track `total`.",
+    "syntax": "a[i] by index; += adds in place"
   },
   {
     "id": "py.u01.accumulate.sum",
@@ -20,13 +20,28 @@
     "kind": "write",
     "prompt": "Write `my_sum(a)` returning the sum of list `a`. Do not use the built-in `sum`.",
     "starter": "def my_sum(a):\n    # your code here\n    pass",
-    "solution": "def my_sum(a):\n    total = 0\n    for x in a:\n        total += x\n    return total",
+    "solution": "def my_sum(a):\n    total = 0\n    for i in range(len(a)):\n        total += a[i]\n    return total",
     "tests": "assert my_sum([]) == 0, my_sum([])\nassert my_sum([5]) == 5, my_sum([5])\nassert my_sum([3, 1, 4, 1, 5]) == 14, my_sum([3, 1, 4, 1, 5])\nassert my_sum([-2, 2, -3]) == -3, my_sum([-2, 2, -3])",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
     ],
-    "cue": "Fold with a running total that starts at 0.",
-    "syntax": "+= accumulates"
+    "cue": "Fold with a running total that starts at 0, indexing `a[i]`.",
+    "syntax": "for i in range(len(a))"
+  },
+  {
+    "id": "py.u01.accumulate.foreach.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "for-each: iterate values directly (shorthand for the index loop)",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "a = [3, 1, 4, 1, 5]\ntotal = 0\nfor x in a:\n    total += x\ntotal",
+    "expected": "14",
+    "prereqs": [
+      "py.u01.accumulate.sum.predict"
+    ],
+    "cue": "`for x in a` hands you each value directly, skipping the index.",
+    "syntax": "for x in a"
   },
   {
     "id": "py.u01.accumulate.product.predict",
@@ -35,7 +50,7 @@
     "concept": "product via accumulator (identity 1)",
     "kind": "predict",
     "prompt": "What is the value of `p`?",
-    "snippet": "a = [2, 3, 4]\np = 1\nfor x in a:\n    p *= x\np",
+    "snippet": "a = [2, 3, 4]\np = 1\nfor i in range(len(a)):\n    p *= a[i]\np",
     "expected": "24",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
@@ -51,7 +66,7 @@
     "kind": "write",
     "prompt": "Write `my_product(a)` returning the product of every element in list `a`. `my_product([])` is 1.",
     "starter": "def my_product(a):\n    # your code here\n    pass",
-    "solution": "def my_product(a):\n    p = 1\n    for x in a:\n        p *= x\n    return p",
+    "solution": "def my_product(a):\n    p = 1\n    for i in range(len(a)):\n        p *= a[i]\n    return p",
     "tests": "assert my_product([]) == 1, my_product([])\nassert my_product([5]) == 5, my_product([5])\nassert my_product([2, 3, 4]) == 24, my_product([2, 3, 4])\nassert my_product([0, 9]) == 0, my_product([0, 9])",
     "prereqs": [
       "py.u01.accumulate.product.predict"
@@ -81,13 +96,13 @@
     "concept": "max value via compare-and-keep",
     "kind": "predict",
     "prompt": "What is the value of `best`?",
-    "snippet": "a = [3, 7, 2, 9, 4]\nbest = a[0]\nfor x in a[1:]:\n    if x > best:\n        best = x\nbest",
+    "snippet": "a = [3, 7, 2, 9, 4]\nbest = a[0]\nfor i in range(1, len(a)):\n    if a[i] > best:\n        best = a[i]\nbest",
     "expected": "9",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
     ],
     "cue": "Track the best-so-far as you scan.",
-    "syntax": "x > best comparison"
+    "syntax": "range(1, len(a)) skips index 0"
   },
   {
     "id": "py.u01.extreme.max",
@@ -97,13 +112,13 @@
     "kind": "write",
     "prompt": "Write `my_max(a)` returning the largest element of non-empty list `a`. Do not use the built-in `max`.",
     "starter": "def my_max(a):\n    # your code here\n    pass",
-    "solution": "def my_max(a):\n    best = a[0]\n    for x in a[1:]:\n        if x > best:\n            best = x\n    return best",
+    "solution": "def my_max(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] > best:\n            best = a[i]\n    return best",
     "tests": "assert my_max([5]) == 5, my_max([5])\nassert my_max([3, 7, 2, 9, 4]) == 9, my_max([3, 7, 2, 9, 4])\nassert my_max([-1, -9, -3]) == -1, my_max([-1, -9, -3])",
     "prereqs": [
       "py.u01.extreme.max.predict"
     ],
     "cue": "Seed from the first element, then compare-and-keep.",
-    "syntax": "a[1:] slices off the first"
+    "syntax": "start the loop at index 1"
   },
   {
     "id": "py.u01.extreme.min",
@@ -113,7 +128,7 @@
     "kind": "write",
     "prompt": "Write `my_min(a)` returning the smallest element of non-empty list `a`. Do not use the built-in `min`.",
     "starter": "def my_min(a):\n    # your code here\n    pass",
-    "solution": "def my_min(a):\n    best = a[0]\n    for x in a[1:]:\n        if x < best:\n            best = x\n    return best",
+    "solution": "def my_min(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] < best:\n            best = a[i]\n    return best",
     "tests": "assert my_min([5]) == 5, my_min([5])\nassert my_min([3, 7, 2, 9, 4]) == 2, my_min([3, 7, 2, 9, 4])\nassert my_min([-1, -9, -3]) == -9, my_min([-1, -9, -3])",
     "prereqs": [
       "py.u01.extreme.max"
@@ -175,7 +190,7 @@
     "concept": "count matches via counter",
     "kind": "predict",
     "prompt": "What is the value of `c`?",
-    "snippet": "a = [1, 5, 2, 8, 3, 9]\nc = 0\nfor x in a:\n    if x > 3:\n        c += 1\nc",
+    "snippet": "a = [1, 5, 2, 8, 3, 9]\nc = 0\nfor i in range(len(a)):\n    if a[i] > 3:\n        c += 1\nc",
     "expected": "3",
     "prereqs": [],
     "cue": "Tally a counter as the loop tests each element.",
@@ -189,7 +204,7 @@
     "kind": "write",
     "prompt": "Write `count_greater(a, t)` returning how many elements of `a` are strictly greater than `t`.",
     "starter": "def count_greater(a, t):\n    # your code here\n    pass",
-    "solution": "def count_greater(a, t):\n    c = 0\n    for x in a:\n        if x > t:\n            c += 1\n    return c",
+    "solution": "def count_greater(a, t):\n    c = 0\n    for i in range(len(a)):\n        if a[i] > t:\n            c += 1\n    return c",
     "tests": "assert count_greater([], 0) == 0, count_greater([], 0)\nassert count_greater([1, 5, 2, 8, 3, 9], 3) == 3, count_greater([1, 5, 2, 8, 3, 9], 3)\nassert count_greater([1, 2], 5) == 0, count_greater([1, 2], 5)",
     "prereqs": [
       "py.u01.count.predicate.predict"
@@ -310,7 +325,7 @@
     "concept": "transform via build-and-append",
     "kind": "predict",
     "prompt": "What is the value of `out`?",
-    "snippet": "a = [1, 2, 3, 4]\nout = []\nfor x in a:\n    out.append(x * x)\nout",
+    "snippet": "a = [1, 2, 3, 4]\nout = []\nfor i in range(len(a)):\n    out.append(a[i] * a[i])\nout",
     "expected": "[1, 4, 9, 16]",
     "prereqs": [],
     "cue": "Trace the list being built by append.",
@@ -324,7 +339,7 @@
     "kind": "write",
     "prompt": "Write `squares(a)` returning a new list with each element of `a` squared, in order.",
     "starter": "def squares(a):\n    # your code here\n    pass",
-    "solution": "def squares(a):\n    out = []\n    for x in a:\n        out.append(x * x)\n    return out",
+    "solution": "def squares(a):\n    out = []\n    for i in range(len(a)):\n        out.append(a[i] * a[i])\n    return out",
     "tests": "assert squares([]) == [], squares([])\nassert squares([1, 2, 3, 4]) == [1, 4, 9, 16], squares([1, 2, 3, 4])\nassert squares([-2]) == [4], squares([-2])",
     "prereqs": [
       "py.u01.map.square.predict"
@@ -340,7 +355,7 @@
     "kind": "write",
     "prompt": "Write `lengths(words)` returning a list of the length of each string in `words`, in order.",
     "starter": "def lengths(words):\n    # your code here\n    pass",
-    "solution": "def lengths(words):\n    out = []\n    for w in words:\n        out.append(len(w))\n    return out",
+    "solution": "def lengths(words):\n    out = []\n    for i in range(len(words)):\n        out.append(len(words[i]))\n    return out",
     "tests": "assert lengths([]) == [], lengths([])\nassert lengths(['a', 'bb', 'ccc']) == [1, 2, 3], lengths(['a', 'bb', 'ccc'])\nassert lengths(['', 'xy']) == [0, 2], lengths(['', 'xy'])",
     "prereqs": [
       "py.u01.map.square"
@@ -370,7 +385,7 @@
     "concept": "filter via conditional append",
     "kind": "predict",
     "prompt": "What is the value of `out`?",
-    "snippet": "a = [1, 2, 3, 4, 5, 6]\nout = []\nfor x in a:\n    if x % 2 == 0:\n        out.append(x)\nout",
+    "snippet": "a = [1, 2, 3, 4, 5, 6]\nout = []\nfor i in range(len(a)):\n    if a[i] % 2 == 0:\n        out.append(a[i])\nout",
     "expected": "[2, 4, 6]",
     "prereqs": [],
     "cue": "Trace the list, appending only when the test holds.",
@@ -384,7 +399,7 @@
     "kind": "write",
     "prompt": "Write `keep_even(a)` returning a new list with only the even numbers of `a`, in their original order.",
     "starter": "def keep_even(a):\n    # your code here\n    pass",
-    "solution": "def keep_even(a):\n    out = []\n    for x in a:\n        if x % 2 == 0:\n            out.append(x)\n    return out",
+    "solution": "def keep_even(a):\n    out = []\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            out.append(a[i])\n    return out",
     "tests": "assert keep_even([]) == [], keep_even([])\nassert keep_even([1, 2, 3, 4, 5, 6]) == [2, 4, 6], keep_even([1, 2, 3, 4, 5, 6])\nassert keep_even([1, 3]) == [], keep_even([1, 3])",
     "prereqs": [
       "py.u01.filter.evens.predict"
@@ -414,7 +429,7 @@
     "concept": "conditional accumulate (filter + fold)",
     "kind": "predict",
     "prompt": "What is the value of `s`?",
-    "snippet": "a = [1, 2, 3, 4, 5, 6]\ns = 0\nfor x in a:\n    if x % 2 == 0:\n        s += x\ns",
+    "snippet": "a = [1, 2, 3, 4, 5, 6]\ns = 0\nfor i in range(len(a)):\n    if a[i] % 2 == 0:\n        s += a[i]\ns",
     "expected": "12",
     "prereqs": [
       "py.u01.accumulate.sum.predict",
@@ -431,7 +446,7 @@
     "kind": "write",
     "prompt": "Write `sum_even(a)` returning the sum of the even numbers in `a`. Returns 0 when none match.",
     "starter": "def sum_even(a):\n    # your code here\n    pass",
-    "solution": "def sum_even(a):\n    s = 0\n    for x in a:\n        if x % 2 == 0:\n            s += x\n    return s",
+    "solution": "def sum_even(a):\n    s = 0\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            s += a[i]\n    return s",
     "tests": "assert sum_even([]) == 0, sum_even([])\nassert sum_even([1, 2, 3, 4, 5, 6]) == 12, sum_even([1, 2, 3, 4, 5, 6])\nassert sum_even([1, 3]) == 0, sum_even([1, 3])",
     "prereqs": [
       "py.u01.condaccum.sumeven.predict",
@@ -463,7 +478,7 @@
     "concept": "flatten via nested loop",
     "kind": "predict",
     "prompt": "What is the value of `flat`?",
-    "snippet": "ll = [[1, 2], [3], [4, 5, 6]]\nflat = []\nfor sub in ll:\n    for x in sub:\n        flat.append(x)\nflat",
+    "snippet": "ll = [[1, 2], [3], [4, 5, 6]]\nflat = []\nfor i in range(len(ll)):\n    for j in range(len(ll[i])):\n        flat.append(ll[i][j])\nflat",
     "expected": "[1, 2, 3, 4, 5, 6]",
     "prereqs": [],
     "cue": "Trace the outer-then-inner loop appending each element.",
@@ -477,7 +492,7 @@
     "kind": "write",
     "prompt": "Write `flatten(ll)`, taking a list of lists, returning one flat list with all elements in order.",
     "starter": "def flatten(ll):\n    # your code here\n    pass",
-    "solution": "def flatten(ll):\n    flat = []\n    for sub in ll:\n        for x in sub:\n            flat.append(x)\n    return flat",
+    "solution": "def flatten(ll):\n    flat = []\n    for i in range(len(ll)):\n        for j in range(len(ll[i])):\n            flat.append(ll[i][j])\n    return flat",
     "tests": "assert flatten([]) == [], flatten([])\nassert flatten([[1, 2], [3], [4, 5, 6]]) == [1, 2, 3, 4, 5, 6], flatten([[1, 2], [3], [4, 5, 6]])\nassert flatten([[], [1]]) == [1], flatten([[], [1]])",
     "prereqs": [
       "py.u01.flatten.raw.predict"

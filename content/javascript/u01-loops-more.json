@@ -8,10 +8,10 @@
     "syntax": "push inside the loop",
     "kind": "predict",
     "prompt": "What is the value of `out`?",
-    "snippet": "let a = [3, 1, 4, 1];\nlet out = [];\nlet run = 0;\nfor (const x of a) { run += x; out.push(run); }\nout",
+    "snippet": "let a = [3, 1, 4, 1];\nlet out = [];\nlet run = 0;\nfor (let i = 0; i < a.length; i++) { run += a[i]; out.push(run); }\nout",
     "expected": "[3, 4, 8, 9]",
     "prereqs": [
-      "js.u01.accumulate.sum.predict"
+      "js.u01.accumulate.sum.index.predict"
     ]
   },
   {
@@ -24,7 +24,7 @@
     "kind": "write",
     "prompt": "Implement `runningMax(a)` returning an array whose element `i` is the largest value among `a[0..i]`. `runningMax([])` is `[]`.",
     "starter": "function runningMax(a) {\n  // your code here\n}",
-    "solution": "function runningMax(a) {\n  const out = [];\n  let best = -Infinity;\n  for (const x of a) {\n    if (x > best) best = x;\n    out.push(best);\n  }\n  return out;\n}",
+    "solution": "function runningMax(a) {\n  const out = [];\n  let best = -Infinity;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] > best) best = a[i];\n    out.push(best);\n  }\n  return out;\n}",
     "tests": "if (JSON.stringify(runningMax([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(runningMax([3, 1, 4, 1, 5, 9, 2])) !== JSON.stringify([3, 3, 4, 4, 5, 9, 9])) throw new Error('rmax');\nif (JSON.stringify(runningMax([-2, -5, -1])) !== JSON.stringify([-2, -2, -1])) throw new Error('neg');",
     "prereqs": [
       "js.u01.extreme.max.predict",
@@ -37,11 +37,11 @@
     "group": "Loops & iteration",
     "concept": "count matches over a string domain",
     "cue": "Same tally loop, but the test is membership in a small set.",
-    "syntax": "'aeiou'.includes(ch)",
+    "syntax": "'aeiou'.includes(s[i])",
     "kind": "write",
     "prompt": "Implement `countVowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
     "starter": "function countVowels(s) {\n  // your code here\n}",
-    "solution": "function countVowels(s) {\n  let c = 0;\n  for (const ch of s) if ('aeiou'.includes(ch)) c++;\n  return c;\n}",
+    "solution": "function countVowels(s) {\n  let c = 0;\n  for (let i = 0; i < s.length; i++) if ('aeiou'.includes(s[i])) c++;\n  return c;\n}",
     "tests": "if (countVowels('') !== 0) throw new Error('empty');\nif (countVowels('hello') !== 2) throw new Error('hello');\nif (countVowels('xyz') !== 0) throw new Error('none');\nif (countVowels('aeiou') !== 5) throw new Error('all');",
     "prereqs": [
       "js.u01.count.predict"

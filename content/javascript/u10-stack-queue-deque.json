@@ -34,7 +34,7 @@
     "concept": "peek reads a[top-1]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const a = new Array(100);\nlet top = 0;\nfor (const x of [1, 2, 3]) a[top++] = x;\na[top - 1];",
+    "snippet": "const a = new Array(100);\nlet top = 0;\nconst src = [1, 2, 3];\nfor (let i = 0; i < src.length; i++) a[top++] = src[i];\na[top - 1];",
     "expected": "3",
     "prereqs": ["js.u10.stack.top-index"]
   },
@@ -47,7 +47,7 @@
     "concept": "pop decrements first, then reads",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const a = new Array(100);\nlet top = 0;\nfor (const x of [1, 2, 3]) a[top++] = x;\nconst v = a[--top];\n[v, top];",
+    "snippet": "const a = new Array(100);\nlet top = 0;\nconst src = [1, 2, 3];\nfor (let i = 0; i < src.length; i++) a[top++] = src[i];\nconst v = a[--top];\n[v, top];",
     "expected": "[3, 2]",
     "prereqs": ["js.u10.stack.peek-raw"]
   },
@@ -170,7 +170,7 @@
     "kind": "write",
     "prompt": "Write `valid(s)` that returns `true` if the brackets in `s` (`()`, `[]`, `{}`) are balanced and correctly nested, else `false`. Use an array as a stack.",
     "starter": "function valid(s) {\n  // your code here\n}",
-    "solution": "function valid(s) {\n  const pairs = { ')': '(', ']': '[', '}': '{' };\n  const st = [];\n  for (const c of s) {\n    if (c in pairs) {\n      if (st.pop() !== pairs[c]) return false;\n    } else {\n      st.push(c);\n    }\n  }\n  return st.length === 0;\n}",
+    "solution": "function valid(s) {\n  const pairs = { ')': '(', ']': '[', '}': '{' };\n  const st = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c in pairs) {\n      if (st.pop() !== pairs[c]) return false;\n    } else {\n      st.push(c);\n    }\n  }\n  return st.length === 0;\n}",
     "tests": "if (valid('()[]{}') !== true) throw new Error('()[]{} should be true');\nif (valid('([)]') !== false) throw new Error('([)] should be false');\nif (valid('(') !== false) throw new Error('( should be false');\nif (valid('') !== true) throw new Error('empty should be true');\nif (valid(']') !== false) throw new Error('] should be false');\nif (valid('([{}])') !== true) throw new Error('([{}]) should be true');",
     "prereqs": ["js.u10.build.pop", "js.u10.stack.pop-empty-js"]
   },
@@ -278,7 +278,7 @@
     "kind": "write",
     "prompt": "Write `bfsOrder(adj, start)` returning the breadth-first visit order over adjacency list `adj` (array of neighbor arrays) from node `start`. Mark nodes seen at enqueue time. Use an array with a head index as the queue (no `shift`).",
     "starter": "function bfsOrder(adj, start) {\n  // your code here\n}",
-    "solution": "function bfsOrder(adj, start) {\n  const q = [start];\n  let head = 0;\n  const seen = new Set([start]);\n  const order = [];\n  while (head < q.length) {\n    const node = q[head++];\n    order.push(node);\n    for (const nb of adj[node]) {\n      if (!seen.has(nb)) {\n        seen.add(nb);\n        q.push(nb);\n      }\n    }\n  }\n  return order;\n}",
+    "solution": "function bfsOrder(adj, start) {\n  const q = [start];\n  let head = 0;\n  const seen = new Set([start]);\n  const order = [];\n  while (head < q.length) {\n    const node = q[head++];\n    order.push(node);\n    const nbrs = adj[node];\n    for (let i = 0; i < nbrs.length; i++) {\n      const nb = nbrs[i];\n      if (!seen.has(nb)) {\n        seen.add(nb);\n        q.push(nb);\n      }\n    }\n  }\n  return order;\n}",
     "tests": "const adj = [[1, 2], [2], [0, 3], []];\nif (JSON.stringify(bfsOrder(adj, 0)) !== JSON.stringify([0, 1, 2, 3])) throw new Error('bfs from 0');\nconst line = [[1], [0, 2], [1, 3], [2]];\nif (JSON.stringify(bfsOrder(line, 0)) !== JSON.stringify([0, 1, 2, 3])) throw new Error('line bfs');\nif (JSON.stringify(bfsOrder(adj, 3)) !== JSON.stringify([3])) throw new Error('start with no neighbors');",
     "prereqs": ["js.u10.build.dequeue", "js.u10.queue.head-pointer"]
   },

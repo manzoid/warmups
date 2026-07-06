@@ -1,42 +1,55 @@
 [
   {
+    "id": "js.u01.accumulate.sum.index.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "sum via accumulator (indexed loop)",
+    "cue": "Walk i from 0 to a.length and add a[i] to the running total.",
+    "syntax": "a[i] indexing; += adds in place",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "let a = [4, 5, 6];\nlet total = 0;\nfor (let i = 0; i < a.length; i++) total += a[i];\ntotal",
+    "expected": "15",
+    "prereqs": []
+  },
+  {
     "id": "js.u01.accumulate.sum.predict",
     "track": "javascript",
     "group": "Loops & iteration",
-    "concept": "sum via accumulator",
-    "cue": "Walk the loop and track the running total.",
-    "syntax": "+= adds in place",
+    "concept": "sum via for...of (for-each shorthand)",
+    "cue": "for...of hands you each value directly, no index; same running total.",
+    "syntax": "for (const x of a) reads values",
     "kind": "predict",
     "prompt": "What is the value of `total`?",
     "snippet": "let a = [4, 5, 6];\nlet total = 0;\nfor (const x of a) total += x;\ntotal",
     "expected": "15",
-    "prereqs": []
+    "prereqs": ["js.u01.accumulate.sum.index.predict"]
   },
   {
     "id": "js.u01.accumulate.sum",
     "track": "javascript",
     "group": "Loops & iteration",
     "concept": "sum via accumulator",
-    "cue": "Start an accumulator at 0 and add each element.",
-    "syntax": "for...of iterates values",
+    "cue": "Start an accumulator at 0 and add each a[i].",
+    "syntax": "a[i] indexing",
     "kind": "write",
     "prompt": "Implement `sum(a)` returning the sum of the numbers in array `a`. Use a loop; do not use `.reduce`.",
     "starter": "function sum(a) {\n  // your code here\n}",
-    "solution": "function sum(a) {\n  let total = 0;\n  for (const x of a) total += x;\n  return total;\n}",
+    "solution": "function sum(a) {\n  let total = 0;\n  for (let i = 0; i < a.length; i++) total += a[i];\n  return total;\n}",
     "tests": "if (sum([1, 2, 3]) !== 6) throw new Error('sum [1,2,3]');\nif (sum([]) !== 0) throw new Error('empty');\nif (sum([-1, 1]) !== 0) throw new Error('neg cancel');",
-    "prereqs": ["js.u01.accumulate.sum.predict"]
+    "prereqs": ["js.u01.accumulate.sum.index.predict"]
   },
   {
     "id": "js.u01.accumulate.product",
     "track": "javascript",
     "group": "Loops & iteration",
     "concept": "product via accumulator",
-    "cue": "Seed an accumulator at 1 and multiply each element.",
+    "cue": "Seed an accumulator at 1 and multiply each a[i].",
     "syntax": "*= multiplies in place",
     "kind": "write",
     "prompt": "Implement `product(a)` returning the product of the numbers in array `a`. The product of an empty array is 1.",
     "starter": "function product(a) {\n  // your code here\n}",
-    "solution": "function product(a) {\n  let p = 1;\n  for (const x of a) p *= x;\n  return p;\n}",
+    "solution": "function product(a) {\n  let p = 1;\n  for (let i = 0; i < a.length; i++) p *= a[i];\n  return p;\n}",
     "tests": "if (product([1, 2, 3, 4]) !== 24) throw new Error('product');\nif (product([]) !== 1) throw new Error('empty is 1');\nif (product([5]) !== 5) throw new Error('single');",
     "prereqs": ["js.u01.accumulate.sum"]
   },
@@ -116,9 +129,9 @@
     "syntax": "counter++",
     "kind": "predict",
     "prompt": "What is the value of `c`?",
-    "snippet": "let a = [1, 4, 2, 8, 3];\nlet c = 0;\nfor (const x of a) if (x > 3) c++;\nc",
+    "snippet": "let a = [1, 4, 2, 8, 3];\nlet c = 0;\nfor (let i = 0; i < a.length; i++) if (a[i] > 3) c++;\nc",
     "expected": "2",
-    "prereqs": []
+    "prereqs": ["js.u01.accumulate.sum.index.predict"]
   },
   {
     "id": "js.u01.count.evens",
@@ -130,7 +143,7 @@
     "kind": "write",
     "prompt": "Implement `countEvens(a)` returning how many elements of `a` are even.",
     "starter": "function countEvens(a) {\n  // your code here\n}",
-    "solution": "function countEvens(a) {\n  let c = 0;\n  for (const x of a) if (x % 2 === 0) c++;\n  return c;\n}",
+    "solution": "function countEvens(a) {\n  let c = 0;\n  for (let i = 0; i < a.length; i++) if (a[i] % 2 === 0) c++;\n  return c;\n}",
     "tests": "if (countEvens([1, 2, 3, 4, 6]) !== 3) throw new Error('count');\nif (countEvens([]) !== 0) throw new Error('empty');\nif (countEvens([1, 3, 5]) !== 0) throw new Error('none');",
     "prereqs": ["js.u01.count.predict"]
   },
@@ -211,7 +224,7 @@
     "kind": "write",
     "prompt": "Implement `squares(a)` returning a new array of each element squared, in order. Use a loop; do not use `.map`.",
     "starter": "function squares(a) {\n  // your code here\n}",
-    "solution": "function squares(a) {\n  const out = [];\n  for (const x of a) out.push(x * x);\n  return out;\n}",
+    "solution": "function squares(a) {\n  const out = [];\n  for (let i = 0; i < a.length; i++) out.push(a[i] * a[i]);\n  return out;\n}",
     "tests": "if (JSON.stringify(squares([1, 2, 3])) !== JSON.stringify([1, 4, 9])) throw new Error('squares');\nif (JSON.stringify(squares([])) !== JSON.stringify([])) throw new Error('empty');",
     "prereqs": []
   },
@@ -238,7 +251,7 @@
     "kind": "write",
     "prompt": "Implement `keepEvens(a)` returning a new array of the even elements of `a`, in order. Use a loop; do not use `.filter`.",
     "starter": "function keepEvens(a) {\n  // your code here\n}",
-    "solution": "function keepEvens(a) {\n  const out = [];\n  for (const x of a) if (x % 2 === 0) out.push(x);\n  return out;\n}",
+    "solution": "function keepEvens(a) {\n  const out = [];\n  for (let i = 0; i < a.length; i++) if (a[i] % 2 === 0) out.push(a[i]);\n  return out;\n}",
     "tests": "if (JSON.stringify(keepEvens([1, 2, 3, 4])) !== JSON.stringify([2, 4])) throw new Error('evens');\nif (JSON.stringify(keepEvens([1, 3])) !== JSON.stringify([])) throw new Error('none');",
     "prereqs": []
   },
@@ -264,9 +277,9 @@
     "syntax": "if inside the loop",
     "kind": "predict",
     "prompt": "What is the value of `s`?",
-    "snippet": "let a = [1, 2, 3, 4, 5, 6];\nlet s = 0;\nfor (const x of a) if (x % 2 === 0) s += x;\ns",
+    "snippet": "let a = [1, 2, 3, 4, 5, 6];\nlet s = 0;\nfor (let i = 0; i < a.length; i++) if (a[i] % 2 === 0) s += a[i];\ns",
     "expected": "12",
-    "prereqs": ["js.u01.accumulate.sum.predict", "js.u01.count.predict"]
+    "prereqs": ["js.u01.accumulate.sum.index.predict", "js.u01.count.predict"]
   },
   {
     "id": "js.u01.condaccum.write",
@@ -278,7 +291,7 @@
     "kind": "write",
     "prompt": "Implement `sumPositives(a)` returning the sum of the elements of `a` that are greater than 0.",
     "starter": "function sumPositives(a) {\n  // your code here\n}",
-    "solution": "function sumPositives(a) {\n  let s = 0;\n  for (const x of a) if (x > 0) s += x;\n  return s;\n}",
+    "solution": "function sumPositives(a) {\n  let s = 0;\n  for (let i = 0; i < a.length; i++) if (a[i] > 0) s += a[i];\n  return s;\n}",
     "tests": "if (sumPositives([-1, 2, -3, 4]) !== 6) throw new Error('mix');\nif (sumPositives([]) !== 0) throw new Error('empty');\nif (sumPositives([-1, -2]) !== 0) throw new Error('all neg');",
     "prereqs": ["js.u01.condaccum.predict", "js.u01.accumulate.sum"]
   },
@@ -288,11 +301,11 @@
     "group": "Loops & iteration",
     "concept": "flatten via nested loop",
     "cue": "Outer loop over the sublists, inner loop over their elements.",
-    "syntax": "nested for...of",
+    "syntax": "nested index loops",
     "kind": "write",
     "prompt": "Implement `flatten(ll)` returning one array with the elements of each inner array of `ll`, in order (one level deep). Use nested loops; do not use `.flat`.",
     "starter": "function flatten(ll) {\n  // your code here\n}",
-    "solution": "function flatten(ll) {\n  const out = [];\n  for (const sub of ll) for (const x of sub) out.push(x);\n  return out;\n}",
+    "solution": "function flatten(ll) {\n  const out = [];\n  for (let i = 0; i < ll.length; i++) for (let j = 0; j < ll[i].length; j++) out.push(ll[i][j]);\n  return out;\n}",
     "tests": "if (JSON.stringify(flatten([[1, 2], [3], [4, 5]])) !== JSON.stringify([1, 2, 3, 4, 5])) throw new Error('flatten');\nif (JSON.stringify(flatten([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(flatten([[], [1]])) !== JSON.stringify([1])) throw new Error('ragged');",
     "prereqs": ["js.u01.map.squares"]
   },
@@ -320,7 +333,7 @@
     "prompt": "What is the value of `s`?",
     "snippet": "let a = [1, 2, 3];\nlet b = [4, 5, 6];\nlet s = 0;\nfor (let i = 0; i < a.length; i++) s += a[i] * b[i];\ns",
     "expected": "32",
-    "prereqs": ["js.u01.accumulate.sum.predict"]
+    "prereqs": ["js.u01.accumulate.sum.index.predict"]
   },
   {
     "id": "js.u01.parallel.interleave",

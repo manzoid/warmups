@@ -75,7 +75,7 @@
     "kind": "write",
     "prompt": "Complete `set(key, val)` on `MyMap`: if `key` is already present, update its value; otherwise add it. Return `this`.",
     "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    // your code here\n    return this;\n  }\n}",
-    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n}",
+    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n}",
     "tests": "const m = new MyMap();\nm.set('a', 1);\nconst b = m.buckets[m._hash('a')];\nif (b.length !== 1 || b[0][0] !== 'a' || b[0][1] !== 1) throw new Error('should store one pair');\nm.set('a', 9);\nif (b.length !== 1 || b[0][1] !== 9) throw new Error('should update in place, not duplicate');",
     "prereqs": ["js.u04.build.hash"]
   },
@@ -85,11 +85,11 @@
     "group": "Hash maps",
     "concept": "lookup compares full keys",
     "cue": "Walk the key's bucket comparing each stored key.",
-    "syntax": "for (const item of arr)",
+    "syntax": "for (let i = 0; i < arr.length; i++)",
     "kind": "write",
     "prompt": "Complete `get(key)` on `MyMap`: return the value stored for `key`, or `undefined` if absent.",
-    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    // your code here\n  }\n}",
-    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n}",
+    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    // your code here\n  }\n}",
+    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n}",
     "tests": "const m = new MyMap();\nm.set('tea', 1);\nm.set('eat', 2);\nif (m.get('tea') !== 1) throw new Error('tea');\nif (m.get('eat') !== 2) throw new Error('eat');\nm.set('tea', 5);\nif (m.get('tea') !== 5) throw new Error('updated value');\nif (m.get('nope') !== undefined) throw new Error('absent -> undefined');",
     "prereqs": ["js.u04.build.set"]
   },
@@ -102,8 +102,8 @@
     "syntax": "=== strict equality",
     "kind": "write",
     "prompt": "Complete `has(key)` on `MyMap`: return `true` if `key` is present, else `false`.",
-    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    // your code here\n  }\n}",
-    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}",
+    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    // your code here\n  }\n}",
+    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}",
     "tests": "const m = new MyMap();\nm.set('x', 0);\nif (m.has('x') !== true) throw new Error('present even with value 0');\nif (m.has('y') !== false) throw new Error('absent -> false');",
     "prereqs": ["js.u04.build.get"]
   },
@@ -116,7 +116,7 @@
     "syntax": "(map.get(ch) || 0) + 1",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (const ch of s) m.set(ch, (m.get(ch) || 0) + 1);\nm.get('b');",
+    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (let i = 0; i < s.length; i++) m.set(s[i], (m.get(s[i]) || 0) + 1);\nm.get('b');",
     "expected": "3",
     "prereqs": ["js.u04.map.basics"]
   },
@@ -126,10 +126,10 @@
     "group": "Hash maps",
     "concept": "Map preserves insertion order",
     "cue": "Count every character, then read the whole Map in the order keys arrived.",
-    "syntax": "for (const ch of s)",
+    "syntax": "for (let i = 0; i < s.length; i++)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (const ch of s) m.set(ch, (m.get(ch) || 0) + 1);\nm;",
+    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (let i = 0; i < s.length; i++) m.set(s[i], (m.get(s[i]) || 0) + 1);\nm;",
     "expected": "Map(3) {\"a\" => 2, \"b\" => 3, \"c\" => 1}",
     "prereqs": ["js.u04.freq.map"]
   },
@@ -155,7 +155,7 @@
     "syntax": "obj[key] = (obj[key] || 0) + 1",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const s = 'abca';\nconst freq = {};\nfor (const ch of s) freq[ch] = (freq[ch] || 0) + 1;\nfreq;",
+    "snippet": "const s = 'abca';\nconst freq = {};\nfor (let i = 0; i < s.length; i++) freq[s[i]] = (freq[s[i]] || 0) + 1;\nfreq;",
     "expected": "{a: 2, b: 1, c: 1}",
     "prereqs": ["js.u04.obj.stringify-keys", "js.u04.freq.map"]
   },
@@ -165,11 +165,11 @@
     "group": "Hash maps",
     "concept": "frequency counter returning an object",
     "cue": "Loop the string and bump each character's tally.",
-    "syntax": "for...of over a string",
+    "syntax": "for (let i = 0; i < s.length; i++)",
     "kind": "write",
     "prompt": "Write `charFreq(s)` that returns an object mapping each character of `s` to its count.",
     "starter": "function charFreq(s) {\n  // your code here\n}",
-    "solution": "function charFreq(s) {\n  const freq = {};\n  for (const ch of s) freq[ch] = (freq[ch] || 0) + 1;\n  return freq;\n}",
+    "solution": "function charFreq(s) {\n  const freq = {};\n  for (let i = 0; i < s.length; i++) freq[s[i]] = (freq[s[i]] || 0) + 1;\n  return freq;\n}",
     "tests": "if (JSON.stringify(charFreq('aabbbc')) !== JSON.stringify({ a: 2, b: 3, c: 1 })) throw new Error('aabbbc');\nif (JSON.stringify(charFreq('')) !== JSON.stringify({})) throw new Error('empty');\nif (charFreq('zzz').z !== 3) throw new Error('zzz');",
     "prereqs": ["js.u04.freq.map", "js.u04.obj.count"]
   },
@@ -182,8 +182,8 @@
     "syntax": "map.get(key) || 0",
     "kind": "write",
     "prompt": "Using the finished `MyMap`, write `freqCount(items)` that returns a `MyMap` mapping each item to how many times it appears.",
-    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  // your code here\n}",
-    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (const pair of b) {\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  const m = new MyMap();\n  for (const x of items) m.set(x, (m.get(x) || 0) + 1);\n  return m;\n}",
+    "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  // your code here\n}",
+    "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  const m = new MyMap();\n  for (let i = 0; i < items.length; i++) m.set(items[i], (m.get(items[i]) || 0) + 1);\n  return m;\n}",
     "tests": "const m = freqCount(['a', 'a', 'b', 'a']);\nif (m.get('a') !== 3) throw new Error('a should be 3');\nif (m.get('b') !== 1) throw new Error('b should be 1');\nif (m.get('z') !== undefined) throw new Error('absent -> undefined');",
     "prereqs": ["js.u04.build.has", "js.u04.freq.write"]
   },
@@ -196,7 +196,7 @@
     "syntax": "s[i] index access",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const s = 'aabbc';\nconst cnt = {};\nfor (const ch of s) cnt[ch] = (cnt[ch] || 0) + 1;\nlet res = -1;\nfor (let i = 0; i < s.length; i++) { if (cnt[s[i]] === 1) { res = i; break; } }\nres;",
+    "snippet": "const s = 'aabbc';\nconst cnt = {};\nfor (let i = 0; i < s.length; i++) cnt[s[i]] = (cnt[s[i]] || 0) + 1;\nlet res = -1;\nfor (let i = 0; i < s.length; i++) { if (cnt[s[i]] === 1) { res = i; break; } }\nres;",
     "expected": "4",
     "prereqs": ["js.u04.obj.count"]
   },
@@ -210,7 +210,7 @@
     "kind": "write",
     "prompt": "Write `firstUniqChar(s)` that returns the index of the first character occurring exactly once, or `-1` if there is none.",
     "starter": "function firstUniqChar(s) {\n  // your code here\n}",
-    "solution": "function firstUniqChar(s) {\n  const cnt = {};\n  for (const ch of s) cnt[ch] = (cnt[ch] || 0) + 1;\n  for (let i = 0; i < s.length; i++) if (cnt[s[i]] === 1) return i;\n  return -1;\n}",
+    "solution": "function firstUniqChar(s) {\n  const cnt = {};\n  for (let i = 0; i < s.length; i++) cnt[s[i]] = (cnt[s[i]] || 0) + 1;\n  for (let i = 0; i < s.length; i++) if (cnt[s[i]] === 1) return i;\n  return -1;\n}",
     "tests": "if (firstUniqChar('aabbc') !== 4) throw new Error('aabbc');\nif (firstUniqChar('leetcode') !== 0) throw new Error('leetcode');\nif (firstUniqChar('loveleetcode') !== 2) throw new Error('loveleetcode');\nif (firstUniqChar('aabb') !== -1) throw new Error('all repeat');\nif (firstUniqChar('') !== -1) throw new Error('empty');",
     "prereqs": ["js.u04.firstunique.predict"]
   },
@@ -250,7 +250,7 @@
     "syntax": "[...map.values()]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const nums = [1, 2, 3, 4, 5];\nconst m = new Map();\nfor (const x of nums) {\n  const k = x % 2;\n  if (!m.has(k)) m.set(k, []);\n  m.get(k).push(x);\n}\n[...m.values()];",
+    "snippet": "const nums = [1, 2, 3, 4, 5];\nconst m = new Map();\nfor (let i = 0; i < nums.length; i++) {\n  const x = nums[i];\n  const k = x % 2;\n  if (!m.has(k)) m.set(k, []);\n  m.get(k).push(x);\n}\n[...m.values()];",
     "expected": "[[1, 3, 5], [2, 4]]",
     "prereqs": ["js.u04.map.basics"]
   },
@@ -264,7 +264,7 @@
     "kind": "write",
     "prompt": "Write `groupAnagrams(words)` that returns an array of groups, each group holding the words that are anagrams of each other. Key each group by its sorted characters. Preserve the order in which each group's key was first seen, and within a group the input order.",
     "starter": "function groupAnagrams(words) {\n  // your code here\n}",
-    "solution": "function groupAnagrams(words) {\n  const m = new Map();\n  for (const w of words) {\n    const key = [...w].sort().join('');\n    if (!m.has(key)) m.set(key, []);\n    m.get(key).push(w);\n  }\n  return [...m.values()];\n}",
+    "solution": "function groupAnagrams(words) {\n  const m = new Map();\n  for (let i = 0; i < words.length; i++) {\n    const w = words[i];\n    const key = [...w].sort().join('');\n    if (!m.has(key)) m.set(key, []);\n    m.get(key).push(w);\n  }\n  return [...m.values()];\n}",
     "tests": "const got = groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat']);\nconst want = [['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']];\nif (JSON.stringify(got) !== JSON.stringify(want)) throw new Error(JSON.stringify(got));\nif (JSON.stringify(groupAnagrams([])) !== JSON.stringify([])) throw new Error('empty');",
     "prereqs": ["js.u04.groupby.buckets"]
   },
@@ -274,10 +274,10 @@
     "group": "Hash maps",
     "concept": "value to index, last write wins",
     "cue": "Trace which index survives when a value repeats.",
-    "syntax": "arr.forEach((v, i) => ...)",
+    "syntax": "for (let i = 0; i < arr.length; i++)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const nums = [5, 3, 5, 7];\nconst pos = new Map();\nnums.forEach((v, i) => pos.set(v, i));\npos.get(5);",
+    "snippet": "const nums = [5, 3, 5, 7];\nconst pos = new Map();\nfor (let i = 0; i < nums.length; i++) pos.set(nums[i], i);\npos.get(5);",
     "expected": "2",
     "prereqs": ["js.u04.map.basics"]
   },
@@ -291,7 +291,7 @@
     "kind": "write",
     "prompt": "Write `buildIndex(nums)` that returns a `Map` from each value to the index of its FIRST occurrence.",
     "starter": "function buildIndex(nums) {\n  // your code here\n}",
-    "solution": "function buildIndex(nums) {\n  const pos = new Map();\n  nums.forEach((v, i) => { if (!pos.has(v)) pos.set(v, i); });\n  return pos;\n}",
+    "solution": "function buildIndex(nums) {\n  const pos = new Map();\n  for (let i = 0; i < nums.length; i++) if (!pos.has(nums[i])) pos.set(nums[i], i);\n  return pos;\n}",
     "tests": "const p = buildIndex([5, 3, 5, 7]);\nif (p.get(5) !== 0) throw new Error('first 5 is index 0');\nif (p.get(3) !== 1) throw new Error('3');\nif (p.get(7) !== 3) throw new Error('7');\nif (p.get(9) !== undefined) throw new Error('absent');\nif (p.size !== 3) throw new Error('distinct values only');",
     "prereqs": ["js.u04.valindex.map"]
   },
@@ -331,7 +331,7 @@
     "kind": "write",
     "prompt": "Write `dedup(arr)` that returns a new array with duplicates removed, keeping the first occurrence of each value in its original order.",
     "starter": "function dedup(arr) {\n  // your code here\n}",
-    "solution": "function dedup(arr) {\n  const seen = new Set();\n  const out = [];\n  for (const x of arr) if (!seen.has(x)) { seen.add(x); out.push(x); }\n  return out;\n}",
+    "solution": "function dedup(arr) {\n  const seen = new Set();\n  const out = [];\n  for (let i = 0; i < arr.length; i++) if (!seen.has(arr[i])) { seen.add(arr[i]); out.push(arr[i]); }\n  return out;\n}",
     "tests": "if (JSON.stringify(dedup([3, 1, 2, 3, 1])) !== JSON.stringify([3, 1, 2])) throw new Error('order preserved');\nif (JSON.stringify(dedup([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(dedup([7, 7, 7])) !== JSON.stringify([7])) throw new Error('all same');",
     "prereqs": ["js.u04.seen.set-value"]
   }

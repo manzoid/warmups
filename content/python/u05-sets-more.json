@@ -34,12 +34,12 @@
     "track": "python",
     "group": "Sets",
     "concept": "membership count against a set",
-    "cue": "Build the jewel set once, then count stones found in it.",
-    "syntax": "x in set",
+    "cue": "Build the jewel set once, then walk stones by index and count a[i] found in it.",
+    "syntax": "for i in range(len(stones)); stones[i]",
     "kind": "write",
     "prompt": "Write `count_jewels(jewels, stones)` returning how many characters of `stones` appear in the string `jewels`. Each character of `jewels` is distinct.",
     "starter": "def count_jewels(jewels, stones):\n    # your code here\n    pass",
-    "solution": "def count_jewels(jewels, stones):\n    js = set(jewels)\n    return sum(1 for s in stones if s in js)",
+    "solution": "def count_jewels(jewels, stones):\n    js = set(jewels)\n    count = 0\n    for i in range(len(stones)):\n        if stones[i] in js:\n            count += 1\n    return count",
     "tests": "assert count_jewels(\"aA\", \"aAAbbbb\") == 3, count_jewels(\"aA\", \"aAAbbbb\")\nassert count_jewels(\"z\", \"ZZ\") == 0, count_jewels(\"z\", \"ZZ\")\nassert count_jewels(\"\", \"abc\") == 0, count_jewels(\"\", \"abc\")\nassert count_jewels(\"xyz\", \"\") == 0, count_jewels(\"xyz\", \"\")",
     "prereqs": [
       "py.u05.membership.build_query"
@@ -66,12 +66,12 @@
     "track": "python",
     "group": "Sets",
     "concept": "union across many lists",
-    "cue": "Fold each list into a growing set, then order the result.",
-    "syntax": "set |= other",
+    "cue": "Walk lists by index, folding each lists[i] into a growing set, then order the result.",
+    "syntax": "for i in range(len(lists)); lists[i]",
     "kind": "write",
     "prompt": "Write `union_all(lists)` taking a list of lists and returning the sorted list of all distinct values across them.",
     "starter": "def union_all(lists):\n    # your code here\n    pass",
-    "solution": "def union_all(lists):\n    out = set()\n    for lst in lists:\n        out |= set(lst)\n    return sorted(out)",
+    "solution": "def union_all(lists):\n    out = set()\n    for i in range(len(lists)):\n        out |= set(lists[i])\n    return sorted(out)",
     "tests": "assert union_all([[1, 2], [2, 3], [3, 4]]) == [1, 2, 3, 4], union_all([[1, 2], [2, 3], [3, 4]])\nassert union_all([]) == [], union_all([])\nassert union_all([[]]) == [], union_all([[]])\nassert union_all([[5, 5], [5]]) == [5], union_all([[5, 5], [5]])",
     "prereqs": [
       "py.u05.setops.union"

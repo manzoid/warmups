@@ -8,7 +8,7 @@
     "concept": "reverse via a stack (LIFO)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const st = [];\nfor (const c of 'abc') st.push(c);\nlet out = '';\nwhile (st.length) out += st.pop();\nout;",
+    "snippet": "const st = [];\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) st.push(s[i]);\nlet out = '';\nwhile (st.length) out += st.pop();\nout;",
     "expected": "cba",
     "prereqs": [
       "js.u10.stack.peek-js"

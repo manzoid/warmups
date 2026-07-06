@@ -6,7 +6,7 @@
     "concept": "reverse via a stack (LIFO)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "st = []\nfor c in 'abc':\n    st.append(c)\nout = []\nwhile st:\n    out.append(st.pop())\n''.join(out)",
+    "snippet": "st = []\ns = 'abc'\nfor i in range(len(s)):\n    st.append(s[i])\nout = []\nwhile st:\n    out.append(st.pop())\n''.join(out)",
     "expected": "'cba'",
     "prereqs": [
       "py.u10.stack.list.predict"
@@ -54,13 +54,13 @@
     "kind": "write",
     "prompt": "Write `daily_temps(temps)` returning a list where position `i` holds how many days until a warmer temperature than `temps[i]`, or `0` if none follows. Keep a stack of indices whose answers are still pending. One pass.",
     "starter": "def daily_temps(temps):\n    # your code here\n    pass",
-    "solution": "def daily_temps(temps):\n    res = [0] * len(temps)\n    st = []\n    for i, t in enumerate(temps):\n        while st and temps[st[-1]] < t:\n            j = st.pop()\n            res[j] = i - j\n        st.append(i)\n    return res",
+    "solution": "def daily_temps(temps):\n    res = [0] * len(temps)\n    st = []\n    for i in range(len(temps)):\n        t = temps[i]\n        while st and temps[st[-1]] < t:\n            j = st.pop()\n            res[j] = i - j\n        st.append(i)\n    return res",
     "tests": "assert daily_temps([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0], daily_temps([73,74,75,71,69,72,76,73])\nassert daily_temps([30,40,50,60]) == [1,1,1,0]\nassert daily_temps([60,50,40]) == [0,0,0]\nassert daily_temps([]) == []",
     "prereqs": [
       "py.u10.nge.write"
     ],
     "cue": "Hold indices whose warmer day hasn't arrived; a hotter reading settles them.",
-    "syntax": "enumerate(temps)"
+    "syntax": "for i in range(len(temps))"
   },
   {
     "id": "py.u10.queue2stacks.write",

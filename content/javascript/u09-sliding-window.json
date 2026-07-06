@@ -102,7 +102,7 @@
     "syntax": "m.set(x, (m.get(x) || 0) + 1)",
     "kind": "predict",
     "prompt": "What is the value of `m`?",
-    "snippet": "const m = new Map();\nfor (const x of [4, 4, 7]) m.set(x, (m.get(x) || 0) + 1);\nm;",
+    "snippet": "const a = [4, 4, 7];\nconst m = new Map();\nfor (let i = 0; i < a.length; i++) m.set(a[i], (m.get(a[i]) || 0) + 1);\nm;",
     "expected": "Map(2) {4 => 2, 7 => 1}",
     "prereqs": []
   },
@@ -115,7 +115,7 @@
     "syntax": "m.delete(key)",
     "kind": "predict",
     "prompt": "What is the value of `m.size`?",
-    "snippet": "const m = new Map();\nfor (const x of [1, 2, 2, 3]) m.set(x, (m.get(x) || 0) + 1);\nfor (const lc of [1, 2]) {\n  m.set(lc, m.get(lc) - 1);\n  if (m.get(lc) === 0) m.delete(lc);\n}\nm.size;",
+    "snippet": "const a = [1, 2, 2, 3];\nconst m = new Map();\nfor (let i = 0; i < a.length; i++) m.set(a[i], (m.get(a[i]) || 0) + 1);\nconst leaving = [1, 2];\nfor (let j = 0; j < leaving.length; j++) {\n  const lc = leaving[j];\n  m.set(lc, m.get(lc) - 1);\n  if (m.get(lc) === 0) m.delete(lc);\n}\nm.size;",
     "expected": "2",
     "prereqs": ["js.u09.countmap.build.predict"]
   },
@@ -237,7 +237,7 @@
     "kind": "write",
     "prompt": "Write `findAnagrams(s, p)` that returns an array of the start indices in `s` where an anagram of `p` begins, in increasing order. Slide a fixed window of length `p.length`.",
     "starter": "function findAnagrams(s, p) {\n  // your code here\n}",
-    "solution": "function findAnagrams(s, p) {\n  const res = [];\n  if (p.length > s.length) return res;\n  const need = new Map();\n  for (const c of p) need.set(c, (need.get(c) || 0) + 1);\n  const win = new Map();\n  const k = p.length;\n  const eq = (a, b) => {\n    if (a.size !== b.size) return false;\n    for (const [key, v] of a) if (b.get(key) !== v) return false;\n    return true;\n  };\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    win.set(c, (win.get(c) || 0) + 1);\n    if (right >= k) {\n      const lc = s[right - k];\n      win.set(lc, win.get(lc) - 1);\n      if (win.get(lc) === 0) win.delete(lc);\n    }\n    if (right >= k - 1 && eq(win, need)) res.push(right - k + 1);\n  }\n  return res;\n}",
+    "solution": "function findAnagrams(s, p) {\n  const res = [];\n  if (p.length > s.length) return res;\n  const need = new Map();\n  for (let i = 0; i < p.length; i++) need.set(p[i], (need.get(p[i]) || 0) + 1);\n  const win = new Map();\n  const k = p.length;\n  const eq = (a, b) => {\n    if (a.size !== b.size) return false;\n    for (const [key, v] of a) if (b.get(key) !== v) return false;\n    return true;\n  };\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    win.set(c, (win.get(c) || 0) + 1);\n    if (right >= k) {\n      const lc = s[right - k];\n      win.set(lc, win.get(lc) - 1);\n      if (win.get(lc) === 0) win.delete(lc);\n    }\n    if (right >= k - 1 && eq(win, need)) res.push(right - k + 1);\n  }\n  return res;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(findAnagrams('cbaebabacd', 'abc'), [0, 6]);\neq(findAnagrams('abab', 'ab'), [0, 1, 2]);\neq(findAnagrams('aa', 'bb'), []);\neq(findAnagrams('a', 'a'), [0]);",
     "prereqs": ["js.u09.countmap.slide.predict", "js.u09.fixed.maxsum.write"]
   },
@@ -251,7 +251,7 @@
     "kind": "write",
     "prompt": "Write `minWindow(s, t)` that returns the shortest substring of `s` containing every character of `t` including multiplicity, or `''` if none exists. Use a sliding window; keep each step O(1).",
     "starter": "function minWindow(s, t) {\n  // your code here\n}",
-    "solution": "function minWindow(s, t) {\n  if (t.length === 0 || s.length < t.length) return '';\n  const need = new Map();\n  for (const c of t) need.set(c, (need.get(c) || 0) + 1);\n  let missing = t.length;\n  let left = 0, bestL = 0, bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    if ((need.get(c) || 0) > 0) missing--;\n    need.set(c, (need.get(c) || 0) - 1);\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) { bestLen = right - left + 1; bestL = left; }\n      const lc = s[left];\n      need.set(lc, need.get(lc) + 1);\n      if (need.get(lc) > 0) missing++;\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestL, bestL + bestLen);\n}",
+    "solution": "function minWindow(s, t) {\n  if (t.length === 0 || s.length < t.length) return '';\n  const need = new Map();\n  for (let i = 0; i < t.length; i++) need.set(t[i], (need.get(t[i]) || 0) + 1);\n  let missing = t.length;\n  let left = 0, bestL = 0, bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    if ((need.get(c) || 0) > 0) missing--;\n    need.set(c, (need.get(c) || 0) - 1);\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) { bestLen = right - left + 1; bestL = left; }\n      const lc = s[left];\n      need.set(lc, need.get(lc) + 1);\n      if (need.get(lc) > 0) missing++;\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestL, bestL + bestLen);\n}",
     "tests": "if (minWindow('ADOBECODEBANC', 'ABC') !== 'BANC') throw new Error(minWindow('ADOBECODEBANC', 'ABC'));\nif (minWindow('a', 'a') !== 'a') throw new Error('single');\nif (minWindow('a', 'aa') !== '') throw new Error('none');\nif (minWindow('ab', 'b') !== 'b') throw new Error('tail');",
     "prereqs": ["js.u09.atmostk.write", "js.u09.var.minlen.write"]
   }

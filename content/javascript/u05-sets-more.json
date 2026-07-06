@@ -39,7 +39,7 @@
     "kind": "write",
     "prompt": "Write `countJewels(jewels, stones)` returning how many characters of `stones` appear in `jewels`. Each character of `jewels` is distinct.",
     "starter": "function countJewels(jewels, stones) {\n  // your code here\n}",
-    "solution": "function countJewels(jewels, stones) {\n  const set = new Set(jewels);\n  let count = 0;\n  for (const s of stones) if (set.has(s)) count++;\n  return count;\n}",
+    "solution": "function countJewels(jewels, stones) {\n  const set = new Set(jewels);\n  let count = 0;\n  for (let i = 0; i < stones.length; i++) if (set.has(stones[i])) count++;\n  return count;\n}",
     "tests": "if (countJewels('aA', 'aAAbbbb') !== 3) throw new Error('mixed case');\nif (countJewels('z', 'ZZ') !== 0) throw new Error('case sensitive');\nif (countJewels('', 'abc') !== 0) throw new Error('no jewels');\nif (countJewels('xyz', '') !== 0) throw new Error('no stones');",
     "prereqs": [
       "js.u05.set.has"
@@ -71,7 +71,7 @@
     "kind": "write",
     "prompt": "Write `distinctCount(lists)` taking an array of arrays and returning how many distinct values appear across all of them.",
     "starter": "function distinctCount(lists) {\n  // your code here\n}",
-    "solution": "function distinctCount(lists) {\n  const all = new Set();\n  for (const lst of lists) for (const x of lst) all.add(x);\n  return all.size;\n}",
+    "solution": "function distinctCount(lists) {\n  const all = new Set();\n  for (let i = 0; i < lists.length; i++) { const lst = lists[i]; for (let j = 0; j < lst.length; j++) all.add(lst[j]); }\n  return all.size;\n}",
     "tests": "if (distinctCount([[1, 2], [2, 3], [3, 4]]) !== 4) throw new Error('overlap');\nif (distinctCount([]) !== 0) throw new Error('empty');\nif (distinctCount([[5, 5], [5]]) !== 1) throw new Error('all same');",
     "prereqs": [
       "js.u05.set.union"

@@ -6,7 +6,7 @@
     "concept": "prefix sums via running accumulator",
     "kind": "predict",
     "prompt": "What is the value of `out`?",
-    "snippet": "a = [3, 1, 4, 1]\nout = []\nrun = 0\nfor x in a:\n    run += x\n    out.append(run)\nout",
+    "snippet": "a = [3, 1, 4, 1]\nout = []\nrun = 0\nfor i in range(len(a)):\n    run += a[i]\n    out.append(run)\nout",
     "expected": "[3, 4, 8, 9]",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
@@ -22,7 +22,7 @@
     "kind": "write",
     "prompt": "Write `running_max(a)` returning a list whose element `i` is the largest value among `a[0..i]`. `running_max([])` is `[]`.",
     "starter": "def running_max(a):\n    # your code here\n    pass",
-    "solution": "def running_max(a):\n    out = []\n    best = None\n    for x in a:\n        if best is None or x > best:\n            best = x\n        out.append(best)\n    return out",
+    "solution": "def running_max(a):\n    out = []\n    best = None\n    for i in range(len(a)):\n        if best is None or a[i] > best:\n            best = a[i]\n        out.append(best)\n    return out",
     "tests": "assert running_max([]) == [], running_max([])\nassert running_max([3, 1, 4, 1, 5, 9, 2]) == [3, 3, 4, 4, 5, 9, 9], running_max([3, 1, 4, 1, 5, 9, 2])\nassert running_max([-2, -5, -1]) == [-2, -2, -1], running_max([-2, -5, -1])",
     "prereqs": [
       "py.u01.extreme.max",
@@ -39,13 +39,13 @@
     "kind": "write",
     "prompt": "Write `count_vowels(s)` returning how many characters of string `s` are lowercase vowels (one of `aeiou`).",
     "starter": "def count_vowels(s):\n    # your code here\n    pass",
-    "solution": "def count_vowels(s):\n    c = 0\n    for ch in s:\n        if ch in 'aeiou':\n            c += 1\n    return c",
+    "solution": "def count_vowels(s):\n    c = 0\n    for i in range(len(s)):\n        if s[i] in 'aeiou':\n            c += 1\n    return c",
     "tests": "assert count_vowels('') == 0, count_vowels('')\nassert count_vowels('hello') == 2, count_vowels('hello')\nassert count_vowels('xyz') == 0, count_vowels('xyz')\nassert count_vowels('aeiou') == 5, count_vowels('aeiou')",
     "prereqs": [
       "py.u01.count.predicate"
     ],
     "cue": "Same tally loop, but the test is membership in a small set.",
-    "syntax": "ch in 'aeiou'"
+    "syntax": "s[i] in 'aeiou'"
   },
   {
     "id": "py.u01.extreme.closest",
@@ -55,13 +55,13 @@
     "kind": "write",
     "prompt": "Write `closest(a, t)` returning the element of non-empty list `a` nearest to `t` (smallest `abs(x - t)`); on ties keep the first.",
     "starter": "def closest(a, t):\n    # your code here\n    pass",
-    "solution": "def closest(a, t):\n    best = a[0]\n    for x in a[1:]:\n        if abs(x - t) < abs(best - t):\n            best = x\n    return best",
+    "solution": "def closest(a, t):\n    best = a[0]\n    for i in range(1, len(a)):\n        if abs(a[i] - t) < abs(best - t):\n            best = a[i]\n    return best",
     "tests": "assert closest([5], 0) == 5, closest([5], 0)\nassert closest([10, 4, 7, 1], 5) == 4, closest([10, 4, 7, 1], 5)\nassert closest([-3, -1, -8], -2) == -3, closest([-3, -1, -8], -2)",
     "prereqs": [
       "py.u01.extreme.min"
     ],
     "cue": "Compare-and-keep, but rank by distance to the target, not by value.",
-    "syntax": "abs(x - t)"
+    "syntax": "abs(a[i] - t)"
   },
   {
     "id": "py.u01.parallel.count-equal.predict",

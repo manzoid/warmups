@@ -218,13 +218,13 @@
     "concept": "stable sort keeps equal-key order",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const data = [[1, 'a'], [2, 'b'], [1, 'c'], [2, 'd']];\ndata.sort((x, y) => x[0] - y[0]);\ndata.map(p => p[1]);",
+    "snippet": "const data = [[1, 'a'], [2, 'b'], [1, 'c'], [2, 'd']];\ndata.sort((x, y) => x[0] - y[0]);\nconst out = [];\nfor (let i = 0; i < data.length; i++) out.push(data[i][1]);\nout;",
     "expected": "[\"a\", \"c\", \"b\", \"d\"]",
     "prereqs": [
       "js.u06.comparator.numeric"
     ],
     "cue": "Equal keys keep their original relative order under a stable sort.",
-    "syntax": "arr.map(fn)"
+    "syntax": "data[i][1] index read"
   },
   {
     "id": "js.u06.sort.tiebreak",
@@ -233,7 +233,7 @@
     "concept": "multi-key tiebreak via || chain",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const data = [['bob', 30], ['al', 30], ['zoe', 25]];\ndata.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));\ndata.map(p => p[0]);",
+    "snippet": "const data = [['bob', 30], ['al', 30], ['zoe', 25]];\ndata.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));\nconst out = [];\nfor (let i = 0; i < data.length; i++) out.push(data[i][0]);\nout;",
     "expected": "[\"zoe\", \"al\", \"bob\"]",
     "prereqs": [
       "js.u06.comparator.numeric"

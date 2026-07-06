@@ -278,7 +278,7 @@
     "kind": "write",
     "prompt": "Write `rank(scores)` where `scores` is a list of `(name, score)` tuples. Return the list of names ordered by score descending, breaking ties by name ascending.",
     "starter": "def rank(scores):\n    # your code here\n    pass",
-    "solution": "def rank(scores):\n    ordered = sorted(scores, key=lambda x: (-x[1], x[0]))\n    return [name for name, _ in ordered]",
+    "solution": "def rank(scores):\n    ordered = sorted(scores, key=lambda x: (-x[1], x[0]))\n    return [ordered[i][0] for i in range(len(ordered))]",
     "tests": "assert rank([('al', 50), ('bo', 70), ('cy', 70)]) == ['bo', 'cy', 'al'], rank([('al', 50), ('bo', 70), ('cy', 70)])\nassert rank([]) == [], 'empty'\nassert rank([('z', 10), ('a', 10)]) == ['a', 'z'], 'tie by name'",
     "prereqs": ["py.u06.sortkey.tuple.predict"]
   },

@@ -179,6 +179,28 @@ Order within a unit follows the matrix:
    `sorted(key=)`). A sugar exercise must `prereqs` the raw pattern it shortcuts,
    so it is only introduced after the learner has done the pattern by hand.
 
+### Index-first iteration (hard rule)
+
+Iteration over a sequence is introduced **index-first**, always. The first time a
+unit iterates a list/array/string, it uses the indexed form:
+
+- Python: `for i in range(len(a)): ... a[i]`
+- JavaScript: `for (let i = 0; i < a.length; i++) { ... a[i] }`
+
+Rationale: `a[i]` with an explicit counter is what a sequence *is* (an indexed
+run of elements) and it is the form that survives translation to C. It is
+fundamental, not convenient. The convenient forms are **sugar** and come later:
+
+- `for x in a` / `for (const x of a)` (for-each) — introduced only after the
+  indexed form, `prereqs` the indexed root, `concept` names it as the shorthand.
+- Slicing (`a[1:]`, `a[::-1]`, `.slice(...)`) — later still; a raw
+  `range(1, len(a))` / bounded-index version comes first and the slice version
+  `prereqs` it.
+
+So a unit's opening exercises are indexed; do NOT open on `for x in a` or on a
+slice. When you author a for-each or slice item, add the indexed root before it
+and point the sugar item's `prereqs` at that root.
+
 Spiral: revisit a pattern from several angles (forward/backward, nested,
 offset, until-a-goal) rather than one-and-done. Unit 1 (loops/arrays) is the
 largest because array iteration is the majority of interview problems.

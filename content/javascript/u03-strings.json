@@ -54,16 +54,31 @@
     "syntax": "charCodeAt(0) difference"
   },
   {
+    "id": "js.u03.index.collect",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "iterate chars by index",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const s = \"cat\";\nconst out = [];\nfor (let i = 0; i < s.length; i++) {\n  out.push(s[i]);\n}\nout",
+    "expected": "[\"c\", \"a\", \"t\"]",
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Walk each index and read s[i].",
+    "syntax": "for (let i = 0; i < s.length; i++)"
+  },
+  {
     "id": "js.u03.forof.collect",
     "track": "javascript",
     "group": "Strings",
-    "concept": "iterate chars with for..of",
+    "concept": "for..of char loop (index-loop shorthand)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const s = \"cat\";\nconst out = [];\nfor (const c of s) {\n  out.push(c);\n}\nout",
     "expected": "[\"c\", \"a\", \"t\"]",
     "prereqs": [
-      "js.u03.index.char"
+      "js.u03.index.collect"
     ],
     "cue": "Walk each char and track the array.",
     "syntax": "for (const c of s)"
@@ -185,10 +200,10 @@
     "concept": "accumulate pieces then join",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const parts = [];\nfor (const c of \"abc\") {\n  parts.push(c + \"!\");\n}\nparts.join(\"\")",
+    "snippet": "const s = \"abc\";\nconst parts = [];\nfor (let i = 0; i < s.length; i++) {\n  parts.push(s[i] + \"!\");\n}\nparts.join(\"\")",
     "expected": "a!b!c!",
     "prereqs": [
-      "js.u03.forof.collect"
+      "js.u03.index.collect"
     ],
     "cue": "Trace what each iteration pushes, then join.",
     "syntax": "arr.join('')"
@@ -200,7 +215,7 @@
     "concept": "prepend while accumulating",
     "kind": "predict",
     "prompt": "What is the value of `out`?",
-    "snippet": "let out = \"\";\nfor (const c of \"xyz\") {\n  out = c + out;\n}\nout",
+    "snippet": "let out = \"\";\nconst s = \"xyz\";\nfor (let i = 0; i < s.length; i++) {\n  out = s[i] + out;\n}\nout",
     "expected": "zyx",
     "prereqs": [
       "js.u03.build.push.join"
@@ -216,7 +231,7 @@
     "kind": "write",
     "prompt": "Write `repeatEach(s)` returning a string where each character of `s` appears twice in place, e.g. `\"ab\"` -> `\"aabb\"`. Accumulate pieces in an array and join.",
     "starter": "function repeatEach(s) {\n  // your code here\n}",
-    "solution": "function repeatEach(s) {\n  const parts = [];\n  for (const c of s) {\n    parts.push(c + c);\n  }\n  return parts.join(\"\");\n}",
+    "solution": "function repeatEach(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    parts.push(s[i] + s[i]);\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (repeatEach(\"ab\") !== \"aabb\") throw new Error(\"ab\");\nif (repeatEach(\"\") !== \"\") throw new Error(\"empty\");\nif (repeatEach(\"x\") !== \"xx\") throw new Error(\"x\");",
     "prereqs": [
       "js.u03.build.push.join"
@@ -232,7 +247,7 @@
     "kind": "write",
     "prompt": "Write `keepDigits(s)` returning a string containing only the digit characters of `s`, in order. Accumulate pieces in an array and join.",
     "starter": "function keepDigits(s) {\n  // your code here\n}",
-    "solution": "function keepDigits(s) {\n  const parts = [];\n  for (const c of s) {\n    if (c >= \"0\" && c <= \"9\") parts.push(c);\n  }\n  return parts.join(\"\");\n}",
+    "solution": "function keepDigits(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    if (s[i] >= \"0\" && s[i] <= \"9\") parts.push(s[i]);\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (keepDigits(\"a1b2\") !== \"12\") throw new Error(\"a1b2\");\nif (keepDigits(\"abc\") !== \"\") throw new Error(\"none\");\nif (keepDigits(\"90210\") !== \"90210\") throw new Error(\"all\");",
     "prereqs": [
       "js.u03.build.push.join",
@@ -249,7 +264,7 @@
     "kind": "write",
     "prompt": "Write `shout(s)` returning `s` with every lowercase letter a-z converted to uppercase, other characters unchanged. Convert with `charCodeAt`/`String.fromCharCode`; do not use `toUpperCase`.",
     "starter": "function shout(s) {\n  // your code here\n}",
-    "solution": "function shout(s) {\n  const parts = [];\n  for (const c of s) {\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
+    "solution": "function shout(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (shout(\"hi!\") !== \"HI!\") throw new Error(\"hi!\");\nif (shout(\"aB3\") !== \"AB3\") throw new Error(\"aB3\");\nif (shout(\"\") !== \"\") throw new Error(\"empty\");",
     "prereqs": [
       "js.u03.build.push.join",
@@ -366,15 +381,32 @@
     "syntax": "str.indexOf(sub)"
   },
   {
+    "id": "js.u03.substr.loop",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "extract a substring by bounded index loop",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const s = \"hello\";\nconst parts = [];\nfor (let i = 1; i < 4; i++) {\n  parts.push(s[i]);\n}\nparts.join(\"\")",
+    "expected": "ell",
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Loop the explicit index range, collecting each char.",
+    "syntax": "for (let i = start; i < end; i++)"
+  },
+  {
     "id": "js.u03.slice",
     "track": "javascript",
     "group": "Strings",
-    "concept": "slice with exclusive end",
+    "concept": "slice(start, end) shorthand for the index-range loop",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "\"hello\".slice(1, 4)",
     "expected": "ell",
-    "prereqs": [],
+    "prereqs": [
+      "js.u03.substr.loop"
+    ],
     "cue": "Take the range with the end excluded.",
     "syntax": "str.slice(start, end)"
   },
@@ -447,7 +479,7 @@
     "kind": "write",
     "prompt": "Write `mySplit(s, sep)` that splits `s` on the single-character `sep`, returning an array of fields (empty fields included). Do not use `String.prototype.split`.",
     "starter": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  // your code here\n}",
-    "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}",
+    "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}",
     "tests": "if (JSON.stringify(mySplit(\"a,,b\", \",\")) !== JSON.stringify([\"a\", \"\", \"b\"])) throw new Error(\"gaps\");\nif (JSON.stringify(mySplit(\"\", \",\")) !== JSON.stringify([\"\"])) throw new Error(\"empty\");\nif (JSON.stringify(mySplit(\"a,b,c\", \",\")) !== JSON.stringify([\"a\", \"b\", \"c\"])) throw new Error(\"three\");",
     "prereqs": [
       "js.u03.myjoin.build"
@@ -462,8 +494,8 @@
     "concept": "split/join round-trip invariant",
     "kind": "write",
     "prompt": "Write `roundTrip(s, sep)` returning `myJoin(mySplit(s, sep), sep)`. For a single-character `sep` this must return `s` unchanged.",
-    "starter": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  // your code here\n}",
-    "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (const c of s) {\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  return myJoin(mySplit(s, sep), sep);\n}",
+    "starter": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  // your code here\n}",
+    "solution": "function myJoin(parts, sep) {\n  if (parts.length === 0) return \"\";\n  let out = parts[0];\n  for (let i = 1; i < parts.length; i++) {\n    out += sep + parts[i];\n  }\n  return out;\n}\n\nfunction mySplit(s, sep) {\n  const out = [];\n  let cur = \"\";\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c === sep) {\n      out.push(cur);\n      cur = \"\";\n    } else {\n      cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction roundTrip(s, sep) {\n  return myJoin(mySplit(s, sep), sep);\n}",
     "tests": "if (roundTrip(\"a,b,c\", \",\") !== \"a,b,c\") throw new Error(\"abc\");\nif (roundTrip(\"a,,b\", \",\") !== \"a,,b\") throw new Error(\"gaps\");\nif (roundTrip(\"\", \",\") !== \"\") throw new Error(\"empty\");\nif (roundTrip(\"hello\", \",\") !== \"hello\") throw new Error(\"no sep\");",
     "prereqs": [
       "js.u03.mysplit.build"
