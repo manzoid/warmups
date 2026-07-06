@@ -245,6 +245,14 @@ export default function App() {
     [persist, bump],
   );
 
+  // In-place retry after a miss: clear the result so the learner can edit and
+  // resubmit without advancing (the missed attempt is already logged).
+  const retry = useCallback(() => {
+    setResult(null);
+    setRunning(false);
+    startedAt.current = Date.now();
+  }, []);
+
   const submit = useCallback(async () => {
     if (!track || !pick) return;
     const ex = pick.exercise;
@@ -332,6 +340,7 @@ export default function App() {
                   onUseHint={useHint}
                   onSubmit={submit}
                   onNext={advanceLearn}
+                  onRetry={retry}
                   timing={
                     solveMs != null
                       ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
@@ -368,6 +377,7 @@ export default function App() {
                   onUseHint={useHint}
                   onSubmit={submit}
                   onNext={advancePractice}
+                  onRetry={retry}
                   timing={
                     solveMs != null
                       ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
@@ -818,6 +828,19 @@ function FluencyDrill({
           ⏱ {graded && lastMs != null ? secs(lastMs) : secs(elapsed)}
         </span>
         {best != null && <span style={styles.pill}>best {secs(best)}</span>}
+        {targetMs != null && (
+          <button
+            style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
+            title="Reset your pace and calibrate again over the next few reps"
+            onClick={() => {
+              setTargetMs(null);
+              setTimes([]);
+              setStreak(0);
+            }}
+          >
+            Re-pace
+          </button>
+        )}
       </div>
 
       <p style={{ margin: '0 0 1rem', color: theme.text }}>{ex.prompt}</p>
@@ -1075,6 +1098,7 @@ function ExerciseView({
   onUseHint,
   onSubmit,
   onNext,
+  onRetry,
   timing,
   firstScreen,
   onSkip,
@@ -1093,6 +1117,7 @@ function ExerciseView({
   onUseHint: (rung: number) => void;
   onSubmit: () => void;
   onNext: () => void;
+  onRetry?: () => void;
   timing?: { ms: number; bestMs: number | null };
   firstScreen?: boolean;
   onSkip?: () => void;
@@ -1131,7 +1156,7 @@ function ExerciseView({
             )}
             {onSkipToProblems && (
               <button style={styles.btn} onClick={onSkipToProblems}>
-                Skip to interview problems →
+                Skip ahead to the problems →
               </button>
             )}
           </div>
@@ -1230,8 +1255,17 @@ function ExerciseView({
             Skip “{ex.group}”
           </button>
         )}
+        {graded && result && !result.passed && onRetry && (
+          <button style={styles.btn} onClick={onRetry} autoFocus>
+            Try again
+          </button>
+        )}
         {graded && (
-          <button style={styles.btn} onClick={onNext} autoFocus>
+          <button
+            style={result && !result.passed && onRetry ? styles.btnGhost : styles.btn}
+            onClick={onNext}
+            autoFocus={!(result && !result.passed && onRetry)}
+          >
             Next →
           </button>
         )}
@@ -1254,7 +1288,7 @@ function ExerciseView({
         </div>
       )}
 
-      {graded && <HintLadder ex={ex} input={input} onUse={onUseHint} />}
+      <HintLadder ex={ex} input={input} graded={graded} onUse={onUseHint} />
     </div>
   );
 }
@@ -1267,18 +1301,22 @@ const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as c
 function HintLadder({
   ex,
   input,
+  graded,
   onUse,
 }: {
   ex: Exercise;
   input: string;
+  graded: boolean;
   onUse: (rung: number) => void;
 }) {
   const answer = ex.kind === 'predict' ? ex.expected : ex.solution;
 
   // A single progressive reveal (NeetCode-style: Hint 1, Hint 2, …, then the
-  // heavier aids, then the answer) instead of a row of parallel buttons. Only
-  // steps that apply to this exercise are included; each reveal escalates the
-  // recorded rung.
+  // heavier aids, then the answer) instead of a row of parallel buttons. The
+  // light cue/syntax rungs are available BEFORE submitting (so an anxious
+  // learner can peek a nudge without having to guess-fail first); the heavier
+  // visualize/walkthrough/reveal rungs unlock only after a submit. Each reveal
+  // escalates the recorded rung.
   const steps = useMemo(() => {
     let n = 0;
     const s: {
@@ -1295,21 +1333,26 @@ function HintLadder({
       n += 1;
       s.push({ key: 'syntax', rung: RUNG.syntax, title: `Hint ${n}`, action: `Show hint ${n}` });
     }
-    s.push({ key: 'visualize', rung: RUNG.visualize, title: 'See it run', action: 'Visualize your run' });
-    s.push({ key: 'walkthrough', rung: RUNG.walkthrough, title: 'Talk it through', action: 'Get a walkthrough' });
-    if (answer && answer.length > 0) {
-      s.push({
-        key: 'reveal',
-        rung: RUNG.reveal,
-        title: ex.kind === 'predict' ? 'Expected value' : 'Reference solution',
-        action: 'Show the answer',
-      });
+    if (graded) {
+      s.push({ key: 'visualize', rung: RUNG.visualize, title: 'See it run', action: 'Visualize your run' });
+      s.push({ key: 'walkthrough', rung: RUNG.walkthrough, title: 'Talk it through', action: 'Get a walkthrough' });
+      if (answer && answer.length > 0) {
+        s.push({
+          key: 'reveal',
+          rung: RUNG.reveal,
+          title: ex.kind === 'predict' ? 'Expected value' : 'Reference solution',
+          action: 'Show the answer',
+        });
+      }
     }
     return s;
-  }, [ex, answer]);
+  }, [ex, answer, graded]);
 
   const [revealed, setRevealed] = useState(0);
   const next = steps[revealed];
+
+  // Nothing to offer yet (no cue/syntax and not graded) — render nothing.
+  if (steps.length === 0) return null;
 
   const revealNext = () => {
     if (!next) return;
@@ -1319,7 +1362,9 @@ function HintLadder({
 
   return (
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
-      <p style={{ ...styles.label, margin: 0 }}>Stuck? Reveal help one step at a time.</p>
+      <p style={{ ...styles.label, margin: 0 }}>
+        {graded ? 'Stuck? Reveal help one step at a time.' : 'Want a nudge before you answer?'}
+      </p>
 
       {steps.slice(0, revealed).map((step) => (
         <div key={step.key} style={{ marginTop: '0.85rem' }}>
@@ -1393,7 +1438,7 @@ function ResultView({
   let label: string;
   if (!result.passed) {
     color = theme.bad;
-    label = '✗ Fail';
+    label = '✗ Not quite';
   } else if (maxRung >= 3) {
     color = theme.bad;
     label = '✓ Pass (with help)';
