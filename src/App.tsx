@@ -99,6 +99,43 @@ export default function App() {
   // The fluency pattern currently being drilled (null = show the picker).
   const [fluencyEx, setFluencyEx] = useState<Exercise | null>(null);
 
+  // "Experienced" preference (persisted, separate from progress): when on, the
+  // fast-lane callout keeps appearing at the start of each new unit, not just on
+  // the very first screen ever — so a returning learner doesn't re-meet the
+  // remedial openers of every unit with no visible exit.
+  const [experienced, setExperienced] = useState<boolean>(() => {
+    try {
+      return typeof window !== 'undefined' && window.localStorage.getItem('warmups.experienced') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleExperienced = useCallback(() => {
+    setExperienced((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem('warmups.experienced', next ? '1' : '0');
+      } catch {
+        // best-effort
+      }
+      return next;
+    });
+  }, []);
+
+  // The first exercise (in content order) of each group — the "unit openers"
+  // where an experienced learner most wants the fast lane offered again.
+  const unitOpenerIds = useMemo(() => {
+    const seen = new Set<string>();
+    const openers = new Set<string>();
+    for (const ex of exercises) {
+      if (!seen.has(ex.group)) {
+        seen.add(ex.group);
+        openers.add(ex.id);
+      }
+    }
+    return openers;
+  }, [exercises]);
+
   const startExercise = useCallback((ex: Exercise, isNew: boolean) => {
     setResult(null);
     setRunning(false);
@@ -346,7 +383,12 @@ export default function App() {
                       ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
                       : undefined
                   }
-                  firstScreen={progress.current.attempts.length === 0}
+                  firstScreen={
+                    progress.current.attempts.length === 0 ||
+                    (experienced && unitOpenerIds.has(pick.exercise.id))
+                  }
+                  experienced={experienced}
+                  onToggleExperienced={toggleExperienced}
                   onSkip={() => skip([pick.exercise.id])}
                   onSkipToFirstWrite={skipToFirstWrite}
                   onSkipToProblems={skipToProblems}
@@ -1123,6 +1165,8 @@ function ExerciseView({
   onRetry,
   timing,
   firstScreen,
+  experienced,
+  onToggleExperienced,
   onSkip,
   onSkipToFirstWrite,
   onSkipToProblems,
@@ -1142,6 +1186,8 @@ function ExerciseView({
   onRetry?: () => void;
   timing?: { ms: number; bestMs: number | null };
   firstScreen?: boolean;
+  experienced?: boolean;
+  onToggleExperienced?: () => void;
   onSkip?: () => void;
   onSkipToFirstWrite?: () => void;
   onSkipToProblems?: () => void;
@@ -1182,6 +1228,14 @@ function ExerciseView({
               </button>
             )}
           </div>
+          {onToggleExperienced && (
+            <label
+              style={{ ...styles.tagline, display: 'flex', alignItems: 'center', gap: 6, margin: '0.6rem 0 0', fontSize: '0.78rem', cursor: 'pointer' }}
+            >
+              <input type="checkbox" checked={!!experienced} onChange={onToggleExperienced} />
+              I'm experienced — keep offering this at the start of each unit
+            </label>
+          )}
         </div>
       )}
       {(subtitle || onExit) && (
