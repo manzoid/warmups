@@ -63,7 +63,11 @@ export function CodeEditor({
         foldGutter: false,
         highlightActiveLine: true,
         tabSize: 4,
-        closeBrackets: true,
+        // No editor assistance: no autocomplete popup, no completion keymap,
+        // no auto-closing brackets. Just a plain typing surface.
+        autocompletion: false,
+        completionKeymap: false,
+        closeBrackets: false,
       }}
       minHeight="200px"
       style={{ fontSize: '0.9rem', borderRadius: 6, overflow: 'hidden', border: '1px solid #333' }}
