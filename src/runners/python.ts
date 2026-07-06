@@ -165,16 +165,22 @@ __wu_ns = {}
 exec(compile(__wu_tree, "<snippet>", "exec"), __wu_ns)
 __wu_actual = eval(compile(__wu_ast.Expression(__wu_last.value), "<snippet>", "eval"), __wu_ns)
 
+# Compare by VALUE, forgiving bracket style: treat list and tuple as equal at
+# ANY depth (so a bare "2, 3, 4" matches [2, 3, 4], and [[1, 2]] matches
+# [(1, 2)] on the zip/enumerate drills), and dicts by key/value regardless of
+# order. Everything else falls back to Python ==.
+def __wu_eq(a, b):
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        return len(a) == len(b) and all(__wu_eq(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return set(a.keys()) == set(b.keys()) and all(__wu_eq(a[k], b[k]) for k in a)
+    return a == b
+
 # The learner's answer evaluates in a CLEAN namespace, so typing a variable
 # name from the snippet (e.g. \`out\`) can't accidentally pass.
 try:
     __wu_user = eval(${JSON.stringify(userAnswer)}, {})
-    __wu_passed = bool(__wu_user == __wu_actual)
-    # Bracket-forgiving fallback: a learner who types a bare "2, 3, 4" for an
-    # expected list [2, 3, 4] gets a tuple, which != the list. Accept it when the
-    # element sequence matches, so a right value isn't failed on bracket style.
-    if not __wu_passed and isinstance(__wu_user, tuple) and isinstance(__wu_actual, list):
-        __wu_passed = list(__wu_user) == __wu_actual
+    __wu_passed = bool(__wu_eq(__wu_user, __wu_actual))
 except Exception:
     # Bare-token fallback: if the value is a string and the learner typed an
     # unquoted token (e.g. bcd instead of 'bcd'), eval raises NameError. Accept
@@ -218,26 +224,24 @@ function formatError(err: unknown): string {
 }
 
 // Run a generator (trusted content code defining `make()`) and JSON-round-trip
-// the fresh instance it returns.
+// the fresh instance it returns. The JSON is the trailing EXPRESSION's value
+// (returned by runPythonAsync), NOT captured from stdout: setStdout is global on
+// the shared Pyodide instance, so two concurrent generate() calls (e.g. React
+// StrictMode's double mount in dev) would stomp each other's stdout callback and
+// concatenate both outputs into one string. Reading the return value is
+// per-call and reentrant-safe.
 async function runGenerate(
   py: PyodideAPI,
   ex: Exercise,
 ): Promise<GeneratedInstance> {
   const ns = freshNamespace(py);
-  let stdout = '';
-  py.setStdout({
-    batched: (s) => {
-      stdout += s;
-    },
-  });
   try {
-    await py.runPythonAsync(
-      `${ex.generator ?? ''}\nimport json as __wu_json\nprint(__wu_json.dumps(make()))`,
+    const out = await py.runPythonAsync(
+      `${ex.generator ?? ''}\nimport json as __wu_json\n__wu_json.dumps(make())`,
       { globals: ns },
     );
-    return JSON.parse(stdout.trim()) as GeneratedInstance;
+    return JSON.parse(typeof out === 'string' ? out : String(out)) as GeneratedInstance;
   } finally {
-    py.setStdout({});
     ns.destroy();
   }
 }
