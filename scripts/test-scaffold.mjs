@@ -120,7 +120,8 @@ check(predictOut.includes('sum([1, 2, 3])'), 'includes the snippet the learner r
 // occur incidentally); the write case below carries the real no-leak check.
 check(/socratic/i.test(predictOut) && /do not reveal/i.test(predictOut), 'states the Socratic no-reveal rules');
 
-// write exercise: the reference solution must NOT appear anywhere in the prompt.
+// write exercise: the reference solution must NOT appear anywhere in the prompt,
+// but the tests/spec and starter (which are the contract, not the answer) MUST.
 const writeEx = {
   id: 'py.secret',
   track: 'python',
@@ -128,13 +129,20 @@ const writeEx = {
   concept: 'Return a constant',
   kind: 'write',
   prompt: 'Write a function that returns 42.',
+  starter: 'def returns_42():\n    # your code here\n    pass',
   solution: 'def secret_marker_9f3a(): return 42',
+  tests: 'assert returns_42() == 42, "spec_marker_7b2c"',
 };
 const writeOut = buildWalkthroughPrompt(writeEx, 'def f(): pass');
 check(writeOut.includes('Write a function that returns 42.'), 'includes the write prompt');
 check(writeOut.includes('def f(): pass'), "includes the learner's code attempt");
 check(!writeOut.includes('def secret_marker_9f3a(): return 42'), 'never leaks ex.solution into the tutor prompt');
 check(!writeOut.includes('secret_marker_9f3a'), 'no fragment of the solution leaks');
+// The tests/spec ARE the contract (edge cases the prose leaves implicit) and must
+// reach the tutor; they never contain ex.solution, so including them can't leak.
+check(writeOut.includes('spec_marker_7b2c'), 'includes ex.tests (the spec) for a write exercise');
+check(/spec|must satisfy|requirements/i.test(writeOut), 'labels the tests as the spec/requirements');
+check(writeOut.includes('def returns_42():'), 'includes ex.starter (the required signature) for a write exercise');
 
 // empty attempt: no dangling empty code block.
 const emptyOut = buildWalkthroughPrompt(predictEx, '   ');
