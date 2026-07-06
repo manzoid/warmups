@@ -153,6 +153,21 @@
     "syntax": "list[-1] last element"
   },
   {
+    "id": "py.u10.trunc.div.predict",
+    "track": "python",
+    "group": "Stack / queue / deque",
+    "concept": "int(a/b) truncates toward zero (differs from //)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "(7 // 2, int(7 / 2), -7 // 2, int(-7 / 2))",
+    "expected": "(3, 3, -4, -3)",
+    "prereqs": [
+      "py.u10.stack.list.predict"
+    ],
+    "cue": "// rounds down toward negative infinity; int(a / b) drops the fraction toward zero. They agree on positives, split on negatives.",
+    "syntax": "int(a / b) vs a // b"
+  },
+  {
     "id": "py.u10.stack.rpn.write",
     "track": "python",
     "group": "Stack / queue / deque",
@@ -161,9 +176,9 @@
     "prompt": "Write `eval_rpn(tokens)` that evaluates a list of reverse-Polish-notation tokens and returns the integer result. Each token is either an operator string (`'+'`, `'-'`, `'*'`, `'/'`) or an integer string. Use integer division that truncates toward zero (`int(a / b)`). Use a list as a stack.",
     "starter": "def eval_rpn(tokens):\n    # your code here\n    pass",
     "solution": "def eval_rpn(tokens):\n    st = []\n    for i in range(len(tokens)):\n        t = tokens[i]\n        if t in ('+', '-', '*', '/'):\n            b = st.pop()\n            a = st.pop()\n            if t == '+': st.append(a + b)\n            elif t == '-': st.append(a - b)\n            elif t == '*': st.append(a * b)\n            else: st.append(int(a / b))\n        else:\n            st.append(int(t))\n    return st.pop()",
-    "tests": "assert eval_rpn(['2','1','+','3','*']) == 9, eval_rpn(['2','1','+','3','*'])\nassert eval_rpn(['4','13','5','/','+']) == 6\nassert eval_rpn(['5']) == 5",
+    "tests": "assert eval_rpn(['2','1','+','3','*']) == 9, eval_rpn(['2','1','+','3','*'])\nassert eval_rpn(['4','13','5','/','+']) == 6\nassert eval_rpn(['5']) == 5\nassert eval_rpn(['-7','2','/']) == -3, eval_rpn(['-7','2','/'])",
     "prereqs": [
-      "py.u10.stack.list.predict"
+      "py.u10.trunc.div.predict"
     ],
     "cue": "Scan tokens; on an operator pop two operands and push the result.",
     "syntax": "list.pop() / list.append(x)",
@@ -231,7 +246,7 @@
     ],
     "cue": "Hold a stack of unresolved indices; a larger element settles them.",
     "syntax": "for i in range(len(nums))",
-    "note": "Each index is pushed and popped at most once, so the whole scan is O(n). LC 496 is the two-array version: build the next-greater answer for one array with this exact scan, then look up a second array's values in it. This single-array scan is the core.",
+    "note": "This is a monotonic stack: the values it holds stay in order (here decreasing), so a bigger element clears every smaller one below it. Each index is pushed and popped at most once, so the whole scan is O(n). LC 496 is the two-array version: build the next-greater answer for one array with this exact scan, then look up a second array's values in it. This single-array scan is the core.",
     "mapsTo": "pattern behind LC 496 · Next Greater Element I"
   },
   {
@@ -325,7 +340,8 @@
       "py.u10.queue.enqueue"
     ],
     "cue": "Read at head, advance head with wraparound, shrink size, return the value.",
-    "syntax": "(head + 1) % n modulo"
+    "syntax": "(head + 1) % n modulo",
+    "mapsTo": "LC 622 · Design Circular Queue"
   },
   {
     "id": "py.u10.queue.builtin.predict",
@@ -373,7 +389,8 @@
       "py.u10.deque.appendleft"
     ],
     "cue": "Shrink the size first, then read the slot now at the back.",
-    "syntax": "(head + size) % n modulo"
+    "syntax": "(head + size) % n modulo",
+    "mapsTo": "LC 641 · Design Circular Deque"
   },
   {
     "id": "py.u10.deque.builtin.predict",

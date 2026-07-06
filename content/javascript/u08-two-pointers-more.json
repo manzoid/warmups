@@ -40,6 +40,7 @@
     "starter": "function isPalAlnum(s) {\n  // your code here\n}",
     "solution": "function isPalAlnum(s) {\n  const alnum = c => /[a-z0-9]/i.test(c);\n  let lo = 0, hi = s.length - 1;\n  while (lo < hi) {\n    while (lo < hi && !alnum(s[lo])) lo++;\n    while (lo < hi && !alnum(s[hi])) hi--;\n    if (s[lo].toLowerCase() !== s[hi].toLowerCase()) return false;\n    lo++;\n    hi--;\n  }\n  return true;\n}",
     "tests": "if (isPalAlnum('A man, a plan, a canal: Panama') !== true) throw new Error('panama');\nif (isPalAlnum('race a car') !== false) throw new Error('racecar');\nif (isPalAlnum('') !== true) throw new Error('empty');\nif (isPalAlnum('.,') !== true) throw new Error('punct');\nif (isPalAlnum('0P') !== false) throw new Error('0P');",
+    "banned": [".reverse("],
     "mapsTo": "LC 125 · Valid Palindrome",
     "prereqs": ["js.u08.palindrome.write"]
   },
@@ -55,6 +56,7 @@
     "starter": "function reverseVowels(s) {\n  // your code here\n}",
     "solution": "function reverseVowels(s) {\n  const vowels = new Set('aeiouAEIOU');\n  const a = s.split('');\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (!vowels.has(a[lo])) lo++;\n    else if (!vowels.has(a[hi])) hi--;\n    else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  }\n  return a.join('');\n}",
     "tests": "if (reverseVowels('hello') !== 'holle') throw new Error(reverseVowels('hello'));\nif (reverseVowels('leetcode') !== 'leotcede') throw new Error(reverseVowels('leetcode'));\nif (reverseVowels('abc') !== 'abc') throw new Error('single vowel');\nif (reverseVowels('') !== '') throw new Error('empty');\nif (reverseVowels('aA') !== 'Aa') throw new Error('case');",
+    "banned": [".reverse("],
     "mapsTo": "LC 345 · Reverse Vowels of a String",
     "prereqs": ["js.u08.reverse.write"]
   },
@@ -83,6 +85,9 @@
     "starter": "function partitionSign(a) {\n  // your code here\n}",
     "solution": "function partitionSign(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (a[lo] < 0) lo++;\n    else if (a[hi] >= 0) hi--;\n    else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  }\n  return a;\n}",
     "tests": "const sortNum = x => [...x].sort((p, q) => p - q);\nconst isPart = (out, inp) => {\n  if (JSON.stringify(sortNum(out)) !== JSON.stringify(sortNum(inp))) throw new Error('not a permutation: ' + out);\n  let seenNonNeg = false;\n  for (const x of out) {\n    if (x >= 0) seenNonNeg = true;\n    else if (seenNonNeg) throw new Error('negative after non-negative: ' + out);\n  }\n};\nisPart(partitionSign([1, -2, 3, -4, 5, -6]), [1, -2, 3, -4, 5, -6]);\nisPart(partitionSign([-1, -2, -3]), [-1, -2, -3]);\nisPart(partitionSign([1, 2, 3]), [1, 2, 3]);\nisPart(partitionSign([]), []);\nisPart(partitionSign([3, -1, -2, 4, -5]), [3, -1, -2, 4, -5]);",
+    "banned": [".filter("],
+    "note": "Swapping a misplaced pair from the ends partitions in one pass with O(1) extra space; `.filter` twice would allocate two new arrays.",
+    "mapsTo": "LC 905 · Sort Array By Parity (partition pattern)",
     "prereqs": ["js.u08.partition.sign.predict"]
   },
   {
@@ -114,5 +119,82 @@
     "expected": "2",
     "mapsTo": "LC 16 · 3Sum Closest",
     "prereqs": ["js.u08.threesum.write"]
+  },
+  {
+    "id": "js.u08.string.immutable.predict",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "strings are immutable; split to an array to swap",
+    "cue": "Writing into a character of a string has no effect; only the array copy is mutable.",
+    "syntax": "s.split('')",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "let s = \"hello\";\nlet t = s.split(\"\");\nt[0] = \"H\";\n[s, t.join(\"\")];",
+    "expected": "[\"hello\", \"Hello\"]",
+    "note": "JS strings are immutable, so `s[i] = x` silently does nothing; a two-pointer swap on a string first does `split('')` into an array, then `join('')` back.",
+    "prereqs": []
+  },
+  {
+    "id": "js.u08.sortcolors.write",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "three-way partition (sort into three buckets in one pass)",
+    "cue": "Three cursors: a boundary for 0s, a scanner, and a boundary for 2s; push each scanned value toward its region.",
+    "syntax": "[a[i], a[j]] = [a[j], a[i]]",
+    "kind": "write",
+    "prompt": "Write `sortColors(a)` where every entry of `a` is 0, 1, or 2. Sort `a` in place in one pass so all 0s come first, then 1s, then 2s, and return it. Do not use the built-in sort; use three pointers.",
+    "starter": "function sortColors(a) {\n  // your code here\n}",
+    "solution": "function sortColors(a) {\n  let lo = 0, mid = 0, hi = a.length - 1;\n  while (mid <= hi) {\n    if (a[mid] === 0) { [a[lo], a[mid]] = [a[mid], a[lo]]; lo++; mid++; }\n    else if (a[mid] === 2) { [a[mid], a[hi]] = [a[hi], a[mid]]; hi--; }\n    else mid++;\n  }\n  return a;\n}",
+    "tests": "if (JSON.stringify(sortColors([2,0,2,1,1,0])) !== JSON.stringify([0,0,1,1,2,2])) throw new Error('a');\nif (JSON.stringify(sortColors([2,0,1])) !== JSON.stringify([0,1,2])) throw new Error('b');\nif (JSON.stringify(sortColors([0])) !== JSON.stringify([0])) throw new Error('single');\nif (JSON.stringify(sortColors([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(sortColors([2,2,1,1,0,0])) !== JSON.stringify([0,0,1,1,2,2])) throw new Error('reversed');",
+    "banned": [".sort("],
+    "note": "After swapping a 2 to the back, `mid` does not advance because the value pulled in from `hi` has not been checked yet; a 0 swap comes from `lo`, which is already settled, so `mid` may move.",
+    "mapsTo": "LC 75 · Sort Colors",
+    "prereqs": ["js.u08.partition.sign.write"]
+  },
+  {
+    "id": "js.u08.trap.write",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "trapping water: bounded by the shorter side",
+    "cue": "Two pointers from the ends; the water over the shorter side is fixed by the tallest wall seen so far on that side.",
+    "syntax": "Math.max(leftMax, h[lo])",
+    "kind": "write",
+    "prompt": "Write `trap(h)` where `h` is an array of non-negative wall heights. Return the total units of water trapped between the walls after rain. Use two pointers from the ends; do not scan all pairs or build a prefix array.",
+    "starter": "function trap(h) {\n  // your code here\n}",
+    "solution": "function trap(h) {\n  let lo = 0, hi = h.length - 1;\n  let leftMax = 0, rightMax = 0, water = 0;\n  while (lo < hi) {\n    if (h[lo] < h[hi]) {\n      leftMax = Math.max(leftMax, h[lo]);\n      water += leftMax - h[lo];\n      lo++;\n    } else {\n      rightMax = Math.max(rightMax, h[hi]);\n      water += rightMax - h[hi];\n      hi--;\n    }\n  }\n  return water;\n}",
+    "tests": "if (trap([0,1,0,2,1,0,1,3,2,1,2,1]) !== 6) throw new Error('a');\nif (trap([4,2,0,3,2,5]) !== 9) throw new Error('b');\nif (trap([]) !== 0) throw new Error('empty');\nif (trap([1,2,3]) !== 0) throw new Error('rising');\nif (trap([3,0,3]) !== 3) throw new Error('well');",
+    "note": "Advancing the shorter side is safe: the water there is capped by that side's running max, since a wall at least as tall is guaranteed on the other side.",
+    "mapsTo": "LC 42 · Trapping Rain Water",
+    "prereqs": ["js.u08.maxarea.write"]
+  },
+  {
+    "id": "js.u08.removenth.gap.predict",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "fixed gap then advance together",
+    "cue": "Send fast ahead by n links first, then move both one step at a time until fast reaches the last node.",
+    "syntax": "cur = nxt[cur]",
+    "kind": "predict",
+    "prompt": "What is the value of `slow`?",
+    "snippet": "const nxt = [1, 2, 3, 4, -1];\nlet fast = 0;\nfor (let i = 0; i < 2; i++) fast = nxt[fast];\nlet slow = 0;\nwhile (nxt[fast] !== -1) { fast = nxt[fast]; slow = nxt[slow]; }\nslow;",
+    "expected": "2",
+    "note": "With fast held n links ahead, stopping when fast hits the last node leaves slow on the node just before the nth-from-end.",
+    "prereqs": ["js.u08.middle.write"]
+  },
+  {
+    "id": "js.u08.removenth.write",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "remove nth-from-end in one pass",
+    "cue": "Advance fast n links, then move fast and slow together; slow lands before the node to drop. Handle removing the head.",
+    "syntax": "nxt[slow] = nxt[nxt[slow]]",
+    "kind": "write",
+    "prompt": "Write `removeNth(nxt, start, n)`. The list is an index array where `nxt[i]` is the next index and `-1` is null. Remove the nth node from the end (1-based) by relinking `nxt` in place, and return the index of the new start (it changes only when the head is removed). Use two pointers with a gap of n; do not count the length first.",
+    "starter": "function removeNth(nxt, start, n) {\n  // your code here\n}",
+    "solution": "function removeNth(nxt, start, n) {\n  let fast = start;\n  for (let i = 0; i < n; i++) fast = nxt[fast];\n  if (fast === -1) return nxt[start];\n  let slow = start;\n  while (nxt[fast] !== -1) { fast = nxt[fast]; slow = nxt[slow]; }\n  nxt[slow] = nxt[nxt[slow]];\n  return start;\n}",
+    "tests": "const collect = (nxt, s) => { const out = []; let c = s; while (c !== -1) { out.push(c); c = nxt[c]; } return out; };\nlet a = [1,2,3,4,-1]; let s = removeNth(a, 0, 2); if (JSON.stringify(collect(a, s)) !== JSON.stringify([0,1,2,4])) throw new Error('mid');\nlet b = [1,2,-1]; let s2 = removeNth(b, 0, 3); if (JSON.stringify(collect(b, s2)) !== JSON.stringify([1,2])) throw new Error('head');\nlet c = [-1]; let s3 = removeNth(c, 0, 1); if (collect(c, s3).length !== 0) throw new Error('single');\nlet d = [1,2,3,-1]; let s4 = removeNth(d, 0, 1); if (JSON.stringify(collect(d, s4)) !== JSON.stringify([0,1,2])) throw new Error('tail');",
+    "note": "When fast falls off the end after exactly n hops, the node to remove is the head, so the new start is `nxt[start]`; otherwise slow stops on the predecessor and one relink drops the target.",
+    "mapsTo": "LC 19 · Remove Nth Node From End of List",
+    "prereqs": ["js.u08.removenth.gap.predict", "js.u08.middle.write"]
   }
 ]

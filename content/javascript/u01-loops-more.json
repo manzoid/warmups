@@ -157,10 +157,60 @@
     "starter": "function maxProfit(a) {\n  // your code here\n}",
     "solution": "function maxProfit(a) {\n  let best = 0;\n  let lo = Infinity;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] < lo) lo = a[i];\n    else if (a[i] - lo > best) best = a[i] - lo;\n  }\n  return best;\n}",
     "tests": "if (maxProfit([]) !== 0) throw new Error('empty');\nif (maxProfit([5]) !== 0) throw new Error('single');\nif (maxProfit([7, 1, 5, 3, 6, 4]) !== 5) throw new Error('profit');\nif (maxProfit([7, 6, 4, 3, 1]) !== 0) throw new Error('descending');\nif (maxProfit([1, 2]) !== 1) throw new Error('rise');",
-    "note": "The trick is a single min-so-far carried left to right, so it stays O(n) instead of comparing every pair O(n^2).",
+    "note": "The trick is a single min-so-far carried left to right, so it stays O(n) (work grows in step with the array length) instead of comparing every pair, which is O(n^2).",
     "mapsTo": "LC 121 · Best Time to Buy and Sell Stock",
     "prereqs": [
       "js.u01.extreme.runningmax"
+    ]
+  },
+  {
+    "id": "js.u01.subarray.kadane",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "max subarray sum via best-ending-here (Kadane)",
+    "cue": "Carry the best sum of a subarray ending at i: extend the previous one or restart at this element.",
+    "syntax": "Math.max(x, y)",
+    "kind": "write",
+    "prompt": "Implement `maxSubArray(a)` returning the largest sum of any non-empty contiguous subarray of `a`.",
+    "starter": "function maxSubArray(a) {\n  // your code here\n}",
+    "solution": "function maxSubArray(a) {\n  let best = a[0];\n  let cur = a[0];\n  for (let i = 1; i < a.length; i++) {\n    cur = Math.max(a[i], cur + a[i]);\n    if (cur > best) best = cur;\n  }\n  return best;\n}",
+    "tests": "if (maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) !== 6) throw new Error('classic');\nif (maxSubArray([1]) !== 1) throw new Error('single');\nif (maxSubArray([-3, -1, -2]) !== -1) throw new Error('all neg');\nif (maxSubArray([5, 4, -1, 7, 8]) !== 23) throw new Error('mostly pos');",
+    "note": "cur is the best sum ending at i: either start fresh at a[i] or extend the running one, whichever is larger. Seeding best and cur at a[0] is why the all-negative case still returns the least-negative element. One pass, O(n).",
+    "mapsTo": "LC 53 · Maximum Subarray",
+    "prereqs": [
+      "js.u01.extreme.maxprofit"
+    ]
+  },
+  {
+    "id": "js.u01.forin.keys.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "for...in yields keys (index strings), not values",
+    "cue": "for...in hands you keys; an array's keys are its indices, as strings.",
+    "syntax": "for (const k in arr)",
+    "kind": "predict",
+    "prompt": "What is the value of `out`?",
+    "snippet": "let a = ['x', 'y', 'z'];\nlet out = [];\nfor (const k in a) out.push(k);\nout",
+    "expected": "[\"0\", \"1\", \"2\"]",
+    "note": "for...in iterates keys, and array indices come out as strings ('0', '1', ...). For values use for...of; for real numeric indices use a counting loop.",
+    "prereqs": [
+      "js.u01.accumulate.sum.predict"
+    ]
+  },
+  {
+    "id": "js.u01.reduce.noinit.predict",
+    "track": "javascript",
+    "group": "Loops & iteration",
+    "concept": "reduce with no initial value seeds from element 0",
+    "cue": "With no second argument, reduce starts from element 0 and folds the rest into it.",
+    "syntax": "arr.reduce(fn) with no init",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[42].reduce((a, b) => a + b)",
+    "expected": "42",
+    "note": "With no initial value, reduce uses element 0 as the seed and never calls the function here. On an empty array with no init it throws instead, which is why passing an init like 0 is the safe habit.",
+    "prereqs": [
+      "js.u01.reduce.predict"
     ]
   }
 ]

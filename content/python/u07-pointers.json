@@ -115,6 +115,7 @@
     "prompt": "Write `first_nonzero_index(a)` that returns the index of the first nonzero element of `a`, or `len(a)` if every element is zero. Advance an index while the current element is zero.",
     "starter": "def first_nonzero_index(a):\n    # your code here\n    pass",
     "solution": "def first_nonzero_index(a):\n    i = 0\n    while i < len(a) and a[i] == 0:\n        i += 1\n    return i",
+    "banned": ["enumerate", "next("],
     "tests": "assert first_nonzero_index([0, 0, 5, 0]) == 2, first_nonzero_index([0, 0, 5, 0])\nassert first_nonzero_index([0, 0, 0]) == 3, first_nonzero_index([0, 0, 0])\nassert first_nonzero_index([9]) == 0, first_nonzero_index([9])\nassert first_nonzero_index([]) == 0, first_nonzero_index([])",
     "prereqs": [
       "py.u07.skip-prefix.predict"
@@ -161,6 +162,7 @@
     "prompt": "Write `count_runs(a)` that returns the number of maximal runs of equal consecutive elements in `a`. Use an inner loop to skip past each run.",
     "starter": "def count_runs(a):\n    # your code here\n    pass",
     "solution": "def count_runs(a):\n    i = 0\n    runs = 0\n    while i < len(a):\n        j = i\n        while j < len(a) and a[j] == a[i]:\n            j += 1\n        runs += 1\n        i = j\n    return runs",
+    "banned": ["groupby"],
     "tests": "assert count_runs([1, 1, 1, 2, 2, 3]) == 3, count_runs([1, 1, 1, 2, 2, 3])\nassert count_runs([]) == 0, count_runs([])\nassert count_runs([5]) == 1, count_runs([5])\nassert count_runs([1, 2, 1]) == 3, count_runs([1, 2, 1])\nassert count_runs([7, 7]) == 1, count_runs([7, 7])",
     "prereqs": [
       "py.u07.skip-run.predict"
@@ -192,7 +194,7 @@
     "prompt": "Write `remove_value(a, val)` that removes every occurrence of `val` from list `a` in place (mutating `a`) and returns the new length. Use a write index. Do not use a list comprehension or list.remove.",
     "starter": "def remove_value(a, val):\n    # your code here\n    pass",
     "solution": "def remove_value(a, val):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != val:\n            a[w] = a[i]\n            w += 1\n    del a[w:]\n    return w",
-    "banned": [".remove("],
+    "banned": [".remove(", "[:]"],
     "tests": "a = [3, 2, 2, 3]\nn = remove_value(a, 3)\nassert n == 2 and a == [2, 2], (n, a)\na = [0, 1, 2, 2, 3, 0, 4, 2]\nn = remove_value(a, 2)\nassert n == 5 and a == [0, 1, 3, 0, 4], (n, a)\na = []\nassert remove_value(a, 1) == 0 and a == [], a",
     "prereqs": [
       "py.u07.compact.predict"
@@ -322,12 +324,28 @@
     "prompt": "Write `rle(s)` that returns the run-length encoding of string `s`: each maximal run of a character becomes that character followed by its count. For example `rle('aaabbc')` returns `'a3b2c1'`.",
     "starter": "def rle(s):\n    # your code here\n    pass",
     "solution": "def rle(s):\n    i = 0\n    res = ''\n    while i < len(s):\n        j = i\n        while j < len(s) and s[j] == s[i]:\n            j += 1\n        res += s[i] + str(j - i)\n        i = j\n    return res",
+    "banned": ["groupby"],
     "tests": "assert rle('aaabbc') == 'a3b2c1', rle('aaabbc')\nassert rle('') == '', rle('')\nassert rle('x') == 'x1', rle('x')\nassert rle('aab') == 'a2b1', rle('aab')",
     "prereqs": [
       "py.u07.rle.predict"
     ],
     "cue": "For each run, find its end, then append the char and its count.",
     "syntax": "str(count) to stringify"
+  },
+  {
+    "id": "py.u07.swap.predict",
+    "track": "python",
+    "group": "Pointers (cursor walks)",
+    "concept": "swap two positions with a tuple assignment",
+    "kind": "predict",
+    "prompt": "What is the value of `a`?",
+    "snippet": "a = [10, 20, 30]\na[0], a[2] = a[2], a[0]\na",
+    "expected": "[30, 20, 10]",
+    "prereqs": [
+      "py.u07.manual-advance.write"
+    ],
+    "cue": "The whole right side is built first, then unpacked into the left side at once.",
+    "syntax": "x, y = y, x"
   },
   {
     "id": "py.u07.move-zeros.predict",
@@ -339,7 +357,8 @@
     "snippet": "a = [0, 1, 0, 3, 12]\nw = 0\nfor i in range(len(a)):\n    if a[i] != 0:\n        a[w], a[i] = a[i], a[w]\n        w += 1\na",
     "expected": "[1, 3, 12, 0, 0]",
     "prereqs": [
-      "py.u07.compact.write"
+      "py.u07.compact.write",
+      "py.u07.swap.predict"
     ],
     "cue": "Track the write index as nonzeros swap toward the front.",
     "syntax": "a[w], a[i] = a[i], a[w]"
@@ -353,6 +372,7 @@
     "prompt": "Write `move_zeros(a)` that moves all zeros in list `a` to the end in place, keeping the order of the nonzero elements, and returns `a`. Use a trailing write index and swap forward.",
     "starter": "def move_zeros(a):\n    # your code here\n    pass",
     "solution": "def move_zeros(a):\n    w = 0\n    for i in range(len(a)):\n        if a[i] != 0:\n            a[w], a[i] = a[i], a[w]\n            w += 1\n    return a",
+    "banned": [".sort(", "sorted("],
     "tests": "assert move_zeros([0, 1, 0, 3, 12]) == [1, 3, 12, 0, 0], move_zeros([0, 1, 0, 3, 12])\nassert move_zeros([0, 0, 0]) == [0, 0, 0], move_zeros([0, 0, 0])\nassert move_zeros([1, 2, 3]) == [1, 2, 3], move_zeros([1, 2, 3])\nassert move_zeros([]) == [], move_zeros([])",
     "prereqs": [
       "py.u07.move-zeros.predict"

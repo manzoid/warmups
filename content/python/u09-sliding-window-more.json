@@ -19,6 +19,7 @@
     "concept": "most vowels in a size-k window",
     "kind": "write",
     "prompt": "Write `max_vowels(s, k)` returning the largest number of vowels (from 'aeiou') in any substring of `s` of length exactly `k`. Assume 1 <= k <= len(s). Slide a running count in O(1); do not recount each window.",
+    "banned": ["sum("],
     "starter": "def max_vowels(s, k):\n    # your code here\n    pass",
     "solution": "def max_vowels(s, k):\n    vowels = set('aeiou')\n    c = 0\n    for i in range(k):\n        if s[i] in vowels:\n            c += 1\n    best = c\n    for i in range(k, len(s)):\n        if s[i] in vowels:\n            c += 1\n        if s[i - k] in vowels:\n            c -= 1\n        if c > best:\n            best = c\n    return best",
     "tests": "assert max_vowels('abciiidef', 3) == 3, max_vowels('abciiidef', 3)\nassert max_vowels('aeiou', 2) == 2, max_vowels('aeiou', 2)\nassert max_vowels('leetcode', 3) == 2, max_vowels('leetcode', 3)\nassert max_vowels('b', 1) == 0, max_vowels('b', 1)",
@@ -100,5 +101,35 @@
     "syntax": "window == need multiset compare",
     "mapsTo": "LC 567 · Permutation in String",
     "prereqs": ["py.u09.anagrams.write"]
+  },
+  {
+    "id": "py.u09.prefix.count.predict",
+    "track": "python",
+    "group": "Sliding window",
+    "concept": "count target subarrays via prefix-sum count-map",
+    "kind": "predict",
+    "prompt": "What is the value of `total`?",
+    "snippet": "nums = [3, 1, 2]\ntarget = 3\ncount = {0: 1}\nprefix = 0\ntotal = 0\nfor i in range(len(nums)):\n    prefix += nums[i]\n    total += count.get(prefix - target, 0)\n    count[prefix] = count.get(prefix, 0) + 1\ntotal",
+    "expected": "2",
+    "cue": "A subarray sums to target exactly when two prefix sums differ by target. The seed count = {0: 1} stands for the empty prefix, so a subarray starting at index 0 is counted too.",
+    "syntax": "count.get(prefix - target, 0)",
+    "note": "This is the tool for when a plain sliding window fails: with negative numbers the window sum is not monotonic, so growing/shrinking left no longer works. A prefix-sum count-map handles negatives.",
+    "prereqs": ["py.u09.countmap.enter.predict"]
+  },
+  {
+    "id": "py.u09.prefix.subarraysum.write",
+    "track": "python",
+    "group": "Sliding window",
+    "concept": "count subarrays summing to k (prefix sums)",
+    "kind": "write",
+    "prompt": "Write `num_subarray_sum_equals_k(nums, k)` returning how many contiguous subarrays of `nums` sum to exactly `k`. `nums` may contain negatives, so a sliding window will not work; carry a running prefix sum and a count-map of prefix sums seen.",
+    "banned": ["sum("],
+    "starter": "def num_subarray_sum_equals_k(nums, k):\n    # your code here\n    pass",
+    "solution": "def num_subarray_sum_equals_k(nums, k):\n    count = {0: 1}\n    prefix = 0\n    total = 0\n    for i in range(len(nums)):\n        prefix += nums[i]\n        total += count.get(prefix - k, 0)\n        count[prefix] = count.get(prefix, 0) + 1\n    return total",
+    "tests": "assert num_subarray_sum_equals_k([1, 1, 1], 2) == 2, num_subarray_sum_equals_k([1, 1, 1], 2)\nassert num_subarray_sum_equals_k([1, 2, 3], 3) == 2, num_subarray_sum_equals_k([1, 2, 3], 3)\nassert num_subarray_sum_equals_k([1, -1, 0], 0) == 3, num_subarray_sum_equals_k([1, -1, 0], 0)\nassert num_subarray_sum_equals_k([-1, -1, 1], 0) == 1, num_subarray_sum_equals_k([-1, -1, 1], 0)",
+    "cue": "Keep a running prefix sum; at each step add how many earlier prefixes equal prefix - k. Seed the map with {0: 1} for subarrays that start at index 0.",
+    "syntax": "count.get(prefix - k, 0)",
+    "mapsTo": "LC 560 · Subarray Sum Equals K",
+    "prereqs": ["py.u09.prefix.count.predict"]
   }
 ]

@@ -76,7 +76,8 @@
     "tests": "assert next_index(3, 4, 5) == 2, next_index(3, 4, 5)\nassert next_index(4, 1, 5) == 0, next_index(4, 1, 5)\nassert next_index(0, 0, 5) == 0, next_index(0, 0, 5)",
     "prereqs": ["py.u11.mod.wrap"],
     "cue": "Advance the position, then wrap it back with the remainder by n.",
-    "syntax": "% remainder"
+    "syntax": "% remainder",
+    "mapsTo": "pattern behind LC 622 · Design Circular Queue"
   },
   {
     "id": "py.u11.intdiv.floor",
@@ -140,6 +141,7 @@
     "prompt": "Write `reverse_int(n)` for `n >= 0` that returns the integer with its decimal digits reversed. `reverse_int(1234)` is `4321`.",
     "starter": "def reverse_int(n):\n    # your code here\n    pass",
     "solution": "def reverse_int(n):\n    r = 0\n    while n:\n        r = r * 10 + n % 10\n        n //= 10\n    return r",
+    "banned": ["str(", "[::-1]"],
     "tests": "assert reverse_int(1234) == 4321, reverse_int(1234)\nassert reverse_int(100) == 1, reverse_int(100)\nassert reverse_int(0) == 0, reverse_int(0)",
     "prereqs": ["py.u11.intdiv.floor", "py.u11.mod.lastdigit"],
     "cue": "Take the last digit off and stack it onto a growing result.",
@@ -155,10 +157,12 @@
     "prompt": "Write `digit_sum(n)` for `n >= 0` that returns the sum of its decimal digits. `digit_sum(1234)` is `10`.",
     "starter": "def digit_sum(n):\n    # your code here\n    pass",
     "solution": "def digit_sum(n):\n    s = 0\n    while n:\n        s += n % 10\n        n //= 10\n    return s",
+    "banned": ["str("],
     "tests": "assert digit_sum(1234) == 10, digit_sum(1234)\nassert digit_sum(0) == 0, digit_sum(0)\nassert digit_sum(9) == 9, digit_sum(9)",
     "prereqs": ["py.u11.intdiv.revnum"],
     "cue": "Take each digit off the end and add it to a running total.",
-    "syntax": "n % 10 and n //= 10"
+    "syntax": "n % 10 and n //= 10",
+    "mapsTo": "pattern behind LC 258 · Add Digits"
   },
   {
     "id": "py.u11.horner.index",
@@ -195,10 +199,12 @@
     "prompt": "Write `to_int(digits)` that combines a list of decimal digits (most significant first) into the integer they represent. `to_int([1, 2, 3, 4])` is `1234`; `to_int([])` is `0`.",
     "starter": "def to_int(digits):\n    # your code here\n    pass",
     "solution": "def to_int(digits):\n    h = 0\n    for i in range(len(digits)):\n        h = h * 10 + digits[i]\n    return h",
+    "banned": ["str(", ".join("],
     "tests": "assert to_int([1, 2, 3, 4]) == 1234, to_int([1, 2, 3, 4])\nassert to_int([]) == 0, to_int([])\nassert to_int([0, 5]) == 5, to_int([0, 5])",
     "prereqs": ["py.u11.horner.index"],
     "cue": "Walk left to right, scaling the running total by 10 before adding each digit.",
-    "syntax": "acc = acc * base + d"
+    "syntax": "acc = acc * base + d",
+    "mapsTo": "pattern behind LC 8 · String to Integer (atoi)"
   },
   {
     "id": "py.u11.horner.hash",
@@ -241,7 +247,8 @@
     "tests": "assert gcd(48, 18) == 6, gcd(48, 18)\nassert gcd(7, 0) == 7, gcd(7, 0)\nassert gcd(13, 17) == 1, gcd(13, 17)",
     "prereqs": ["py.u11.gcd.loop.predict"],
     "cue": "Loop until the second number is zero, replacing the pair with (b, remainder).",
-    "syntax": "tuple swap: a, b = b, r"
+    "syntax": "tuple swap: a, b = b, r",
+    "mapsTo": "pattern behind LC 1071 · Greatest Common Divisor of Strings"
   },
   {
     "id": "py.u11.gcd.lcm",
@@ -348,6 +355,34 @@
     "mapsTo": "LC 191 · Number of 1 Bits"
   },
   {
+    "id": "py.u11.bits.shiftone",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "single-bit number via 1 << k",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "1 << 3",
+    "expected": "8",
+    "prereqs": ["py.u11.bits.half"],
+    "cue": "Left shift slides the lone 1 up by that many places.",
+    "syntax": "1 << k",
+    "note": "`1 << k` is the number with a single 1 in position k, so `1 << 0` is 1, `1 << 1` is 2, `1 << 3` is 8. It doubles once per shift, the mirror of the `>> 1` halving."
+  },
+  {
+    "id": "py.u11.bits.setbit",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "turn a bit on with |=",
+    "kind": "predict",
+    "prompt": "What is the value of `mask`?",
+    "snippet": "mask = 0\nmask |= 1 << 1\nmask |= 1 << 3\nmask",
+    "expected": "10",
+    "prereqs": ["py.u11.bits.shiftone"],
+    "cue": "Each |= turns one bit on and leaves the rest as they were; add up the places you set.",
+    "syntax": "mask |= 1 << k",
+    "note": "`|` keeps a 1 wherever either side has a 1, so `mask |= 1 << k` switches bit k on without disturbing the others. Here bits 1 and 3 (the 2s and 8s places) are set, giving 2 + 8 = 10."
+  },
+  {
     "id": "py.u11.bits.mask",
     "track": "python",
     "group": "Programming math",
@@ -357,10 +392,10 @@
     "starter": "def contains(nums, target):\n    # your code here\n    pass",
     "solution": "def contains(nums, target):\n    mask = 0\n    for i in range(len(nums)):\n        mask |= 1 << nums[i]\n    return bool((mask >> target) & 1)",
     "tests": "assert contains([0, 1, 3], 3) == True, contains([0, 1, 3], 3)\nassert contains([0, 1, 3], 2) == False, contains([0, 1, 3], 2)\nassert contains([], 0) == False, contains([], 0)",
-    "prereqs": ["py.u11.bits.parity"],
+    "prereqs": ["py.u11.bits.setbit"],
     "cue": "Set one bit per value at its index, then read back the bit at the target position.",
     "syntax": "1 << k, |= to set",
-    "note": "`1 << k` is the number with a single 1 in position k (1 << 3 is 8). `|=` turns that bit on in the mask and leaves the others alone. Reading back, `(mask >> target) & 1` slides that bit down to the 1s place and checks it. Packing small ints into one integer this way lets a single number stand in for a set."
+    "note": "Reading back, `(mask >> target) & 1` slides bit `target` down to the 1s place and checks it. Packing small non-negative ints into one integer this way lets a single number stand in for a set."
   },
   {
     "id": "py.u11.bits.xorfold",

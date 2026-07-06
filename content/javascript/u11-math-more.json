@@ -41,6 +41,7 @@
     "banned": ["Math.sqrt", "**"],
     "cue": "Advance i while the next square still fits under n; the last i that fits is the floor root.",
     "syntax": "(i + 1) * (i + 1) <= n",
+    "mapsTo": "LC 69 · Sqrt(x)",
     "prereqs": ["js.u11.intdiv.trunc-negative"]
   },
   {
@@ -55,6 +56,7 @@
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(toBase(13, 2), [1, 1, 0, 1]);\neq(toBase(0, 2), [0]);\neq(toBase(255, 16), [15, 15]);\neq(toBase(7, 10), [7]);",
     "cue": "The same digit loop as reversing a number, but divide and mod by b, not 10. Taking n % b gives the least-significant digit first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and Math.trunc(n / b)",
+    "mapsTo": "pattern behind LC 504 · Base 7",
     "prereqs": ["js.u11.digits.reverse"]
   },
   {
@@ -69,6 +71,7 @@
     "tests": "if (singleNumber([2, 2, 1]) !== 1) throw new Error('a');\nif (singleNumber([4, 1, 2, 1, 2]) !== 4) throw new Error('b');\nif (singleNumber([7]) !== 7) throw new Error('c');\nif (singleNumber([0, 5, 0]) !== 5) throw new Error('d');",
     "cue": "Combine the whole array with XOR; the paired values cancel and the lone one survives.",
     "syntax": "x ^= xs[i]",
+    "note": "O(1) extra space means the memory used stays constant as the array grows; here that is just the single accumulator x, no helper set or map.",
     "mapsTo": "LC 136 · Single Number",
     "prereqs": ["js.u11.bits.xor-fold"]
   },

@@ -29,7 +29,8 @@
       "js.u06.selection"
     ],
     "cue": "Each pass walks adjacent pairs, swapping to float the largest to the end.",
-    "syntax": "swap via temp variable"
+    "syntax": "swap via temp variable",
+    "note": "Bubble, selection, and insertion are all O(n^2) and share the same swap atom. Selection is the canonical one to remember; bubble does the most swaps and is rarely used in practice, while insertion wins on nearly-sorted input."
   },
   {
     "id": "js.u06.sortkey.bylastchar",
@@ -42,7 +43,8 @@
     "solution": "function byLastChar(words) {\n  return words.slice().sort((a, b) => a[a.length - 1].localeCompare(b[b.length - 1]));\n}",
     "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(byLastChar(['cba', 'abc', 'bca']), ['cba', 'bca', 'abc'])) throw new Error('by last char');\nif (!eq(byLastChar(['ax', 'bx', 'c']), ['c', 'ax', 'bx'])) throw new Error('stable ties');\nconst o = ['yz', 'xy'];\nbyLastChar(o);\nif (!eq(o, ['yz', 'xy'])) throw new Error('must not mutate input');",
     "prereqs": [
-      "js.u06.sortkey.bylen"
+      "js.u06.sortkey.bylen",
+      "js.u06.localecompare"
     ],
     "cue": "Derive each element's last character as the sort key on a copy.",
     "syntax": "s[s.length - 1] last char"

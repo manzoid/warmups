@@ -106,6 +106,65 @@
     "tests": "if (middle([1, 2, 3]) !== 2) throw new Error('three');\nif (middle([7]) !== 7) throw new Error('one');\nif (middle([1, 2, 3, 4, 5]) !== 3) throw new Error('five');\nif (middle(['a', 'b', 'c']) !== 'b') throw new Error('str');",
     "prereqs": ["js.u02.midpoint.raw"],
     "cue": "Halve the length to land on the center index.",
-    "syntax": "Math.floor(a.length / 2)"
+    "syntax": "Math.floor(a.length / 2)",
+    "mapsTo": "LC 876 · Middle of the Linked List (the center index on an array here)"
+  },
+  {
+    "id": "js.u02.forin.keys",
+    "track": "javascript",
+    "group": "Indexing & slicing",
+    "concept": "for...in yields index strings, not values",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const a = [10, 20, 30];\nconst out = [];\nfor (const i in a) out.push(i);\nout",
+    "expected": "[\"0\", \"1\", \"2\"]",
+    "prereqs": ["js.u02.access.last.raw"],
+    "cue": "for...in walks an object's keys; an array's keys are its indices, and keys are strings.",
+    "syntax": "for (const k in obj)"
+  },
+  {
+    "id": "js.u02.forof.values",
+    "track": "javascript",
+    "group": "Indexing & slicing",
+    "concept": "for...of yields values",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const a = [10, 20, 30];\nlet sum = 0;\nfor (const x of a) sum += x;\nsum",
+    "expected": "60",
+    "prereqs": ["js.u02.forin.keys"],
+    "cue": "for...of hands you each element itself, not its index.",
+    "syntax": "for (const x of arr)"
+  },
+  {
+    "id": "js.u02.compact.dedup",
+    "track": "javascript",
+    "group": "Indexing & slicing",
+    "concept": "in-place dedup with a write index",
+    "kind": "write",
+    "prompt": "Write removeDuplicates(a) that removes duplicates from the ascending-sorted array a in place, so the first m slots hold the distinct values in order, and returns m (the count of distinct values). Do not build a new array; do not use a Set.",
+    "starter": "function removeDuplicates(a) {\n  // your code here\n}",
+    "solution": "function removeDuplicates(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let i = 1; i < a.length; i++) {\n    if (a[i] !== a[w - 1]) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  return w;\n}",
+    "tests": "let a = [1, 1, 2];\nif (removeDuplicates(a) !== 2) throw new Error('m');\nif (JSON.stringify(a.slice(0, 2)) !== JSON.stringify([1, 2])) throw new Error('front');\nlet b = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];\nif (removeDuplicates(b) !== 5) throw new Error('m2');\nif (JSON.stringify(b.slice(0, 5)) !== JSON.stringify([0, 1, 2, 3, 4])) throw new Error('front2');\nif (removeDuplicates([7]) !== 1) throw new Error('single');\nif (removeDuplicates([]) !== 0) throw new Error('empty');",
+    "banned": ["Set", ".filter(", ".indexOf("],
+    "prereqs": ["js.u02.subrange.raw"],
+    "cue": "Keep a write index for the next distinct slot; compare each element to the last value you kept.",
+    "syntax": "a[w] = a[i]; w++",
+    "mapsTo": "LC 26 · Remove Duplicates from Sorted Array"
+  },
+  {
+    "id": "js.u02.compact.removeval",
+    "track": "javascript",
+    "group": "Indexing & slicing",
+    "concept": "in-place remove-value with a write index",
+    "kind": "write",
+    "prompt": "Write removeElement(a, val) that removes every occurrence of val from a in place, packing the kept elements into the front, and returns the number of kept elements. Do not use .filter or .splice.",
+    "starter": "function removeElement(a, val) {\n  // your code here\n}",
+    "solution": "function removeElement(a, val) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== val) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  return w;\n}",
+    "tests": "let a = [3, 2, 2, 3];\nif (removeElement(a, 3) !== 2) throw new Error('m');\nif (JSON.stringify(a.slice(0, 2)) !== JSON.stringify([2, 2])) throw new Error('front');\nlet b = [0, 1, 2, 2, 3, 0, 4, 2];\nif (removeElement(b, 2) !== 5) throw new Error('m2');\nif (JSON.stringify(b.slice(0, 5)) !== JSON.stringify([0, 1, 3, 0, 4])) throw new Error('front2');\nif (removeElement([], 1) !== 0) throw new Error('empty');\nif (removeElement([1, 1, 1], 1) !== 0) throw new Error('all');",
+    "banned": [".filter(", ".splice("],
+    "prereqs": ["js.u02.subrange.raw", "js.u02.compact.dedup"],
+    "cue": "Keep a write index; copy an element forward only when it is not the value being removed.",
+    "syntax": "a[w] = a[i]; w++",
+    "mapsTo": "LC 27 · Remove Element"
   }
 ]

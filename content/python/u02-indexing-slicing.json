@@ -121,6 +121,19 @@
     "prereqs": ["py.u02.subrange.slice"]
   },
   {
+    "id": "py.u02.swap.predict",
+    "track": "python",
+    "group": "Indexing & slicing",
+    "concept": "swap two slots in one assignment",
+    "cue": "Both right-hand values are read before either slot is written.",
+    "syntax": "a[i], a[j] = a[j], a[i]",
+    "kind": "predict",
+    "prompt": "What is the value of `a`?",
+    "snippet": "a = [10, 20, 30, 40]\na[0], a[3] = a[3], a[0]\na",
+    "expected": "[40, 20, 30, 10]",
+    "prereqs": ["py.u02.last.raw"]
+  },
+  {
     "id": "py.u02.reverse.raw",
     "track": "python",
     "group": "Indexing & slicing",
@@ -134,7 +147,7 @@
     "tests": "assert reverse_range([1, 2, 3, 4, 5], 1, 4) == [1, 4, 3, 2, 5], reverse_range([1, 2, 3, 4, 5], 1, 4)\nassert reverse_range([1, 2, 3, 4], 0, 4) == [4, 3, 2, 1]\nassert reverse_range([1, 2, 3], 1, 1) == [1, 2, 3]\nassert reverse_range([7], 0, 1) == [7]\nassert reverse_range([], 0, 0) == []\n",
     "banned": ["[::-1]", "reversed(", ".reverse("],
     "mapsTo": "LC 344 · Reverse String",
-    "prereqs": []
+    "prereqs": ["py.u02.swap.predict"]
   },
   {
     "id": "py.u02.reverse.slice",

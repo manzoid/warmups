@@ -38,6 +38,7 @@
     "starter": "def min_index(a, i):\n    # your code here\n    pass",
     "solution": "def min_index(a, i):\n    m = i\n    for j in range(i + 1, len(a)):\n        if a[j] < a[m]:\n            m = j\n    return m",
     "tests": "assert min_index([5, 2, 4, 6], 0) == 1, min_index([5, 2, 4, 6], 0)\nassert min_index([5, 2, 4, 6], 2) == 2, min_index([5, 2, 4, 6], 2)\nassert min_index([3], 0) == 0, min_index([3], 0)\nassert min_index([4, 1, 1], 0) == 1, min_index([4, 1, 1], 0)",
+    "banned": ["sorted(", ".sort(", ".index(", "min("],
     "prereqs": ["py.u06.swap.predict"]
   },
   {
@@ -193,11 +194,12 @@
     "syntax": "a[i], a[j] = a[j], a[i] swap",
     "track": "python",
     "group": "Sorting",
-    "concept": "state after one Lomuto partition",
+    "concept": "Lomuto partition on all-equal keys",
     "kind": "predict",
     "prompt": "What is the value of `a`?",
-    "snippet": "def partition(a, lo, hi):\n    pivot = a[hi]\n    i = lo\n    for j in range(lo, hi):\n        if a[j] < pivot:\n            a[i], a[j] = a[j], a[i]\n            i += 1\n    a[i], a[hi] = a[hi], a[i]\n    return i\n\na = [5, 3, 8, 1, 4]\npartition(a, 0, 4)\na",
-    "expected": "[3, 1, 4, 5, 8]",
+    "snippet": "def partition(a, lo, hi):\n    pivot = a[hi]\n    i = lo\n    for j in range(lo, hi):\n        if a[j] < pivot:\n            a[i], a[j] = a[j], a[i]\n            i += 1\n    a[i], a[hi] = a[hi], a[i]\n    return i\n\na = [4, 4, 4, 4, 4]\npartition(a, 0, 4)\na",
+    "expected": "[4, 4, 4, 4, 4]",
+    "note": "With all keys equal, no element is strictly less than the pivot, so `i` never advances and the pivot lands at `lo`. That maximally lopsided split is quicksort's O(n^2) worst case on duplicate-heavy input.",
     "prereqs": ["py.u06.partition.write"]
   },
   {
@@ -268,6 +270,7 @@
     "starter": "def has_duplicate(a):\n    # your code here\n    pass",
     "solution": "def has_duplicate(a):\n    a = sorted(a)\n    for i in range(1, len(a)):\n        if a[i] == a[i - 1]:\n            return True\n    return False",
     "tests": "assert has_duplicate([1, 2, 3, 1]) is True, 'has dup'\nassert has_duplicate([1, 2, 3]) is False, 'no dup'\nassert has_duplicate([]) is False, 'empty'\nassert has_duplicate([5, 5]) is True, 'pair'\norig = [3, 1, 2]\nhas_duplicate(orig)\nassert orig == [3, 1, 2], orig",
+    "banned": ["set(", "Counter"],
     "mapsTo": "LC 217 · Contains Duplicate",
     "prereqs": ["py.u06.sweep.dup.predict"]
   },
@@ -297,6 +300,7 @@
     "solution": "def two_sum_sorted(a, target):\n    a = sorted(a)\n    i, j = 0, len(a) - 1\n    while i < j:\n        s = a[i] + a[j]\n        if s == target:\n            return (a[i], a[j])\n        elif s < target:\n            i += 1\n        else:\n            j -= 1\n    return None",
     "tests": "r = two_sum_sorted([8, 1, 3, 5], 8)\nassert r is not None and tuple(sorted(r)) == (3, 5), r\nassert two_sum_sorted([1, 2, 3], 10) is None, 'none'\nr = two_sum_sorted([2, 2], 4)\nassert r is not None and tuple(sorted(r)) == (2, 2), r\nr = two_sum_sorted([1, 2, 4, 7], 11)\nassert r is not None and tuple(sorted(r)) == (4, 7), r",
     "note": "Sorting first lets two pointers converge in one O(n) pass; checking every pair would be O(n^2).",
+    "banned": ["set("],
     "mapsTo": "pattern behind LC 167 · Two Sum II (returns the pair of values, not their indices)",
     "prereqs": ["py.u06.twopointer.predict"]
   },

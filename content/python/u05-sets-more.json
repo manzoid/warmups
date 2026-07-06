@@ -15,6 +15,22 @@
     ]
   },
   {
+    "id": "py.u05.hashable.tuple",
+    "track": "python",
+    "group": "Sets",
+    "concept": "sets hold hashable elements (tuples work, lists don't)",
+    "cue": "Tuples are hashable, so a set can store and dedup them.",
+    "syntax": "{(a, b), ...}",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "sorted({(1, 2), (1, 2), (3, 4)})",
+    "expected": "[(1, 2), (3, 4)]",
+    "note": "A set element must be hashable: tuples qualify and get deduped, but adding a list raises TypeError because lists are mutable.",
+    "prereqs": [
+      "py.u05.dedup.set"
+    ]
+  },
+  {
     "id": "py.u05.disjoint.predict",
     "track": "python",
     "group": "Sets",

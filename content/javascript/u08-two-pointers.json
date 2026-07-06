@@ -13,6 +13,20 @@
     "prereqs": []
   },
   {
+    "id": "js.u08.swap.predict",
+    "track": "javascript",
+    "group": "Two pointers",
+    "concept": "swap two names in one statement",
+    "cue": "The right side is built first as a pair, then unpacked back into the two names.",
+    "syntax": "[x, y] = [y, x]",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "let x = 1, y = 2;\n[x, y] = [y, x];\n[x, y];",
+    "expected": "[2, 1]",
+    "note": "`[x, y] = [y, x]` swaps two values with no temporary variable; the same form works on array slots, e.g. `[a[i], a[j]] = [a[j], a[i]]`.",
+    "prereqs": []
+  },
+  {
     "id": "js.u08.reverse.write",
     "track": "javascript",
     "group": "Two pointers",
@@ -27,7 +41,7 @@
     "banned": [".reverse("],
     "note": "`[a[lo], a[hi]] = [a[hi], a[lo]]` swaps two array slots in one statement, with no temporary variable.",
     "mapsTo": "LC 344 · Reverse String",
-    "prereqs": ["js.u08.converge.guard"]
+    "prereqs": ["js.u08.converge.guard", "js.u08.swap.predict"]
   },
   {
     "id": "js.u08.reverse.predict",
@@ -55,6 +69,7 @@
     "starter": "function isPal(s) {\n  // your code here\n}",
     "solution": "function isPal(s) {\n  let lo = 0, hi = s.length - 1;\n  while (lo < hi) {\n    if (s[lo] !== s[hi]) return false;\n    lo++;\n    hi--;\n  }\n  return true;\n}",
     "tests": "if (isPal('racecar') !== true) throw new Error('racecar');\nif (isPal('abca') !== false) throw new Error('abca');\nif (isPal('') !== true) throw new Error('empty');\nif (isPal('a') !== true) throw new Error('single');",
+    "banned": [".reverse("],
     "prereqs": ["js.u08.converge.guard"]
   },
   {
@@ -92,13 +107,14 @@
     "id": "js.u08.pairsum.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "pair-sum in sorted array",
-    "cue": "Follow each pointer step: the high end drops while the sum is too big, the low end rises while it is too small.",
-    "syntax": "a[i] + a[j]",
+    "concept": "pair-sum bug: loop guard lets an index pair with itself",
+    "cue": "Watch the guard: this loop keeps going once the two indices are equal.",
+    "syntax": "while (lo <= hi)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}\npairSum([1, 2, 4, 7, 11, 15], 9);",
-    "expected": "[1, 3]",
+    "snippet": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo <= hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}\npairSum([1, 2, 4], 8);",
+    "expected": "[2, 2]",
+    "note": "With `<=` the loop runs when `lo === hi`, so `a[2] + a[2]` is treated as a pair; the guard must be `lo < hi` to force two distinct entries.",
     "prereqs": ["js.u08.pairsum.write"]
   },
   {
@@ -134,13 +150,14 @@
     "id": "js.u08.maxarea.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "container with most water",
-    "cue": "Track the running best area as the pointers move inward.",
+    "concept": "container with equal walls: width decides",
+    "cue": "Every wall is the same height, so only the distance between the two walls changes the area.",
     "syntax": "Math.max(best, area)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function maxArea(h) {\n  let lo = 0, hi = h.length - 1, best = 0;\n  while (lo < hi) {\n    best = Math.max(best, (hi - lo) * Math.min(h[lo], h[hi]));\n    if (h[lo] < h[hi]) lo++;\n    else hi--;\n  }\n  return best;\n}\nmaxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]);",
-    "expected": "49",
+    "snippet": "function maxArea(h) {\n  let lo = 0, hi = h.length - 1, best = 0;\n  while (lo < hi) {\n    best = Math.max(best, (hi - lo) * Math.min(h[lo], h[hi]));\n    if (h[lo] < h[hi]) lo++;\n    else hi--;\n  }\n  return best;\n}\nmaxArea([5, 5, 5, 5]);",
+    "expected": "15",
+    "note": "When every wall ties, the first (widest) pair already holds the best area; each later pair is narrower, so the maximum is `(n - 1) * 5`.",
     "prereqs": ["js.u08.maxarea.write"]
   },
   {
@@ -164,13 +181,14 @@
     "id": "js.u08.sortedsquares.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "merge-fill from the far end",
-    "cue": "Trace which end's square is larger and where it lands in the result.",
+    "concept": "sorted squares: all-negative input reverses",
+    "cue": "Every value is negative, so the most-negative entry has the largest square.",
     "syntax": "new Array(n)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function sortedSquares(a) {\n  const n = a.length, res = new Array(n);\n  let lo = 0, hi = n - 1;\n  for (let i = n - 1; i >= 0; i--) {\n    if (Math.abs(a[lo]) > Math.abs(a[hi])) { res[i] = a[lo] * a[lo]; lo++; }\n    else { res[i] = a[hi] * a[hi]; hi--; }\n  }\n  return res;\n}\nsortedSquares([-4, -1, 0, 3, 10]);",
-    "expected": "[0, 1, 9, 16, 100]",
+    "snippet": "function sortedSquares(a) {\n  const n = a.length, res = new Array(n);\n  let lo = 0, hi = n - 1;\n  for (let i = n - 1; i >= 0; i--) {\n    if (Math.abs(a[lo]) > Math.abs(a[hi])) { res[i] = a[lo] * a[lo]; lo++; }\n    else { res[i] = a[hi] * a[hi]; hi--; }\n  }\n  return res;\n}\nsortedSquares([-5, -3, -1]);",
+    "expected": "[1, 9, 25]",
+    "note": "For an all-negative input the `lo` end always has the bigger absolute value, so squares come out in reverse of the input order.",
     "prereqs": ["js.u08.sortedsquares.write"]
   },
   {
@@ -198,6 +216,7 @@
     "starter": "function removeDupes(a) {\n  // your code here\n}",
     "solution": "function removeDupes(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let r = 1; r < a.length; r++) {\n    if (a[r] !== a[w - 1]) { a[w] = a[r]; w++; }\n  }\n  return w;\n}",
     "tests": "const b = [0,0,1,1,1,2,2,3,3,4];\nconst k = removeDupes(b);\nif (k !== 5) throw new Error('k');\nif (JSON.stringify(b.slice(0, k)) !== JSON.stringify([0,1,2,3,4])) throw new Error('prefix');\nif (removeDupes([]) !== 0) throw new Error('empty');\nif (removeDupes([7]) !== 1) throw new Error('single');",
+    "banned": ["new Set", ".filter("],
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
     "prereqs": ["js.u08.compaction.intro"]
   },
@@ -226,6 +245,7 @@
     "starter": "function removeElement(a, val) {\n  // your code here\n}",
     "solution": "function removeElement(a, val) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== val) { a[w] = a[r]; w++; }\n  }\n  return w;\n}",
     "tests": "const a = [3,2,2,3];\nconst k = removeElement(a, 3);\nif (k !== 2) throw new Error('k');\nif (JSON.stringify(a.slice(0, k)) !== JSON.stringify([2,2])) throw new Error('prefix');\nconst b = [0,1,2,2,3,0,4,2];\nconst k2 = removeElement(b, 2);\nif (k2 !== 5) throw new Error('k2');\nif (JSON.stringify(b.slice(0, k2)) !== JSON.stringify([0,1,3,0,4])) throw new Error('prefix2');",
+    "banned": [".filter("],
     "mapsTo": "LC 27 · Remove Element",
     "prereqs": ["js.u08.removedupes.write"]
   },
@@ -241,6 +261,7 @@
     "starter": "function moveZeroes(a) {\n  // your code here\n}",
     "solution": "function moveZeroes(a) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== 0) { a[w] = a[r]; w++; }\n  }\n  while (w < a.length) { a[w] = 0; w++; }\n  return a;\n}",
     "tests": "if (JSON.stringify(moveZeroes([0,1,0,3,12])) !== JSON.stringify([1,3,12,0,0])) throw new Error('a');\nif (JSON.stringify(moveZeroes([0,0,1])) !== JSON.stringify([1,0,0])) throw new Error('b');\nif (JSON.stringify(moveZeroes([1,2,3])) !== JSON.stringify([1,2,3])) throw new Error('none');",
+    "banned": [".filter("],
     "mapsTo": "LC 283 · Move Zeroes",
     "prereqs": ["js.u08.removeelement.write"]
   },
@@ -248,13 +269,14 @@
     "id": "js.u08.movezeroes.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "move zeroes to the end",
-    "cue": "Trace the non-zeros compacting forward, then the tail filling in.",
+    "concept": "move zeroes: leading zeros",
+    "cue": "The write pointer stays put until the first non-zero, then the tail is padded.",
     "syntax": "a[w] = a[r] overwrite",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function moveZeroes(a) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== 0) { a[w] = a[r]; w++; }\n  }\n  while (w < a.length) { a[w] = 0; w++; }\n  return a;\n}\nmoveZeroes([0, 1, 0, 3, 12]);",
-    "expected": "[1, 3, 12, 0, 0]",
+    "snippet": "function moveZeroes(a) {\n  let w = 0;\n  for (let r = 0; r < a.length; r++) {\n    if (a[r] !== 0) { a[w] = a[r]; w++; }\n  }\n  while (w < a.length) { a[w] = 0; w++; }\n  return a;\n}\nmoveZeroes([0, 0, 1, 2]);",
+    "expected": "[1, 2, 0, 0]",
+    "note": "The read pointer skips both leading zeros before the write pointer moves; the tail loop then refills the two emptied slots.",
     "prereqs": ["js.u08.movezeroes.write"]
   },
   {
@@ -306,13 +328,14 @@
     "id": "js.u08.hascycle.predict",
     "track": "javascript",
     "group": "Two pointers",
-    "concept": "fast/slow cycle detection",
-    "cue": "Trace slow by one and fast by two until they meet or fast runs off the end.",
+    "concept": "cycle detection: fast runs off a straight list",
+    "cue": "This list ends in -1; watch the loop guard the moment fast reaches the terminator.",
     "syntax": "=== identity check",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "function hasCycle(nxt, start) {\n  let slow = start, fast = start;\n  while (fast !== -1 && nxt[fast] !== -1) {\n    slow = nxt[slow];\n    fast = nxt[nxt[fast]];\n    if (slow === fast) return true;\n  }\n  return false;\n}\nhasCycle([1, 2, 3, 1], 0);",
-    "expected": "true",
+    "snippet": "function hasCycle(nxt, start) {\n  let slow = start, fast = start;\n  while (fast !== -1 && nxt[fast] !== -1) {\n    slow = nxt[slow];\n    fast = nxt[nxt[fast]];\n    if (slow === fast) return true;\n  }\n  return false;\n}\nhasCycle([1, 2, -1], 0);",
+    "expected": "false",
+    "note": "On a straight list fast reaches the -1 terminator first, so the guard stops the loop and the two pointers never meet.",
     "prereqs": ["js.u08.hascycle.write"]
   },
   {
@@ -355,7 +378,7 @@
     "prompt": "Write `threeSum(a)` that returns all unique triples `[x, y, z]` from `a` with `x + y + z === 0`, each triple in ascending order and no duplicate triples. Sort first, then use two pointers; use a numeric comparator when sorting.",
     "starter": "function threeSum(a) {\n  // your code here\n}",
     "solution": "function threeSum(a) {\n  a.sort((x, y) => x - y);\n  const res = [], n = a.length;\n  for (let i = 0; i < n; i++) {\n    if (i > 0 && a[i] === a[i - 1]) continue;\n    let lo = i + 1, hi = n - 1;\n    while (lo < hi) {\n      const s = a[i] + a[lo] + a[hi];\n      if (s < 0) lo++;\n      else if (s > 0) hi--;\n      else {\n        res.push([a[i], a[lo], a[hi]]);\n        lo++;\n        hi--;\n        while (lo < hi && a[lo] === a[lo - 1]) lo++;\n        while (lo < hi && a[hi] === a[hi + 1]) hi--;\n      }\n    }\n  }\n  return res;\n}",
-    "tests": "const norm = r => JSON.stringify(r.map(t => [...t]).sort((p, q) => (p[0] - q[0]) || (p[1] - q[1]) || (p[2] - q[2])));\nif (norm(threeSum([-1,0,1,2,-1,-4])) !== norm([[-1,-1,2],[-1,0,1]])) throw new Error('a');\nif (norm(threeSum([0,0,0])) !== norm([[0,0,0]])) throw new Error('zeros');\nif (norm(threeSum([1,2,3])) !== norm([])) throw new Error('none');",
+    "tests": "const norm = r => JSON.stringify(r.map(t => [...t]).sort((p, q) => (p[0] - q[0]) || (p[1] - q[1]) || (p[2] - q[2])));\nif (norm(threeSum([-1,0,1,2,-1,-4])) !== norm([[-1,-1,2],[-1,0,1]])) throw new Error('a');\nif (norm(threeSum([0,0,0])) !== norm([[0,0,0]])) throw new Error('zeros');\nif (norm(threeSum([1,2,3])) !== norm([])) throw new Error('none');\nif (norm(threeSum([-2,0,0,2,2])) !== norm([[-2,0,2]])) throw new Error('dupes');",
     "banned": [".sort()"],
     "note": "Sorting first makes equal values adjacent, so skipping neighbors that match dedups triples in O(1) extra space.",
     "mapsTo": "LC 15 · 3Sum",

@@ -150,6 +150,20 @@
     "prereqs": ["js.u11.intdiv.trunc-negative"]
   },
   {
+    "id": "js.u11.charcode.at",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "character code of a letter",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "'a'.charCodeAt(0);",
+    "expected": "97",
+    "cue": "Each character has a numeric code; this asks for the code of the first character.",
+    "syntax": "s.charCodeAt(i)",
+    "note": "charCodeAt(i) returns the code unit of the character at index i. 'a' is 97, 'A' is 65, '0' is 48; subtracting one of these bases maps a run of characters to small 0-based numbers.",
+    "prereqs": []
+  },
+  {
     "id": "js.u11.horner.abc",
     "track": "javascript",
     "group": "Programming math",
@@ -161,7 +175,7 @@
     "cue": "Each pass multiplies the running value by the base, then adds this character's small offset code.",
     "syntax": "s.charCodeAt(i)",
     "note": "Characters are numbered by their code unit; subtracting a base like 'a' maps them to a small 0-based range.",
-    "prereqs": []
+    "prereqs": ["js.u11.charcode.at"]
   },
   {
     "id": "js.u11.horner.parse",
@@ -177,6 +191,7 @@
     "cue": "Go through the digits left to right, subtracting the code of '0' to get each digit's value.",
     "syntax": "s.charCodeAt(i)",
     "note": "Subtracting the code of '0' (48) turns a digit character into its numeric value 0-9.",
+    "mapsTo": "LC 8 · String to Integer (atoi)",
     "prereqs": ["js.u11.horner.abc"]
   },
   {
@@ -191,6 +206,8 @@
     "tests": "for (const s of ['tea', 'eat', 'hi', '', 'a']) {\n  const h = polyHash(s, 31, 8);\n  if (!Number.isInteger(h) || h < 0 || h >= 8) throw new Error('range: ' + s);\n}\nif (polyHash('', 31, 8) !== 0) throw new Error('empty');\nif (polyHash('tea', 31, 8) !== polyHash('tea', 31, 8)) throw new Error('deterministic');",
     "cue": "Combine each character into the hash and take % mod on every step to stay in range.",
     "syntax": "s.charCodeAt(i)",
+    "note": "A rolling hash folds a whole string into one number by combining each character in turn; the % mod at each step keeps the value inside [0, mod), meaning 0 up to but not including mod.",
+    "mapsTo": "pattern behind LC 187 · Repeated DNA Sequences",
     "prereqs": ["js.u11.horner.abc", "js.u11.mod.last-digit"]
   },
   {
@@ -218,6 +235,7 @@
     "tests": "if (gcd(48, 18) !== 6) throw new Error('48,18');\nif (gcd(7, 0) !== 7) throw new Error('7,0');\nif (gcd(0, 5) !== 5) throw new Error('0,5');\nif (gcd(13, 17) !== 1) throw new Error('13,17');\nif (gcd(100, 80) !== 20) throw new Error('100,80');",
     "cue": "Keep replacing the pair with the remainder until the second value hits zero.",
     "syntax": "a % b",
+    "mapsTo": "pattern behind LC 1071 · Greatest Common Divisor of Strings",
     "prereqs": ["js.u11.gcd.euclid"]
   },
   {
@@ -285,7 +303,7 @@
     "starter": "function runningMax(xs) {\n  // your code here\n}",
     "solution": "function runningMax(xs) {\n  let best = xs[0];\n  for (let i = 0; i < xs.length; i++) if (xs[i] > best) best = xs[i];\n  return best;\n}",
     "tests": "if (runningMax([3, 1, 4, 1, 5, 9, 2]) !== 9) throw new Error('a');\nif (runningMax([-5, -2, -9]) !== -2) throw new Error('b');\nif (runningMax([7]) !== 7) throw new Error('c');",
-    "banned": ["Math.max", "..."],
+    "banned": ["Math.max", "...", "sort", "reduce"],
     "cue": "Seed with the first element, then scan and keep whichever is larger.",
     "syntax": "for (let i = 0; i < xs.length; i++)",
     "prereqs": ["js.u11.clamp.predict"]
@@ -361,6 +379,34 @@
     "prereqs": ["js.u11.bits.clear-lowest"]
   },
   {
+    "id": "js.u11.bits.shift-set",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "single-bit value via left shift",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "1 << 4;",
+    "expected": "16",
+    "cue": "Left-shifting 1 by k moves that single 1 up k places.",
+    "syntax": "1 << k",
+    "note": "1 << k is the integer with only bit k on: 1<<0 is 1, 1<<1 is 2, 1<<2 is 4, doubling for each further shift.",
+    "prereqs": ["js.u11.bits.halve"]
+  },
+  {
+    "id": "js.u11.bits.or-assign",
+    "track": "javascript",
+    "group": "Programming math",
+    "concept": "turn a bit on with |=",
+    "kind": "predict",
+    "prompt": "What is the value of `f`?",
+    "snippet": "let f = 5;\nf |= 2;\nf;",
+    "expected": "7",
+    "cue": "OR keeps a 1 wherever either side has one; |= writes the result back into f.",
+    "syntax": "x |= mask",
+    "note": "5 is bits 101 and 2 is bits 010; OR-ing them gives 111, which is 7. |= turns the chosen bit on without disturbing the others.",
+    "prereqs": []
+  },
+  {
     "id": "js.u11.bits.mask-build",
     "track": "javascript",
     "group": "Programming math",
@@ -373,7 +419,7 @@
     "cue": "For each index, OR in a 1 shifted to that number's bit position.",
     "syntax": "1 << nums[i]",
     "note": "1 << k is the integer with only bit k set (bit 0 is 1, bit 1 is 2, bit 2 is 4, and so on). The |= operator turns that bit on in the mask without disturbing the others.",
-    "prereqs": ["js.u11.bits.clear-lowest"]
+    "prereqs": ["js.u11.bits.shift-set", "js.u11.bits.or-assign"]
   },
   {
     "id": "js.u11.bits.xor-fold",

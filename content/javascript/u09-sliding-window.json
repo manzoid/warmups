@@ -97,21 +97,36 @@
     "starter": "function countWindowsAtLeast(nums, k, threshold) {\n  // your code here\n}",
     "solution": "function countWindowsAtLeast(nums, k, threshold) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let count = s >= threshold ? 1 : 0;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s >= threshold) count++;\n  }\n  return count;\n}",
     "tests": "if (countWindowsAtLeast([2, 1, 5, 1, 3, 2], 3, 8) !== 2) throw new Error(countWindowsAtLeast([2, 1, 5, 1, 3, 2], 3, 8));\nif (countWindowsAtLeast([1, 1, 1], 1, 1) !== 3) throw new Error('all');\nif (countWindowsAtLeast([1, 2, 3, 4], 2, 5) !== 2) throw new Error('k2');\nif (countWindowsAtLeast([1], 1, 5) !== 0) throw new Error('none');",
+    "mapsTo": "pattern behind LC 1343 · Number of Sub-arrays of Size K and Average Greater Than or Equal to Threshold",
     "prereqs": ["js.u09.fixed.countge.predict"]
+  },
+  {
+    "id": "js.u09.default.orzero.predict",
+    "track": "javascript",
+    "group": "Sliding window",
+    "concept": "|| supplies a default for a missing map key",
+    "cue": "A key that was never set reads back as undefined, and `undefined || 0` is 0.",
+    "syntax": "map.get(k) || 0",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const m = new Map();\nm.set('a', 5);\n[m.get('a') || 0, m.get('z') || 0];",
+    "expected": "[5, 0]",
+    "note": "Counting code leans on this: `(m.get(x) || 0) + 1` starts a brand-new key at 1 with no separate 'is it present?' check, because a missing key gives undefined and `undefined || 0` is 0.",
+    "prereqs": []
   },
   {
     "id": "js.u09.countmap.build.predict",
     "track": "javascript",
     "group": "Sliding window",
     "concept": "count-map: increment on enter",
-    "cue": "For each value, bump its tally in the map.",
+    "cue": "For each value, bump its tally in the map, then read the entries out in order.",
     "syntax": "m.set(x, (m.get(x) || 0) + 1)",
     "kind": "predict",
-    "prompt": "What is the value of `m`?",
-    "snippet": "const a = [4, 4, 7];\nconst m = new Map();\nfor (let i = 0; i < a.length; i++) m.set(a[i], (m.get(a[i]) || 0) + 1);\nm;",
-    "expected": "Map(2) {4 => 2, 7 => 1}",
-    "note": "`m.get(x) || 0` reads x's current count, or 0 when x is not in the map yet: get returns undefined for a missing key, and `undefined || 0` gives 0.",
-    "prereqs": []
+    "prompt": "What does this evaluate to?",
+    "snippet": "const a = [4, 4, 7];\nconst m = new Map();\nfor (let i = 0; i < a.length; i++) m.set(a[i], (m.get(a[i]) || 0) + 1);\n[...m.entries()];",
+    "expected": "[[4, 2], [7, 1]]",
+    "note": "A Map itself has no plain literal you can type, so we read it out with `[...m.entries()]` as [key, count] pairs in insertion order. `m.get(x) || 0` reads x's current count, or 0 when x is not in the map yet.",
+    "prereqs": ["js.u09.default.orzero.predict"]
   },
   {
     "id": "js.u09.countmap.slide.predict",
@@ -295,5 +310,34 @@
     "tests": "if (minWindow('ADOBECODEBANC', 'ABC') !== 'BANC') throw new Error(minWindow('ADOBECODEBANC', 'ABC'));\nif (minWindow('a', 'a') !== 'a') throw new Error('single');\nif (minWindow('a', 'aa') !== '') throw new Error('none');\nif (minWindow('ab', 'b') !== 'b') throw new Error('tail');",
     "mapsTo": "LC 76 · Minimum Window Substring",
     "prereqs": ["js.u09.minwindow.missing.predict", "js.u09.atmostk.write", "js.u09.var.minlen.write"]
+  },
+  {
+    "id": "js.u09.prefix.subarraysum.predict",
+    "track": "javascript",
+    "group": "Sliding window",
+    "concept": "prefix-sum count-map: subarrays summing to k",
+    "cue": "A prefix sum is the running total of everything so far; a subarray sums to k exactly when some earlier prefix equals the current sum minus k.",
+    "syntax": "seen.get(sum - k) || 0",
+    "kind": "predict",
+    "prompt": "What is the value of `count`?",
+    "snippet": "const nums = [1, 1, 1];\nconst k = 2;\nconst seen = new Map([[0, 1]]);\nlet sum = 0, count = 0;\nfor (let right = 0; right < nums.length; right++) {\n  sum += nums[right];\n  count += seen.get(sum - k) || 0;\n  seen.set(sum, (seen.get(sum) || 0) + 1);\n}\ncount;",
+    "expected": "2",
+    "note": "With negative values a sliding window fails (adding an element can lower the sum), so instead of a window you count matching prefix sums. Seeding the map with {0: 1} lets a subarray that starts at index 0 be counted.",
+    "prereqs": ["js.u09.countmap.build.predict"]
+  },
+  {
+    "id": "js.u09.prefix.subarraysum.write",
+    "track": "javascript",
+    "group": "Sliding window",
+    "concept": "count subarrays summing to exactly k (values may be negative)",
+    "cue": "Keep a running prefix sum and a map of how many times each prefix sum has occurred; at each step add the stored count for `sum - k`.",
+    "syntax": "seen.set(sum, (seen.get(sum) || 0) + 1)",
+    "kind": "write",
+    "prompt": "Write `subarraySum(nums, k)` that returns how many contiguous subarrays of `nums` sum to exactly `k`. Values may be negative, so a sliding window will not work; use running prefix sums and a count-map.",
+    "starter": "function subarraySum(nums, k) {\n  // your code here\n}",
+    "solution": "function subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0, count = 0;\n  for (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
+    "tests": "if (subarraySum([1, 1, 1], 2) !== 2) throw new Error(subarraySum([1, 1, 1], 2));\nif (subarraySum([1, 2, 3], 3) !== 2) throw new Error('123');\nif (subarraySum([1, -1, 0], 0) !== 3) throw new Error('neg');\nif (subarraySum([3], 3) !== 1) throw new Error('single');\nif (subarraySum([1], 2) !== 0) throw new Error('none');\nif (subarraySum([0, 0, 0], 0) !== 6) throw new Error('zeros');",
+    "mapsTo": "LC 560 · Subarray Sum Equals K",
+    "prereqs": ["js.u09.prefix.subarraysum.predict"]
   }
 ]

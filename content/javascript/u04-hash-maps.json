@@ -4,13 +4,13 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "Map set and read back",
-    "cue": "Insert two keys in order, then read the whole Map back.",
+    "cue": "Insert two keys in order, then read the Map's entries back as an array.",
     "syntax": "map.set(key, val)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const m = new Map();\nm.set('a', 1);\nm.set('b', 2);\nm;",
-    "expected": "Map(2) {\"a\" => 1, \"b\" => 2}",
-    "note": "A Map prints as Map(size) {key => value, ...}: string keys keep their quotes and entries show in the order they were inserted.",
+    "snippet": "const m = new Map();\nm.set('a', 1);\nm.set('b', 2);\n[...m.entries()];",
+    "expected": "[[\"a\", 1], [\"b\", 2]]",
+    "note": "map.entries() yields [key, value] pairs in the order keys were inserted; spreading them into an array gives a plain, typeable view of the whole Map.",
     "prereqs": []
   },
   {
@@ -36,7 +36,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const o = {};\no[1] = 'x';\no['1'] = 'y';\no[1];",
-    "expected": "y",
+    "expected": "'y'",
     "prereqs": []
   },
   {
@@ -107,6 +107,7 @@
     "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    // your code here\n  }\n}",
     "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n}",
     "tests": "const m = new MyMap();\nm.set('tea', 1);\nm.set('eat', 2);\nif (m.get('tea') !== 1) throw new Error('tea');\nif (m.get('eat') !== 2) throw new Error('eat');\nm.set('tea', 5);\nif (m.get('tea') !== 5) throw new Error('updated value');\nif (m.get('nope') !== undefined) throw new Error('absent -> undefined');",
+    "mapsTo": "LC 706 · Design HashMap",
     "prereqs": ["js.u04.build.set"]
   },
   {
@@ -124,6 +125,20 @@
     "prereqs": ["js.u04.build.get"]
   },
   {
+    "id": "js.u04.default.or",
+    "track": "javascript",
+    "group": "Hash maps",
+    "concept": "|| supplies a fallback for a missing key",
+    "cue": "A key that was never set reads undefined; the fallback turns that into a starting number.",
+    "syntax": "value || 0",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const m = new Map();\nm.get('z') || 0;",
+    "expected": "0",
+    "note": "Reading an absent key gives undefined, which is falsy, so `|| 0` yields 0. This is the trick a frequency counter uses to start each new key at zero.",
+    "prereqs": ["js.u04.map.get-missing"]
+  },
+  {
     "id": "js.u04.freq.map",
     "track": "javascript",
     "group": "Hash maps",
@@ -134,19 +149,19 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (let i = 0; i < s.length; i++) m.set(s[i], (m.get(s[i]) || 0) + 1);\nm.get('b');",
     "expected": "3",
-    "prereqs": ["js.u04.map.basics"]
+    "prereqs": ["js.u04.map.basics", "js.u04.default.or"]
   },
   {
     "id": "js.u04.freq.map-full",
     "track": "javascript",
     "group": "Hash maps",
     "concept": "Map preserves insertion order",
-    "cue": "Count every character, then read the whole Map in the order keys arrived.",
+    "cue": "Count every character, then read the entries in the order keys arrived.",
     "syntax": "for (let i = 0; i < s.length; i++)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (let i = 0; i < s.length; i++) m.set(s[i], (m.get(s[i]) || 0) + 1);\nm;",
-    "expected": "Map(3) {\"a\" => 2, \"b\" => 3, \"c\" => 1}",
+    "snippet": "const s = 'aabbbc';\nconst m = new Map();\nfor (let i = 0; i < s.length; i++) m.set(s[i], (m.get(s[i]) || 0) + 1);\n[...m.entries()];",
+    "expected": "[[\"a\", 2], [\"b\", 3], [\"c\", 1]]",
     "prereqs": ["js.u04.freq.map"]
   },
   {
@@ -175,6 +190,20 @@
     "snippet": "const s = 'abca';\nconst freq = {};\nfor (let i = 0; i < s.length; i++) freq[s[i]] = (freq[s[i]] || 0) + 1;\nfreq;",
     "expected": "{a: 2, b: 1, c: 1}",
     "prereqs": ["js.u04.obj.stringify-keys", "js.u04.freq.map"]
+  },
+  {
+    "id": "js.u04.obj.forin",
+    "track": "javascript",
+    "group": "Hash maps",
+    "concept": "for...in walks an object's keys",
+    "cue": "for...in iterates the keys of an object, not its values.",
+    "syntax": "for (const k in obj)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const freq = {a: 2, b: 1, c: 3};\nconst out = [];\nfor (const k in freq) out.push(k);\nout;",
+    "expected": "[\"a\", \"b\", \"c\"]",
+    "note": "for...in gives an object's keys (always strings); for...of iterates the values of an array or other iterable. Reach for for...in when your hash map is a plain object.",
+    "prereqs": ["js.u04.obj.count"]
   },
   {
     "id": "js.u04.freq.write",
@@ -336,12 +365,12 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "Set keeps first occurrences",
-    "cue": "A Set drops later repeats; read back what survives.",
+    "cue": "A Set drops later repeats; spread what survives into an array.",
     "syntax": "new Set(iterable)",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "const arr = [3, 1, 2, 3, 1];\nnew Set(arr);",
-    "expected": "Set(3) {3, 1, 2}",
+    "snippet": "const arr = [3, 1, 2, 3, 1];\n[...new Set(arr)];",
+    "expected": "[3, 1, 2]",
     "prereqs": ["js.u04.seen.dedup"]
   },
   {
@@ -349,12 +378,13 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "order-preserving dedup with a seen set",
-    "cue": "Track seen values and emit each the first time only.",
-    "syntax": "set.add(x)",
+    "cue": "Track seen values in an object and emit each the first time only.",
+    "syntax": "seen[x] = true",
     "kind": "write",
-    "prompt": "Write `dedup(arr)` that returns a new array with duplicates removed, keeping the first occurrence of each value in its original order.",
+    "banned": ["new Set(", "...new Set", "Array.from("],
+    "prompt": "Write `dedup(arr)` that returns a new array with duplicates removed, keeping the first occurrence of each value in its original order. Do it by hand, without a Set.",
     "starter": "function dedup(arr) {\n  // your code here\n}",
-    "solution": "function dedup(arr) {\n  const seen = new Set();\n  const out = [];\n  for (let i = 0; i < arr.length; i++) if (!seen.has(arr[i])) { seen.add(arr[i]); out.push(arr[i]); }\n  return out;\n}",
+    "solution": "function dedup(arr) {\n  const seen = {};\n  const out = [];\n  for (let i = 0; i < arr.length; i++) {\n    if (!seen[arr[i]]) { seen[arr[i]] = true; out.push(arr[i]); }\n  }\n  return out;\n}",
     "tests": "if (JSON.stringify(dedup([3, 1, 2, 3, 1])) !== JSON.stringify([3, 1, 2])) throw new Error('order preserved');\nif (JSON.stringify(dedup([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(dedup([7, 7, 7])) !== JSON.stringify([7])) throw new Error('all same');",
     "prereqs": ["js.u04.seen.set-value"]
   },
@@ -452,7 +482,8 @@
     "cue": "Load a set, then from each run-start count upward while the next value is present.",
     "syntax": "new Set(nums)",
     "kind": "write",
-    "prompt": "Write `longestConsecutive(nums)` that returns the length of the longest run of consecutive integers in `nums`, in O(n) time. The values need not be adjacent in the array.",
+    "banned": [".sort("],
+    "prompt": "Write `longestConsecutive(nums)` that returns the length of the longest run of consecutive integers in `nums`, in O(n) time (no sorting). The values need not be adjacent in the array.",
     "starter": "function longestConsecutive(nums) {\n  // your code here\n}",
     "solution": "function longestConsecutive(nums) {\n  const s = new Set(nums);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    const x = nums[i];\n    if (!s.has(x - 1)) {\n      let len = 1;\n      while (s.has(x + len)) len++;\n      if (len > best) best = len;\n    }\n  }\n  return best;\n}",
     "tests": "if (longestConsecutive([100, 4, 200, 1, 3, 2]) !== 4) throw new Error('basic');\nif (longestConsecutive([]) !== 0) throw new Error('empty');\nif (longestConsecutive([1, 2, 0, 1]) !== 3) throw new Error('duplicates');\nif (longestConsecutive([0, 3, 7, 2, 5, 8, 4, 6, 0, 1]) !== 9) throw new Error('long run');",

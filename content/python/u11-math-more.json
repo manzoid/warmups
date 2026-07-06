@@ -12,7 +12,8 @@
     "tests": "assert is_prime(2) == True, is_prime(2)\nassert is_prime(1) == False, is_prime(1)\nassert is_prime(97) == True, is_prime(97)\nassert is_prime(100) == False, is_prime(100)\nassert is_prime(0) == False, is_prime(0)",
     "cue": "A divisor larger than the square root pairs with a smaller one, so stop testing at i * i > n. A remainder of 0 means it divides.",
     "syntax": "n % i == 0",
-    "prereqs": ["py.u11.mod.parity"]
+    "prereqs": ["py.u11.mod.parity"],
+    "mapsTo": "pattern behind LC 204 · Count Primes"
   },
   {
     "id": "py.u11.power.write",
@@ -54,10 +55,12 @@
     "prompt": "Write `to_base(n, b)` for `n >= 0` and `b >= 2` returning the list of `n`'s digits in base `b`, most significant first. `to_base(0, 2)` is `[0]`; `to_base(13, 2)` is `[1, 1, 0, 1]`.",
     "starter": "def to_base(n, b):\n    # your code here\n    pass",
     "solution": "def to_base(n, b):\n    if n == 0:\n        return [0]\n    digits = []\n    while n:\n        digits.append(n % b)\n        n //= b\n    digits.reverse()\n    return digits",
+    "banned": ["import"],
     "tests": "assert to_base(13, 2) == [1, 1, 0, 1], to_base(13, 2)\nassert to_base(0, 2) == [0], to_base(0, 2)\nassert to_base(255, 16) == [15, 15], to_base(255, 16)\nassert to_base(7, 10) == [7], to_base(7, 10)",
     "cue": "Same digit-by-digit loop as reversing a number, but the modulus is b, not 10. That gives least-significant first, so reverse at the end. Handle 0 as its own case.",
     "syntax": "n % b and n //= b",
-    "prereqs": ["py.u11.intdiv.revnum"]
+    "prereqs": ["py.u11.intdiv.revnum"],
+    "mapsTo": "pattern behind LC 504 · Base 7"
   },
   {
     "id": "py.u11.power.sqfold",
@@ -88,5 +91,32 @@
     "syntax": "exp & 1, base *= base, exp >>= 1",
     "note": "The exponent's binary digits pick which squares to multiply in, so the loop runs about log2(exp) times instead of exp times.",
     "mapsTo": "LC 50 · Pow(x, n)"
+  },
+  {
+    "id": "py.u11.float.imprecise",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "binary floats can't hold 0.1 exactly",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "0.1 + 0.2",
+    "expected": "0.30000000000000004",
+    "cue": "Tenths have no exact form in base-2 floats, so the sum lands a hair off.",
+    "syntax": "float rounding",
+    "note": "A float is stored in binary, and 0.1 and 0.2 have no exact binary form, so the result is the nearest representable value, not a clean 0.3. This is why you compare floats with a tolerance (abs(a - b) < 1e-9) instead of ==, or use integer cents / the decimal module for money."
+  },
+  {
+    "id": "py.u11.float.roundeven",
+    "track": "python",
+    "group": "Programming math",
+    "concept": "round() ties go to even",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "round(2.5)",
+    "expected": "2",
+    "prereqs": ["py.u11.float.imprecise"],
+    "cue": "A .5 tie does not always round up in Python.",
+    "syntax": "round(x)",
+    "note": "Python's round uses banker's rounding: an exact .5 rounds to the nearest even integer, so round(2.5) is 2 and round(3.5) is 4. It keeps a long column of roundings from drifting upward. To always round half up, add 0.5 and take the floor, or use the decimal module."
   }
 ]

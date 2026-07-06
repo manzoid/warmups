@@ -44,7 +44,38 @@
     ],
     "cue": "Two strings are anagrams exactly when their character tallies match.",
     "syntax": "Counter(s) == Counter(t)",
+    "banned": ["sorted(", ".sort("],
     "mapsTo": "LC 242 · Valid Anagram"
+  },
+  {
+    "id": "py.u04.dict-zip.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "build a dict from paired lists (zip truncates)",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "keys = ['a', 'b', 'c']\nvals = [1, 2]\ndict(zip(keys, vals))",
+    "expected": "{'a': 1, 'b': 2}",
+    "prereqs": [
+      "py.u04.freq.get.predict"
+    ],
+    "cue": "zip pairs the lists position by position; dict turns those pairs into entries.",
+    "syntax": "dict(zip(keys, vals))",
+    "note": "zip stops at the shorter input, so the third key with no matching value is silently dropped. This truncation is a common source of quietly-missing entries."
+  },
+  {
+    "id": "py.u04.split-default.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "str.split() with no argument",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\"  hello   world  \".split()",
+    "expected": "['hello', 'world']",
+    "prereqs": [],
+    "cue": "Bare split() treats any run of whitespace as one separator.",
+    "syntax": "str.split()",
+    "note": "split() with no argument splits on any whitespace run and drops leading, trailing, and empty pieces. split(' ') with an explicit space does NOT: it keeps the empty strings between doubled spaces."
   },
   {
     "id": "py.u04.wordcount.get.write",
@@ -52,15 +83,18 @@
     "group": "Hash maps",
     "concept": "word frequency via .get(k, 0)",
     "kind": "write",
-    "prompt": "Write `word_count(text)` that returns a dict mapping each whitespace-separated word in `text` to how many times it appears.",
+    "prompt": "Write `word_count(text)` that returns a dict mapping each whitespace-separated word in `text` to how many times it appears. Do not use collections.Counter.",
     "starter": "def word_count(text):\n    # your code here\n    pass",
     "solution": "def word_count(text):\n    freq = {}\n    words = text.split()\n    for i in range(len(words)):\n        w = words[i]\n        freq[w] = freq.get(w, 0) + 1\n    return freq",
     "tests": "assert word_count(\"a b a\") == {'a': 2, 'b': 1}, word_count(\"a b a\")\nassert word_count(\"\") == {}, word_count(\"\")\nassert word_count(\"hi\") == {'hi': 1}, word_count(\"hi\")\nassert word_count(\"go go go\") == {'go': 3}, word_count(\"go go go\")",
     "prereqs": [
-      "py.u04.freq.get.predict"
+      "py.u04.freq.get.predict",
+      "py.u04.split-default.predict"
     ],
     "cue": "Split into words, then tally each by index with a miss-safe read.",
-    "syntax": "str.split()"
+    "syntax": "str.split()",
+    "banned": ["Counter"],
+    "mapsTo": "pattern behind LC 819 · Most Common Word"
   },
   {
     "id": "py.u04.majority.write",

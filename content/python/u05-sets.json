@@ -10,7 +10,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = {1, 2, 3, 4}\n2 in s",
     "expected": "True",
-    "note": "Set lookup is O(1) on average via hashing; scanning a list for the same check is O(n).",
+    "note": "Set lookup is O(1) on average (constant time, no matter how many items) via hashing; scanning a list for the same check is O(n) (grows with the list length).",
     "prereqs": []
   },
   {
@@ -41,6 +41,20 @@
     "prereqs": ["py.u05.membership.set"]
   },
   {
+    "id": "py.u05.boolset.repeat_list",
+    "track": "python",
+    "group": "Sets",
+    "concept": "[value] * n makes n independent slots",
+    "cue": "One list of n flags, each starting at the same value.",
+    "syntax": "[value] * n",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "[False] * 3",
+    "expected": "[False, False, False]",
+    "note": "[False] * n builds n separate slots; the next set stores presence by flipping one slot per key.",
+    "prereqs": ["py.u05.add.idempotent"]
+  },
+  {
     "id": "py.u05.boolset.add",
     "track": "python",
     "group": "Sets",
@@ -54,7 +68,7 @@
     "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n\n    def remove(self, k):\n        self.present[k] = False\n",
     "tests": "s = BoolSet(5)\ns.add(2)\ns.add(2)\nassert s.contains(2) is True, s.present\nassert s.contains(0) is False, s.present\ns.remove(2)\nassert s.contains(2) is False, s.present\ns.remove(4)\nassert s.contains(4) is False, s.present\n",
     "note": "A set is one flag of presence per slot; indexing straight to the slot makes add, contains, and remove O(1).",
-    "prereqs": ["py.u05.add.idempotent"]
+    "prereqs": ["py.u05.boolset.repeat_list"]
   },
   {
     "id": "py.u05.boolset.contains",
@@ -83,6 +97,20 @@
     "prereqs": ["py.u05.boolset.contains"]
   },
   {
+    "id": "py.u05.hashset.bucket_index",
+    "track": "python",
+    "group": "Sets",
+    "concept": "hash a key into a bucket index",
+    "cue": "Reduce the key's hash into the table's range with modulo.",
+    "syntax": "hash(k) % nbuckets",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "hash(5) % 8",
+    "expected": "5",
+    "note": "A bucket is one slot of the backing array; hash(k) % nbuckets picks the slot. Keys that land in the same slot are chained (kept in a short list together).",
+    "prereqs": ["py.u05.boolset.remove"]
+  },
+  {
     "id": "py.u05.hashset.add",
     "track": "python",
     "group": "Sets",
@@ -95,8 +123,8 @@
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n",
     "tests": "s = HashSet()\ns.add(5)\ns.add(5)\ns.add(1)\nassert sum(len(b) for b in s.buckets) == 2, sum(len(b) for b in s.buckets)\n",
-    "note": "A hash set is u04's HashMap with the value dropped: each bucket stores bare keys, not [key, val] pairs.",
-    "prereqs": ["py.u05.boolset.remove"]
+    "note": "Chaining means each bucket holds a short list of the keys that hashed to it. This is u04's HashMap with the value slot dropped: each bucket stores bare keys, not [key, val] pairs.",
+    "prereqs": ["py.u05.hashset.bucket_index"]
   },
   {
     "id": "py.u05.hashset.contains",
@@ -126,6 +154,7 @@
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        return k in self.buckets[self._idx(k)]\n\n    def remove(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        return k in self.buckets[self._idx(k)]\n\n    def remove(self, k):\n        b = self.buckets[self._idx(k)]\n        if k in b:\n            b.remove(k)\n",
     "tests": "s = HashSet()\ns.add(5)\ns.add(1)\ns.remove(5)\nassert s.contains(5) is False, 5\nassert s.contains(1) is True, 1\ns.remove(99)\nassert s.contains(1) is True, 1\n",
+    "mapsTo": "LC 705 · Design HashSet",
     "prereqs": ["py.u05.hashset.contains"]
   },
   {
@@ -164,6 +193,7 @@
     "syntax": "for i in range(len(a)); a[i]",
     "kind": "write",
     "prompt": "Write `dedup(a)` returning the distinct elements of list `a` in first-seen order. Iterate by index, not with a for-each loop.",
+    "banned": [".fromkeys"],
     "starter": "def dedup(a):\n    # your code here\n    pass\n",
     "solution": "def dedup(a):\n    seen = set()\n    out = []\n    for i in range(len(a)):\n        if a[i] not in seen:\n            seen.add(a[i])\n            out.append(a[i])\n    return out\n",
     "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == []\nassert dedup([5, 5, 5]) == [5]\n",
@@ -193,6 +223,7 @@
     "syntax": "for x in a",
     "kind": "write",
     "prompt": "Write `dedup(a)` returning the distinct elements of list `a` in first-seen order. Use a for-each loop `for x in a`.",
+    "banned": [".fromkeys"],
     "starter": "def dedup(a):\n    # your code here\n    pass\n",
     "solution": "def dedup(a):\n    seen = set()\n    out = []\n    for x in a:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out\n",
     "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == []\nassert dedup([5, 5, 5]) == [5]\n",
@@ -328,7 +359,8 @@
     "cue": "Put one list in a set, then filter the other against it.",
     "syntax": "sorted(x for x in xs if cond)",
     "kind": "write",
-    "prompt": "Write `common(a, b)` returning the sorted list of distinct values present in both list `a` and list `b`.",
+    "prompt": "Write `common(a, b)` returning the sorted list of distinct values present in both list `a` and list `b`. Filter one set against the other by hand; do not use the intersection operator.",
+    "banned": ["&", ".intersection("],
     "starter": "def common(a, b):\n    # your code here\n    pass\n",
     "solution": "def common(a, b):\n    bs = set(b)\n    return sorted(x for x in set(a) if x in bs)\n",
     "tests": "assert common([1, 2, 3], [2, 3, 4]) == [2, 3], common([1, 2, 3], [2, 3, 4])\nassert common([1, 1, 2], [2, 2, 3]) == [2]\nassert common([], [1]) == []\n",

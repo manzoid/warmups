@@ -44,6 +44,7 @@
     ],
     "cue": "Sort descending, then take the front slice.",
     "syntax": "sorted(xs, reverse=True)[:k]",
+    "mapsTo": "pattern behind LC 215 · Kth Largest Element in an Array",
     "note": "Full sort is O(n log n); a size-k heap gets the top k in O(n log k), which wins when k is much smaller than n."
   },
   {
@@ -61,6 +62,7 @@
     ],
     "cue": "After sorting, the minimum gap is between neighbors, so sweep adjacent pairs.",
     "syntax": "a[i] - a[i - 1] neighbor diff",
+    "mapsTo": "pattern behind LC 1200 · Minimum Absolute Difference",
     "note": "Once sorted, the closest pair is always adjacent, so one linear sweep replaces checking every O(n^2) pair."
   }
 ]

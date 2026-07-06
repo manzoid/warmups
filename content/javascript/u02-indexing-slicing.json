@@ -24,7 +24,8 @@
     "banned": [".at("],
     "prereqs": ["js.u02.access.last.raw"],
     "cue": "Turn the distance-from-end into an index by subtracting from the length.",
-    "syntax": "arr.length"
+    "syntax": "arr.length",
+    "mapsTo": "LC 19 · Remove Nth Node From End of List (the length-minus-k index, on an array here)"
   },
   {
     "id": "js.u02.access.at",
@@ -160,7 +161,8 @@
     "banned": [".reverse("],
     "prereqs": ["js.u02.reverse.raw"],
     "cue": "Compare the outermost pair, then move both pointers inward.",
-    "syntax": "arr[lo] !== arr[hi] comparison"
+    "syntax": "arr[lo] !== arr[hi] comparison",
+    "mapsTo": "LC 125 · Valid Palindrome (the two-pointer symmetric check)"
   },
   {
     "id": "js.u02.reverse.mutates",
@@ -252,7 +254,7 @@
     "prompt": "Write maxWindowSum(a, k) that returns the largest sum of any k consecutive elements. Do not re-sum each window from scratch. Assume 1 <= k <= a.length.",
     "starter": "function maxWindowSum(a, k) {\n  // your code here\n}",
     "solution": "function maxWindowSum(a, k) {\n  let sum = 0;\n  for (let t = 0; t < k; t++) sum += a[t];\n  let best = sum;\n  for (let i = k; i < a.length; i++) {\n    sum += a[i] - a[i - k];\n    if (sum > best) best = sum;\n  }\n  return best;\n}",
-    "tests": "if (maxWindowSum([1, 2, 3, 4, 5], 2) !== 9) throw new Error('9');\nif (maxWindowSum([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error('9b');\nif (maxWindowSum([4], 1) !== 4) throw new Error('single');\nif (maxWindowSum([-1, -2, -3], 2) !== -3) throw new Error('neg');",
+    "tests": "if (maxWindowSum([1, 2, 3, 4, 5], 2) !== 9) throw new Error('9');\nif (maxWindowSum([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error('9b');\nif (maxWindowSum([4], 1) !== 4) throw new Error('single');\nif (maxWindowSum([-1, -2, -3], 2) !== -3) throw new Error('neg');\nlet _reads = 0;\nconst _base = Array.from({ length: 200 }, (_, i) => (i % 9) - 4);\nconst _spy = new Proxy(_base, { get(t, p, r) { if (typeof p === 'string' && String(Number(p)) === p) _reads++; return Reflect.get(t, p, r); } });\nconst _want = maxWindowSum(_base, 100);\n_reads = 0;\nif (maxWindowSum(_spy, 100) !== _want) throw new Error('rolling value');\nif (_reads > 4 * _base.length) throw new Error('re-summed each window instead of rolling: ' + _reads + ' index reads');",
     "prereqs": ["js.u02.window.raw"],
     "cue": "Add up the first k elements, then slide the window forward one step at a time and keep the largest sum you see.",
     "syntax": "add the entering element, subtract the leaving one",

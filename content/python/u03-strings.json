@@ -77,6 +77,7 @@
     "kind": "write",
     "prompt": "Write `char_freq(s)` returning a dict that maps each character in `s` to the number of times it appears.",
     "starter": "def char_freq(s):\n    # your code here\n    pass",
+    "banned": ["Counter", ".count("],
     "solution": "def char_freq(s):\n    counts = {}\n    for c in s:\n        counts[c] = counts.get(c, 0) + 1\n    return counts",
     "tests": "assert char_freq(\"aab\") == {\"a\": 2, \"b\": 1}, char_freq(\"aab\")\nassert char_freq(\"\") == {}, char_freq(\"\")\nassert char_freq(\"xxx\") == {\"x\": 3}, char_freq(\"xxx\")",
     "prereqs": [
@@ -85,7 +86,8 @@
     ],
     "cue": "One pass, bump a running count per character.",
     "syntax": "dict.get(key, 0)",
-    "note": "A dict keyed by character is the standard O(n) frequency count; collections.Counter wraps exactly this loop."
+    "note": "A dict keyed by character is the standard frequency count and runs in O(n) time (the work grows in step with the input length); collections.Counter wraps exactly this loop.",
+    "mapsTo": "pattern behind LC 383 · Ransom Note"
   },
   {
     "id": "py.u03.count.vowels",
@@ -95,6 +97,7 @@
     "kind": "write",
     "prompt": "Write `count_vowels(s)` returning the number of vowel characters (a, e, i, o, u) in `s`, counting both uppercase and lowercase.",
     "starter": "def count_vowels(s):\n    # your code here\n    pass",
+    "banned": ["sum(", ".count("],
     "solution": "def count_vowels(s):\n    n = 0\n    for c in s:\n        if c in \"aeiouAEIOU\":\n            n += 1\n    return n",
     "tests": "assert count_vowels(\"Banana\") == 3\nassert count_vowels(\"AEIOU\") == 5\nassert count_vowels(\"HELLO\") == 2\nassert count_vowels(\"xyz\") == 0\nassert count_vowels(\"\") == 0",
     "prereqs": [
@@ -169,7 +172,7 @@
     "kind": "write",
     "prompt": "Write `count_digits(s)` returning how many characters of `s` are digits 0-9. Do not use `str.isdigit`.",
     "starter": "def count_digits(s):\n    # your code here\n    pass",
-    "banned": [".isdigit("],
+    "banned": [".isdigit(", "sum(", ".count("],
     "solution": "def count_digits(s):\n    n = 0\n    for c in s:\n        if '0' <= c <= '9':\n            n += 1\n    return n",
     "tests": "assert count_digits(\"a1b2c3\") == 3\nassert count_digits(\"abc\") == 0\nassert count_digits(\"2024\") == 4",
     "prereqs": [
@@ -184,11 +187,11 @@
     "group": "Strings",
     "concept": "sum digit values",
     "kind": "write",
-    "prompt": "Write `digit_sum(s)` returning the sum of the numeric values of the digit characters in `s`; ignore non-digit characters. Do not use `int`.",
-    "starter": "def digit_sum(s):\n    # your code here\n    pass",
-    "banned": ["int("],
-    "solution": "def digit_sum(s):\n    total = 0\n    for c in s:\n        if '0' <= c <= '9':\n            total += ord(c) - ord('0')\n    return total",
-    "tests": "assert digit_sum(\"a1b2c3\") == 6\nassert digit_sum(\"abc\") == 0\nassert digit_sum(\"111\") == 3",
+    "prompt": "Write `sum_digits(s)` returning the sum of the numeric values of the digit characters in `s`; ignore non-digit characters. Do not use `int`.",
+    "starter": "def sum_digits(s):\n    # your code here\n    pass",
+    "banned": ["int(", "sum(", ".count("],
+    "solution": "def sum_digits(s):\n    total = 0\n    for c in s:\n        if '0' <= c <= '9':\n            total += ord(c) - ord('0')\n    return total",
+    "tests": "assert sum_digits(\"a1b2c3\") == 6\nassert sum_digits(\"abc\") == 0\nassert sum_digits(\"111\") == 3",
     "prereqs": [
       "py.u03.classify.digitval"
     ],
@@ -246,6 +249,7 @@
     "kind": "write",
     "prompt": "Write `only_letters(s)` returning a new string containing only the alphabetic characters of `s`, in order.",
     "starter": "def only_letters(s):\n    # your code here\n    pass",
+    "banned": [".isalpha("],
     "solution": "def only_letters(s):\n    parts = []\n    for c in s:\n        if ('a' <= c <= 'z') or ('A' <= c <= 'Z'):\n            parts.append(c)\n    return \"\".join(parts)",
     "tests": "assert only_letters(\"a1b2c3\") == \"abc\"\nassert only_letters(\"Hello, World!\") == \"HelloWorld\"\nassert only_letters(\"123\") == \"\"",
     "prereqs": [
@@ -353,7 +357,7 @@
     "kind": "write",
     "prompt": "Write `is_palindrome(s)` returning True if `s` reads the same forwards and backwards. Use two pointers converging from the ends; do not use slicing.",
     "starter": "def is_palindrome(s):\n    # your code here\n    pass",
-    "banned": ["[::-1]"],
+    "banned": ["[::-1]", "reversed("],
     "solution": "def is_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        if s[i] != s[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
     "tests": "assert is_palindrome(\"racecar\") == True\nassert is_palindrome(\"abba\") == True\nassert is_palindrome(\"abc\") == False\nassert is_palindrome(\"\") == True\nassert is_palindrome(\"a\") == True",
     "prereqs": [
@@ -387,6 +391,7 @@
     "kind": "write",
     "prompt": "Write `is_clean_palindrome(s)` returning True if `s` is a palindrome when considering only alphanumeric characters and ignoring case. Use two pointers that skip non-alphanumeric characters.",
     "starter": "def is_clean_palindrome(s):\n    # your code here\n    pass",
+    "banned": ["[::-1]", "reversed("],
     "solution": "def is_clean_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        while i < j and not s[i].isalnum():\n            i += 1\n        while i < j and not s[j].isalnum():\n            j -= 1\n        if s[i].lower() != s[j].lower():\n            return False\n        i += 1\n        j -= 1\n    return True",
     "tests": "assert is_clean_palindrome(\"A man, a plan, a canal: Panama\") == True\nassert is_clean_palindrome(\"race a car\") == False\nassert is_clean_palindrome(\"\") == True\nassert is_clean_palindrome(\".,\") == True\nassert is_clean_palindrome(\"Ab_a\") == True",
     "prereqs": [

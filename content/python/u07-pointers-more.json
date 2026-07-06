@@ -57,6 +57,7 @@
     "prompt": "Write `last_nonzero_index(a)` that returns the index of the last nonzero element of `a`, or -1 if every element is zero or `a` is empty. Scan backward from the end.",
     "starter": "def last_nonzero_index(a):\n    # your code here\n    return -1",
     "solution": "def last_nonzero_index(a):\n    i = len(a) - 1\n    while i >= 0 and a[i] == 0:\n        i -= 1\n    return i",
+    "banned": ["enumerate", "max("],
     "tests": "assert last_nonzero_index([0, 5, 0, 0]) == 1, last_nonzero_index([0, 5, 0, 0])\nassert last_nonzero_index([0, 0, 0]) == -1\nassert last_nonzero_index([]) == -1\nassert last_nonzero_index([7]) == 0\nassert last_nonzero_index([1, 0]) == 0",
     "prereqs": [
       "py.u07.skip-suffix.predict"
@@ -73,6 +74,7 @@
     "prompt": "Write `partition_even_odd(a)` that rearranges list `a` in place so every even number comes before every odd number, and returns `a`. The order within each group need not be preserved.",
     "starter": "def partition_even_odd(a):\n    # your code here\n    return a",
     "solution": "def partition_even_odd(a):\n    w = 0\n    for i in range(len(a)):\n        if a[i] % 2 == 0:\n            a[w], a[i] = a[i], a[w]\n            w += 1\n    return a",
+    "banned": [".sort(", "sorted("],
     "tests": "from collections import Counter\ndef _check(orig):\n    a = list(orig)\n    r = partition_even_odd(a)\n    assert r is a, 'must rearrange in place and return the same list'\n    seen_odd = False\n    for x in r:\n        if x % 2 == 1:\n            seen_odd = True\n        elif seen_odd:\n            assert False, ('odd before even', r)\n    assert Counter(r) == Counter(orig), r\n_check([1, 2, 3, 4, 5])\n_check([])\n_check([2, 4])\n_check([1, 3])\n_check([4, 1, 6, 3, 8])",
     "prereqs": [
       "py.u07.move-zeros.write"
@@ -131,5 +133,57 @@
     "cue": "Same skip-run walk as run-length encoding, but append the count only when the run is longer than one.",
     "syntax": "if j - i > 1",
     "mapsTo": "pattern behind LC 443 · String Compression (LC 443 packs counts in place; this returns a new string)"
+  },
+  {
+    "id": "py.u07.converge.predict",
+    "track": "python",
+    "group": "Pointers (cursor walks)",
+    "concept": "two pointers moving inward from both ends",
+    "kind": "predict",
+    "prompt": "What is the value of `pairs`?",
+    "snippet": "a = [1, 2, 3, 4, 5]\ni = 0\nj = len(a) - 1\npairs = []\nwhile i < j:\n    pairs.append((a[i], a[j]))\n    i += 1\n    j -= 1\npairs",
+    "expected": "[(1, 5), (2, 4)]",
+    "prereqs": [
+      "py.u07.skip-suffix.predict"
+    ],
+    "cue": "One index starts at the front, one at the back; they step toward each other and stop when they meet.",
+    "syntax": "while i < j"
+  },
+  {
+    "id": "py.u07.reverse-inplace.write",
+    "track": "python",
+    "group": "Pointers (cursor walks)",
+    "concept": "reverse in place with two ends meeting",
+    "kind": "write",
+    "prompt": "Write `reverse_in_place(a)` that reverses list `a` in place using two indices that start at the ends and move inward, and returns `a`. Do not use slicing, list.reverse, or reversed.",
+    "starter": "def reverse_in_place(a):\n    # your code here\n    return a",
+    "solution": "def reverse_in_place(a):\n    i = 0\n    j = len(a) - 1\n    while i < j:\n        a[i], a[j] = a[j], a[i]\n        i += 1\n        j -= 1\n    return a",
+    "banned": ["::", ".reverse(", "reversed("],
+    "tests": "assert reverse_in_place([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_in_place([1, 2, 3, 4])\nassert reverse_in_place([1, 2, 3]) == [3, 2, 1]\nassert reverse_in_place([]) == []\nassert reverse_in_place([9]) == [9]\nb = [1, 2]\nassert reverse_in_place(b) is b and b == [2, 1], b",
+    "prereqs": [
+      "py.u07.converge.predict"
+    ],
+    "cue": "Swap the two ends, then step both indices inward.",
+    "syntax": "a[i], a[j] = a[j], a[i]",
+    "note": "Two pointers from the ends do half as many swaps as copying into a fresh reversed list, with no extra space.",
+    "mapsTo": "LC 344 · Reverse String"
+  },
+  {
+    "id": "py.u07.palindrome.write",
+    "track": "python",
+    "group": "Pointers (cursor walks)",
+    "concept": "palindrome check with converging pointers",
+    "kind": "write",
+    "prompt": "Write `is_palindrome(a)` that returns True if list `a` reads the same forward and backward, using two indices moving inward from the ends. Do not reverse the list or compare it to its reverse.",
+    "starter": "def is_palindrome(a):\n    # your code here\n    return False",
+    "solution": "def is_palindrome(a):\n    i = 0\n    j = len(a) - 1\n    while i < j:\n        if a[i] != a[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
+    "banned": ["::", ".reverse(", "reversed("],
+    "tests": "assert is_palindrome([1, 2, 1]) == True, is_palindrome([1, 2, 1])\nassert is_palindrome([1, 2, 2, 1]) == True\nassert is_palindrome([1, 2, 3]) == False\nassert is_palindrome([]) == True\nassert is_palindrome([7]) == True\nassert is_palindrome([1, 2, 2, 3]) == False",
+    "prereqs": [
+      "py.u07.reverse-inplace.write"
+    ],
+    "cue": "Compare the two ends; the moment they differ it is not a palindrome.",
+    "syntax": "return False on the first mismatch",
+    "mapsTo": "pattern behind LC 125 · Valid Palindrome (LC 125 first strips non-alphanumerics and lowercases)"
   }
 ]

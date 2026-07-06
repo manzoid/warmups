@@ -1,5 +1,19 @@
 [
   {
+    "id": "py.u04.ord-and-slots.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "character codes and zero-filled slots",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "codes = [ord('a'), ord('b'), ord('c')]\nslots = [0] * 3\n[codes, slots]",
+    "expected": "[[97, 98, 99], [0, 0, 0]]",
+    "prereqs": [],
+    "cue": "ord turns a character into its integer code; [0] * n repeats one value into a list.",
+    "syntax": "ord(ch); [0] * n",
+    "note": "ord('a') is 97, ord('b') 98, ord('c') 99 (consecutive), so ord(ch) - ord('a') gives 0..25 for lowercase letters. [0] * 3 builds three tally slots, all starting at zero."
+  },
+  {
     "id": "py.u04.direct-address.count.indexed",
     "track": "python",
     "group": "Hash maps",
@@ -8,7 +22,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "s = \"aabbbc\"\ncount = [0] * 256\nfor i in range(len(s)):\n    count[ord(s[i])] += 1\n[count[ord('a')], count[ord('b')], count[ord('c')]]",
     "expected": "[2, 3, 1]",
-    "prereqs": [],
+    "prereqs": [
+      "py.u04.ord-and-slots.predict"
+    ],
     "cue": "Walk indices 0..len(s)-1; read s[i] each pass into the count array.",
     "syntax": "for i in range(len(s)): s[i]",
     "note": "ord(ch) is the integer code of a character (ord('a') is 97); [0] * 256 makes 256 tally slots, one per possible code, so count[ord(ch)] is that character's own counter."
@@ -153,7 +169,7 @@
     ],
     "cue": "The loop is given; you supply the final step that maps any h into a valid slot in [0, self.size).",
     "syntax": "% self.size",
-    "note": "The multiplier 31 spreads similar strings apart; `% self.size` is what turns an unbounded number back into a real array index."
+    "note": "A rolling hash folds each character into one running number, left to right (h = h*31 + code). The range [0, self.size) means a slot from 0 up to size-1. The multiplier 31 spreads similar strings apart; `% self.size` is what turns an unbounded number back into a real array index."
   },
   {
     "id": "py.u04.build.put",
@@ -169,7 +185,8 @@
       "py.u04.build.hash"
     ],
     "cue": "Hash to a bucket, scan its indices for the key, then update or append.",
-    "syntax": "list.append([key, val])"
+    "syntax": "list.append([key, val])",
+    "note": "A bucket is the list living at one slot. Chaining means keys that hash to the same slot just coexist in that slot's list, so a collision costs a short scan, not a lost entry."
   },
   {
     "id": "py.u04.build.get",
@@ -185,7 +202,9 @@
       "py.u04.build.put"
     ],
     "cue": "Hash to the bucket, then linear-scan pair indices by full key.",
-    "syntax": "return inside loop, else None"
+    "syntax": "return inside loop, else None",
+    "note": "With _hash, put, and get in place you have a working hash map built from raw arrays: the same design a language ships as its dict.",
+    "mapsTo": "LC 706 · Design HashMap"
   },
   {
     "id": "py.u04.two-sum.predict",
@@ -217,7 +236,7 @@
     ],
     "cue": "One pass storing value to index; first check whether target minus the current value is already stored.",
     "syntax": "seen[nums[i]] = i",
-    "note": "The map trades O(n) space to drop the O(n^2) inner loop of checking every pair: each complement lookup is O(1).",
+    "note": "Big-O describes how the work grows with input size n. The map trades O(n) space (grows with n) to drop the O(n^2) inner loop of checking every pair: each complement lookup is O(1), constant regardless of n.",
     "mapsTo": "LC 1 · Two Sum"
   },
   {
@@ -361,7 +380,8 @@
       "py.u04.seen.dedup.predict"
     ],
     "cue": "Track seen values in a set; append first occurrences in order.",
-    "syntax": "set.add(x)"
+    "syntax": "set.add(x)",
+    "banned": ["fromkeys"]
   },
   {
     "id": "py.u04.contains-dup.predict",

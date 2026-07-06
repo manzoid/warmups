@@ -81,7 +81,7 @@
     ],
     "cue": "One stack takes arrivals; pour it into a second only when that second is empty, which reverses to arrival order.",
     "syntax": "while self.in_st: pour with list.pop()",
-    "note": "Each item is moved between stacks at most once, so dequeue is amortized O(1).",
+    "note": "Each item is moved between stacks at most once, so dequeue is amortized O(1): any single dequeue may pour the whole in-stack over, but averaged across a run of operations each one costs O(1).",
     "mapsTo": "LC 232 · Implement Queue using Stacks"
   }
 ]

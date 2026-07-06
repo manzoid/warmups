@@ -7,10 +7,26 @@
     "kind": "predict",
     "prompt": "What is the value of `c`?",
     "snippet": "const s = \"warmup\";\nconst c = s[3];\nc",
-    "expected": "m",
+    "expected": "'m'",
     "prereqs": [],
     "cue": "Index into the string from position zero.",
     "syntax": "s[i] one-char access"
+  },
+  {
+    "id": "js.u03.char.order",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "chars compare by code point",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "\"a\" < \"b\"",
+    "expected": "true",
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "Letters order the way they sit in the alphabet.",
+    "syntax": "c1 < c2 char comparison",
+    "note": "Each character carries a hidden number, its code point, and < compares those numbers. That is why 'a' < 'b' and '0' < '9'. The next few exercises read that number directly."
   },
   {
     "id": "js.u03.charcode.at",
@@ -21,7 +37,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"A\".charCodeAt(0)",
     "expected": "65",
-    "prereqs": [],
+    "prereqs": [
+      "js.u03.char.order"
+    ],
     "cue": "Read the code point of the character.",
     "syntax": "str.charCodeAt(i)",
     "note": "Every character has a number, its code point. charCodeAt(i) reads that number: 'A' is 65, 'B' is 66, and so on up through the alphabet."
@@ -34,7 +52,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "String.fromCharCode(66)",
-    "expected": "B",
+    "expected": "'B'",
     "prereqs": [],
     "cue": "Map the code point back to a character.",
     "syntax": "String.fromCharCode(n)"
@@ -86,6 +104,38 @@
     "syntax": "for (const c of s)"
   },
   {
+    "id": "js.u03.forin.keys",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "for..in yields index keys as strings, not chars",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const s = \"ab\";\nconst out = [];\nfor (const k in s) {\n  out.push(k);\n}\nout",
+    "expected": "[\"0\", \"1\"]",
+    "prereqs": [
+      "js.u03.forof.collect"
+    ],
+    "cue": "for..in walks keys; for a string those keys are the positions.",
+    "syntax": "for (const k in s)",
+    "note": "for..in gives keys (here the indices, as the strings '0' and '1'), while for..of gives the characters. To loop over characters, reach for for..of."
+  },
+  {
+    "id": "js.u03.str.immutable",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "strings are immutable; methods return new strings",
+    "kind": "predict",
+    "prompt": "What is the value of `s`?",
+    "snippet": "const s = \"abc\";\nconst t = s.toUpperCase();\ns",
+    "expected": "'abc'",
+    "prereqs": [
+      "js.u03.index.char"
+    ],
+    "cue": "A string method hands back a new string; consider whether the original changes.",
+    "syntax": "str methods return, never mutate",
+    "note": "A string never changes in place. toUpperCase returns a new string and the original s is untouched; assigning to s[0] does nothing either. To 'edit' a string, build a new one (collect chars in an array, then join)."
+  },
+  {
     "id": "js.u03.count.char",
     "track": "javascript",
     "group": "Strings",
@@ -95,12 +145,26 @@
     "starter": "function countChar(s, ch) {\n  // your code here\n}",
     "solution": "function countChar(s, ch) {\n  let n = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (s[i] === ch) n++;\n  }\n  return n;\n}",
     "tests": "if (countChar(\"banana\", \"a\") !== 3) throw new Error(\"banana/a\");\nif (countChar(\"\", \"a\") !== 0) throw new Error(\"empty\");\nif (countChar(\"abc\", \"z\") !== 0) throw new Error(\"absent\");",
-    "banned": [".split(", ".match(", ".replaceAll("],
+    "banned": [".split(", ".match(", ".replaceAll(", ".filter("],
     "prereqs": [
       "js.u03.index.char"
     ],
     "cue": "Scan with an index and tally matches.",
     "syntax": "for (let i = 0; i < s.length; i++)"
+  },
+  {
+    "id": "js.u03.or.default",
+    "track": "javascript",
+    "group": "Strings",
+    "concept": "|| supplies a default for a missing value",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "undefined || 0",
+    "expected": "0",
+    "prereqs": [],
+    "cue": "A missing value is falsy, so || falls through to the right side.",
+    "syntax": "value || fallback",
+    "note": "undefined is falsy, so `undefined || 0` yields 0. Reading a key that was never set gives undefined, so `(m[k] || 0)` turns a first-seen key into 0 before you add to it."
   },
   {
     "id": "js.u03.counter.idiom",
@@ -111,7 +175,9 @@
     "prompt": "What is the value of `m`?",
     "snippet": "const m = {};\nm[\"a\"] = (m[\"a\"] || 0) + 1;\nm[\"a\"] = (m[\"a\"] || 0) + 1;\nm[\"b\"] = (m[\"b\"] || 0) + 1;\nm",
     "expected": "{a: 2, b: 1}",
-    "prereqs": [],
+    "prereqs": [
+      "js.u03.or.default"
+    ],
     "cue": "A missing key reads as undefined; the || supplies the starting count.",
     "syntax": "obj[k] = (obj[k] || 0) + 1",
     "note": "obj[k] || 0 turns a first-seen key into 0, so the bump starts its tally at 1."
@@ -143,7 +209,8 @@
     "snippet": "const c = \"7\";\nc >= \"0\" && c <= \"9\"",
     "expected": "true",
     "prereqs": [
-      "js.u03.index.char"
+      "js.u03.index.char",
+      "js.u03.char.order"
     ],
     "cue": "Compare the char against the digit range.",
     "syntax": "c >= '0' && c <= '9'"
@@ -212,7 +279,8 @@
       "js.u03.digit.value"
     ],
     "cue": "Build the number one digit at a time, left to right, each step worth ten of the last.",
-    "syntax": "n * 10 + digit"
+    "syntax": "n * 10 + digit",
+    "mapsTo": "LC 8 · String to Integer (atoi)"
   },
   {
     "id": "js.u03.build.push.join",
@@ -222,7 +290,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const s = \"abc\";\nconst parts = [];\nfor (let i = 0; i < s.length; i++) {\n  parts.push(s[i] + \"!\");\n}\nparts.join(\"\")",
-    "expected": "a!b!c!",
+    "expected": "'a!b!c!'",
     "prereqs": [
       "js.u03.index.collect"
     ],
@@ -237,7 +305,7 @@
     "kind": "predict",
     "prompt": "What is the value of `out`?",
     "snippet": "let out = \"\";\nconst s = \"xyz\";\nfor (let i = 0; i < s.length; i++) {\n  out = s[i] + out;\n}\nout",
-    "expected": "zyx",
+    "expected": "'zyx'",
     "prereqs": [
       "js.u03.build.push.join"
     ],
@@ -295,7 +363,8 @@
     ],
     "cue": "Shift lowercase letters by the case offset.",
     "syntax": "String.fromCharCode(code - 32)",
-    "note": "Each lowercase letter sits exactly 32 code points above its uppercase twin."
+    "note": "Each lowercase letter sits exactly 32 code points above its uppercase twin.",
+    "mapsTo": "pattern behind LC 709 · To Lower Case"
   },
   {
     "id": "js.u03.template",
@@ -305,7 +374,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "`hi ${\"Tom\"} ${1 + 2}`",
-    "expected": "hi Tom 3",
+    "expected": "'hi Tom 3'",
     "prereqs": [
       "js.u03.build.push.join"
     ],
@@ -338,7 +407,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "[...\"hello\"].reverse().join(\"\")",
-    "expected": "olleh",
+    "expected": "'olleh'",
     "prereqs": [
       "js.u03.reverse.loop"
     ],
@@ -415,7 +484,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const s = \"hello\";\nconst parts = [];\nfor (let i = 1; i < 4; i++) {\n  parts.push(s[i]);\n}\nparts.join(\"\")",
-    "expected": "ell",
+    "expected": "'ell'",
     "prereqs": [
       "js.u03.index.char"
     ],
@@ -430,7 +499,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "\"hello\".slice(1, 4)",
-    "expected": "ell",
+    "expected": "'ell'",
     "prereqs": [
       "js.u03.substr.loop"
     ],

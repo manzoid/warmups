@@ -52,6 +52,7 @@
     "starter": "function everyOther(a) {\n  // your code here\n}",
     "solution": "function everyOther(a) {\n  let i = 0;\n  const out = [];\n  while (i < a.length) {\n    out.push(a[i]);\n    i += 2;\n  }\n  return out;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(everyOther([5, 6, 7, 8, 9]), [5, 7, 9]);\neq(everyOther([]), []);\neq(everyOther([1]), [1]);\neq(everyOther([1, 2]), [1]);",
+    "banned": [".filter("],
     "prereqs": ["js.u07.manual.write"]
   },
   {
@@ -105,6 +106,7 @@
     "starter": "function firstNonZero(a) {\n  // your code here\n}",
     "solution": "function firstNonZero(a) {\n  let i = 0;\n  while (i < a.length && a[i] === 0) i++;\n  return i;\n}",
     "tests": "if (firstNonZero([0, 0, 5, 0]) !== 2) throw new Error('2');\nif (firstNonZero([0, 0, 0]) !== 3) throw new Error('all zero');\nif (firstNonZero([]) !== 0) throw new Error('empty');\nif (firstNonZero([7]) !== 0) throw new Error('first');",
+    "banned": [".findIndex(", ".filter("],
     "prereqs": ["js.u07.skipprefix.predict"]
   },
   {
@@ -186,7 +188,21 @@
     "starter": "function firstRunLength(a) {\n  // your code here\n}",
     "solution": "function firstRunLength(a) {\n  if (a.length === 0) return 0;\n  let j = 0;\n  while (j < a.length && a[j] === a[0]) j++;\n  return j;\n}",
     "tests": "if (firstRunLength([1, 1, 1, 2]) !== 3) throw new Error('3');\nif (firstRunLength([5]) !== 1) throw new Error('single');\nif (firstRunLength([]) !== 0) throw new Error('empty');\nif (firstRunLength([3, 3]) !== 2) throw new Error('two');\nif (firstRunLength([1, 2, 2]) !== 1) throw new Error('run of one');",
+    "banned": [".findIndex("],
     "prereqs": ["js.u07.skiprun.predict"]
+  },
+  {
+    "id": "js.u07.truncate.predict",
+    "track": "javascript",
+    "group": "Pointers (cursor walks)",
+    "concept": "shrink an array by setting .length",
+    "cue": "Assigning a smaller length drops the elements past that index.",
+    "syntax": "a.length = 2",
+    "kind": "predict",
+    "prompt": "What is the value of `a`?",
+    "snippet": "const a = [1, 2, 3, 4, 5];\na.length = 2;\na;",
+    "expected": "[1, 2]",
+    "prereqs": ["js.u07.manual.sum"]
   },
   {
     "id": "js.u07.compact.predict",
@@ -200,7 +216,7 @@
     "snippet": "const a = [1, 0, 2, 0];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    a[w] = a[i];\n    w++;\n  }\n}\na.length = w;\na;",
     "expected": "[1, 2]",
     "note": "Assigning to `a.length = w` truncates the array to its first w elements, dropping the leftover tail slots after the survivors were copied to the front.",
-    "prereqs": ["js.u07.manual.sum"]
+    "prereqs": ["js.u07.manual.sum", "js.u07.truncate.predict"]
   },
   {
     "id": "js.u07.compact.write",
@@ -214,6 +230,7 @@
     "starter": "function removeVal(a, val) {\n  // your code here\n}",
     "solution": "function removeVal(a, val) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== val) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  a.length = w;\n  return w;\n}",
     "tests": "const a = [0, 3, 0, 5, 7, 0];\nif (removeVal(a, 0) !== 3) throw new Error('len');\nif (JSON.stringify(a) !== JSON.stringify([3, 5, 7])) throw new Error('a: ' + a);\nconst b = [1, 1, 1];\nif (removeVal(b, 1) !== 0) throw new Error('all removed');\nif (JSON.stringify(b) !== JSON.stringify([])) throw new Error('b empty');\nconst c = [1, 2, 3];\nif (removeVal(c, 9) !== 3) throw new Error('none removed');",
+    "banned": [".filter(", ".splice("],
     "note": "The write index w never runs ahead of the read index i, so overwriting a[w] can't clobber an element you still need to read.",
     "mapsTo": "LC 27 · Remove Element",
     "prereqs": ["js.u07.compact.predict"]
@@ -230,6 +247,7 @@
     "starter": "function dedupeSorted(a) {\n  // your code here\n}",
     "solution": "function dedupeSorted(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let i = 1; i < a.length; i++) {\n    if (a[i] !== a[w - 1]) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  a.length = w;\n  return w;\n}",
     "tests": "const a = [1, 1, 2, 2, 3];\nif (dedupeSorted(a) !== 3) throw new Error('len');\nif (JSON.stringify(a) !== JSON.stringify([1, 2, 3])) throw new Error('a: ' + a);\nif (dedupeSorted([]) !== 0) throw new Error('empty');\nconst c = [5];\nif (dedupeSorted(c) !== 1) throw new Error('single');\nconst d = [1, 1, 1];\nif (dedupeSorted(d) !== 1 || JSON.stringify(d) !== JSON.stringify([1])) throw new Error('all same');",
+    "banned": ["Set(", ".filter("],
     "note": "Comparing against the last kept element (a[w-1]) instead of a fixed anchor is what lets one pass collapse every duplicate run; it only works because the array is sorted.",
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array",
     "prereqs": ["js.u07.compact.write"]
@@ -249,6 +267,19 @@
     "prereqs": ["js.u07.compact.write"]
   },
   {
+    "id": "js.u07.swap.predict",
+    "track": "javascript",
+    "group": "Pointers (cursor walks)",
+    "concept": "destructuring swap (no temp)",
+    "cue": "Both right-hand values are read first, then assigned to the left in order.",
+    "syntax": "[a, b] = [b, a]",
+    "kind": "predict",
+    "prompt": "What is the value of `a`?",
+    "snippet": "const a = [10, 20, 30];\n[a[0], a[2]] = [a[2], a[0]];\na;",
+    "expected": "[30, 20, 10]",
+    "prereqs": ["js.u07.manual.sum"]
+  },
+  {
     "id": "js.u07.movezeros.predict",
     "track": "javascript",
     "group": "Pointers (cursor walks)",
@@ -260,7 +291,7 @@
     "snippet": "const a = [1, 0, 2, 0, 0, 3];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    [a[w], a[i]] = [a[i], a[w]];\n    w++;\n  }\n}\na;",
     "expected": "[1, 2, 3, 0, 0, 0]",
     "note": "`[a[w], a[i]] = [a[i], a[w]]` is a destructuring swap: it exchanges the two elements in one line, with no temporary variable.",
-    "prereqs": ["js.u07.compact.predict"]
+    "prereqs": ["js.u07.compact.predict", "js.u07.swap.predict"]
   },
   {
     "id": "js.u07.movezeros.write",
@@ -274,6 +305,7 @@
     "starter": "function moveZeros(a) {\n  // your code here\n}",
     "solution": "function moveZeros(a) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== 0) {\n      [a[w], a[i]] = [a[i], a[w]];\n      w++;\n    }\n  }\n  return a;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(moveZeros([0, 1, 0, 3, 12]), [1, 3, 12, 0, 0]);\neq(moveZeros([0]), [0]);\neq(moveZeros([1, 2]), [1, 2]);\neq(moveZeros([0, 0, 1]), [1, 0, 0]);\neq(moveZeros([]), []);",
+    "banned": [".filter(", ".sort("],
     "note": "Swapping (not copying) preserves every value, so the zeros collect at the end for free and no truncation is needed.",
     "mapsTo": "LC 283 · Move Zeroes",
     "prereqs": ["js.u07.compact.write"]
@@ -318,7 +350,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const s = 'aabcccc';\nlet i = 0;\nlet res = '';\nwhile (i < s.length) {\n  let j = i;\n  while (j < s.length && s[j] === s[i]) j++;\n  res += s[i] + (j - i);\n  i = j;\n}\nres;",
-    "expected": "a2b1c4",
+    "expected": "'a2b1c4'",
     "prereqs": ["js.u07.skiprun.predict"]
   },
   {
@@ -333,6 +365,7 @@
     "starter": "function rle(s) {\n  // your code here\n}",
     "solution": "function rle(s) {\n  let i = 0;\n  let res = '';\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    res += s[i] + (j - i);\n    i = j;\n  }\n  return res;\n}",
     "tests": "if (rle('aaabbc') !== 'a3b2c1') throw new Error(rle('aaabbc'));\nif (rle('') !== '') throw new Error('empty');\nif (rle('a') !== 'a1') throw new Error('single');\nif (rle('abc') !== 'a1b1c1') throw new Error('distinct');\nif (rle('aabbaa') !== 'a2b2a2') throw new Error('repeat block');",
+    "banned": [".match("],
     "prereqs": ["js.u07.rle.predict"]
   }
 ]

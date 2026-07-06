@@ -48,8 +48,12 @@
     "group": "Sorting",
     "concept": "index of min in a suffix",
     "kind": "write",
-    "prompt": "Write `minIndex(a, i)` that returns the index of the smallest element in `a` at or after position `i`.",
+    "prompt": "Write `minIndex(a, i)` that returns the index of the smallest element in `a` at or after position `i`. Scan with a loop.",
     "starter": "function minIndex(a, i) {\n  // your code here\n}",
+    "banned": [
+      ".indexOf(",
+      "Math.min("
+    ],
     "solution": "function minIndex(a, i) {\n  let m = i;\n  for (let j = i + 1; j < a.length; j++) {\n    if (a[j] < a[m]) m = j;\n  }\n  return m;\n}",
     "tests": "if (minIndex([5, 2, 4, 6], 0) !== 1) throw new Error('whole array');\nif (minIndex([5, 2, 4, 6], 2) !== 2) throw new Error('suffix from 2');\nif (minIndex([3, 1, 2], 0) !== 1) throw new Error('mid min');\nif (minIndex([7], 0) !== 0) throw new Error('single');",
     "prereqs": [],
@@ -115,15 +119,19 @@
     "group": "Sorting",
     "concept": "merge with tail drain (stable)",
     "kind": "write",
-    "prompt": "Write `merge(L, R)` that merges two ascending arrays into one new ascending array. When elements are equal, take from `L` first. Return the merged array.",
+    "prompt": "Write `merge(L, R)` that merges two ascending arrays into one new ascending array by walking one index into each. When elements are equal, take from `L` first. Return the merged array.",
     "starter": "function merge(L, R) {\n  // your code here\n}",
+    "banned": [
+      ".sort("
+    ],
     "solution": "function merge(L, R) {\n  const res = [];\n  let i = 0, j = 0;\n  while (i < L.length && j < R.length) {\n    if (L[i] <= R[j]) { res.push(L[i]); i++; }\n    else { res.push(R[j]); j++; }\n  }\n  while (i < L.length) { res.push(L[i]); i++; }\n  while (j < R.length) { res.push(R[j]); j++; }\n  return res;\n}",
     "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(merge([1, 4], [2, 3]), [1, 2, 3, 4])) throw new Error('interleave');\nif (!eq(merge([1, 2, 3], []), [1, 2, 3])) throw new Error('drain left');\nif (!eq(merge([], [5]), [5])) throw new Error('drain right');\nif (!eq(merge([1, 5, 9], [2, 3]), [1, 2, 3, 5, 9])) throw new Error('uneven');",
     "prereqs": [
       "js.u06.merge.predict"
     ],
     "cue": "Take the smaller of the two fronts, then drain whichever array is left.",
-    "syntax": "arr.push(x)"
+    "syntax": "arr.push(x)",
+    "mapsTo": "pattern behind LC 21 · Merge Two Sorted Lists"
   },
   {
     "id": "js.u06.recursion.combine",
@@ -277,6 +285,22 @@
     "note": "JS sort is stable since ES2019. Stability is what lets you sort by a secondary key first, then a primary key, to get multi-key ordering."
   },
   {
+    "id": "js.u06.localecompare",
+    "track": "javascript",
+    "group": "Sorting",
+    "concept": "string compare returns a signed number",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "['b'.localeCompare('a'), 'a'.localeCompare('a'), 'a'.localeCompare('b')];",
+    "expected": "[1, 0, -1]",
+    "prereqs": [
+      "js.u06.comparator.numeric"
+    ],
+    "cue": "It reports order as a sign, like the numeric comparator: before, same, or after.",
+    "syntax": "'x'.localeCompare('y')",
+    "note": "localeCompare returns a negative number if the string sorts before the argument, 0 if equal, positive if after. That signed result is exactly what a sort comparator wants, so use it to order strings."
+  },
+  {
     "id": "js.u06.sort.tiebreak",
     "track": "javascript",
     "group": "Sorting",
@@ -286,7 +310,8 @@
     "snippet": "const data = [['bob', 30], ['al', 30], ['zoe', 25]];\ndata.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));\nconst out = [];\nfor (let i = 0; i < data.length; i++) out.push(data[i][0]);\nout;",
     "expected": "[\"zoe\", \"al\", \"bob\"]",
     "prereqs": [
-      "js.u06.comparator.numeric"
+      "js.u06.comparator.numeric",
+      "js.u06.localecompare"
     ],
     "cue": "The || uses the second key only when the first compares as 0.",
     "syntax": "cmp1 || cmp2 fallback"

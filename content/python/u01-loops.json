@@ -56,6 +56,21 @@
     "syntax": "total += 5"
   },
   {
+    "id": "py.u01.atom.loop.predict",
+    "track": "python",
+    "group": "Loops & iteration",
+    "concept": "a bare counting loop with range",
+    "kind": "predict",
+    "prompt": "What is the value of `c`?",
+    "snippet": "c = 0\nfor i in range(3):\n    c += 1\nc",
+    "expected": "3",
+    "prereqs": [
+      "py.u01.atom.accum.predict"
+    ],
+    "cue": "`range(n)` runs the body once per value it yields; the counter bumps each pass.",
+    "syntax": "for i in range(n)"
+  },
+  {
     "id": "py.u01.accumulate.sum.predict",
     "track": "python",
     "group": "Loops & iteration",
@@ -67,7 +82,8 @@
     "prereqs": [
       "py.u01.atom.len.predict",
       "py.u01.atom.indexvar.predict",
-      "py.u01.atom.accum.predict"
+      "py.u01.atom.accum.predict",
+      "py.u01.atom.loop.predict"
     ],
     "cue": "Index the list with `range(len(a))` and track `total`.",
     "syntax": "a[i] by index; += adds in place"
@@ -380,7 +396,8 @@
       "py.u01.offset.compare.predict"
     ],
     "cue": "Scan indices where `i+k` stays in range.",
-    "syntax": "range(len(a) - k)"
+    "syntax": "range(len(a) - k)",
+    "mapsTo": "pattern behind LC 219 · Contains Duplicate II"
   },
   {
     "id": "py.u01.map.square.predict",

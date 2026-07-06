@@ -46,6 +46,7 @@
     "concept": "max sum over size-k blocks",
     "kind": "write",
     "prompt": "Write `max_sum_k(nums, k)` returning the largest sum of any contiguous block of exactly `k` elements. Assume 1 <= k <= len(nums). Maintain a running sum with an O(1) slide; do not recompute each block.",
+    "banned": ["sum("],
     "starter": "def max_sum_k(nums, k):\n    # your code here\n    pass",
     "solution": "def max_sum_k(nums, k):\n    s = 0\n    for i in range(k):\n        s += nums[i]\n    best = s\n    for i in range(k, len(nums)):\n        s += nums[i] - nums[i - k]\n        if s > best:\n            best = s\n    return best",
     "tests": "assert max_sum_k([1, 3, 2, 6, 1], 2) == 8, max_sum_k([1, 3, 2, 6, 1], 2)\nassert max_sum_k([2, 3], 2) == 5, max_sum_k([2, 3], 2)\nassert max_sum_k([5, -1, 5, -1, 5], 1) == 5, max_sum_k([5, -1, 5, -1, 5], 1)",

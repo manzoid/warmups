@@ -9,7 +9,7 @@
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const st = [];\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) st.push(s[i]);\nlet out = '';\nwhile (st.length) out += st.pop();\nout;",
-    "expected": "cba",
+    "expected": "'cba'",
     "prereqs": [
       "js.u10.stack.peek-js"
     ]
@@ -24,7 +24,8 @@
     "mapsTo": "LC 155 · Min Stack",
     "note": "Recording the min-so-far at each level trades a little space for O(1) getMin; pop discards the current level's min for free.",
     "kind": "write",
-    "prompt": "Write a `MinStack` class with `push(x)`, `pop()`, `top()`, and `getMin()`, each O(1). `top` returns the most recent value; `getMin` returns the current minimum. Keep a parallel stack recording the minimum so far at each level.",
+    "prompt": "Write a `MinStack` class with `push(x)`, `pop()`, `top()`, and `getMin()`, each O(1) (constant time, independent of stack size). `top` returns the most recent value; `getMin` returns the current minimum. Keep a parallel stack recording the minimum so far at each level.",
+    "banned": ["Math.min", "Math.max"],
     "starter": "class MinStack {\n  constructor() {\n    this.st = [];\n    this.mins = [];\n  }\n  push(x) {\n    // your code here\n  }\n  pop() {\n    // your code here\n  }\n  top() {\n    // your code here\n  }\n  getMin() {\n    // your code here\n  }\n}",
     "solution": "class MinStack {\n  constructor() {\n    this.st = [];\n    this.mins = [];\n  }\n  push(x) {\n    this.st.push(x);\n    if (!this.mins.length || x <= this.mins[this.mins.length - 1]) this.mins.push(x);\n    else this.mins.push(this.mins[this.mins.length - 1]);\n  }\n  pop() {\n    this.mins.pop();\n    return this.st.pop();\n  }\n  top() {\n    return this.st[this.st.length - 1];\n  }\n  getMin() {\n    return this.mins[this.mins.length - 1];\n  }\n}",
     "tests": "const m = new MinStack();\nm.push(3); m.push(5);\nif (m.getMin() !== 3) throw new Error('min should be 3');\nm.push(2); m.push(1);\nif (m.getMin() !== 1) throw new Error('min should be 1');\nif (m.pop() !== 1) throw new Error('pop should be 1');\nif (m.getMin() !== 2) throw new Error('min should be 2');\nif (m.top() !== 2) throw new Error('top should be 2');\nm.pop();\nif (m.getMin() !== 3) throw new Error('min should be 3 again');",
@@ -78,6 +79,7 @@
     "note": "Each item is moved between stacks at most once, so dequeue is O(1) amortized despite the occasional refill.",
     "kind": "write",
     "prompt": "Write a `Queue` class backed by two arrays used as stacks (`inSt`, `outSt`), with `enqueue(x)` and `dequeue()` returning items in FIFO order. Refill `outSt` from `inSt` only when `outSt` is empty.",
+    "banned": [".shift("],
     "starter": "class Queue {\n  constructor() {\n    this.inSt = [];\n    this.outSt = [];\n  }\n  enqueue(x) {\n    // your code here\n  }\n  dequeue() {\n    // your code here\n  }\n}",
     "solution": "class Queue {\n  constructor() {\n    this.inSt = [];\n    this.outSt = [];\n  }\n  enqueue(x) {\n    this.inSt.push(x);\n  }\n  dequeue() {\n    if (!this.outSt.length) {\n      while (this.inSt.length) this.outSt.push(this.inSt.pop());\n    }\n    return this.outSt.pop();\n  }\n}",
     "tests": "const q = new Queue();\nq.enqueue(1); q.enqueue(2); q.enqueue(3);\nif (q.dequeue() !== 1) throw new Error('should be 1');\nq.enqueue(4);\nif (q.dequeue() !== 2) throw new Error('should be 2');\nif (q.dequeue() !== 3) throw new Error('should be 3');\nif (q.dequeue() !== 4) throw new Error('should be 4');",
