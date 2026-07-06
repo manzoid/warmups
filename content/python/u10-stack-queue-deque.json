@@ -222,7 +222,7 @@
     "group": "Stack / queue / deque",
     "concept": "next greater element",
     "kind": "write",
-    "prompt": "Write `nge(nums)` returning a list where position `i` holds the nearest element after `i` that is greater than `nums[i]`, or `-1` if none exists. Keep a stack of indices whose answers are still pending. One pass, O(n).",
+    "prompt": "Write `nge(nums)` returning a list where position `i` holds the nearest element after `i` that is greater than `nums[i]`, or `-1` if none exists. One pass, O(n).",
     "starter": "def nge(nums):\n    # your code here\n    pass",
     "solution": "def nge(nums):\n    res = [-1] * len(nums)\n    st = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while st and nums[st[-1]] < x:\n            res[st.pop()] = x\n        st.append(i)\n    return res",
     "tests": "assert nge([2,1,2,4,3]) == [4, 2, 4, -1, -1], nge([2,1,2,4,3])\nassert nge([1,2,3]) == [2, 3, -1]\nassert nge([3,2,1]) == [-1, -1, -1]",
@@ -231,8 +231,8 @@
     ],
     "cue": "Hold a stack of unresolved indices; a larger element settles them.",
     "syntax": "for i in range(len(nums))",
-    "note": "Each index is pushed and popped at most once, so the whole scan is O(n).",
-    "mapsTo": "LC 496 · Next Greater Element"
+    "note": "Each index is pushed and popped at most once, so the whole scan is O(n). LC 496 is the two-array version: build the next-greater answer for one array with this exact scan, then look up a second array's values in it. This single-array scan is the core.",
+    "mapsTo": "pattern behind LC 496 · Next Greater Element I"
   },
   {
     "id": "py.u10.nge.enumerate.predict",
@@ -428,14 +428,14 @@
     "group": "Stack / queue / deque",
     "concept": "sliding window maximum",
     "kind": "write",
-    "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, left to right. Keep a monotonic `deque` of candidate indices. One pass, O(n).",
+    "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, left to right. One pass, O(n).",
     "starter": "from collections import deque\n\ndef maxwin(nums, k):\n    # your code here\n    pass",
     "solution": "from collections import deque\n\ndef maxwin(nums, k):\n    d = deque()\n    out = []\n    for i in range(len(nums)):\n        x = nums[i]\n        while d and nums[d[-1]] <= x:\n            d.pop()\n        d.append(i)\n        if d[0] <= i - k:\n            d.popleft()\n        if i >= k - 1:\n            out.append(nums[d[0]])\n    return out",
     "tests": "assert maxwin([1,3,-1,-3,5,3,6,7], 3) == [3, 3, 5, 5, 6, 7], maxwin([1,3,-1,-3,5,3,6,7], 3)\nassert maxwin([1], 1) == [1]\nassert maxwin([9,8,7], 2) == [9, 8]",
     "prereqs": [
       "py.u10.maxwin.predict"
     ],
-    "cue": "Maintain a monotonic deque of indices; drop the front once it leaves the window.",
+    "cue": "Keep a deque of indices whose values fall from front to back; drop the front once it leaves the window.",
     "syntax": "deque[0] front index",
     "note": "Each index enters and leaves the deque once, so it is O(n), not O(nk) re-scanning each window.",
     "mapsTo": "LC 239 · Sliding Window Maximum"

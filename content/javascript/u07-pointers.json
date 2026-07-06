@@ -24,6 +24,7 @@
     "starter": "function sumAll(a) {\n  // your code here\n}",
     "solution": "function sumAll(a) {\n  let i = 0;\n  let s = 0;\n  while (i < a.length) {\n    s += a[i];\n    i++;\n  }\n  return s;\n}",
     "tests": "if (sumAll([10, 20, 30]) !== 60) throw new Error('60: ' + sumAll([10, 20, 30]));\nif (sumAll([]) !== 0) throw new Error('empty must be 0');\nif (sumAll([5]) !== 5) throw new Error('single');\nif (sumAll([-1, 1, -2, 2]) !== 0) throw new Error('signs');",
+    "banned": ["for (", "for(", ".reduce("],
     "prereqs": ["js.u07.manual.sum"]
   },
   {
@@ -144,6 +145,7 @@
     "starter": "function indexOfManual(a, target) {\n  // your code here\n}",
     "solution": "function indexOfManual(a, target) {\n  let i = 0;\n  while (i < a.length && a[i] !== target) i++;\n  return i < a.length ? i : -1;\n}",
     "tests": "if (indexOfManual([4, 5, 6, 5, 7], 5) !== 1) throw new Error('1');\nif (indexOfManual([4, 5, 6, 5, 7], 9) !== -1) throw new Error('absent');\nif (indexOfManual([], 1) !== -1) throw new Error('empty');\nif (indexOfManual([7], 7) !== 0) throw new Error('first');",
+    "banned": [".indexOf(", ".findIndex("],
     "prereqs": ["js.u07.find.predict"]
   },
   {
@@ -197,6 +199,7 @@
     "prompt": "What is the value of `a`?",
     "snippet": "const a = [1, 0, 2, 0];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    a[w] = a[i];\n    w++;\n  }\n}\na.length = w;\na;",
     "expected": "[1, 2]",
+    "note": "Assigning to `a.length = w` truncates the array to its first w elements, dropping the leftover tail slots after the survivors were copied to the front.",
     "prereqs": ["js.u07.manual.sum"]
   },
   {
@@ -256,6 +259,7 @@
     "prompt": "What is the value of `a`?",
     "snippet": "const a = [1, 0, 2, 0, 0, 3];\nlet w = 0;\nfor (let i = 0; i < a.length; i++) {\n  if (a[i] !== 0) {\n    [a[w], a[i]] = [a[i], a[w]];\n    w++;\n  }\n}\na;",
     "expected": "[1, 2, 3, 0, 0, 0]",
+    "note": "`[a[w], a[i]] = [a[i], a[w]]` is a destructuring swap: it exchanges the two elements in one line, with no temporary variable.",
     "prereqs": ["js.u07.compact.predict"]
   },
   {
@@ -299,8 +303,9 @@
     "starter": "function mergeSorted(A, B) {\n  // your code here\n}",
     "solution": "function mergeSorted(A, B) {\n  let i = 0, j = 0;\n  const out = [];\n  while (i < A.length && j < B.length) {\n    if (A[i] <= B[j]) { out.push(A[i]); i++; }\n    else { out.push(B[j]); j++; }\n  }\n  while (i < A.length) { out.push(A[i]); i++; }\n  while (j < B.length) { out.push(B[j]); j++; }\n  return out;\n}",
     "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(mergeSorted([1, 3, 5], [2, 4, 6]), [1, 2, 3, 4, 5, 6]);\neq(mergeSorted([], [1, 2]), [1, 2]);\neq(mergeSorted([1, 2], []), [1, 2]);\neq(mergeSorted([1, 1], [1]), [1, 1, 1]);\neq(mergeSorted([], []), []);",
+    "banned": [".sort(", ".concat("],
     "note": "One interleaved pass is O(n+m); concatenating then sorting would be O((n+m) log(n+m)). The two drain loops handle whichever array still has a tail.",
-    "mapsTo": "LC 88 · Merge Sorted Array",
+    "mapsTo": "pattern behind LC 88 · Merge Sorted Array (LC 88 itself merges in place from the back; this is the same two-cursor merge, returning a new array)",
     "prereqs": ["js.u07.merge.predict"]
   },
   {

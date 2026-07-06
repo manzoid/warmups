@@ -21,6 +21,7 @@
     "starter": "function nthFromEnd(a, k) {\n  // your code here\n}",
     "solution": "function nthFromEnd(a, k) {\n  return a[a.length - k];\n}",
     "tests": "if (nthFromEnd([10, 20, 30, 40], 1) !== 40) throw new Error('k=1');\nif (nthFromEnd([10, 20, 30, 40], 4) !== 10) throw new Error('k=4');\nif (nthFromEnd([5], 1) !== 5) throw new Error('single');",
+    "banned": [".at("],
     "prereqs": ["js.u02.access.last.raw"],
     "cue": "Turn the distance-from-end into an index by subtracting from the length.",
     "syntax": "arr.length"
@@ -62,7 +63,7 @@
     "solution": "function ringGet(a, i) {\n  return a[i % a.length];\n}",
     "tests": "if (ringGet([1, 2, 3], 0) !== 1) throw new Error('i=0');\nif (ringGet([1, 2, 3], 4) !== 2) throw new Error('i=4');\nif (ringGet([1, 2, 3], 7) !== 2) throw new Error('i=7');\nif (ringGet(['a', 'b'], 3) !== 'b') throw new Error('str');",
     "prereqs": ["js.u02.access.last.raw"],
-    "cue": "Fold the index back into range against the length.",
+    "cue": "Wrap the index back into range using the remainder against the length.",
     "syntax": "i % arr.length"
   },
   {
@@ -75,6 +76,7 @@
     "starter": "function subrange(a, i, j) {\n  // your code here\n}",
     "solution": "function subrange(a, i, j) {\n  const out = [];\n  for (let t = i; t < j; t++) out.push(a[t]);\n  return out;\n}",
     "tests": "if (JSON.stringify(subrange([10, 20, 30, 40], 1, 3)) !== JSON.stringify([20, 30])) throw new Error('mid');\nif (JSON.stringify(subrange([1, 2, 3], 0, 0)) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(subrange([1, 2, 3], 1, 3)) !== JSON.stringify([2, 3])) throw new Error('tail');",
+    "banned": [".slice("],
     "cue": "Loop from i while below j, collecting each element into a fresh array.",
     "syntax": "out.push(x)"
   },
@@ -140,8 +142,10 @@
     "starter": "function reverseRange(a, i, j) {\n  // your code here\n}",
     "solution": "function reverseRange(a, i, j) {\n  let lo = i, hi = j;\n  while (lo < hi) {\n    const tmp = a[lo];\n    a[lo] = a[hi];\n    a[hi] = tmp;\n    lo++;\n    hi--;\n  }\n  return a;\n}",
     "tests": "if (JSON.stringify(reverseRange([1, 2, 3, 4, 5], 1, 3)) !== JSON.stringify([1, 4, 3, 2, 5])) throw new Error('mid');\nif (JSON.stringify(reverseRange([1, 2, 3, 4], 0, 3)) !== JSON.stringify([4, 3, 2, 1])) throw new Error('whole');\nif (JSON.stringify(reverseRange([1, 2, 3], 1, 1)) !== JSON.stringify([1, 2, 3])) throw new Error('single');\nconst a = [7, 8, 9];\nreverseRange(a, 0, 2);\nif (JSON.stringify(a) !== JSON.stringify([9, 8, 7])) throw new Error('in place');",
+    "banned": [".reverse("],
     "cue": "Point one index at i and one at j, then swap and step both inward until they cross.",
-    "syntax": "swap a[lo] and a[hi], then lo++, hi--"
+    "syntax": "swap a[lo] and a[hi], then lo++, hi--",
+    "mapsTo": "LC 344 · Reverse String (the two-pointer in-place reversal, over a sub-range here)"
   },
   {
     "id": "js.u02.palindrome.raw",
@@ -153,6 +157,7 @@
     "starter": "function isPalindrome(a) {\n  // your code here\n}",
     "solution": "function isPalindrome(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (a[lo] !== a[hi]) return false;\n    lo++;\n    hi--;\n  }\n  return true;\n}",
     "tests": "if (isPalindrome([1, 2, 3, 2, 1]) !== true) throw new Error('odd');\nif (isPalindrome([1, 2, 2, 1]) !== true) throw new Error('even');\nif (isPalindrome([1, 2, 3]) !== false) throw new Error('no');\nif (isPalindrome([]) !== true) throw new Error('empty');\nif (isPalindrome([9]) !== true) throw new Error('single');",
+    "banned": [".reverse("],
     "prereqs": ["js.u02.reverse.raw"],
     "cue": "Compare the outermost pair, then move both pointers inward.",
     "syntax": "arr[lo] !== arr[hi] comparison"
@@ -193,6 +198,7 @@
     "starter": "function everyKth(a, k) {\n  // your code here\n}",
     "solution": "function everyKth(a, k) {\n  const out = [];\n  for (let t = 0; t < a.length; t += k) out.push(a[t]);\n  return out;\n}",
     "tests": "if (JSON.stringify(everyKth([0, 1, 2, 3, 4, 5], 2)) !== JSON.stringify([0, 2, 4])) throw new Error('k=2');\nif (JSON.stringify(everyKth([0, 1, 2, 3, 4, 5], 3)) !== JSON.stringify([0, 3])) throw new Error('k=3');\nif (JSON.stringify(everyKth([1, 2, 3], 1)) !== JSON.stringify([1, 2, 3])) throw new Error('k=1');",
+    "banned": [".filter("],
     "cue": "Walk an index that advances by k each iteration.",
     "syntax": "for (let t = 0; t < n; t += k)"
   },
@@ -219,6 +225,7 @@
     "starter": "function window(a, i, k) {\n  // your code here\n}",
     "solution": "function window(a, i, k) {\n  const out = [];\n  for (let t = 0; t < k; t++) out.push(a[i + t]);\n  return out;\n}",
     "tests": "if (JSON.stringify(window([10, 20, 30, 40, 50], 1, 2)) !== JSON.stringify([20, 30])) throw new Error('mid');\nif (JSON.stringify(window([1, 2, 3, 4], 0, 3)) !== JSON.stringify([1, 2, 3])) throw new Error('prefix');\nif (JSON.stringify(window([1, 2, 3], 2, 1)) !== JSON.stringify([3])) throw new Error('one');",
+    "banned": [".slice("],
     "prereqs": ["js.u02.subrange.raw"],
     "cue": "Read k elements in a row, offsetting each from the start index.",
     "syntax": "arr[i + t]"
@@ -247,9 +254,9 @@
     "solution": "function maxWindowSum(a, k) {\n  let sum = 0;\n  for (let t = 0; t < k; t++) sum += a[t];\n  let best = sum;\n  for (let i = k; i < a.length; i++) {\n    sum += a[i] - a[i - k];\n    if (sum > best) best = sum;\n  }\n  return best;\n}",
     "tests": "if (maxWindowSum([1, 2, 3, 4, 5], 2) !== 9) throw new Error('9');\nif (maxWindowSum([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error('9b');\nif (maxWindowSum([4], 1) !== 4) throw new Error('single');\nif (maxWindowSum([-1, -2, -3], 2) !== -3) throw new Error('neg');",
     "prereqs": ["js.u02.window.raw"],
-    "cue": "Seed the first window's sum, then roll it forward tracking the best.",
+    "cue": "Add up the first k elements, then slide the window forward one step at a time and keep the largest sum you see.",
     "syntax": "add the entering element, subtract the leaving one",
-    "note": "Rolling the sum (add the new element, drop the old one) makes the whole scan O(n); re-summing each window from scratch is O(nk).",
+    "note": "Big-O describes how the work grows as the array size n grows. Rolling the sum (add the entering element, drop the leaving one) does one step per element, so the whole scan is O(n): the work grows in step with n. Re-summing each window from scratch does k additions per window, which is O(nk).",
     "mapsTo": "LC 643 · Maximum Average Subarray I"
   },
   {
@@ -307,16 +314,30 @@
     "note": "Adding half the span instead of averaging the ends keeps lo+hi from overflowing a fixed-width int in C or Java; in JS it is a good habit and stays exact below 2^53."
   },
   {
+    "id": "js.u02.bsearch.trace",
+    "track": "javascript",
+    "group": "Indexing & slicing",
+    "concept": "one binary-search step",
+    "kind": "predict",
+    "prompt": "What is the value of `lo`?",
+    "snippet": "const a = [1, 3, 5, 7, 9, 11];\nlet lo = 0, hi = 5;\nconst mid = Math.floor((lo + hi) / 2);\nif (a[mid] < 7) lo = mid + 1;\nlo",
+    "expected": "3",
+    "prereqs": ["js.u02.midpoint.raw"],
+    "cue": "Find the middle index, check its value against the target, then move the lower bound just past it.",
+    "syntax": "mid = Math.floor((lo + hi) / 2)"
+  },
+  {
     "id": "js.u02.bsearch.write",
     "track": "javascript",
     "group": "Indexing & slicing",
     "concept": "binary search on a sorted array",
     "kind": "write",
     "prompt": "Write binarySearch(a, target) that returns the index of target in the ascending-sorted array a, or -1 if it is absent. Halve the search range each step; do not use .indexOf.",
-    "starter": "function binarySearch(a, target) {\n  // your code here\n}",
+    "starter": "function binarySearch(a, target) {\n  let lo = 0, hi = a.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    // your code here\n  }\n  return -1;\n}",
     "solution": "function binarySearch(a, target) {\n  let lo = 0, hi = a.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (a[mid] === target) return mid;\n    if (a[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}",
     "tests": "if (binarySearch([1, 3, 5, 7, 9], 7) !== 3) throw new Error('found');\nif (binarySearch([1, 3, 5, 7, 9], 1) !== 0) throw new Error('first');\nif (binarySearch([1, 3, 5, 7, 9], 9) !== 4) throw new Error('last');\nif (binarySearch([1, 3, 5, 7, 9], 4) !== -1) throw new Error('absent');\nif (binarySearch([], 3) !== -1) throw new Error('empty');\nif (binarySearch([5], 5) !== 0) throw new Error('single');",
-    "prereqs": ["js.u02.midpoint.raw"],
+    "banned": [".indexOf("],
+    "prereqs": ["js.u02.midpoint.raw", "js.u02.bsearch.trace"],
     "cue": "Track a lo/hi range; compare the middle element and drop the half that cannot hold the target.",
     "syntax": "mid = Math.floor((lo + hi) / 2)",
     "note": "Each comparison discards half the remaining range, so lookup is O(log n) instead of an O(n) linear scan.",

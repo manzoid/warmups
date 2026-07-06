@@ -92,9 +92,26 @@
     "prereqs": [
       "py.u04.freq.counter.mostcommon"
     ],
-    "cue": "Count all values, then peel off the top k pairs and keep only the keys.",
+    "cue": "Count all values, then take the k highest-count pairs and keep only the keys.",
     "syntax": "Counter(...).most_common(k)",
+    "note": "Counter.most_common does the ranking for you; done by hand the interview-optimal way is bucket sort by frequency (O(n)) or a size-k heap (O(n log k)).",
     "mapsTo": "LC 347 · Top K Frequent Elements"
+  },
+  {
+    "id": "py.u04.prefixsum.bridge.predict",
+    "track": "python",
+    "group": "Hash maps",
+    "concept": "running prefix sum",
+    "kind": "predict",
+    "prompt": "What is the value of `sums`?",
+    "snippet": "nums = [3, 1, 2, 4]\nprefix = 0\nsums = []\nfor i in range(len(nums)):\n    prefix += nums[i]\n    sums.append(prefix)\nsums",
+    "expected": "[3, 4, 6, 10]",
+    "prereqs": [
+      "py.u04.freq.get.predict"
+    ],
+    "cue": "Keep one running total; after each element, record the sum so far.",
+    "syntax": "prefix += nums[i]",
+    "note": "sums[j] minus sums[i] is the sum of the slice between i and j. The next exercise counts subarrays with this idea."
   },
   {
     "id": "py.u04.subarraysum.predict",
@@ -106,7 +123,8 @@
     "snippet": "nums = [1, 1, 1]\nk = 2\ncount = {0: 1}\nprefix = 0\ntotal = 0\nfor i in range(len(nums)):\n    prefix += nums[i]\n    total += count.get(prefix - k, 0)\n    count[prefix] = count.get(prefix, 0) + 1\ntotal",
     "expected": "2",
     "prereqs": [
-      "py.u04.freq.get.predict"
+      "py.u04.freq.get.predict",
+      "py.u04.prefixsum.bridge.predict"
     ],
     "cue": "Track how often each running total has occurred; a matching earlier total means a subarray sums to k.",
     "syntax": "count.get(prefix - k, 0)",
@@ -161,6 +179,7 @@
     ],
     "cue": "From each run-start, walk upward through the set counting how far the run extends.",
     "syntax": "while y in s: y += 1",
+    "banned": [".sort(", "sorted("],
     "mapsTo": "LC 128 · Longest Consecutive Sequence"
   }
 ]

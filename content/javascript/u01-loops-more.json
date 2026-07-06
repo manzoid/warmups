@@ -118,10 +118,12 @@
     "syntax": "lo < hi loop condition",
     "kind": "write",
     "prompt": "Implement `reverseInPlace(a)` that reverses array `a` in place and returns it. Do not build a new array or use `.reverse()` or spread.",
+    "banned": [".reverse", "..."],
     "starter": "function reverseInPlace(a) {\n  // your code here\n}",
     "solution": "function reverseInPlace(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const t = a[lo];\n    a[lo] = a[hi];\n    a[hi] = t;\n    lo++;\n    hi--;\n  }\n  return a;\n}",
     "tests": "if (JSON.stringify(reverseInPlace([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverseInPlace([7])) !== JSON.stringify([7])) throw new Error('single');\nif (JSON.stringify(reverseInPlace([1, 2, 3, 4])) !== JSON.stringify([4, 3, 2, 1])) throw new Error('even');\nif (JSON.stringify(reverseInPlace([1, 2, 3])) !== JSON.stringify([3, 2, 1])) throw new Error('odd');",
     "note": "In place uses O(1) extra space: swap the ends and walk inward, versus the spread copy which allocates a second array.",
+    "mapsTo": "LC 344 · Reverse String",
     "prereqs": [
       "js.u01.reverse.predict"
     ]

@@ -82,7 +82,7 @@
     "prompt": "Write `partitionSign(a)` that rearranges `a` in place so every negative value comes before every non-negative value, mutating `a` and returning it. Use two pointers from the ends, swapping a misplaced pair. Order within each group need not be preserved.",
     "starter": "function partitionSign(a) {\n  // your code here\n}",
     "solution": "function partitionSign(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (a[lo] < 0) lo++;\n    else if (a[hi] >= 0) hi--;\n    else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  }\n  return a;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(partitionSign([1, -2, 3, -4, 5, -6]), [-6, -2, -4, 3, 5, 1]);\neq(partitionSign([-1, -2, -3]), [-1, -2, -3]);\neq(partitionSign([1, 2, 3]), [1, 2, 3]);\neq(partitionSign([]), []);\nconst r = partitionSign([3, -1, -2, 4, -5]);\nif (!(r.slice(0, 3).every(x => x < 0) && r.slice(3).every(x => x >= 0))) throw new Error('split: ' + r);",
+    "tests": "const sortNum = x => [...x].sort((p, q) => p - q);\nconst isPart = (out, inp) => {\n  if (JSON.stringify(sortNum(out)) !== JSON.stringify(sortNum(inp))) throw new Error('not a permutation: ' + out);\n  let seenNonNeg = false;\n  for (const x of out) {\n    if (x >= 0) seenNonNeg = true;\n    else if (seenNonNeg) throw new Error('negative after non-negative: ' + out);\n  }\n};\nisPart(partitionSign([1, -2, 3, -4, 5, -6]), [1, -2, 3, -4, 5, -6]);\nisPart(partitionSign([-1, -2, -3]), [-1, -2, -3]);\nisPart(partitionSign([1, 2, 3]), [1, 2, 3]);\nisPart(partitionSign([]), []);\nisPart(partitionSign([3, -1, -2, 4, -5]), [3, -1, -2, 4, -5]);",
     "prereqs": ["js.u08.partition.sign.predict"]
   },
   {

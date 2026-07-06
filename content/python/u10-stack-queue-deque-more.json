@@ -24,6 +24,7 @@
     "starter": "def to_binary(n):\n    # your code here\n    pass",
     "solution": "def to_binary(n):\n    if n == 0:\n        return '0'\n    st = []\n    while n > 0:\n        st.append(n % 2)\n        n //= 2\n    out = []\n    while st:\n        out.append(str(st.pop()))\n    return ''.join(out)",
     "tests": "assert to_binary(13) == '1101', to_binary(13)\nassert to_binary(0) == '0'\nassert to_binary(1) == '1'\nassert to_binary(8) == '1000'",
+    "banned": ["bin(", "format(", "f'", "f\""],
     "prereqs": [
       "py.u10.stack.list.predict"
     ],
@@ -36,7 +37,7 @@
     "group": "Stack / queue / deque",
     "concept": "min stack (auxiliary stack of minima)",
     "kind": "write",
-    "prompt": "Write a `MinStack` class with `push(x)`, `pop()`, `top()`, and `get_min()`, each O(1). `top` returns the most recent item; `get_min` returns the current minimum. Keep a parallel stack that records the minimum so far at each level.",
+    "prompt": "Write a `MinStack` class with `push(x)`, `pop()`, `top()`, and `get_min()`, each O(1). `top` returns the most recent item; `get_min` returns the current minimum.",
     "starter": "class MinStack:\n    def __init__(self):\n        self.st = []\n        self.mins = []\n\n    def push(self, x):\n        # your code here\n        pass\n\n    def pop(self):\n        # your code here\n        pass\n\n    def top(self):\n        # your code here\n        pass\n\n    def get_min(self):\n        # your code here\n        pass",
     "solution": "class MinStack:\n    def __init__(self):\n        self.st = []\n        self.mins = []\n\n    def push(self, x):\n        self.st.append(x)\n        if not self.mins or x <= self.mins[-1]:\n            self.mins.append(x)\n        else:\n            self.mins.append(self.mins[-1])\n\n    def pop(self):\n        self.mins.pop()\n        return self.st.pop()\n\n    def top(self):\n        return self.st[-1]\n\n    def get_min(self):\n        return self.mins[-1]",
     "tests": "m = MinStack()\nm.push(3); m.push(5)\nassert m.get_min() == 3\nm.push(2); m.push(1)\nassert m.get_min() == 1\nassert m.pop() == 1\nassert m.get_min() == 2\nassert m.top() == 2\nm.pop()\nassert m.get_min() == 3",
@@ -53,7 +54,7 @@
     "group": "Stack / queue / deque",
     "concept": "daily temperatures (monotonic stack, distance)",
     "kind": "write",
-    "prompt": "Write `daily_temps(temps)` returning a list where position `i` holds how many days until a warmer temperature than `temps[i]`, or `0` if none follows. Keep a stack of indices whose answers are still pending. One pass.",
+    "prompt": "Write `daily_temps(temps)` returning a list where position `i` holds how many days until a warmer temperature than `temps[i]`, or `0` if none follows. One pass.",
     "starter": "def daily_temps(temps):\n    # your code here\n    pass",
     "solution": "def daily_temps(temps):\n    res = [0] * len(temps)\n    st = []\n    for i in range(len(temps)):\n        t = temps[i]\n        while st and temps[st[-1]] < t:\n            j = st.pop()\n            res[j] = i - j\n        st.append(i)\n    return res",
     "tests": "assert daily_temps([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0], daily_temps([73,74,75,71,69,72,76,73])\nassert daily_temps([30,40,50,60]) == [1,1,1,0]\nassert daily_temps([60,50,40]) == [0,0,0]\nassert daily_temps([]) == []",
@@ -71,14 +72,14 @@
     "group": "Stack / queue / deque",
     "concept": "FIFO queue from two stacks",
     "kind": "write",
-    "prompt": "Write a `Queue` class backed by two lists used as stacks (`in_st`, `out_st`), with `enqueue(x)` and `dequeue()` that returns items in FIFO order. Refill `out_st` from `in_st` only when `out_st` is empty.",
+    "prompt": "Write a `Queue` class backed by two lists used as stacks (`in_st`, `out_st`), with `enqueue(x)` and `dequeue()` that returns items in FIFO order.",
     "starter": "class Queue:\n    def __init__(self):\n        self.in_st = []\n        self.out_st = []\n\n    def enqueue(self, x):\n        # your code here\n        pass\n\n    def dequeue(self):\n        # your code here\n        pass",
     "solution": "class Queue:\n    def __init__(self):\n        self.in_st = []\n        self.out_st = []\n\n    def enqueue(self, x):\n        self.in_st.append(x)\n\n    def dequeue(self):\n        if not self.out_st:\n            while self.in_st:\n                self.out_st.append(self.in_st.pop())\n        return self.out_st.pop()",
     "tests": "q = Queue()\nq.enqueue(1); q.enqueue(2); q.enqueue(3)\nassert q.dequeue() == 1\nq.enqueue(4)\nassert q.dequeue() == 2\nassert q.dequeue() == 3\nassert q.dequeue() == 4",
     "prereqs": [
       "py.u10.stack.list.predict"
     ],
-    "cue": "One stack takes arrivals; pouring it into a second reverses to arrival order.",
+    "cue": "One stack takes arrivals; pour it into a second only when that second is empty, which reverses to arrival order.",
     "syntax": "while self.in_st: pour with list.pop()",
     "note": "Each item is moved between stacks at most once, so dequeue is amortized O(1).",
     "mapsTo": "LC 232 · Implement Queue using Stacks"

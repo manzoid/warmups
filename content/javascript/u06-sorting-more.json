@@ -22,6 +22,7 @@
     "kind": "write",
     "prompt": "Write `bubbleSort(a)` that sorts `a` ascending in place and returns it by repeatedly swapping adjacent out-of-order pairs. Do not use the built-in sort.",
     "starter": "function bubbleSort(a) {\n  // your code here\n}",
+    "banned": [".sort("],
     "solution": "function bubbleSort(a) {\n  for (let i = 0; i < a.length; i++) {\n    for (let j = 0; j < a.length - 1 - i; j++) {\n      if (a[j] > a[j + 1]) {\n        const t = a[j];\n        a[j] = a[j + 1];\n        a[j + 1] = t;\n      }\n    }\n  }\n  return a;\n}",
     "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(bubbleSort([5, 2, 4, 6, 1, 3]), [1, 2, 3, 4, 5, 6])) throw new Error('basic');\nif (!eq(bubbleSort([]), [])) throw new Error('empty');\nif (!eq(bubbleSort([1]), [1])) throw new Error('single');\nif (!eq(bubbleSort([3, 3, 1]), [1, 3, 3])) throw new Error('dups');",
     "prereqs": [

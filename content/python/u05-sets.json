@@ -1,5 +1,19 @@
 [
   {
+    "id": "py.u05.membership.set",
+    "track": "python",
+    "group": "Sets",
+    "concept": "membership via set (O(1))",
+    "cue": "Ask whether the value is in the set.",
+    "syntax": "x in set",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = {1, 2, 3, 4}\n2 in s",
+    "expected": "True",
+    "note": "Set lookup is O(1) on average via hashing; scanning a list for the same check is O(n).",
+    "prereqs": []
+  },
+  {
     "id": "py.u05.membership.list_scan",
     "track": "python",
     "group": "Sets",
@@ -11,20 +25,6 @@
     "snippet": "a = [1, 2, 3, 4]\n3 in a",
     "expected": "True",
     "prereqs": []
-  },
-  {
-    "id": "py.u05.membership.set",
-    "track": "python",
-    "group": "Sets",
-    "concept": "membership via set (O(1))",
-    "cue": "Ask whether the value is in the set.",
-    "syntax": "x in set",
-    "kind": "predict",
-    "prompt": "What does this evaluate to?",
-    "snippet": "s = set([1, 2, 3, 4])\n2 in s",
-    "expected": "True",
-    "note": "Set lookup is O(1) on average via hashing; the list scan above is O(n).",
-    "prereqs": ["py.u05.membership.list_scan"]
   },
   {
     "id": "py.u05.add.idempotent",
@@ -49,6 +49,7 @@
     "syntax": "self.present[k] = ...",
     "kind": "write",
     "prompt": "Complete `BoolSet` for keys in `0..n-1`, backed by a list of flags. Implement `add(k)`, `contains(k)`, and `remove(k)` without Python's built-in `set`.",
+    "banned": ["set("],
     "starter": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        # your code here\n        pass\n\n    def contains(self, k):\n        # your code here\n        pass\n\n    def remove(self, k):\n        # your code here\n        pass\n",
     "solution": "class BoolSet:\n    def __init__(self, n):\n        self.present = [False] * n\n\n    def add(self, k):\n        self.present[k] = True\n\n    def contains(self, k):\n        return self.present[k]\n\n    def remove(self, k):\n        self.present[k] = False\n",
     "tests": "s = BoolSet(5)\ns.add(2)\ns.add(2)\nassert s.contains(2) is True, s.present\nassert s.contains(0) is False, s.present\ns.remove(2)\nassert s.contains(2) is False, s.present\ns.remove(4)\nassert s.contains(4) is False, s.present\n",
@@ -90,6 +91,7 @@
     "syntax": "list.append(x)",
     "kind": "write",
     "prompt": "Complete `HashSet` (chaining over a fixed bucket array). Implement `add(k)` so a key is stored once and never duplicated. Do not use Python's built-in `set`.",
+    "banned": ["set("],
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n",
     "tests": "s = HashSet()\ns.add(5)\ns.add(5)\ns.add(1)\nassert sum(len(b) for b in s.buckets) == 2, sum(len(b) for b in s.buckets)\n",
@@ -104,7 +106,8 @@
     "cue": "Scan only the one bucket the key hashes to.",
     "syntax": "x in list",
     "kind": "write",
-    "prompt": "Add `contains(k)` to `HashSet`, returning whether key `k` is stored.",
+    "prompt": "Add `contains(k)` to `HashSet`, returning whether key `k` is stored. Do not use Python's built-in `set`.",
+    "banned": ["set("],
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        return k in self.buckets[self._idx(k)]\n",
     "tests": "s = HashSet()\ns.add(5)\nassert s.contains(5) is True, 5\nassert s.contains(9) is False, 9\n",
@@ -118,7 +121,8 @@
     "cue": "Locate the key's bucket, then drop the key only if it is there.",
     "syntax": "list.remove(x)",
     "kind": "write",
-    "prompt": "Add `remove(k)` to `HashSet`, unlinking key `k` from its bucket if present.",
+    "prompt": "Add `remove(k)` to `HashSet`, unlinking key `k` from its bucket if present. Do not use Python's built-in `set`.",
+    "banned": ["set("],
     "starter": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        return k in self.buckets[self._idx(k)]\n\n    def remove(self, k):\n        # your code here\n        pass\n",
     "solution": "class HashSet:\n    def __init__(self, nbuckets=8):\n        self.nbuckets = nbuckets\n        self.buckets = [[] for _ in range(nbuckets)]\n\n    def _idx(self, k):\n        return hash(k) % self.nbuckets\n\n    def add(self, k):\n        b = self.buckets[self._idx(k)]\n        if k not in b:\n            b.append(k)\n\n    def contains(self, k):\n        return k in self.buckets[self._idx(k)]\n\n    def remove(self, k):\n        b = self.buckets[self._idx(k)]\n        if k in b:\n            b.remove(k)\n",
     "tests": "s = HashSet()\ns.add(5)\ns.add(1)\ns.remove(5)\nassert s.contains(5) is False, 5\nassert s.contains(1) is True, 1\ns.remove(99)\nassert s.contains(1) is True, 1\n",
@@ -159,7 +163,7 @@
     "cue": "Walk positions with range(len(a)); keep a seen set and append new values.",
     "syntax": "for i in range(len(a)); a[i]",
     "kind": "write",
-    "prompt": "Write `dedup(a)` returning the distinct elements of list `a` in first-seen order. Iterate by index with range(len(a)) and read each element as a[i]. Do not use a for-each loop.",
+    "prompt": "Write `dedup(a)` returning the distinct elements of list `a` in first-seen order. Iterate by index, not with a for-each loop.",
     "starter": "def dedup(a):\n    # your code here\n    pass\n",
     "solution": "def dedup(a):\n    seen = set()\n    out = []\n    for i in range(len(a)):\n        if a[i] not in seen:\n            seen.add(a[i])\n            out.append(a[i])\n    return out\n",
     "tests": "assert dedup([3, 1, 3, 2, 1]) == [3, 1, 2], dedup([3, 1, 3, 2, 1])\nassert dedup([]) == []\nassert dedup([5, 5, 5]) == [5]\n",
@@ -359,6 +363,20 @@
     "prereqs": ["py.u05.membership.set"]
   },
   {
+    "id": "py.u05.window.shrink_trace",
+    "track": "python",
+    "group": "Sets",
+    "concept": "sliding window: shrink from the left on a repeat",
+    "cue": "The window holds a, b, c; the incoming char repeats one already inside, so drop chars from the left until it is gone.",
+    "syntax": "set.discard(s[l]); l += 1",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "s = \"abcb\"\nseen = {'a', 'b', 'c'}\nl = 0\nwhile 'b' in seen:\n    seen.discard(s[l])\n    l += 1\n(sorted(seen), l)",
+    "expected": "(['c'], 2)",
+    "note": "This is one shrink step of the sliding window: when the incoming char already sits in the window, remove from the left until it no longer does. The next write repeats this each time the right edge moves.",
+    "prereqs": ["py.u05.hasdup.earlyexit"]
+  },
+  {
     "id": "py.u05.window.longest_unique",
     "track": "python",
     "group": "Sets",
@@ -372,6 +390,6 @@
     "tests": "assert longest_unique('abcabcbb') == 3, longest_unique('abcabcbb')\nassert longest_unique('bbbbb') == 1\nassert longest_unique('') == 0\nassert longest_unique('pwwkew') == 3\nassert longest_unique('au') == 2\n",
     "note": "One pass is O(n): each index joins and leaves the window's set once, instead of re-checking every substring.",
     "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
-    "prereqs": ["py.u05.hasdup.earlyexit"]
+    "prereqs": ["py.u05.window.shrink_trace"]
   }
 ]

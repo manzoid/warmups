@@ -38,7 +38,8 @@
     "expected": "[97, 'b', 65]",
     "prereqs": [],
     "cue": "Apply each conversion, noting which direction it goes.",
-    "syntax": "ord(ch) / chr(n)"
+    "syntax": "ord(ch) / chr(n)",
+    "note": "Each character has a code-point number; ord(ch) gives that number and chr(n) turns a number back into its character. They are inverses."
   },
   {
     "id": "py.u03.ord.index",
@@ -168,6 +169,7 @@
     "kind": "write",
     "prompt": "Write `count_digits(s)` returning how many characters of `s` are digits 0-9. Do not use `str.isdigit`.",
     "starter": "def count_digits(s):\n    # your code here\n    pass",
+    "banned": [".isdigit("],
     "solution": "def count_digits(s):\n    n = 0\n    for c in s:\n        if '0' <= c <= '9':\n            n += 1\n    return n",
     "tests": "assert count_digits(\"a1b2c3\") == 3\nassert count_digits(\"abc\") == 0\nassert count_digits(\"2024\") == 4",
     "prereqs": [
@@ -184,6 +186,7 @@
     "kind": "write",
     "prompt": "Write `digit_sum(s)` returning the sum of the numeric values of the digit characters in `s`; ignore non-digit characters. Do not use `int`.",
     "starter": "def digit_sum(s):\n    # your code here\n    pass",
+    "banned": ["int("],
     "solution": "def digit_sum(s):\n    total = 0\n    for c in s:\n        if '0' <= c <= '9':\n            total += ord(c) - ord('0')\n    return total",
     "tests": "assert digit_sum(\"a1b2c3\") == 6\nassert digit_sum(\"abc\") == 0\nassert digit_sum(\"111\") == 3",
     "prereqs": [
@@ -303,6 +306,7 @@
     "kind": "write",
     "prompt": "Write `reverse(s)` returning the characters of `s` in opposite order. Do not use slicing or `reversed`.",
     "starter": "def reverse(s):\n    # your code here\n    pass",
+    "banned": ["[::-1]", "reversed("],
     "solution": "def reverse(s):\n    out = \"\"\n    for i in range(len(s) - 1, -1, -1):\n        out += s[i]\n    return out",
     "tests": "assert reverse(\"abc\") == \"cba\"\nassert reverse(\"\") == \"\"\nassert reverse(\"a\") == \"a\"\nassert reverse(\"hello\") == \"olleh\"",
     "prereqs": [
@@ -349,6 +353,7 @@
     "kind": "write",
     "prompt": "Write `is_palindrome(s)` returning True if `s` reads the same forwards and backwards. Use two pointers converging from the ends; do not use slicing.",
     "starter": "def is_palindrome(s):\n    # your code here\n    pass",
+    "banned": ["[::-1]"],
     "solution": "def is_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        if s[i] != s[j]:\n            return False\n        i += 1\n        j -= 1\n    return True",
     "tests": "assert is_palindrome(\"racecar\") == True\nassert is_palindrome(\"abba\") == True\nassert is_palindrome(\"abc\") == False\nassert is_palindrome(\"\") == True\nassert is_palindrome(\"a\") == True",
     "prereqs": [
@@ -474,6 +479,7 @@
     "kind": "write",
     "prompt": "Write `my_find(s, p)` returning the index of the first occurrence of `p` in `s`, or -1 if `p` does not occur. An empty pattern matches at index 0. Do not use `str.find`, `str.index`, or the `in` operator.",
     "starter": "def my_find(s, p):\n    # your code here\n    pass",
+    "banned": [".find(", ".index("],
     "solution": "def my_find(s, p):\n    n, m = len(s), len(p)\n    for i in range(n - m + 1):\n        k = 0\n        while k < m and s[i + k] == p[k]:\n            k += 1\n        if k == m:\n            return i\n    return -1",
     "tests": "assert my_find(\"hello\", \"ll\") == 2\nassert my_find(\"hello\", \"z\") == -1\nassert my_find(\"hello\", \"\") == 0\nassert my_find(\"aaa\", \"aa\") == 0\nassert my_find(\"abcabc\", \"cab\") == 2",
     "prereqs": [
@@ -492,6 +498,7 @@
     "kind": "write",
     "prompt": "Write `my_join(parts, sep)` returning the strings in `parts` concatenated with `sep` between adjacent items (no trailing separator). Return the empty string for an empty list. Do not use `str.join`.",
     "starter": "def my_join(parts, sep):\n    # your code here\n    pass",
+    "banned": [".join("],
     "solution": "def my_join(parts, sep):\n    if not parts:\n        return \"\"\n    out = parts[0]\n    for i in range(1, len(parts)):\n        out += sep + parts[i]\n    return out",
     "tests": "assert my_join([], \"-\") == \"\"\nassert my_join([\"a\"], \"-\") == \"a\"\nassert my_join([\"a\", \"b\", \"c\"], \"-\") == \"a-b-c\"\nassert my_join([\"x\", \"y\"], \"\") == \"xy\"",
     "prereqs": [
@@ -523,6 +530,7 @@
     "kind": "write",
     "prompt": "Write `my_split(s, sep)` where `sep` is a single character: return the list of substrings of `s` separated by `sep`. Adjacent separators produce empty strings, and splitting the empty string returns a list with one empty string. Do not use `str.split`.",
     "starter": "def my_split(s, sep):\n    # your code here\n    pass",
+    "banned": [".split("],
     "solution": "def my_split(s, sep):\n    out = []\n    cur = \"\"\n    for c in s:\n        if c == sep:\n            out.append(cur)\n            cur = \"\"\n        else:\n            cur += c\n    out.append(cur)\n    return out",
     "tests": "assert my_split(\"a,b,c\", \",\") == [\"a\", \"b\", \"c\"]\nassert my_split(\"a,,b\", \",\") == [\"a\", \"\", \"b\"]\nassert my_split(\"\", \",\") == [\"\"]\nassert my_split(\"abc\", \",\") == [\"abc\"]\nassert my_split(\",x\", \",\") == [\"\", \"x\"]",
     "prereqs": [

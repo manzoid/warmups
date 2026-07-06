@@ -117,6 +117,7 @@
     "concept": "reverse in place via two-pointer swap",
     "kind": "write",
     "prompt": "Write `reverse_in_place(a)` that reverses list `a` in place and returns it. Do not build a new list or use `reversed`, `.reverse()`, or `a[::-1]`.",
+    "banned": ["reversed(", ".reverse(", "[::-1]"],
     "starter": "def reverse_in_place(a):\n    # your code here\n    pass",
     "solution": "def reverse_in_place(a):\n    lo = 0\n    hi = len(a) - 1\n    while lo < hi:\n        a[lo], a[hi] = a[hi], a[lo]\n        lo += 1\n        hi -= 1\n    return a",
     "tests": "assert reverse_in_place([]) == [], reverse_in_place([])\nassert reverse_in_place([7]) == [7], reverse_in_place([7])\nassert reverse_in_place([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_in_place([1, 2, 3, 4])\nassert reverse_in_place([1, 2, 3]) == [3, 2, 1], reverse_in_place([1, 2, 3])",
@@ -125,7 +126,8 @@
     ],
     "cue": "Two indices walking inward, swapping until they meet.",
     "syntax": "a[lo], a[hi] = a[hi], a[lo]",
-    "note": "In-place swap uses O(1) extra space; building a new reversed list uses O(n)."
+    "note": "In-place swap uses O(1) extra space; building a new reversed list uses O(n).",
+    "mapsTo": "LC 344 · Reverse String"
   },
   {
     "id": "py.u01.profit.min-so-far.predict",

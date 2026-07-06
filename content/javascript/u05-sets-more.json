@@ -59,6 +59,7 @@
     "starter": "function symmetricDiff(a, b) {\n  // your code here\n}",
     "solution": "function symmetricDiff(a, b) {\n  const setA = new Set(a);\n  const setB = new Set(b);\n  const out = [];\n  for (const x of setA) if (!setB.has(x)) out.push(x);\n  for (const x of setB) if (!setA.has(x)) out.push(x);\n  return out;\n}",
     "tests": "if (JSON.stringify(symmetricDiff([1, 2, 3], [2, 3, 4])) !== JSON.stringify([1, 4])) throw new Error('basic');\nif (JSON.stringify(symmetricDiff([1, 1], [1])) !== JSON.stringify([])) throw new Error('all shared');\nif (JSON.stringify(symmetricDiff([], [5])) !== JSON.stringify([5])) throw new Error('only b');",
+    "mapsTo": "pattern behind LC 2215 · Find the Difference of Two Arrays",
     "prereqs": [
       "js.u05.set.difference"
     ]

@@ -24,8 +24,9 @@
     "starter": "function isAnagram(a, b) {\n  // your code here\n}",
     "solution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const freq = {};\n  for (let i = 0; i < a.length; i++) freq[a[i]] = (freq[a[i]] || 0) + 1;\n  for (let i = 0; i < b.length; i++) {\n    if (!freq[b[i]]) return false;\n    freq[b[i]]--;\n  }\n  return true;\n}",
     "tests": "if (isAnagram(\"listen\", \"silent\") !== true) throw new Error(\"listen\");\nif (isAnagram(\"rat\", \"car\") !== false) throw new Error(\"rat\");\nif (isAnagram(\"\", \"\") !== true) throw new Error(\"empty\");\nif (isAnagram(\"aabb\", \"bbaa\") !== true) throw new Error(\"aabb\");\nif (isAnagram(\"a\", \"ab\") !== false) throw new Error(\"len\");",
+    "banned": [".sort("],
     "prereqs": ["js.u03.freq"],
-    "cue": "Tally one string, then draw the tally down with the other.",
+    "cue": "Count the chars in one string, then subtract one for each char in the other; every count should end at zero.",
     "syntax": "freq[c] = (freq[c] || 0) + 1",
     "mapsTo": "LC 242 · Valid Anagram"
   },
@@ -39,6 +40,7 @@
     "starter": "function swapCase(s) {\n  // your code here\n}",
     "solution": "function swapCase(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else if (c >= \"A\" && c <= \"Z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) + 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
     "tests": "if (swapCase(\"Hi!\") !== \"hI!\") throw new Error(\"Hi!\");\nif (swapCase(\"aB3\") !== \"Ab3\") throw new Error(\"aB3\");\nif (swapCase(\"abcABC\") !== \"ABCabc\") throw new Error(\"mix\");\nif (swapCase(\"\") !== \"\") throw new Error(\"empty\");\nif (swapCase(\"123\") !== \"123\") throw new Error(\"digits\");",
+    "banned": ["toLowerCase", "toUpperCase"],
     "prereqs": ["js.u03.shout"],
     "cue": "Branch on which case a letter is, then shift it the opposite way.",
     "syntax": "code - 32 for lower, code + 32 for upper",
@@ -69,6 +71,7 @@
     "starter": "function startsWith(s, p) {\n  // your code here\n}",
     "solution": "function startsWith(s, p) {\n  if (p.length > s.length) return false;\n  for (let i = 0; i < p.length; i++) {\n    if (s[i] !== p[i]) return false;\n  }\n  return true;\n}",
     "tests": "if (startsWith(\"hello\", \"he\") !== true) throw new Error(\"he\");\nif (startsWith(\"hello\", \"hello\") !== true) throw new Error(\"full\");\nif (startsWith(\"hello\", \"world\") !== false) throw new Error(\"world\");\nif (startsWith(\"hi\", \"hello\") !== false) throw new Error(\"long\");\nif (startsWith(\"abc\", \"\") !== true) throw new Error(\"empty\");",
+    "banned": [".startsWith(", ".slice("],
     "prereqs": ["js.u03.my.indexof"],
     "cue": "Walk the prefix, comparing each char to the same position in the string.",
     "syntax": "s[i] !== p[i] comparison"

@@ -75,7 +75,7 @@
     "prompt": "Write `wordCount(text)` that returns an object mapping each whitespace-separated word in `text` to how many times it appears.",
     "starter": "function wordCount(text) {\n  // your code here\n}",
     "solution": "function wordCount(text) {\n  const freq = {};\n  const words = text.split(/\\s+/).filter(Boolean);\n  for (let i = 0; i < words.length; i++) freq[words[i]] = (freq[words[i]] || 0) + 1;\n  return freq;\n}",
-    "tests": "if (JSON.stringify(wordCount('a b a')) !== JSON.stringify({ a: 2, b: 1 })) throw new Error('basic');\nif (JSON.stringify(wordCount('')) !== JSON.stringify({})) throw new Error('empty');\nif (wordCount('hi').hi !== 1) throw new Error('single');\nif (wordCount('go go go').go !== 3) throw new Error('repeat');",
+    "tests": "const w = wordCount('a b a');\nif (w.a !== 2 || w.b !== 1 || Object.keys(w).length !== 2) throw new Error('basic');\nif (Object.keys(wordCount('')).length !== 0) throw new Error('empty');\nif (wordCount('hi').hi !== 1) throw new Error('single');\nif (wordCount('go go go').go !== 3) throw new Error('repeat');",
     "prereqs": [
       "js.u04.obj.count"
     ]

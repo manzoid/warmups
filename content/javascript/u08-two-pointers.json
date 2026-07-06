@@ -24,6 +24,8 @@
     "starter": "function reverse(a) {\n  // your code here\n}",
     "solution": "function reverse(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    [a[lo], a[hi]] = [a[hi], a[lo]];\n    lo++;\n    hi--;\n  }\n  return a;\n}",
     "tests": "if (JSON.stringify(reverse([1,2,3,4,5])) !== JSON.stringify([5,4,3,2,1])) throw new Error('odd');\nif (JSON.stringify(reverse([1,2,3,4])) !== JSON.stringify([4,3,2,1])) throw new Error('even');\nif (JSON.stringify(reverse([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverse([9])) !== JSON.stringify([9])) throw new Error('single');",
+    "banned": [".reverse("],
+    "note": "`[a[lo], a[hi]] = [a[hi], a[lo]]` swaps two array slots in one statement, with no temporary variable.",
     "mapsTo": "LC 344 · Reverse String",
     "prereqs": ["js.u08.converge.guard"]
   },
@@ -81,6 +83,7 @@
     "starter": "function pairSum(a, t) {\n  // your code here\n}",
     "solution": "function pairSum(a, t) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const s = a[lo] + a[hi];\n    if (s === t) return [lo, hi];\n    else if (s < t) lo++;\n    else hi--;\n  }\n  return null;\n}",
     "tests": "if (JSON.stringify(pairSum([1,2,4,7,11,15], 15)) !== JSON.stringify([2,4])) throw new Error('found');\nif (pairSum([1,2,3], 100) !== null) throw new Error('none');\nif (JSON.stringify(pairSum([2,3,4], 6)) !== JSON.stringify([0,2])) throw new Error('ends');",
+    "banned": ["new Map"],
     "note": "On a sorted array this is O(n) time and O(1) space; a hash map matches the time but adds O(n) space.",
     "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted",
     "prereqs": ["js.u08.converge.guard"]
@@ -152,6 +155,7 @@
     "starter": "function sortedSquares(a) {\n  // your code here\n}",
     "solution": "function sortedSquares(a) {\n  const n = a.length, res = new Array(n);\n  let lo = 0, hi = n - 1;\n  for (let i = n - 1; i >= 0; i--) {\n    if (Math.abs(a[lo]) > Math.abs(a[hi])) { res[i] = a[lo] * a[lo]; lo++; }\n    else { res[i] = a[hi] * a[hi]; hi--; }\n  }\n  return res;\n}",
     "tests": "if (JSON.stringify(sortedSquares([-4,-1,0,3,10])) !== JSON.stringify([0,1,9,16,100])) throw new Error('a');\nif (JSON.stringify(sortedSquares([-7,-3,2,3,11])) !== JSON.stringify([4,9,9,49,121])) throw new Error('b');\nif (JSON.stringify(sortedSquares([1,2,3])) !== JSON.stringify([1,4,9])) throw new Error('positive');",
+    "banned": [".sort("],
     "note": "The largest square sits at one of the two ends, so filling the result from the back is O(n) and skips a final sort's O(n log n).",
     "mapsTo": "LC 977 · Squares of a Sorted Array",
     "prereqs": ["js.u08.converge.guard"]
@@ -293,6 +297,7 @@
     "starter": "function hasCycle(nxt, start) {\n  // your code here\n}",
     "solution": "function hasCycle(nxt, start) {\n  let slow = start, fast = start;\n  while (fast !== -1 && nxt[fast] !== -1) {\n    slow = nxt[slow];\n    fast = nxt[nxt[fast]];\n    if (slow === fast) return true;\n  }\n  return false;\n}",
     "tests": "if (hasCycle([1,2,3,1], 0) !== true) throw new Error('cycle');\nif (hasCycle([1,2,3,-1], 0) !== false) throw new Error('nocycle');\nif (hasCycle([-1], 0) !== false) throw new Error('single');",
+    "banned": ["new Set", ".includes(", ".indexOf("],
     "note": "Floyd's tortoise and hare uses O(1) extra space; a visited set would cost O(n).",
     "mapsTo": "LC 141 · Linked List Cycle",
     "prereqs": ["js.u08.linkedlist.walk.predict", "js.u08.floyd.trace.predict"]
@@ -350,7 +355,8 @@
     "prompt": "Write `threeSum(a)` that returns all unique triples `[x, y, z]` from `a` with `x + y + z === 0`, each triple in ascending order and no duplicate triples. Sort first, then use two pointers; use a numeric comparator when sorting.",
     "starter": "function threeSum(a) {\n  // your code here\n}",
     "solution": "function threeSum(a) {\n  a.sort((x, y) => x - y);\n  const res = [], n = a.length;\n  for (let i = 0; i < n; i++) {\n    if (i > 0 && a[i] === a[i - 1]) continue;\n    let lo = i + 1, hi = n - 1;\n    while (lo < hi) {\n      const s = a[i] + a[lo] + a[hi];\n      if (s < 0) lo++;\n      else if (s > 0) hi--;\n      else {\n        res.push([a[i], a[lo], a[hi]]);\n        lo++;\n        hi--;\n        while (lo < hi && a[lo] === a[lo - 1]) lo++;\n        while (lo < hi && a[hi] === a[hi + 1]) hi--;\n      }\n    }\n  }\n  return res;\n}",
-    "tests": "if (JSON.stringify(threeSum([-1,0,1,2,-1,-4])) !== JSON.stringify([[-1,-1,2],[-1,0,1]])) throw new Error('a');\nif (JSON.stringify(threeSum([0,0,0])) !== JSON.stringify([[0,0,0]])) throw new Error('zeros');\nif (JSON.stringify(threeSum([1,2,3])) !== JSON.stringify([])) throw new Error('none');",
+    "tests": "const norm = r => JSON.stringify(r.map(t => [...t]).sort((p, q) => (p[0] - q[0]) || (p[1] - q[1]) || (p[2] - q[2])));\nif (norm(threeSum([-1,0,1,2,-1,-4])) !== norm([[-1,-1,2],[-1,0,1]])) throw new Error('a');\nif (norm(threeSum([0,0,0])) !== norm([[0,0,0]])) throw new Error('zeros');\nif (norm(threeSum([1,2,3])) !== norm([])) throw new Error('none');",
+    "banned": [".sort()"],
     "note": "Sorting first makes equal values adjacent, so skipping neighbors that match dedups triples in O(1) extra space.",
     "mapsTo": "LC 15 · 3Sum",
     "prereqs": ["js.u08.pairsum.write", "js.u08.sort.trap"]

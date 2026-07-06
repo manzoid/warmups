@@ -10,6 +10,7 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const m = new Map();\nm.set('a', 1);\nm.set('b', 2);\nm;",
     "expected": "Map(2) {\"a\" => 1, \"b\" => 2}",
+    "note": "A Map prints as Map(size) {key => value, ...}: string keys keep their quotes and entries show in the order they were inserted.",
     "prereqs": []
   },
   {
@@ -59,11 +60,11 @@
     "cue": "Accumulate a running hash across the characters left to right.",
     "syntax": "s.charCodeAt(i)",
     "kind": "write",
-    "prompt": "Write `hashStr(s, mod)` that folds the string `s` into an integer in the range `[0, mod)` using `h = h * 31 + charCode` accumulated left to right, taking `% mod`.",
+    "prompt": "Write `hashStr(s, mod)` that combines the characters of `s` into an integer in the range `[0, mod)` using `h = h * 31 + charCode` accumulated left to right, taking `% mod`.",
     "starter": "function hashStr(s, mod) {\n  // your code here\n}",
     "solution": "function hashStr(s, mod) {\n  let h = 0;\n  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % mod;\n  return h;\n}",
     "tests": "for (const s of ['tea', 'eat', 'hello', '', 'a']) {\n  const h = hashStr(s, 8);\n  if (!Number.isInteger(h) || h < 0 || h >= 8) throw new Error('out of range: ' + s + ' -> ' + h);\n}\nif (hashStr('', 8) !== 0) throw new Error('empty must be 0');\nif (hashStr('tea', 8) !== hashStr('tea', 8)) throw new Error('must be deterministic');",
-    "note": "Each character has a numeric code (charCodeAt); folding with * 31 lets position matter, so 'tea' and 'eat' land in different buckets.",
+    "note": "Each character has a numeric code (charCodeAt); multiplying the running total by 31 makes position matter. Collisions still happen: at size 8 both 'tea' and 'eat' hash to bucket 0, which is exactly why each bucket holds a list you scan by full key.",
     "prereqs": []
   },
   {
@@ -186,7 +187,7 @@
     "prompt": "Write `charFreq(s)` that returns an object mapping each character of `s` to its count.",
     "starter": "function charFreq(s) {\n  // your code here\n}",
     "solution": "function charFreq(s) {\n  const freq = {};\n  for (let i = 0; i < s.length; i++) freq[s[i]] = (freq[s[i]] || 0) + 1;\n  return freq;\n}",
-    "tests": "if (JSON.stringify(charFreq('aabbbc')) !== JSON.stringify({ a: 2, b: 3, c: 1 })) throw new Error('aabbbc');\nif (JSON.stringify(charFreq('')) !== JSON.stringify({})) throw new Error('empty');\nif (charFreq('zzz').z !== 3) throw new Error('zzz');",
+    "tests": "const f = charFreq('aabbbc');\nif (f.a !== 2 || f.b !== 3 || f.c !== 1 || Object.keys(f).length !== 3) throw new Error('aabbbc');\nif (Object.keys(charFreq('')).length !== 0) throw new Error('empty');\nif (charFreq('zzz').z !== 3) throw new Error('zzz');",
     "prereqs": ["js.u04.freq.map", "js.u04.obj.count"]
   },
   {
@@ -197,10 +198,11 @@
     "cue": "Feed each item through the map's own set/get to accumulate counts.",
     "syntax": "map.get(key) || 0",
     "kind": "write",
+    "banned": ["new Map("],
     "prompt": "Using the finished `MyMap`, write `freqCount(items)` that returns a `MyMap` mapping each item to how many times it appears.",
     "starter": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  // your code here\n}",
     "solution": "class MyMap {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  set(key, val) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) { pair[1] = val; return this; }\n    }\n    b.push([key, val]);\n    return this;\n  }\n  get(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return pair[1];\n    }\n    return undefined;\n  }\n  has(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) {\n      const pair = b[i];\n      if (pair[0] === key) return true;\n    }\n    return false;\n  }\n}\n\nfunction freqCount(items) {\n  const m = new MyMap();\n  for (let i = 0; i < items.length; i++) m.set(items[i], (m.get(items[i]) || 0) + 1);\n  return m;\n}",
-    "tests": "const m = freqCount(['a', 'a', 'b', 'a']);\nif (m.get('a') !== 3) throw new Error('a should be 3');\nif (m.get('b') !== 1) throw new Error('b should be 1');\nif (m.get('z') !== undefined) throw new Error('absent -> undefined');",
+    "tests": "const m = freqCount(['a', 'a', 'b', 'a']);\nif (!(m instanceof MyMap)) throw new Error('must return a MyMap');\nif (m.get('a') !== 3) throw new Error('a should be 3');\nif (m.get('b') !== 1) throw new Error('b should be 1');\nif (m.get('z') !== undefined) throw new Error('absent -> undefined');",
     "prereqs": ["js.u04.build.has", "js.u04.freq.write"]
   },
   {
@@ -236,7 +238,7 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "complement lookup in one pass",
-    "cue": "Track seen values and look for each element's complement.",
+    "cue": "Track the values you have seen; for each new one, look for the earlier value that adds up to target.",
     "syntax": "target - nums[i]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -249,15 +251,15 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "two-sum via complement map",
-    "cue": "Check for the complement in the seen map before recording the current value.",
-    "syntax": "map.has(complement)",
+    "cue": "For each value, check whether the value it needs (target minus it) was already seen, before recording the current value.",
+    "syntax": "map.has(key)",
     "kind": "write",
-    "prompt": "Write `twoSum(nums, target)` that returns `[i, j]` of two distinct indices whose values sum to `target`, or `null` if none exist. Make a single pass and check the complement before storing the current value.",
+    "prompt": "Write `twoSum(nums, target)` that returns `[i, j]` of two distinct indices whose values sum to `target`, or `null` if none exist.",
     "starter": "function twoSum(nums, target) {\n  // your code here\n}",
     "solution": "function twoSum(nums, target) {\n  const seen = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const c = target - nums[i];\n    if (seen.has(c)) return [seen.get(c), i];\n    seen.set(nums[i], i);\n  }\n  return null;\n}",
     "tests": "if (JSON.stringify(twoSum([2, 7, 11, 15], 9)) !== JSON.stringify([0, 1])) throw new Error('basic');\nif (JSON.stringify(twoSum([3, 3], 6)) !== JSON.stringify([0, 1])) throw new Error('duplicates');\nif (JSON.stringify(twoSum([3, 2, 4], 6)) !== JSON.stringify([1, 2])) throw new Error('not first two');\nif (twoSum([1, 2, 3], 100) !== null) throw new Error('no pair -> null');",
     "mapsTo": "LC 1 · Two Sum",
-    "note": "Storing seen values as you go turns the O(n^2) nested scan into one pass: each complement lookup is O(1).",
+    "note": "Storing seen values as you go replaces the nested double loop with a single pass; each map lookup is one constant-time step (O(1)).",
     "prereqs": ["js.u04.twosum.seen"]
   },
   {
@@ -265,7 +267,7 @@
     "track": "javascript",
     "group": "Hash maps",
     "concept": "group-by into value lists",
-    "cue": "Bucket each number by its parity, appending into the matching list.",
+    "cue": "Bucket each number by whether it is even or odd, appending into the matching list.",
     "syntax": "[...map.values()]",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
@@ -281,7 +283,7 @@
     "cue": "Key each word by its sorted letters and append into that group.",
     "syntax": "arr.sort() then join('')",
     "kind": "write",
-    "prompt": "Write `groupAnagrams(words)` that returns an array of groups, each group holding the words that are anagrams of each other. Key each group by its sorted characters. Preserve the order in which each group's key was first seen, and within a group the input order.",
+    "prompt": "Write `groupAnagrams(words)` that returns an array of groups, each group holding the words that are anagrams of each other. Preserve the order in which each group's key was first seen, and within a group the input order.",
     "starter": "function groupAnagrams(words) {\n  // your code here\n}",
     "solution": "function groupAnagrams(words) {\n  const m = new Map();\n  for (let i = 0; i < words.length; i++) {\n    const w = words[i];\n    const key = [...w].sort().join('');\n    if (!m.has(key)) m.set(key, []);\n    m.get(key).push(w);\n  }\n  return [...m.values()];\n}",
     "tests": "const got = groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat']);\nconst want = [['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']];\nif (JSON.stringify(got) !== JSON.stringify(want)) throw new Error(JSON.stringify(got));\nif (JSON.stringify(groupAnagrams([])) !== JSON.stringify([])) throw new Error('empty');",
@@ -382,7 +384,22 @@
     "solution": "function topKFrequent(nums, k) {\n  const m = new Map();\n  for (let i = 0; i < nums.length; i++) m.set(nums[i], (m.get(nums[i]) || 0) + 1);\n  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, k).map(e => e[0]);\n}",
     "tests": "if (JSON.stringify(topKFrequent([1, 1, 1, 2, 2, 3], 2)) !== JSON.stringify([1, 2])) throw new Error('basic');\nif (JSON.stringify(topKFrequent([4, 4, 4, 5, 5, 6, 6, 6, 6], 1)) !== JSON.stringify([6])) throw new Error('single leader');\nif (JSON.stringify(topKFrequent([7], 1)) !== JSON.stringify([7])) throw new Error('one element');",
     "mapsTo": "LC 347 · Top K Frequent Elements",
+    "note": "This sorts every entry (O(n log n)); the optimal LC 347 solution uses a heap or a bucket sort to pull the top k in O(n).",
     "prereqs": ["js.u04.topk.predict"]
+  },
+  {
+    "id": "js.u04.prefixsum.predict",
+    "track": "javascript",
+    "group": "Hash maps",
+    "concept": "running prefix sums",
+    "cue": "Build an array where entry i holds the sum of every element before index i.",
+    "syntax": "pref.push(pref[pref.length - 1] + nums[i])",
+    "kind": "predict",
+    "prompt": "What does this evaluate to?",
+    "snippet": "const nums = [3, 1, 2, 4];\nconst pref = [0];\nfor (let i = 0; i < nums.length; i++) pref.push(pref[pref.length - 1] + nums[i]);\npref;",
+    "expected": "[0, 3, 4, 6, 10]",
+    "note": "With prefix sums, the sum of the slice nums[i..j] equals pref[j + 1] - pref[i]; the subarray-sum counter is built on that fact.",
+    "prereqs": ["js.u04.map.basics"]
   },
   {
     "id": "js.u04.subarraysum.predict",
@@ -396,7 +413,7 @@
     "snippet": "const nums = [1, 1, 1];\nconst k = 2;\nconst seen = new Map([[0, 1]]);\nlet sum = 0, count = 0;\nfor (let i = 0; i < nums.length; i++) {\n  sum += nums[i];\n  if (seen.has(sum - k)) count += seen.get(sum - k);\n  seen.set(sum, (seen.get(sum) || 0) + 1);\n}\ncount;",
     "expected": "2",
     "note": "seen maps each running prefix sum to how many times it occurred; seeding {0: 1} counts subarrays that start at index 0.",
-    "prereqs": ["js.u04.freq.map"]
+    "prereqs": ["js.u04.freq.map", "js.u04.prefixsum.predict"]
   },
   {
     "id": "js.u04.subarraysum.write",

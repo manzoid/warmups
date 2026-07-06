@@ -10,7 +10,8 @@
     "expected": "[2, 3, 1]",
     "prereqs": [],
     "cue": "Walk indices 0..len(s)-1; read s[i] each pass into the count array.",
-    "syntax": "for i in range(len(s)): s[i]"
+    "syntax": "for i in range(len(s)): s[i]",
+    "note": "ord(ch) is the integer code of a character (ord('a') is 97); [0] * 256 makes 256 tally slots, one per possible code, so count[ord(ch)] is that character's own counter."
   },
   {
     "id": "py.u04.direct-address.count",
@@ -56,7 +57,8 @@
       "py.u04.freq.raw.predict"
     ],
     "cue": "Loop indices; branch on whether the char is already a key.",
-    "syntax": "dict[k] increment"
+    "syntax": "dict[k] increment",
+    "banned": ["Counter"]
   },
   {
     "id": "py.u04.freq.get.predict",
@@ -141,7 +143,7 @@
     "group": "Hash maps",
     "concept": "string hash into SIZE slots",
     "kind": "write",
-    "prompt": "Complete `_hash(self, key)` so it returns an int slot in the range [0, self.size) for the string `key`, using the rolling hash `h = h*31 + ord(ch)` folded by `% self.size`. Same key must always give the same slot.",
+    "prompt": "Complete `_hash(self, key)` so it returns an int slot in the range [0, self.size) for the string `key`, using the rolling hash `h = h*31 + ord(ch)`, then `% self.size` to land in range. Same key must always give the same slot.",
     "starter": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for i in range(len(key)):\n            h = h * 31 + ord(key[i])\n        # fold h into [0, self.size) and return it\n        pass",
     "solution": "class HashMap:\n    def __init__(self, size=8):\n        self.size = size\n        self.buckets = [[] for _ in range(self.size)]\n\n    def _hash(self, key):\n        h = 0\n        for i in range(len(key)):\n            h = h * 31 + ord(key[i])\n        return h % self.size",
     "tests": "m = HashMap(8)\nh = m._hash(\"tea\")\nassert isinstance(h, int), h\nassert 0 <= h < 8, h\nassert m._hash(\"tea\") == m._hash(\"tea\"), \"must be deterministic\"",
@@ -149,7 +151,7 @@
       "py.u04.direct-address.count",
       "py.u04.build.oo.predict"
     ],
-    "cue": "The loop is given; you supply the fold that pins any h into a valid slot.",
+    "cue": "The loop is given; you supply the final step that maps any h into a valid slot in [0, self.size).",
     "syntax": "% self.size",
     "note": "The multiplier 31 spreads similar strings apart; `% self.size` is what turns an unbounded number back into a real array index."
   },
@@ -197,7 +199,7 @@
     "prereqs": [
       "py.u04.freq.raw.write"
     ],
-    "cue": "Track seen values; check for each complement as you go.",
+    "cue": "Track values you've seen; for each one, check whether target minus it is already stored.",
     "syntax": "(target - x) in seen"
   },
   {
@@ -213,7 +215,7 @@
     "prereqs": [
       "py.u04.two-sum.predict"
     ],
-    "cue": "One pass storing value to index; look up the complement first.",
+    "cue": "One pass storing value to index; first check whether target minus the current value is already stored.",
     "syntax": "seen[nums[i]] = i",
     "note": "The map trades O(n) space to drop the O(n^2) inner loop of checking every pair: each complement lookup is O(1).",
     "mapsTo": "LC 1 · Two Sum"

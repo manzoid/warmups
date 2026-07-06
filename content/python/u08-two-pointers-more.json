@@ -82,7 +82,7 @@
     "prompt": "Write `partition_sign(a)` that rearranges list `a` in place so every negative value comes before every non-negative value, and returns `a`. Use two pointers from the ends, swapping a misplaced pair. Order within each group need not be preserved.",
     "starter": "def partition_sign(a):\n    # your code here\n    return a",
     "solution": "def partition_sign(a):\n    lo, hi = 0, len(a) - 1\n    while lo < hi:\n        if a[lo] < 0:\n            lo += 1\n        elif a[hi] >= 0:\n            hi -= 1\n        else:\n            a[lo], a[hi] = a[hi], a[lo]\n            lo += 1\n            hi -= 1\n    return a",
-    "tests": "assert partition_sign([1, -2, 3, -4, 5, -6]) == [-6, -2, -4, 3, 5, 1], partition_sign([1, -2, 3, -4, 5, -6])\nassert partition_sign([-1, -2, -3]) == [-1, -2, -3]\nassert partition_sign([1, 2, 3]) == [1, 2, 3]\nassert partition_sign([]) == []\nr = partition_sign([3, -1, -2, 4, -5])\nassert all(x < 0 for x in r[:3]) and all(x >= 0 for x in r[3:]), r",
+    "tests": "src = [1, -2, 3, -4, 5, -6]\nr = partition_sign(src[:])\nneg = sum(1 for x in src if x < 0)\nassert all(x < 0 for x in r[:neg]) and all(x >= 0 for x in r[neg:]), r\nassert sorted(r) == sorted(src), r\nassert partition_sign([-1, -2, -3]) == [-1, -2, -3]\nassert partition_sign([1, 2, 3]) == [1, 2, 3]\nassert partition_sign([]) == []\nr2 = partition_sign([3, -1, -2, 4, -5])\nassert all(x < 0 for x in r2[:3]) and all(x >= 0 for x in r2[3:]), r2",
     "prereqs": ["py.u08.partition.sign.predict"]
   },
   {

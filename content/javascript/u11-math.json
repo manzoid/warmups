@@ -29,7 +29,7 @@
     "id": "js.u11.mod.parity",
     "track": "javascript",
     "group": "Programming math",
-    "concept": "parity via % 2",
+    "concept": "even or odd via % 2",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const xs = [10, 7, 4, 3];\nconst out = [];\nfor (let i = 0; i < xs.length; i++) out.push(xs[i] % 2);\nout;",
@@ -115,7 +115,7 @@
     "starter": "function reverseDigits(n) {\n  // your code here\n}",
     "solution": "function reverseDigits(n) {\n  let r = 0;\n  while (n > 0) {\n    r = r * 10 + (n % 10);\n    n = Math.trunc(n / 10);\n  }\n  return r;\n}",
     "tests": "if (reverseDigits(1234) !== 4321) throw new Error('1234');\nif (reverseDigits(120) !== 21) throw new Error('120');\nif (reverseDigits(0) !== 0) throw new Error('0');\nif (reverseDigits(7) !== 7) throw new Error('7');",
-    "cue": "Peel the last digit each pass and fold it onto a growing result.",
+    "cue": "Each pass, take the last digit and add it onto the number you are building.",
     "syntax": "% 10 and Math.trunc(x)",
     "mapsTo": "LC 7 · Reverse Integer",
     "prereqs": ["js.u11.mod.last-digit", "js.u11.intdiv.trunc-negative"]
@@ -130,7 +130,7 @@
     "starter": "function digitSum(n) {\n  // your code here\n}",
     "solution": "function digitSum(n) {\n  let s = 0;\n  while (n > 0) {\n    s += n % 10;\n    n = Math.trunc(n / 10);\n  }\n  return s;\n}",
     "tests": "if (digitSum(1234) !== 10) throw new Error('1234');\nif (digitSum(0) !== 0) throw new Error('0');\nif (digitSum(9) !== 9) throw new Error('9');\nif (digitSum(105) !== 6) throw new Error('105');",
-    "cue": "Peel each digit and add it to a running total.",
+    "cue": "Take the last digit each pass and add it to a running total.",
     "syntax": "% 10 and Math.trunc(x)",
     "prereqs": ["js.u11.digits.reverse"]
   },
@@ -144,6 +144,7 @@
     "starter": "function ceilDiv(a, b) {\n  // your code here\n}",
     "solution": "function ceilDiv(a, b) {\n  return Math.trunc((a + b - 1) / b);\n}",
     "tests": "if (ceilDiv(7, 2) !== 4) throw new Error('7/2');\nif (ceilDiv(6, 2) !== 3) throw new Error('6/2');\nif (ceilDiv(1, 3) !== 1) throw new Error('1/3');\nif (ceilDiv(10, 5) !== 2) throw new Error('10/5');",
+    "banned": ["Math.ceil"],
     "cue": "Bias the numerator up before dividing down to round up.",
     "syntax": "Math.trunc(x)",
     "prereqs": ["js.u11.intdiv.trunc-negative"]
@@ -152,7 +153,7 @@
     "id": "js.u11.horner.abc",
     "track": "javascript",
     "group": "Programming math",
-    "concept": "polynomial hash via Horner",
+    "concept": "polynomial hash by multiply-then-add",
     "kind": "predict",
     "prompt": "What is the value of `h`?",
     "snippet": "let h = 0;\nconst s = 'abc';\nfor (let i = 0; i < s.length; i++) h = h * 4 + (s.charCodeAt(i) - 96);\nh;",
@@ -166,13 +167,14 @@
     "id": "js.u11.horner.parse",
     "track": "javascript",
     "group": "Programming math",
-    "concept": "parse digits with base-10 Horner",
+    "concept": "parse digits by multiply-then-add",
     "kind": "write",
     "prompt": "Write `parseNum(s)` that turns a string of decimal digits into its integer value using `h = h * 10 + digit`. Do not use `Number`, `parseInt`, or `parseFloat`.",
     "starter": "function parseNum(s) {\n  // your code here\n}",
     "solution": "function parseNum(s) {\n  let h = 0;\n  for (let i = 0; i < s.length; i++) h = h * 10 + (s.charCodeAt(i) - 48);\n  return h;\n}",
     "tests": "if (parseNum('0') !== 0) throw new Error('0');\nif (parseNum('1234') !== 1234) throw new Error('1234');\nif (parseNum('7') !== 7) throw new Error('7');\nif (parseNum('1000') !== 1000) throw new Error('1000');",
-    "cue": "Fold digits left to right, subtracting the code of '0' to get each digit.",
+    "banned": ["Number(", "parseInt", "parseFloat"],
+    "cue": "Go through the digits left to right, subtracting the code of '0' to get each digit's value.",
     "syntax": "s.charCodeAt(i)",
     "note": "Subtracting the code of '0' (48) turns a digit character into its numeric value 0-9.",
     "prereqs": ["js.u11.horner.abc"]
@@ -187,7 +189,7 @@
     "starter": "function polyHash(s, base, mod) {\n  // your code here\n}",
     "solution": "function polyHash(s, base, mod) {\n  let h = 0;\n  for (let i = 0; i < s.length; i++) h = (h * base + s.charCodeAt(i)) % mod;\n  return h;\n}",
     "tests": "for (const s of ['tea', 'eat', 'hi', '', 'a']) {\n  const h = polyHash(s, 31, 8);\n  if (!Number.isInteger(h) || h < 0 || h >= 8) throw new Error('range: ' + s);\n}\nif (polyHash('', 31, 8) !== 0) throw new Error('empty');\nif (polyHash('tea', 31, 8) !== polyHash('tea', 31, 8)) throw new Error('deterministic');",
-    "cue": "Fold each char into the hash and reduce by mod on every step to stay in range.",
+    "cue": "Combine each character into the hash and take % mod on every step to stay in range.",
     "syntax": "s.charCodeAt(i)",
     "prereqs": ["js.u11.horner.abc", "js.u11.mod.last-digit"]
   },
@@ -255,6 +257,7 @@
     "starter": "function clamp(x, lo, hi) {\n  // your code here\n}",
     "solution": "function clamp(x, lo, hi) {\n  return Math.max(lo, Math.min(x, hi));\n}",
     "tests": "if (clamp(15, 0, 10) !== 10) throw new Error('15');\nif (clamp(-3, 0, 10) !== 0) throw new Error('-3');\nif (clamp(5, 0, 10) !== 5) throw new Error('5');",
+    "banned": ["if", "?"],
     "cue": "Cap against the upper bound, then floor against the lower bound.",
     "syntax": "Math.min, Math.max",
     "prereqs": ["js.u11.clamp.predict"]
@@ -282,6 +285,7 @@
     "starter": "function runningMax(xs) {\n  // your code here\n}",
     "solution": "function runningMax(xs) {\n  let best = xs[0];\n  for (let i = 0; i < xs.length; i++) if (xs[i] > best) best = xs[i];\n  return best;\n}",
     "tests": "if (runningMax([3, 1, 4, 1, 5, 9, 2]) !== 9) throw new Error('a');\nif (runningMax([-5, -2, -9]) !== -2) throw new Error('b');\nif (runningMax([7]) !== 7) throw new Error('c');",
+    "banned": ["Math.max", "..."],
     "cue": "Seed with the first element, then scan and keep whichever is larger.",
     "syntax": "for (let i = 0; i < xs.length; i++)",
     "prereqs": ["js.u11.clamp.predict"]
@@ -290,13 +294,14 @@
     "id": "js.u11.bits.parity",
     "track": "javascript",
     "group": "Programming math",
-    "concept": "parity via low bit",
+    "concept": "even or odd via the low bit",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
     "snippet": "const xs = [12, 7];\nconst out = [];\nfor (let i = 0; i < xs.length; i++) out.push(xs[i] & 1);\nout;",
     "expected": "[0, 1]",
     "cue": "The lowest bit tells even from odd; walk each index and record it.",
     "syntax": "x & 1",
+    "note": "A bit is one binary digit, 0 or 1, and a non-negative integer is just a row of bits. The & operator lines up two numbers and keeps a 1 only where both have a 1. Here x & 1 looks at just the lowest bit, which is 1 for odd numbers and 0 for even.",
     "prereqs": ["js.u11.mod.parity"]
   },
   {
@@ -367,6 +372,7 @@
     "tests": "if (buildMask([0, 1, 3]) !== 11) throw new Error('a');\nif (buildMask([]) !== 0) throw new Error('b');\nif (buildMask([2]) !== 4) throw new Error('c');\nif (buildMask([0, 0]) !== 1) throw new Error('d');",
     "cue": "For each index, OR in a 1 shifted to that number's bit position.",
     "syntax": "1 << nums[i]",
+    "note": "1 << k is the integer with only bit k set (bit 0 is 1, bit 1 is 2, bit 2 is 4, and so on). The |= operator turns that bit on in the mask without disturbing the others.",
     "prereqs": ["js.u11.bits.clear-lowest"]
   },
   {
@@ -380,7 +386,7 @@
     "expected": "1",
     "cue": "XOR of a value with itself is zero, so equal values cancel in pairs.",
     "syntax": "x ^= xs[i]",
-    "note": "a ^ a is 0 and a ^ 0 is a, so folding an array with XOR leaves only the values that appear an odd number of times.",
+    "note": "a ^ a is 0 and a ^ 0 is a, so combining an array with XOR leaves only the values that appear an odd number of times.",
     "prereqs": []
   }
 ]

@@ -216,7 +216,7 @@
     "starter": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    // your code here\n    return this;\n  }\n}",
     "solution": "class HashSet {\n  constructor(size = 8) {\n    this.n = size;\n    this.buckets = Array.from({ length: size }, () => []);\n  }\n  _hash(key) {\n    let h = 0;\n    const s = String(key);\n    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % this.n;\n    return h;\n  }\n  add(key) {\n    const b = this.buckets[this._hash(key)];\n    for (let i = 0; i < b.length; i++) if (b[i] === key) return this;\n    b.push(key);\n    return this;\n  }\n}",
     "tests": "const s = new HashSet();\ns.add('cat');\ns.add('cat');\nconst b = s.buckets[s._hash('cat')];\nif (b.length !== 1) throw new Error('duplicate add must not grow the chain');\nif (b[0] !== 'cat') throw new Error('should store the key');",
-    "note": "A hash set is a chaining hash map with the value field deleted: each bucket entry is just the key. The insert-only-if-absent scan is what makes add idempotent.",
+    "note": "A hash set is unit 4's chaining hash map (MyMap) with the value slot dropped: each bucket entry is just the key, and _hash is the same function. The insert-only-if-absent scan is what makes add idempotent.",
     "prereqs": ["js.u05.build.boolset.delete"]
   },
   {
@@ -308,6 +308,20 @@
     "prereqs": ["js.u05.set.intersection"]
   },
   {
+    "id": "js.u05.set.window-shrink",
+    "track": "javascript",
+    "group": "Sets",
+    "concept": "shrink the window past a repeat",
+    "cue": "The next character is already in the seen set; drop characters from the left until it is not.",
+    "syntax": "set.delete(s[l])",
+    "kind": "predict",
+    "prompt": "What is the value of `l`?",
+    "snippet": "const s = 'abca';\nconst seen = new Set();\nlet l = 0;\nfor (let r = 0; r < 3; r++) seen.add(s[r]);\nwhile (seen.has(s[3])) {\n  seen.delete(s[l]);\n  l++;\n}\nl;",
+    "expected": "1",
+    "note": "This is one shrink step of the sliding window: when s[r] repeats, advance l past the earlier copy so the window holds distinct characters again. The next exercise wraps this step in a loop over r.",
+    "prereqs": ["js.u05.set.has"]
+  },
+  {
     "id": "js.u05.use.longest-unique",
     "track": "javascript",
     "group": "Sets",
@@ -321,7 +335,7 @@
     "tests": "if (longest('abcabcbb') !== 3) throw new Error('abcabcbb -> 3');\nif (longest('bbbbb') !== 1) throw new Error('bbbbb -> 1');\nif (longest('pwwkew') !== 3) throw new Error('pwwkew -> 3');\nif (longest('') !== 0) throw new Error('empty -> 0');",
     "note": "The window slides in O(n): each character is added and removed at most once, versus O(n^2) rechecking every substring for repeats.",
     "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
-    "prereqs": ["js.u05.use.has-duplicate"]
+    "prereqs": ["js.u05.use.has-duplicate", "js.u05.set.window-shrink"]
   },
   {
     "id": "js.u05.use.dup-within-k",

@@ -6,8 +6,8 @@
     "concept": "index into a list by position",
     "kind": "predict",
     "prompt": "What does this evaluate to?",
-    "snippet": "a = [3, 1, 4, 1, 5]\na[0], a[2]",
-    "expected": "(3, 4)",
+    "snippet": "a = [3, 1, 4, 1, 5]\na[0]",
+    "expected": "3",
     "prereqs": [],
     "cue": "Positions count from 0, so `a[0]` is the first element.",
     "syntax": "a[0] reads by position"
@@ -79,13 +79,14 @@
     "concept": "sum via accumulator",
     "kind": "write",
     "prompt": "Write `my_sum(a)` returning the sum of list `a`. Do not use the built-in `sum`.",
-    "starter": "def my_sum(a):\n    # your code here\n    pass",
+    "banned": [" sum("],
+    "starter": "def my_sum(a):\n    total = 0\n    for i in range(len(a)):\n        pass  # your code here\n    return total",
     "solution": "def my_sum(a):\n    total = 0\n    for i in range(len(a)):\n        total += a[i]\n    return total",
     "tests": "assert my_sum([]) == 0, my_sum([])\nassert my_sum([5]) == 5, my_sum([5])\nassert my_sum([3, 1, 4, 1, 5]) == 14, my_sum([3, 1, 4, 1, 5])\nassert my_sum([-2, 2, -3]) == -3, my_sum([-2, 2, -3])",
     "prereqs": [
       "py.u01.accumulate.sum.predict"
     ],
-    "cue": "Fold with a running total that starts at 0, indexing `a[i]`.",
+    "cue": "Keep one running total, updated once per element as you index `a[i]`.",
     "syntax": "for i in range(len(a))"
   },
   {
@@ -131,7 +132,7 @@
     "prereqs": [
       "py.u01.accumulate.product.predict"
     ],
-    "cue": "Fold with a running product; the identity is 1.",
+    "cue": "Keep one running product; it starts at 1.",
     "syntax": "*= accumulates"
   },
   {
@@ -171,6 +172,7 @@
     "concept": "max value via compare-and-keep",
     "kind": "write",
     "prompt": "Write `my_max(a)` returning the largest element of non-empty list `a`. Do not use the built-in `max`.",
+    "banned": [" max("],
     "starter": "def my_max(a):\n    # your code here\n    pass",
     "solution": "def my_max(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] > best:\n            best = a[i]\n    return best",
     "tests": "assert my_max([5]) == 5, my_max([5])\nassert my_max([3, 7, 2, 9, 4]) == 9, my_max([3, 7, 2, 9, 4])\nassert my_max([-1, -9, -3]) == -1, my_max([-1, -9, -3])",
@@ -187,6 +189,7 @@
     "concept": "min value via compare-and-keep",
     "kind": "write",
     "prompt": "Write `my_min(a)` returning the smallest element of non-empty list `a`. Do not use the built-in `min`.",
+    "banned": [" min("],
     "starter": "def my_min(a):\n    # your code here\n    pass",
     "solution": "def my_min(a):\n    best = a[0]\n    for i in range(1, len(a)):\n        if a[i] < best:\n            best = a[i]\n    return best",
     "tests": "assert my_min([5]) == 5, my_min([5])\nassert my_min([3, 7, 2, 9, 4]) == 2, my_min([3, 7, 2, 9, 4])\nassert my_min([-1, -9, -3]) == -9, my_min([-1, -9, -3])",
@@ -218,6 +221,7 @@
     "concept": "argmax (index of the max)",
     "kind": "write",
     "prompt": "Write `argmax(a)` returning the index of the largest element of non-empty list `a`, the first such index on ties. Do not use the built-in `max`.",
+    "banned": [" max("],
     "starter": "def argmax(a):\n    # your code here\n    pass",
     "solution": "def argmax(a):\n    mi = 0\n    for i in range(1, len(a)):\n        if a[i] > a[mi]:\n            mi = i\n    return mi",
     "tests": "assert argmax([5]) == 0, argmax([5])\nassert argmax([3, 7, 2, 9, 4]) == 3, argmax([3, 7, 2, 9, 4])\nassert argmax([4, 4, 2]) == 0, argmax([4, 4, 2])",
@@ -701,6 +705,7 @@
     "concept": "reverse via backward loop",
     "kind": "write",
     "prompt": "Write `reverse_list(a)` returning a new list with the elements of `a` in reverse order. Do not use `reversed`, `.reverse()`, or slice-reversal `a[::-1]`.",
+    "banned": ["reversed(", ".reverse(", "[::-1]"],
     "starter": "def reverse_list(a):\n    # your code here\n    pass",
     "solution": "def reverse_list(a):\n    out = []\n    for i in range(len(a) - 1, -1, -1):\n        out.append(a[i])\n    return out",
     "tests": "assert reverse_list([]) == [], reverse_list([])\nassert reverse_list([7]) == [7], reverse_list([7])\nassert reverse_list([1, 2, 3, 4]) == [4, 3, 2, 1], reverse_list([1, 2, 3, 4])",
@@ -784,6 +789,6 @@
     ],
     "cue": "For each window start, sum its k elements.",
     "syntax": "range(len(a) - k + 1)",
-    "note": "This re-sums every window from scratch: O(n*k). A rolling sum that adds the entering element and drops the leaving one does it in O(n)."
+    "note": "Big-O names how the work grows with the input size n: O(n) means the work grows in step with n, O(n*k) means about n times k as much. This re-sums every window from scratch, which is O(n*k). A rolling sum that adds the entering element and drops the leaving one does it in O(n)."
   }
 ]

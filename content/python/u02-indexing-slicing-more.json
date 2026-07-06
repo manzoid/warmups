@@ -11,6 +11,9 @@
     "starter": "def rotate_left(a, k):\n    # your code here\n    pass\n",
     "solution": "def rotate_left(a, k):\n    n = len(a)\n    if n == 0:\n        return []\n    k %= n\n    out = []\n    for i in range(n):\n        out.append(a[(i + k) % n])\n    return out\n",
     "tests": "assert rotate_left([1, 2, 3, 4, 5], 2) == [3, 4, 5, 1, 2], rotate_left([1, 2, 3, 4, 5], 2)\nassert rotate_left([1, 2, 3], 0) == [1, 2, 3]\nassert rotate_left([1, 2, 3], 4) == [2, 3, 1]\nassert rotate_left([], 3) == []\nassert rotate_left([9], 5) == [9]\n",
+    "banned": ["[:", ":]", "::"],
+    "note": "LC 189 rotates right by k; rotating left by k is the mirror image (left by k equals right by n - k).",
+    "mapsTo": "LC 189 · Rotate Array",
     "prereqs": ["py.u02.ring"]
   },
   {
@@ -107,6 +110,19 @@
     "prereqs": ["py.u02.midpoint"]
   },
   {
+    "id": "py.u02.binsearch.trace",
+    "track": "python",
+    "group": "Indexing & slicing",
+    "concept": "one binary-search step narrows the range",
+    "cue": "Find the midpoint, compare it to the target, then keep only the half that could still hold it.",
+    "syntax": "lo = mid + 1",
+    "kind": "predict",
+    "prompt": "What is the value of `lo`?",
+    "snippet": "a = [1, 3, 5, 7, 9]\ntarget = 7\nlo, hi = 0, len(a) - 1\nmid = lo + (hi - lo) // 2\nif a[mid] < target:\n    lo = mid + 1\nlo",
+    "expected": "3",
+    "prereqs": ["py.u02.midpoint"]
+  },
+  {
     "id": "py.u02.binsearch",
     "track": "python",
     "group": "Indexing & slicing",
@@ -115,11 +131,12 @@
     "syntax": "lo + (hi - lo) // 2",
     "kind": "write",
     "prompt": "Write `binary_search(a, target)` returning the index of `target` in the sorted list `a`, or -1 if it is absent. Halve the range each step; do not use `list.index` or `in`.",
-    "starter": "def binary_search(a, target):\n    # your code here\n    pass\n",
+    "starter": "def binary_search(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo <= hi:\n        mid = lo + (hi - lo) // 2\n        # your code here: compare a[mid] to target, then narrow lo/hi or return mid\n        pass\n    return -1\n",
     "solution": "def binary_search(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo <= hi:\n        mid = lo + (hi - lo) // 2\n        if a[mid] == target:\n            return mid\n        if a[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n",
     "tests": "assert binary_search([1, 3, 5, 7, 9], 7) == 3, binary_search([1, 3, 5, 7, 9], 7)\nassert binary_search([1, 3, 5, 7, 9], 1) == 0\nassert binary_search([1, 3, 5, 7, 9], 9) == 4\nassert binary_search([1, 3, 5, 7, 9], 4) == -1\nassert binary_search([], 1) == -1\nassert binary_search([2], 2) == 0\n",
+    "banned": [".index("],
     "note": "Each step throws away half the remaining range, so lookup is O(log n) versus a linear O(n) scan.",
     "mapsTo": "LC 704 · Binary Search",
-    "prereqs": ["py.u02.midpoint"]
+    "prereqs": ["py.u02.midpoint", "py.u02.binsearch.trace"]
   }
 ]

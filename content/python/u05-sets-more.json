@@ -69,7 +69,7 @@
     "track": "python",
     "group": "Sets",
     "concept": "union across many lists",
-    "cue": "Walk lists by index, folding each lists[i] into a growing set, then order the result.",
+    "cue": "Walk lists by index, adding each value of lists[i] into a growing set, then sort the result.",
     "syntax": "for i in range(len(lists)); lists[i]",
     "kind": "write",
     "prompt": "Write `union_all(lists)` taking a list of lists and returning the sorted list of all distinct values across them.",

@@ -9,6 +9,7 @@
     "starter": "function rotateLeft(a, k) {\n  // your code here\n}",
     "solution": "function rotateLeft(a, k) {\n  const n = a.length;\n  if (n === 0) return [];\n  k %= n;\n  const out = [];\n  for (let i = 0; i < n; i++) out.push(a[(i + k) % n]);\n  return out;\n}",
     "tests": "if (JSON.stringify(rotateLeft([1, 2, 3, 4, 5], 2)) !== JSON.stringify([3, 4, 5, 1, 2])) throw new Error('two');\nif (JSON.stringify(rotateLeft([1, 2, 3], 0)) !== JSON.stringify([1, 2, 3])) throw new Error('zero');\nif (JSON.stringify(rotateLeft([1, 2, 3], 4)) !== JSON.stringify([2, 3, 1])) throw new Error('wrap');\nif (JSON.stringify(rotateLeft([], 3)) !== JSON.stringify([])) throw new Error('empty');",
+    "banned": [".slice("],
     "prereqs": ["js.u02.access.ring"],
     "cue": "Pull each output element from a wrapped source index.",
     "syntax": "(i + k) % a.length",
