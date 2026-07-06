@@ -15,6 +15,7 @@ import {
 } from './core/storage';
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
+import { INTERVIEW_FEATURES } from './core/features';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
 import { Visualizer } from './ui/Visualizer';
@@ -396,7 +397,7 @@ export default function App() {
                   onToggleExperienced={toggleExperienced}
                   onSkip={() => skip([pick.exercise.id])}
                   onSkipToFirstWrite={skipToFirstWrite}
-                  onSkipToProblems={skipToProblems}
+                  onSkipToProblems={INTERVIEW_FEATURES ? skipToProblems : undefined}
                   onSkipUnit={() =>
                     skip(
                       exercises
@@ -577,7 +578,7 @@ function PracticePicker({
         <button style={styles.btn} onClick={() => onStart(exercises, 'Everything')}>
           Everything ({exercises.length})
         </button>
-        {problems.length > 0 && (
+        {INTERVIEW_FEATURES && problems.length > 0 && (
           <button
             style={styles.btn}
             onClick={onBrowseProblems}
@@ -766,6 +767,9 @@ function FluencyPicker({
         // learners come for.
         const byGroup = new Map<string, Exercise[]>();
         for (const ex of generators) {
+          // The "interview reps" group is an interview-problem surface; hide it
+          // unless the interview feature flag is on.
+          if (!INTERVIEW_FEATURES && /interview/i.test(ex.group)) continue;
           const g = ex.group;
           if (!byGroup.has(g)) byGroup.set(g, []);
           byGroup.get(g)!.push(ex);
