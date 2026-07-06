@@ -26,14 +26,6 @@ export function transformCode(code: string): string {
   }).code;
 }
 
-/**
- * Whitespace-normalized string compare for `predict` grading: trim ends and
- * collapse every run of internal whitespace to a single space, on both sides.
- */
-export function normalizeAnswer(s: string): string {
-  return s.replace(/\s+/g, ' ').trim();
-}
-
 /** Readable, JSON-ish rendering of a snippet's resulting value. */
 export function stringifyValue(value: unknown, seen = new WeakSet<object>()): string {
   switch (typeof value) {
@@ -113,39 +105,33 @@ function deepEqual(a: unknown, b: unknown): boolean {
 /**
  * Grade one exercise against the learner's input.
  *  - 'write':  run userCode + ex.tests; pass = nothing thrown. console.* captured.
- *  - 'predict': compare typed answer (userCode) to ex.expected, whitespace-normalized;
- *               also evaluate ex.snippet to populate `actual` (informational).
+ *  - 'predict': eval ex.snippet (ground truth) and the typed answer (userCode),
+ *               then deep-compare the VALUES. Never a string compare.
  */
 export async function runExercise(ex: Exercise, userCode: string): Promise<RunResult> {
   if (ex.kind === 'predict') {
-    // Grade by VALUE, not string: eval the snippet (ground truth) and the
-    // learner's answer, then deep-compare — so `{'a':1,'b':2}` == `{'a': 1, 'b': 2}`
-    // and array/object spacing never matters, while strings with spaces still
-    // compare correctly. Fall back to a normalized-string compare.
-    let actual: string | undefined;
+    // Grade by VALUE, never by string: eval the snippet (ground truth) and the
+    // learner's answer, then deep-compare — so `{a: 1}` == `{ a: 1 }` and
+    // Map/Set entry order never matters, while strings that legitimately
+    // contain spaces still compare correctly.
     let actualValue: unknown;
-    let haveActual = false;
     try {
-      const js = transformCode(ex.snippet ?? '');
-      actualValue = ex.snippet ? (0, eval)(js) : undefined;
-      haveActual = Boolean(ex.snippet);
-      actual = stringifyValue(actualValue);
-    } catch {
-      actual = undefined;
+      actualValue = (0, eval)(transformCode(ex.snippet ?? ''));
+    } catch (err) {
+      // The snippet itself failed to run — a content bug, not a wrong answer.
+      return {
+        passed: false,
+        error: `snippet failed to evaluate: ${err instanceof Error ? err.message : String(err)}`,
+      };
     }
     let passed = false;
-    if (haveActual) {
-      try {
-        const userValue = (0, eval)('(' + userCode + ')');
-        passed = deepEqual(userValue, actualValue);
-      } catch {
-        passed = false;
-      }
+    try {
+      const userValue = (0, eval)('(' + userCode + ')');
+      passed = deepEqual(userValue, actualValue);
+    } catch {
+      passed = false;
     }
-    if (!passed && normalizeAnswer(userCode) === normalizeAnswer(ex.expected ?? '')) {
-      passed = true;
-    }
-    return { passed, actual };
+    return { passed, actual: stringifyValue(actualValue) };
   }
 
   // kind === 'write'

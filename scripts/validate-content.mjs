@@ -4,8 +4,11 @@
 //  - 'write'  : run `solution` + `tests` (python3 for python, node for
 //               javascript, sucrase-transforming any TS) and assert it does
 //               not throw / exits 0.
-//  - 'predict': evaluate `snippet` and assert its stringified value equals
-//               `expected` (whitespace-normalized).
+//  - 'predict': execute `snippet`, evaluate `expected` as an expression in the
+//               same language, and assert the two VALUES are equal — the same
+//               way the runners grade a learner's answer. Never a string
+//               compare: this guarantees a learner who types `expected`
+//               verbatim passes.
 //
 // Also checks structural invariants: unique ids and resolvable prereqs.
 //
@@ -16,6 +19,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { isDeepStrictEqual, inspect } from 'node:util';
 import { transform } from 'sucrase';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -34,49 +38,10 @@ function walk(dir) {
   return out;
 }
 
-// --- value stringification for 'predict' ------------------------------------
-
-// Whitespace-normalize: collapse internal whitespace runs to a single space and
-// trim. Matches the runners' grading normalization.
+// Whitespace-normalize; used only for the textual hint-leak checks below,
+// never for grading.
 function normalize(s) {
   return String(s).replace(/\s+/g, ' ').trim();
-}
-
-// Render a JS value the way the content `expected` strings are written:
-// a top-level string is emitted raw (no quotes); everything else uses a
-// JSON-ish form with ", " / ": " separators.
-function fmt(value) {
-  switch (typeof value) {
-    case 'string':
-      return JSON.stringify(value);
-    case 'bigint':
-      return `${value}n`;
-    case 'number':
-    case 'boolean':
-    case 'symbol':
-      return String(value);
-    case 'undefined':
-      return 'undefined';
-  }
-  if (value === null) return 'null';
-  if (Array.isArray(value)) return `[${value.map(fmt).join(', ')}]`;
-  if (value instanceof Map)
-    return `Map(${value.size}) {${[...value.entries()]
-      .map(([k, v]) => `${fmt(k)} => ${fmt(v)}`)
-      .join(', ')}}`;
-  if (value instanceof Set)
-    return `Set(${value.size}) {${[...value.values()].map(fmt).join(', ')}}`;
-  if (typeof value === 'object')
-    return `{${Object.entries(value)
-      .map(([k, v]) => `${k}: ${fmt(v)}`)
-      .join(', ')}}`;
-  return String(value);
-}
-
-function stringifyTopLevel(value) {
-  // Learners type strings without surrounding quotes, so render a top-level
-  // string raw; nested values keep their quoted/structured form.
-  return typeof value === 'string' ? value : fmt(value);
 }
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
@@ -91,12 +56,16 @@ async function validateJs(ex) {
     }).code;
     // Indirect eval yields the completion value of the last expression.
     const value = (0, eval)(js);
-    const got = normalize(stringifyTopLevel(value));
-    const want = normalize(ex.expected ?? '');
-    if (got !== want) {
+    let want;
+    try {
+      want = (0, eval)(`(${ex.expected ?? ''})`);
+    } catch (e) {
+      return `"expected" is not an evaluable JS expression: ${e.message}`;
+    }
+    if (!isDeepStrictEqual(value, want)) {
       return `predict mismatch: expected ${JSON.stringify(
-        want,
-      )}, got ${JSON.stringify(got)}`;
+        ex.expected,
+      )}, snippet evaluates to ${inspect(value)}`;
     }
     return null;
   }
@@ -113,36 +82,40 @@ async function validateJs(ex) {
 
 function validatePy(ex) {
   if (ex.kind === 'predict') {
+    // Mirrors the Pyodide runner's grading: exec the snippet's statements,
+    // eval its trailing expression as ground truth, eval `expected` in a
+    // clean namespace, compare the values with `==`.
     const driver = `
-import os, ast, sys
+import os, ast, json, sys
 src = os.environ['WU_SNIPPET']
+expected_src = os.environ['WU_EXPECTED']
 tree = ast.parse(src)
-ns = {}
 last = tree.body[-1] if tree.body else None
-if isinstance(last, ast.Expr):
-    body = ast.Module(body=tree.body[:-1], type_ignores=[])
-    exec(compile(body, '<snippet>', 'exec'), ns)
-    val = eval(compile(ast.Expression(last.value), '<snippet>', 'eval'), ns)
-    sys.stdout.write(repr(val))
+if not isinstance(last, ast.Expr):
+    sys.stdout.write(json.dumps({"err": "predict snippet has no final expression to evaluate"}))
+    sys.exit(0)
+ns = {}
+exec(compile(ast.Module(body=tree.body[:-1], type_ignores=[]), '<snippet>', 'exec'), ns)
+val = eval(compile(ast.Expression(last.value), '<snippet>', 'eval'), ns)
+try:
+    want = eval(expected_src, {})
+except Exception as e:
+    sys.stdout.write(json.dumps({"err": '"expected" is not an evaluable Python expression: ' + repr(e)}))
+    sys.exit(0)
+if val == want:
+    sys.stdout.write(json.dumps({"err": None}))
 else:
-    exec(compile(tree, '<snippet>', 'exec'), ns)
-    sys.stdout.write('__WU_NO_EXPR__')
+    sys.stdout.write(json.dumps({"err": "predict mismatch: expected " + expected_src + ", snippet evaluates to " + repr(val)}))
 `;
     const out = execFileSync('python3', ['-c', driver], {
-      env: { ...process.env, WU_SNIPPET: ex.snippet ?? '' },
+      env: {
+        ...process.env,
+        WU_SNIPPET: ex.snippet ?? '',
+        WU_EXPECTED: ex.expected ?? '',
+      },
       encoding: 'utf8',
     });
-    if (out === '__WU_NO_EXPR__') {
-      return `predict snippet has no final expression to evaluate`;
-    }
-    const got = normalize(out);
-    const want = normalize(ex.expected ?? '');
-    if (got !== want) {
-      return `predict mismatch: expected ${JSON.stringify(
-        want,
-      )}, got ${JSON.stringify(got)}`;
-    }
-    return null;
+    return JSON.parse(out).err;
   }
   // write: solution + tests must run without raising (exit 0).
   const program = `${ex.solution ?? ''}\n\n${ex.tests ?? ''}\n`;
