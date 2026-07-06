@@ -8,6 +8,7 @@ import {
   recordAttempt,
   bumpLastAttemptRung,
   lastAttempt,
+  hasAttempted,
   resetProgress,
   type ProgressState,
 } from './core/storage';
@@ -105,6 +106,23 @@ export default function App() {
     }
     bump();
   }, [exercises, startExercise, bump]);
+
+  // Test out: mark exercises seen-but-not-passed and advance past them (for
+  // learners who already know this material). Skipped items don't count as
+  // passed, and stay redoable from History/Practice.
+  const skip = useCallback(
+    (ids: string[]) => {
+      const now = Date.now();
+      for (const id of ids) {
+        if (!hasAttempted(progress.current, id)) {
+          recordAttempt(progress.current, { id, at: now, passed: false, rung: 0, skipped: true });
+        }
+      }
+      persist();
+      advanceLearn();
+    },
+    [persist, advanceLearn],
+  );
 
   const advancePractice = useCallback(() => {
     if (!queue) return;
@@ -252,6 +270,14 @@ export default function App() {
                   onUseHint={useHint}
                   onSubmit={submit}
                   onNext={advanceLearn}
+                  onSkip={() => skip([pick.exercise.id])}
+                  onSkipUnit={() =>
+                    skip(
+                      exercises
+                        .filter((e) => e.group === pick.exercise.group)
+                        .map((e) => e.id),
+                    )
+                  }
                 />
               ) : (
                 <AllPassed />
@@ -469,22 +495,22 @@ function HistoryView({
   const [filter, setFilter] = useState<Filter>('all');
 
   const rows = useMemo(() => {
-    const out: { ex: Exercise; passed: boolean; rung: number; at: number }[] = [];
+    const out: { ex: Exercise; passed: boolean; rung: number; at: number; skipped: boolean }[] = [];
     for (const ex of exercises) {
       const la = lastAttempt(state, ex.id);
       if (!la) continue;
-      out.push({ ex, passed: la.passed, rung: la.rung, at: la.at });
+      out.push({ ex, passed: la.passed, rung: la.rung, at: la.at, skipped: !!la.skipped });
     }
     out.sort((a, b) => b.at - a.at);
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercises, state]);
 
-  const match = (r: { passed: boolean; rung: number }) =>
+  const match = (r: { passed: boolean; rung: number; skipped: boolean }) =>
     filter === 'all'
       ? true
       : filter === 'failed'
-        ? !r.passed
+        ? !r.passed && !r.skipped
         : filter === 'hinted'
           ? r.rung >= 1
           : r.passed && r.rung === 0;
@@ -546,7 +572,7 @@ function HistoryView({
               : 'No exercises match this filter.'}
           </p>
         ) : (
-          shown.map(({ ex, passed, rung }) => (
+          shown.map(({ ex, passed, rung, skipped }) => (
             <div
               key={ex.id}
               style={{
@@ -558,8 +584,14 @@ function HistoryView({
               }}
             >
               <div style={{ minWidth: 0 }}>
-                <span style={{ color: passed ? theme.good : theme.bad, marginRight: 8 }}>
-                  {passed ? '✓' : '✗'}
+                <span
+                  style={{
+                    color: skipped ? theme.muted : passed ? theme.good : theme.bad,
+                    marginRight: 8,
+                  }}
+                  title={skipped ? 'skipped' : passed ? 'passed' : 'failed'}
+                >
+                  {skipped ? '⤼' : passed ? '✓' : '✗'}
                 </span>
                 <span>{ex.concept}</span>
                 <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.group}</span>
@@ -592,6 +624,8 @@ function ExerciseView({
   onUseHint,
   onSubmit,
   onNext,
+  onSkip,
+  onSkipUnit,
   subtitle,
   onExit,
 }: {
@@ -604,6 +638,8 @@ function ExerciseView({
   onUseHint: (rung: number) => void;
   onSubmit: () => void;
   onNext: () => void;
+  onSkip?: () => void;
+  onSkipUnit?: () => void;
   subtitle?: string;
   onExit?: () => void;
 }) {
@@ -669,6 +705,16 @@ function ExerciseView({
         {!graded && (
           <button style={styles.btn} onClick={onSubmit} disabled={running}>
             {running ? 'Running…' : 'Submit'}
+          </button>
+        )}
+        {!graded && onSkip && (
+          <button style={styles.btnGhost} onClick={onSkip} title="I know this — skip it">
+            Skip
+          </button>
+        )}
+        {!graded && onSkipUnit && (
+          <button style={styles.btnGhost} onClick={onSkipUnit} title="Skip the rest of this group">
+            Skip “{ex.group}”
           </button>
         )}
         {graded && (

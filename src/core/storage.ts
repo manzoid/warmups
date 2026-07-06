@@ -18,6 +18,7 @@ export interface Attempt {
   at: number; // epoch ms
   passed: boolean;
   rung: number; // deepest hint-ladder rung used (0 = unaided, 1 cue … 5 reveal)
+  skipped?: boolean; // learner tested out / skipped it (counts as "seen", not passed)
 }
 
 export interface ProgressState {
