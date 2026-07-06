@@ -613,9 +613,7 @@ function ExerciseView({
 
       {result && <ResultView result={result} maxRung={maxRung} />}
 
-      {graded && (
-        <HintLadder ex={ex} input={input} maxRung={maxRung} onUse={onUseHint} />
-      )}
+      {graded && <HintLadder ex={ex} input={input} onUse={onUseHint} />}
     </div>
   );
 }
@@ -628,105 +626,85 @@ const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as c
 function HintLadder({
   ex,
   input,
-  maxRung,
   onUse,
 }: {
   ex: Exercise;
   input: string;
-  maxRung: number;
   onUse: (rung: number) => void;
 }) {
-  const [open, setOpen] = useState({
-    cue: false,
-    syntax: false,
-    visualize: false,
-    walkthrough: false,
-    reveal: false,
-  });
-  const toggle = (key: keyof typeof open, rung: number) => {
-    const willOpen = !open[key];
-    if (willOpen) onUse(rung);
-    setOpen((o) => ({ ...o, [key]: willOpen }));
-  };
-
   const answer = ex.kind === 'predict' ? ex.expected : ex.solution;
+
+  // A single progressive reveal (NeetCode-style: Hint 1, Hint 2, …, then the
+  // heavier aids, then the answer) instead of a row of parallel buttons. Only
+  // steps that apply to this exercise are included; each reveal escalates the
+  // recorded rung.
+  const steps = useMemo(() => {
+    let n = 0;
+    const s: {
+      key: 'cue' | 'syntax' | 'visualize' | 'walkthrough' | 'reveal';
+      rung: number;
+      title: string;
+      action: string;
+    }[] = [];
+    if (ex.cue) {
+      n += 1;
+      s.push({ key: 'cue', rung: RUNG.cue, title: `Hint ${n}`, action: `Show hint ${n}` });
+    }
+    if (ex.syntax) {
+      n += 1;
+      s.push({ key: 'syntax', rung: RUNG.syntax, title: `Hint ${n}`, action: `Show hint ${n}` });
+    }
+    s.push({ key: 'visualize', rung: RUNG.visualize, title: 'See it run', action: 'Visualize your run' });
+    s.push({ key: 'walkthrough', rung: RUNG.walkthrough, title: 'Talk it through', action: 'Get a walkthrough' });
+    if (answer && answer.length > 0) {
+      s.push({
+        key: 'reveal',
+        rung: RUNG.reveal,
+        title: ex.kind === 'predict' ? 'Expected value' : 'Reference solution',
+        action: 'Show the answer',
+      });
+    }
+    return s;
+  }, [ex, answer]);
+
+  const [revealed, setRevealed] = useState(0);
+  const next = steps[revealed];
+
+  const revealNext = () => {
+    if (!next) return;
+    onUse(next.rung);
+    setRevealed((r) => r + 1);
+  };
 
   return (
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
-      <div style={{ ...styles.row, justifyContent: 'space-between' }}>
-        <p style={{ ...styles.label, margin: 0 }}>Need a hand?</p>
-        {maxRung >= RUNG.visualize ? (
-          <span style={{ ...styles.pill, color: theme.bad, borderColor: theme.bad }}>
-            used help
-          </span>
-        ) : maxRung >= RUNG.cue ? (
-          <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
-            used a hint
-          </span>
-        ) : null}
-      </div>
-      <div style={{ ...styles.row, marginTop: '0.6rem', flexWrap: 'wrap', gap: 8 }}>
-        {ex.cue && (
-          <button style={styles.btnGhost} onClick={() => toggle('cue', RUNG.cue)}>
-            {open.cue ? 'Hide cue' : 'Cue'}
-          </button>
-        )}
-        {ex.syntax && (
-          <button style={styles.btnGhost} onClick={() => toggle('syntax', RUNG.syntax)}>
-            {open.syntax ? 'Hide syntax' : 'Syntax'}
-          </button>
-        )}
-        <button style={styles.btnGhost} onClick={() => toggle('visualize', RUNG.visualize)}>
-          {open.visualize ? 'Hide visualization' : 'Visualize my run'}
-        </button>
-        <button style={styles.btnGhost} onClick={() => toggle('walkthrough', RUNG.walkthrough)}>
-          {open.walkthrough ? 'Hide walkthrough' : 'Get a walkthrough'}
-        </button>
-        <button style={styles.btnGhost} onClick={() => toggle('reveal', RUNG.reveal)}>
-          {open.reveal ? 'Hide answer' : 'Reveal answer'}
-        </button>
-      </div>
+      <p style={{ ...styles.label, margin: 0 }}>Stuck? Reveal help one step at a time.</p>
 
-      {open.cue && ex.cue && (
-        <div style={{ marginTop: '1rem' }}>
-          <p style={styles.label}>Cue</p>
-          <p style={{ ...styles.tagline, margin: 0, color: theme.text }}>{ex.cue}</p>
-        </div>
-      )}
-
-      {open.syntax && ex.syntax && (
-        <div style={{ marginTop: '1rem' }}>
-          <p style={styles.label}>Syntax</p>
-          <pre style={styles.code}>{ex.syntax}</pre>
-        </div>
-      )}
-
-      {open.visualize && (
-        <div style={{ marginTop: '1rem' }}>
-          {/* Predict: trace the snippet the learner mis-traced. Write: their own code. */}
-          <Visualizer
-            track={ex.track}
-            code={ex.kind === 'write' ? input : ex.snippet ?? input}
-            title={ex.concept}
-          />
-        </div>
-      )}
-
-      {open.reveal && (
-        <div style={{ marginTop: '1rem' }}>
-          <p style={styles.label}>{ex.kind === 'predict' ? 'Expected value' : 'Reference solution'}</p>
-          {answer && answer.length > 0 ? (
-            <pre style={styles.code}>{answer}</pre>
-          ) : (
-            <p style={{ ...styles.tagline, margin: 0 }}>No reference answer is available for this exercise.</p>
+      {steps.slice(0, revealed).map((step) => (
+        <div key={step.key} style={{ marginTop: '0.85rem' }}>
+          <p style={{ ...styles.label, marginBottom: 4 }}>{step.title}</p>
+          {step.key === 'cue' && (
+            <p style={{ ...styles.tagline, margin: 0, color: theme.text }}>{ex.cue}</p>
           )}
+          {step.key === 'syntax' && <pre style={styles.code}>{ex.syntax}</pre>}
+          {step.key === 'visualize' && (
+            <Visualizer
+              track={ex.track}
+              code={ex.kind === 'write' ? input : ex.snippet ?? input}
+              title={ex.concept}
+            />
+          )}
+          {step.key === 'walkthrough' && (
+            <WalkthroughBox prompt={buildWalkthroughPrompt(ex, input)} />
+          )}
+          {step.key === 'reveal' && <pre style={styles.code}>{answer}</pre>}
         </div>
-      )}
+      ))}
 
-      {open.walkthrough && (
-        <div style={{ marginTop: '1rem' }}>
-          <WalkthroughBox prompt={buildWalkthroughPrompt(ex, input)} />
-        </div>
+      {next && (
+        <button style={{ ...styles.btnGhost, marginTop: '0.85rem' }} onClick={revealNext}>
+          {revealed === 0 ? next.action : `Still stuck? ${next.action}`}
+        </button>
       )}
     </div>
   );
