@@ -3,15 +3,28 @@
 // leaning learner (exactly who we target) pass by using the very builtin the
 // kata forbids. So the runners refuse a submission that contains a banned token.
 //
-// A simple substring scan is intentional: patterns are things like "sum(",
-// "sorted(", ".sort(", "[::-1]", ".reduce", ".reverse(". It can over-match
-// inside a string/comment, but for these katas that's an acceptable, rare edge
-// and the message tells the learner exactly what to remove.
+// Patterns are things like "sum(", "sorted(", ".sort(", "[::-1]", ".reverse(".
+// A token that starts with an identifier char is matched at a WORD BOUNDARY so
+// it hits the builtin call but NOT the learner's own name: banning "sum(" must
+// reject `return sum(a)` yet allow `def my_sum(a)`, and "int(" must not trip on
+// "print(". Tokens that start with a symbol (".reverse(", "[::-1]", " sum(")
+// already carry their own left edge, so they're matched literally.
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /** The first banned pattern present in `code`, or null. */
 export function firstBanned(code: string, banned?: string[]): string | null {
   if (!banned || banned.length === 0) return null;
-  for (const b of banned) if (b && code.includes(b)) return b;
+  for (const b of banned) {
+    if (!b) continue;
+    const startsWord = /[A-Za-z0-9_]/.test(b[0]);
+    const re = startsWord
+      ? new RegExp('(?<![A-Za-z0-9_.])' + escapeRe(b))
+      : new RegExp(escapeRe(b));
+    if (re.test(code)) return b;
+  }
   return null;
 }
 

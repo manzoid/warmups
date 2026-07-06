@@ -187,9 +187,25 @@ check(gradeFor({ passed: false, deepestRung: 0 }) === 'again', 'fail, rung 0 →
 check(gradeFor({ passed: false, deepestRung: 2 }) === 'again', 'fail, rung 2 → again');
 
 // ---------------------------------------------------------------------------
+// 4. banned.firstBanned — word-boundary ban matching
+// ---------------------------------------------------------------------------
+
+const { firstBanned } = loadTs(join(ROOT, 'src/core/banned.ts'));
+
+console.log('firstBanned:');
+check(firstBanned('return sum(a)', ['sum(']) === 'sum(', '"sum(" catches a bare sum( call');
+check(firstBanned('def my_sum(a):\n    t=0', ['sum(']) === null, 'word-boundary: "sum(" does not trip on my_sum(');
+check(firstBanned('x = a.sum(b)', ['sum(']) === null, 'word-boundary: "sum(" does not trip on a.sum(');
+check(firstBanned('print(x)', ['int(']) === null, 'word-boundary: "int(" does not trip on print(');
+check(firstBanned('x = int(y)', ['int(']) === 'int(', '"int(" catches a real int( call');
+check(firstBanned('return s[::-1]', ['[::-1]']) === '[::-1]', 'symbol pattern [::-1] matched literally');
+check(firstBanned('return sum(a)', [' sum(']) === ' sum(', 'legacy " sum(" pattern still works');
+check(firstBanned('for x in a:\n    t += x', ['sum(', '.reduce']) === null, 'clean hand-written code is not flagged');
+
+// ---------------------------------------------------------------------------
 
 if (failures) {
   console.error(`\n${failures} scaffold test(s) failed.`);
   process.exit(1);
 }
-console.log('\nOK: scaffold helpers (traceRequest, buildWalkthroughPrompt, gradeFor) pass.');
+console.log('\nOK: scaffold helpers (traceRequest, buildWalkthroughPrompt, gradeFor, firstBanned) pass.');
