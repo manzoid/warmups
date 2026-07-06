@@ -82,5 +82,59 @@
     "kind": "predict",
     "prompt": "Predict the value. || falls back on any falsy left side; ?? falls back only on null or undefined. Watch what happens when the left is 0. Fresh each time.",
     "generator": "function make() {\n  const pool = [0, 0, 3, 5, 7];\n  const left = pool[Math.floor(Math.random() * pool.length)];\n  const op = Math.random() < 0.5 ? '||' : '??';\n  const right = 9;\n  const val = op === '||' ? (left || right) : (left ?? right);\n  return { snippet: `${left} ${op} ${right}`, expected: String(val) };\n}"
+  },
+  {
+    "id": "js.fluency.destructure",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "array destructuring swap",
+    "kind": "predict",
+    "prompt": "Predict the array. Destructuring swaps both bindings in one step, with no temp variable. Fresh numbers every time.",
+    "generator": "function make() {\n  const a = 1 + Math.floor(Math.random() * 9);\n  const b = 1 + Math.floor(Math.random() * 9);\n  const snippet = `let a = ${a}, b = ${b};\\n[a, b] = [b, a];\\n[a, b]`;\n  return { snippet, expected: JSON.stringify([b, a]) };\n}"
+  },
+  {
+    "id": "js.fluency.spread",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "object spread with an override",
+    "kind": "predict",
+    "prompt": "Predict the object. Spreading first, then a later key, lets the later key win. Fresh values every time.",
+    "generator": "function make() {\n  const b0 = 1 + Math.floor(Math.random() * 5);\n  const bNew = 6 + Math.floor(Math.random() * 4);\n  const merged = { ...{ a: 1, b: b0 }, b: bNew };\n  const snippet = `({ ...{ a: 1, b: ${b0} }, b: ${bNew} })`;\n  return { snippet, expected: JSON.stringify(merged) };\n}"
+  },
+  {
+    "id": "js.fluency.objkeys",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "Object.keys returns keys in insertion order",
+    "kind": "predict",
+    "prompt": "Predict the array of keys (in quotes). Object.keys lists string keys in insertion order. Fresh objects every time.",
+    "generator": "function make() {\n  const keys = ['a', 'b', 'c', 'd'];\n  const n = 2 + Math.floor(Math.random() * 3);\n  const chosen = keys.slice(0, n);\n  const obj = {};\n  chosen.forEach((k, i) => { obj[k] = i + 1; });\n  const entries = chosen.map((k, i) => `${k}: ${i + 1}`).join(', ');\n  return { snippet: `Object.keys({ ${entries} })`, expected: JSON.stringify(Object.keys(obj)) };\n}"
+  },
+  {
+    "id": "js.fluency.optchain",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "optional chaining short-circuits to undefined",
+    "kind": "predict",
+    "prompt": "Predict the value. Optional chaining stops and yields undefined the moment a link is missing. Fresh path every time.",
+    "generator": "function make() {\n  if (Math.random() < 0.5) {\n    const v = 1 + Math.floor(Math.random() * 9);\n    return { snippet: `({ a: { b: ${v} } }).a?.b`, expected: String(v) };\n  }\n  return { snippet: `({ a: {} }).a?.b?.c`, expected: 'undefined' };\n}"
+  },
+  {
+    "id": "js.fluency.flatmap",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "flatMap maps then flattens one level",
+    "kind": "predict",
+    "prompt": "Predict the array. flatMap maps each item to an array, then flattens one level. Fresh data every time.",
+    "generator": "function make() {\n  const n = 2 + Math.floor(Math.random() * 3);\n  const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 9));\n  const out = a.flatMap((x) => [x, x * 10]);\n  return { snippet: `[${a.join(', ')}].flatMap((x) => [x, x * 10])`, expected: JSON.stringify(out) };\n}"
+  },
+  {
+    "id": "js.fluency.freqmap",
+    "track": "javascript",
+    "group": "Fluency idioms",
+    "concept": "count frequencies into a Map by hand",
+    "kind": "write",
+    "prompt": "Implement `tally(items)` returning a Map from each item to how many times it appears. Fresh data every time.",
+    "generator": "function make() {\n  const pool = ['a', 'b', 'c'];\n  const n = 5 + Math.floor(Math.random() * 4);\n  const items = Array.from({ length: n }, () => pool[Math.floor(Math.random() * pool.length)]);\n  const counts = {};\n  for (const it of items) counts[it] = (counts[it] || 0) + 1;\n  const starter = 'function tally(items) {\\n  // return a Map from item to count\\n}';\n  const solution = 'function tally(items) {\\n  const m = new Map();\\n  for (const it of items) m.set(it, (m.get(it) || 0) + 1);\\n  return m;\\n}';\n  const keys = Object.keys(counts);\n  const checks = keys.map((k) => `if (m.get('${k}') !== ${counts[k]}) throw new Error('wrong count for ${k}');`).join('\\n');\n  const list = items.map((x) => `'${x}'`).join(', ');\n  const tests = `const m = tally([${list}]);\\nif (m.size !== ${keys.length}) throw new Error('wrong size');\\n${checks}`;\n  return { starter, solution, tests };\n}"
   }
 ]

@@ -91,5 +91,59 @@
     "kind": "predict",
     "prompt": "Predict the list of (index, value) pairs. Fresh data every time — make enumerate automatic.",
     "generator": "import random\ndef make():\n    a = [random.choice(\"xyz\") for _ in range(random.randint(2, 4))]\n    return {\"snippet\": \"a = \" + repr(a) + \"\\nlist(enumerate(a))\", \"expected\": repr(list(enumerate(a)))}"
+  },
+  {
+    "id": "py.fluency.sortedkey",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "sorted with a key function",
+    "kind": "predict",
+    "prompt": "Predict the list. sorted(words, key=len) orders by length, keeping the original order for ties. Fresh words every time.",
+    "generator": "import random\ndef make():\n    pool = [\"ox\", \"cat\", \"bee\", \"tiger\", \"ant\", \"dog\", \"eel\", \"goat\", \"pig\"]\n    words = random.sample(pool, random.randint(3, 5))\n    return {\"snippet\": \"words = \" + repr(words) + \"\\nsorted(words, key=len)\", \"expected\": repr(sorted(words, key=len))}"
+  },
+  {
+    "id": "py.fluency.swap",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "tuple unpacking swap",
+    "kind": "predict",
+    "prompt": "Predict the resulting tuple. Tuple unpacking swaps both names at once. Fresh numbers every time.",
+    "generator": "import random\ndef make():\n    a = random.randint(1, 9)\n    b = random.randint(1, 9)\n    snippet = \"a, b = \" + str(a) + \", \" + str(b) + \"\\nb, a = a, b\\n(a, b)\"\n    return {\"snippet\": snippet, \"expected\": repr((b, a))}"
+  },
+  {
+    "id": "py.fluency.dictcomp",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "dict comprehension",
+    "kind": "predict",
+    "prompt": "Predict the dict of each number mapped to its square. Fresh data every time.",
+    "generator": "import random\ndef make():\n    xs = random.sample(range(1, 8), random.randint(3, 5))\n    return {\"snippet\": \"xs = \" + repr(xs) + \"\\n{x: x * x for x in xs}\", \"expected\": repr({x: x * x for x in xs})}"
+  },
+  {
+    "id": "py.fluency.setops",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "set intersection, union, and difference",
+    "kind": "predict",
+    "prompt": "Predict the resulting set. & is intersection, | is union, - is difference. Fresh sets and operator every time.",
+    "generator": "import random\ndef make():\n    a = set(random.sample(range(1, 9), 4))\n    b = set(random.sample(range(1, 9), 4))\n    op = random.choice([\"&\", \"|\", \"-\"])\n    result = a & b if op == \"&\" else (a | b if op == \"|\" else a - b)\n    snippet = \"a = \" + repr(a) + \"\\nb = \" + repr(b) + \"\\na \" + op + \" b\"\n    return {\"snippet\": snippet, \"expected\": repr(result)}"
+  },
+  {
+    "id": "py.fluency.allany",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "all/any over a comprehension",
+    "kind": "predict",
+    "prompt": "Predict True or False. all() is True only when every item passes; any() is True when at least one passes. Fresh data and function every time.",
+    "generator": "import random\ndef make():\n    xs = [random.randint(1, 9) for _ in range(random.randint(3, 5))]\n    fn = random.choice([\"all\", \"any\"])\n    snippet = \"xs = \" + repr(xs) + \"\\n\" + fn + \"(x % 2 == 0 for x in xs)\"\n    result = all(x % 2 == 0 for x in xs) if fn == \"all\" else any(x % 2 == 0 for x in xs)\n    return {\"snippet\": snippet, \"expected\": repr(result)}"
+  },
+  {
+    "id": "py.fluency.invert",
+    "track": "python",
+    "group": "Fluency idioms",
+    "concept": "invert a dict with a comprehension",
+    "kind": "write",
+    "prompt": "Implement `invert(d)` returning a new dict that maps each value back to its key. Values are distinct. Fresh data every time.",
+    "generator": "import random\ndef make():\n    keys = random.sample([\"a\", \"b\", \"c\", \"d\", \"e\"], random.randint(3, 4))\n    vals = random.sample(range(1, 9), len(keys))\n    d = dict(zip(keys, vals))\n    starter = \"def invert(d):\\n    # your code here\\n    pass\"\n    solution = \"def invert(d):\\n    return {v: k for k, v in d.items()}\"\n    inverted = {v: k for k, v in d.items()}\n    tests = \"assert invert(\" + repr(d) + \") == \" + repr(inverted)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
   }
 ]
