@@ -124,6 +124,20 @@ export default function App() {
     [persist, advanceLearn],
   );
 
+  // Fast-forward: skip past not-yet-attempted trivia to the next LC-tagged
+  // (interview-grade) exercise. Lets experienced learners jump to the meat.
+  const skipToProblems = useCallback(() => {
+    const ids: string[] = [];
+    let started = false;
+    for (const ex of exercises) {
+      if (hasAttempted(progress.current, ex.id)) continue;
+      if (started && ex.mapsTo) break; // land on the next tagged problem
+      ids.push(ex.id);
+      started = true;
+    }
+    if (ids.length) skip(ids);
+  }, [exercises, skip]);
+
   const advancePractice = useCallback(() => {
     if (!queue) return;
     const ni = qIndex + 1;
@@ -271,6 +285,7 @@ export default function App() {
                   onSubmit={submit}
                   onNext={advanceLearn}
                   onSkip={() => skip([pick.exercise.id])}
+                  onSkipToProblems={skipToProblems}
                   onSkipUnit={() =>
                     skip(
                       exercises
@@ -408,6 +423,7 @@ function PracticePicker({
     for (const ex of exercises) m.set(ex.group, (m.get(ex.group) ?? 0) + 1);
     return [...m.entries()];
   }, [exercises]);
+  const problems = useMemo(() => exercises.filter((e) => e.mapsTo), [exercises]);
   return (
     <div style={styles.panel}>
       <p style={styles.label}>Practice — pick a set and just drill (no scheduling)</p>
@@ -415,6 +431,15 @@ function PracticePicker({
         <button style={styles.btn} onClick={() => onStart(exercises, 'Everything')}>
           Everything ({exercises.length})
         </button>
+        {problems.length > 0 && (
+          <button
+            style={styles.btn}
+            onClick={() => onStart(problems, 'Interview problems (LC)')}
+            title="Only the LeetCode/NeetCode-tagged problems"
+          >
+            Interview problems ({problems.length})
+          </button>
+        )}
       </div>
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
         {groups.map(([g, n]) => (
@@ -625,6 +650,7 @@ function ExerciseView({
   onSubmit,
   onNext,
   onSkip,
+  onSkipToProblems,
   onSkipUnit,
   subtitle,
   onExit,
@@ -639,6 +665,7 @@ function ExerciseView({
   onSubmit: () => void;
   onNext: () => void;
   onSkip?: () => void;
+  onSkipToProblems?: () => void;
   onSkipUnit?: () => void;
   subtitle?: string;
   onExit?: () => void;
@@ -715,6 +742,15 @@ function ExerciseView({
         {!graded && onSkip && (
           <button style={styles.btnGhost} onClick={onSkip} title="I know this — skip it">
             Skip
+          </button>
+        )}
+        {!graded && onSkipToProblems && (
+          <button
+            style={styles.btnGhost}
+            onClick={onSkipToProblems}
+            title="Fast-forward past the trivia to the next interview-tagged problem"
+          >
+            Skip to problems →
           </button>
         )}
         {!graded && onSkipUnit && (
