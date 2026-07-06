@@ -69,6 +69,29 @@ async function validateJs(ex) {
     }
     return null;
   }
+  // write with structured cases: the reference solution must pass every case.
+  if (Array.isArray(ex.cases) && ex.cases.length) {
+    const tx = (s) =>
+      transform(s ?? '', { transforms: ['typescript'], disableESTransforms: true }).code;
+    for (const c of ex.cases) {
+      const fn = new AsyncFunction(`${tx(ex.solution)}\n${c.setup ?? ''}\nreturn (${c.call});`);
+      const actual = await fn();
+      let ok;
+      if (c.expect !== undefined) {
+        const want = (0, eval)('(' + tx(c.expect) + ')');
+        ok = isDeepStrictEqual(actual, want);
+      } else {
+        ok = Boolean(new Function('_', `return (${tx(c.check)});`)(actual));
+      }
+      if (!ok) {
+        return `case failed: ${c.call} -> ${inspect(actual)}${
+          c.expect !== undefined ? ` (expected ${c.expect})` : ''
+        }`;
+      }
+    }
+    return null;
+  }
+
   // write
   const source = `${ex.solution ?? ''}\n;\n${ex.tests ?? ''}`;
   const js = transform(source, {
@@ -117,6 +140,43 @@ else:
     });
     return JSON.parse(out).err;
   }
+  // write with structured cases: the reference solution must pass every case.
+  if (Array.isArray(ex.cases) && ex.cases.length) {
+    const driver = `
+import os, json
+sol = os.environ['WU_SOL']
+cases = json.loads(os.environ['WU_CASES'])
+def eq(a, b):
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        return len(a) == len(b) and all(eq(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return set(a.keys()) == set(b.keys()) and all(eq(a[k], b[k]) for k in a)
+    return a == b
+code = compile(sol, '<sol>', 'exec')
+err = None
+for c in cases:
+    ns = {}
+    exec(code, ns)
+    if c.get('setup'):
+        exec(c['setup'], ns)
+    actual = eval(c['call'], ns)
+    if c.get('expect') is not None:
+        ok = eq(actual, eval(c['expect'], ns))
+    else:
+        ns['_'] = actual
+        ok = bool(eval(c['check'], ns))
+    if not ok:
+        err = 'case failed: ' + c['call'] + ' -> ' + repr(actual) + ((' (expected ' + c['expect'] + ')') if c.get('expect') else '')
+        break
+print(json.dumps({'err': err}))
+`;
+    const out = execFileSync('python3', ['-c', driver], {
+      env: { ...process.env, WU_SOL: ex.solution ?? '', WU_CASES: JSON.stringify(ex.cases) },
+      encoding: 'utf8',
+    });
+    return JSON.parse(out).err;
+  }
+
   // write: solution + tests must run without raising (exit 0).
   const program = `${ex.solution ?? ''}\n\n${ex.tests ?? ''}\n`;
   execFileSync('python3', ['-c', program], { stdio: 'pipe' });

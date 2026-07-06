@@ -1484,7 +1484,13 @@ function ExerciseView({
         </div>
       )}
 
-      <HintLadder ex={ex} input={input} graded={graded} onUse={onUseHint} />
+      <HintLadder
+        ex={ex}
+        input={input}
+        graded={graded}
+        failingCase={result?.failingCase}
+        onUse={onUseHint}
+      />
     </div>
   );
 }
@@ -1500,26 +1506,39 @@ const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as c
 // the exercise's own tests, which call the function with real inputs (including
 // the failing case), so codeviz steps through an actual run and the bug is
 // visible where it happens.
-function vizCode(ex: Exercise, input: string): string {
+function vizCode(
+  ex: Exercise,
+  input: string,
+  failingCase?: RunResult['failingCase'],
+): string {
   if (ex.kind !== 'write') return ex.snippet ?? input;
-  const driver = ex.tests?.trim();
-  if (!driver) return input;
   const sep =
     ex.track === 'python'
-      ? '\n\n# --- running the exercise tests to drive your code ---\n'
-      : '\n\n// --- running the exercise tests to drive your code ---\n';
-  return `${input}${sep}${driver}`;
+      ? '\n\n# --- driving your code with a test case ---\n'
+      : '\n\n// --- driving your code with a test case ---\n';
+  // Prefer the specific case that just failed, so the trace lands exactly on the
+  // run that broke. Else drive with the first structured case. Else fall back to
+  // the legacy tests block.
+  const driveCase = failingCase ?? ex.cases?.[0];
+  if (driveCase) {
+    const setup = driveCase.setup ? `${driveCase.setup}\n` : '';
+    return `${input}${sep}${setup}${driveCase.call}`;
+  }
+  const driver = ex.tests?.trim();
+  return driver ? `${input}${sep}${driver}` : input;
 }
 
 function HintLadder({
   ex,
   input,
   graded,
+  failingCase,
   onUse,
 }: {
   ex: Exercise;
   input: string;
   graded: boolean;
+  failingCase?: RunResult['failingCase'];
   onUse: (rung: number) => void;
 }) {
   const answer = ex.kind === 'predict' ? ex.expected : ex.solution;
@@ -1589,7 +1608,7 @@ function HintLadder({
           {step.key === 'visualize' && (
             <Visualizer
               track={ex.track}
-              code={vizCode(ex, input)}
+              code={vizCode(ex, input, failingCase)}
               title={ex.concept}
             />
           )}

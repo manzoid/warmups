@@ -11,7 +11,7 @@
 
 import { transform } from 'sucrase';
 import type { Exercise, RunResult } from '../core/types';
-import { firstBanned, bannedMessage } from '../core/banned';
+import { firstBanned, bannedMessage, failingCaseMessage } from '../core/banned';
 
 // `new AsyncFunction(...)` lets learner code and tests use top-level `await`.
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as
@@ -141,6 +141,47 @@ export async function runExercise(ex: Exercise, userCode: string): Promise<RunRe
   // kind === 'write'
   const banned = firstBanned(userCode, ex.banned);
   if (banned) return { passed: false, error: bannedMessage(banned) };
+
+  // Structured cases: run the learner's code + each case in a fresh function
+  // scope, evaluate `call`, and compare to `expect` (deepEqual) or `check`.
+  // Report the first failing case so the UI can show it and drive the viz.
+  if (ex.cases && ex.cases.length > 0) {
+    for (const c of ex.cases) {
+      let actual: unknown;
+      try {
+        const src = transformCode(`${userCode}\n${c.setup ?? ''}\nreturn (${c.call});`);
+        const runOne = new AsyncFunction(src);
+        actual = await runOne();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message || err.toString() : String(err);
+        return {
+          passed: false,
+          error: failingCaseMessage(c.call, c.expect, `threw ${msg}`),
+          failingCase: { setup: c.setup, call: c.call, expected: c.expect, actual: `threw ${msg}` },
+        };
+      }
+      let ok: boolean;
+      let expectedStr: string | undefined;
+      if (c.expect !== undefined) {
+        const want = (0, eval)('(' + transformCode(c.expect) + ')');
+        ok = deepEqual(actual, want);
+        expectedStr = stringifyValue(want);
+      } else {
+        ok = Boolean(new Function('_', `return (${transformCode(c.check ?? 'false')});`)(actual));
+        expectedStr = undefined;
+      }
+      if (!ok) {
+        const actualStr = stringifyValue(actual);
+        return {
+          passed: false,
+          error: failingCaseMessage(c.call, expectedStr, actualStr),
+          failingCase: { setup: c.setup, call: c.call, expected: expectedStr, actual: actualStr },
+        };
+      }
+    }
+    return { passed: true };
+  }
+
   const logs: string[] = [];
   const sandboxConsole = {
     log: (...a: unknown[]) => logs.push(a.map(formatLogArg).join(' ')),

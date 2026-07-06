@@ -1,5 +1,5 @@
 import type { Exercise, GeneratedInstance, RunResult, Runner } from '../core/types';
-import { firstBanned, bannedMessage } from '../core/banned';
+import { firstBanned, bannedMessage, failingCaseMessage } from '../core/banned';
 
 // ---------------------------------------------------------------------------
 // Pyodide loading (from the jsdelivr CDN — Pyodide is NOT an npm dependency).
@@ -142,6 +142,89 @@ async function runWrite(
   }
 }
 
+// Run structured `cases`: for each, exec the learner's code in a fresh
+// namespace, run the case's setup, evaluate `call`, and compare to `expect` (by
+// value, list/tuple/dict-forgiving) or `check` (with `_` = the result). Reports
+// the FIRST failing case with its call/expected/actual, so the UI can show a
+// clear message and drive the visualizer with exactly that case.
+async function runWriteCases(
+  py: PyodideAPI,
+  userCode: string,
+  ex: Exercise,
+): Promise<RunResult> {
+  const banned = firstBanned(userCode, ex.banned);
+  if (banned) return { passed: false, error: bannedMessage(banned) };
+  const ns = freshNamespace(py);
+  try {
+    const src = `
+import json as __wu_json
+__wu_user_src = ${JSON.stringify(userCode)}
+__wu_cases = __wu_json.loads(${JSON.stringify(JSON.stringify(ex.cases ?? []))})
+
+def __wu_eq(a, b):
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
+        return len(a) == len(b) and all(__wu_eq(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return set(a.keys()) == set(b.keys()) and all(__wu_eq(a[k], b[k]) for k in a)
+    return a == b
+
+try:
+    __wu_code = compile(__wu_user_src, "<your code>", "exec")
+    __wu_out = {"passed": True}
+except SyntaxError as __wu_e:
+    __wu_out = {"error": "SyntaxError: " + str(__wu_e)}
+else:
+    for __wu_c in __wu_cases:
+        __wu_ns = {}
+        try:
+            exec(__wu_code, __wu_ns)
+            if __wu_c.get("setup"):
+                exec(__wu_c["setup"], __wu_ns)
+            __wu_actual = eval(__wu_c["call"], __wu_ns)
+            if __wu_c.get("expect") is not None:
+                __wu_want = eval(__wu_c["expect"], __wu_ns)
+                __wu_ok = __wu_eq(__wu_actual, __wu_want)
+                __wu_exp = repr(__wu_want)
+            else:
+                __wu_ns["_"] = __wu_actual
+                __wu_ok = bool(eval(__wu_c["check"], __wu_ns))
+                __wu_exp = None
+        except Exception as __wu_e:
+            __wu_out = {"passed": False, "setup": __wu_c.get("setup"), "call": __wu_c["call"], "expected": __wu_c.get("expect"), "actual": type(__wu_e).__name__ + ": " + str(__wu_e)}
+            break
+        if not __wu_ok:
+            __wu_out = {"passed": False, "setup": __wu_c.get("setup"), "call": __wu_c["call"], "expected": __wu_exp, "actual": repr(__wu_actual)}
+            break
+__wu_json.dumps(__wu_out)
+`;
+    const out = await py.runPythonAsync(src, { globals: ns });
+    const parsed = JSON.parse(typeof out === 'string' ? out : String(out)) as {
+      passed?: boolean;
+      error?: string;
+      setup?: string;
+      call?: string;
+      expected?: string;
+      actual?: string;
+    };
+    if (parsed.error) return { passed: false, error: parsed.error };
+    if (parsed.passed) return { passed: true };
+    return {
+      passed: false,
+      error: failingCaseMessage(parsed.call ?? '', parsed.expected, parsed.actual),
+      failingCase: {
+        setup: parsed.setup,
+        call: parsed.call ?? '',
+        expected: parsed.expected,
+        actual: parsed.actual,
+      },
+    };
+  } catch (err) {
+    return { passed: false, error: formatError(err) };
+  } finally {
+    ns.destroy();
+  }
+}
+
 async function runPredict(
   py: PyodideAPI,
   userAnswer: string,
@@ -252,6 +335,9 @@ export const pythonRunner: Runner = {
     const py = await initPyodide();
     if (ex.kind === 'predict') {
       return runPredict(py, userCode, ex);
+    }
+    if (ex.cases && ex.cases.length > 0) {
+      return runWriteCases(py, userCode, ex);
     }
     return runWrite(py, userCode, ex);
   },

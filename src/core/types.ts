@@ -17,7 +17,12 @@ export interface Exercise {
   // kind === 'write': user writes/completes code; tests decide pass/fail
   starter?: string;      // pre-filled editor content
   solution?: string;     // reference solution (hidden; used only for content validation)
-  tests?: string;        // appended after the user's code; must throw/assert on failure
+  tests?: string;        // legacy: appended after the user's code; must throw/assert on failure
+  // Structured test cases (preferred over `tests`): each runs the learner's code
+  // then evaluates `call` and checks it. Lets the runner report WHICH case failed
+  // (with its input, expected, and actual) and drive the visualizer with exactly
+  // the failing case. `tests` stays supported for exercises not yet migrated.
+  cases?: Case[];
   banned?: string[];     // substrings the learner's code may NOT contain (enforces "do not use X")
   prereqs?: string[];    // exercise ids that should be learned first
   // Shown only AFTER solving (never in the prompt — prompts stay terse):
@@ -29,7 +34,28 @@ export interface Exercise {
   // Ground truth is computed by executing, so instances are self-verifying.
   generator?: string;
 }
-export interface RunResult { passed: boolean; actual?: string; error?: string; }
+/**
+ * One structured test case for a `write` exercise. `setup` (optional) runs first
+ * (e.g. to build a fixture or call a mutating function), then `call` is
+ * evaluated as an expression. Its value is compared to `expect` (by value), or
+ * checked with `check` (a boolean expression where `_` is the call's result).
+ * Exactly one of `expect` / `check` is used.
+ */
+export interface Case {
+  setup?: string;
+  call: string;
+  expect?: string;
+  check?: string;
+}
+
+export interface RunResult {
+  passed: boolean;
+  actual?: string;
+  error?: string;
+  // When a structured `cases` run fails, which case failed (for a clearer
+  // message and to drive the visualizer with exactly this case).
+  failingCase?: { setup?: string; call: string; expected?: string; actual?: string };
+}
 
 /** One freshly-generated exercise instance (from an Exercise's `generator`). */
 export interface GeneratedInstance {

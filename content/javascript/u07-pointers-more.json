@@ -82,7 +82,12 @@
     "prompt": "Write `sortedIntersection(A, B)` where `A` and `B` are each sorted ascending with no duplicates. Return a new sorted array of the values present in both, using two cursors in a single pass.",
     "starter": "function sortedIntersection(A, B) {\n  // your code here\n}",
     "solution": "function sortedIntersection(A, B) {\n  let i = 0, j = 0;\n  const out = [];\n  while (i < A.length && j < B.length) {\n    if (A[i] === B[j]) { out.push(A[i]); i++; j++; }\n    else if (A[i] < B[j]) i++;\n    else j++;\n  }\n  return out;\n}",
-    "tests": "const eq = (g, w) => { if (JSON.stringify(g) !== JSON.stringify(w)) throw new Error(JSON.stringify(g)); };\neq(sortedIntersection([1, 2, 4, 5, 6], [2, 3, 5, 7]), [2, 5]);\neq(sortedIntersection([1, 2, 3], [4, 5, 6]), []);\neq(sortedIntersection([], [1]), []);\neq(sortedIntersection([1, 2, 3], [1, 2, 3]), [1, 2, 3]);",
+    "cases": [
+      { "call": "sortedIntersection([1, 2, 4, 5, 6], [2, 3, 5, 7])", "expect": "[2, 5]" },
+      { "call": "sortedIntersection([1, 2, 3], [4, 5, 6])", "expect": "[]" },
+      { "call": "sortedIntersection([], [1])", "expect": "[]" },
+      { "call": "sortedIntersection([1, 2, 3], [1, 2, 3])", "expect": "[1, 2, 3]" }
+    ],
     "banned": [".filter(", ".includes("],
     "note": "Because both arrays are sorted, advancing only the cursor at the smaller head can never skip a shared value; this is O(n+m) with no extra set.",
     "mapsTo": "LC 349 · Intersection of Two Arrays",

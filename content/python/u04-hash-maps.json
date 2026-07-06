@@ -230,7 +230,12 @@
     "prompt": "Write `two_sum(nums, target)` that returns `[i, j]` (i < j) of the two indices whose values sum to `target`, or `None` if no pair exists. Make one pass using a dict.",
     "starter": "def two_sum(nums, target):\n    # your code here\n    pass",
     "solution": "def two_sum(nums, target):\n    seen = {}\n    for i in range(len(nums)):\n        x = nums[i]\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return None",
-    "tests": "assert two_sum([2, 7, 11, 15], 9) == [0, 1], two_sum([2, 7, 11, 15], 9)\nassert two_sum([3, 2, 4], 6) == [1, 2], two_sum([3, 2, 4], 6)\nassert two_sum([3, 3], 6) == [0, 1], two_sum([3, 3], 6)\nassert two_sum([1, 2], 10) is None, two_sum([1, 2], 10)",
+    "cases": [
+      { "call": "two_sum([2, 7, 11, 15], 9)", "expect": "[0, 1]" },
+      { "call": "two_sum([3, 2, 4], 6)", "expect": "[1, 2]" },
+      { "call": "two_sum([3, 3], 6)", "expect": "[0, 1]" },
+      { "call": "two_sum([1, 2], 10)", "expect": "None" }
+    ],
     "prereqs": [
       "py.u04.two-sum.predict"
     ],

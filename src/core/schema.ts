@@ -21,6 +21,21 @@ export const ExerciseSchema = z.object({
   starter: z.string().optional(),
   solution: z.string().optional(),
   tests: z.string().optional(),
+  cases: z
+    .array(
+      z
+        .object({
+          setup: z.string().optional(),
+          call: z.string().min(1),
+          expect: z.string().optional(),
+          check: z.string().optional(),
+        })
+        .refine((c) => (c.expect === undefined) !== (c.check === undefined), {
+          message: 'each case needs exactly one of "expect" or "check"',
+        }),
+    )
+    .min(1)
+    .optional(),
   banned: z.array(z.string()).optional(),
   prereqs: z.array(z.string()).optional(),
   // shown only after solving
@@ -40,10 +55,10 @@ export const ExerciseSchema = z.object({
       path: ['expected'],
     });
   }
-  if (ex.kind === 'write' && ex.tests === undefined) {
+  if (ex.kind === 'write' && ex.tests === undefined && ex.cases === undefined) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `write exercise "${ex.id}" must provide "tests"`,
+      message: `write exercise "${ex.id}" must provide "tests" or "cases"`,
       path: ['tests'],
     });
   }

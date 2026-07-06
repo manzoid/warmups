@@ -32,3 +32,19 @@ export function firstBanned(code: string, banned?: string[]): string | null {
 export function bannedMessage(pattern: string): string {
   return `This kata asks you to do it by hand — remove \`${pattern}\` and write the logic yourself.`;
 }
+
+/**
+ * A clear failure message for a structured test case: which call failed, what
+ * it should return, and what it actually returned. Replaces the opaque bare
+ * `AssertionError: [1, 0]` with the input in view.
+ */
+export function failingCaseMessage(
+  call: string,
+  expected?: string,
+  actual?: string,
+): string {
+  const lines = [`Failed on:  ${call}`];
+  if (expected !== undefined && expected !== null) lines.push(`expected:   ${expected}`);
+  if (actual !== undefined) lines.push(`got:        ${actual}`);
+  return lines.join('\n');
+}
