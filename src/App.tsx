@@ -337,6 +337,7 @@ export default function App() {
                       ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
                       : undefined
                   }
+                  firstScreen={progress.current.attempts.length === 0}
                   onSkip={() => skip([pick.exercise.id])}
                   onSkipToFirstWrite={skipToFirstWrite}
                   onSkipToProblems={skipToProblems}
@@ -1058,6 +1059,7 @@ function ExerciseView({
   onSubmit,
   onNext,
   timing,
+  firstScreen,
   onSkip,
   onSkipToFirstWrite,
   onSkipToProblems,
@@ -1075,6 +1077,7 @@ function ExerciseView({
   onSubmit: () => void;
   onNext: () => void;
   timing?: { ms: number; bestMs: number | null };
+  firstScreen?: boolean;
   onSkip?: () => void;
   onSkipToFirstWrite?: () => void;
   onSkipToProblems?: () => void;
@@ -1086,6 +1089,37 @@ function ExerciseView({
   const graded = result !== null;
   return (
     <div style={styles.panel}>
+      {firstScreen && !graded && (onSkipToFirstWrite || onSkipToProblems) && (
+        <div
+          style={{
+            border: `1px solid ${theme.accent}`,
+            borderRadius: 8,
+            padding: '0.7rem 0.85rem',
+            marginBottom: '1rem',
+            background: 'rgba(120,170,255,0.06)',
+          }}
+        >
+          <p style={{ ...styles.label, margin: '0 0 0.15rem', color: theme.accent }}>
+            Already comfortable with the basics?
+          </p>
+          <p style={{ ...styles.tagline, margin: '0 0 0.55rem', fontSize: '0.82rem' }}>
+            These open on warm-up atoms. Jump straight ahead any time — skipped
+            items stay redoable from History.
+          </p>
+          <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+            {onSkipToFirstWrite && (
+              <button style={styles.btn} onClick={onSkipToFirstWrite}>
+                Skip to first write →
+              </button>
+            )}
+            {onSkipToProblems && (
+              <button style={styles.btn} onClick={onSkipToProblems}>
+                Skip to interview problems →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       {(subtitle || onExit) && (
         <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
           <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>{subtitle}</span>
