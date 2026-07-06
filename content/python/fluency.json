@@ -145,5 +145,144 @@
     "kind": "write",
     "prompt": "Implement `invert(d)` returning a new dict that maps each value back to its key. Values are distinct. Fresh data every time.",
     "generator": "import random\ndef make():\n    keys = random.sample([\"a\", \"b\", \"c\", \"d\", \"e\"], random.randint(3, 4))\n    vals = random.sample(range(1, 9), len(keys))\n    d = dict(zip(keys, vals))\n    starter = \"def invert(d):\\n    # your code here\\n    pass\"\n    solution = \"def invert(d):\\n    return {v: k for k, v in d.items()}\"\n    inverted = {v: k for k, v in d.items()}\n    tests = \"assert invert(\" + repr(d) + \") == \" + repr(inverted)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.reversestr",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "reverse a string by hand",
+    "kind": "write",
+    "prompt": "Implement `reverse(s)` returning the string in reverse order, by hand. No slicing tricks and no `reversed()`. Fresh data every time.",
+    "banned": [
+      "[::-1]",
+      "reversed("
+    ],
+    "generator": "import random\nimport string\ndef make():\n    n = random.randint(4, 9)\n    s = \"\".join(random.choice(string.ascii_lowercase) for _ in range(n))\n    starter = \"\"\"def reverse(s):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def reverse(s):\n    out = \"\"\n    for ch in s:\n        out = ch + out\n    return out\"\"\"\n    tests = \"assert reverse(\" + repr(s) + \") == \" + repr(s[::-1])\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests, \"banned\": [\"[::-1]\", \"reversed(\"]}"
+  },
+  {
+    "id": "py.fluency.countvowels",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "count vowels in a string",
+    "kind": "write",
+    "prompt": "Implement `count_vowels(s)` returning how many characters are one of a, e, i, o, u. Fresh data every time.",
+    "generator": "import random\ndef make():\n    n = random.randint(5, 10)\n    s = \"\".join(random.choice(\"aeiouxyzbcdfg\") for _ in range(n))\n    starter = \"\"\"def count_vowels(s):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def count_vowels(s):\n    total = 0\n    for ch in s:\n        if ch in \"aeiou\":\n            total += 1\n    return total\"\"\"\n    expected = sum(1 for ch in s if ch in \"aeiou\")\n    tests = \"assert count_vowels(\" + repr(s) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.palindrome",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "palindrome check by hand",
+    "kind": "write",
+    "prompt": "Implement `is_palindrome(s)` returning True if the string reads the same forward and backward. No slicing tricks. Fresh data every time.",
+    "banned": [
+      "[::-1]"
+    ],
+    "generator": "import random\ndef make():\n    n = random.randint(3, 7)\n    if random.random() < 0.5:\n        half = \"\".join(random.choice(\"abc\") for _ in range(n))\n        s = half + half[::-1]\n    else:\n        s = \"\".join(random.choice(\"abc\") for _ in range(n))\n    starter = \"\"\"def is_palindrome(s):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def is_palindrome(s):\n    i, j = 0, len(s) - 1\n    while i < j:\n        if s[i] != s[j]:\n            return False\n        i += 1\n        j -= 1\n    return True\"\"\"\n    tests = \"assert is_palindrome(\" + repr(s) + \") == \" + repr(s == s[::-1])\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests, \"banned\": [\"[::-1]\"]}"
+  },
+  {
+    "id": "py.fluency.flatten",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "flatten one level of nesting",
+    "kind": "write",
+    "prompt": "Implement `flatten(xss)` that takes a list of lists and returns one flat list, one level deep. So [[1, 2], [3]] becomes [1, 2, 3]. Fresh data every time.",
+    "generator": "import random\ndef make():\n    rows = [[random.randint(1, 9) for _ in range(random.randint(1, 3))] for _ in range(random.randint(2, 4))]\n    starter = \"\"\"def flatten(xss):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def flatten(xss):\n    out = []\n    for row in xss:\n        for x in row:\n            out.append(x)\n    return out\"\"\"\n    expected = [x for row in rows for x in row]\n    tests = \"assert flatten(\" + repr(rows) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.dedupe",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "dedupe while keeping order",
+    "kind": "write",
+    "prompt": "Implement `dedupe(a)` returning a new list with duplicates removed, keeping the first time each value appears. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.randint(1, 5) for _ in range(random.randint(6, 10))]\n    starter = \"\"\"def dedupe(a):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def dedupe(a):\n    seen = set()\n    out = []\n    for x in a:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out\"\"\"\n    expected = list(dict.fromkeys(a))\n    tests = \"assert dedupe(\" + repr(a) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.fizzbuzz",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "fizzbuzz",
+    "kind": "write",
+    "prompt": "Implement `fizzbuzz(n)` returning a list for 1 to n: \"Fizz\" if divisible by 3, \"Buzz\" if by 5, \"FizzBuzz\" if by both, else the number itself. Fresh n every time.",
+    "generator": "import random\ndef make():\n    n = random.randint(10, 20)\n    starter = \"\"\"def fizzbuzz(n):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def fizzbuzz(n):\n    out = []\n    for i in range(1, n + 1):\n        if i % 15 == 0:\n            out.append(\"FizzBuzz\")\n        elif i % 3 == 0:\n            out.append(\"Fizz\")\n        elif i % 5 == 0:\n            out.append(\"Buzz\")\n        else:\n            out.append(i)\n    return out\"\"\"\n    def ref(n):\n        out = []\n        for i in range(1, n + 1):\n            if i % 15 == 0:\n                out.append(\"FizzBuzz\")\n            elif i % 3 == 0:\n                out.append(\"Fizz\")\n            elif i % 5 == 0:\n                out.append(\"Buzz\")\n            else:\n                out.append(i)\n        return out\n    tests = \"assert fizzbuzz(\" + str(n) + \") == \" + repr(ref(n))\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.sumdigits",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "sum the digits of an integer",
+    "kind": "write",
+    "prompt": "Implement `sum_of_digits(n)` returning the sum of the decimal digits of a non-negative integer. Fresh number every time.",
+    "generator": "import random\ndef make():\n    n = random.randint(10, 99999)\n    starter = \"\"\"def sum_of_digits(n):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def sum_of_digits(n):\n    total = 0\n    while n > 0:\n        total += n % 10\n        n //= 10\n    return total\"\"\"\n    expected = sum(int(c) for c in str(n))\n    tests = \"assert sum_of_digits(\" + str(n) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.runningtotal",
+    "track": "python",
+    "group": "Fluency writes",
+    "concept": "prefix sums",
+    "kind": "write",
+    "prompt": "Implement `running_total(a)` returning the list of prefix sums, so each position holds the sum of all values up to and including it. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.randint(1, 9) for _ in range(random.randint(4, 7))]\n    starter = \"\"\"def running_total(a):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def running_total(a):\n    out = []\n    total = 0\n    for x in a:\n        total += x\n        out.append(total)\n    return out\"\"\"\n    expected = []\n    running = 0\n    for x in a:\n        running += x\n        expected.append(running)\n    tests = \"assert running_total(\" + repr(a) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.twosum",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "two sum",
+    "kind": "write",
+    "mapsTo": "LC 1 · Two Sum",
+    "prompt": "Implement `two_sum(a, target)` returning two different indices i and j where a[i] + a[j] equals target. At least one pair always exists. Fresh data every time.",
+    "generator": "import random\ndef make():\n    n = random.randint(4, 7)\n    a = [random.randint(1, 20) for _ in range(n)]\n    i, j = random.sample(range(n), 2)\n    target = a[i] + a[j]\n    starter = \"\"\"def two_sum(a, target):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def two_sum(a, target):\n    seen = {}\n    for i, x in enumerate(a):\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\"\"\"\n    tests = (\"r = two_sum(\" + repr(a) + \", \" + str(target) + \")\\n\"\n             + \"assert len(r) == 2 and r[0] != r[1]\\n\"\n             + \"assert \" + repr(a) + \"[r[0]] + \" + repr(a) + \"[r[1]] == \" + str(target))\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.binarysearch",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "binary search",
+    "kind": "write",
+    "mapsTo": "LC 704 · Binary Search",
+    "prompt": "Implement `binary_search(a, target)` on a sorted list of distinct integers, returning the index of target or -1 if it is absent. Fresh data every time.",
+    "generator": "import random\ndef make():\n    vals = sorted(random.sample(range(1, 50), random.randint(5, 9)))\n    idx = random.randint(0, len(vals) - 1)\n    target = vals[idx]\n    missing = random.choice([x for x in range(0, 51) if x not in vals])\n    starter = \"\"\"def binary_search(a, target):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def binary_search(a, target):\n    lo, hi = 0, len(a) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if a[mid] == target:\n            return mid\n        elif a[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\"\"\"\n    tests = (\"assert binary_search(\" + repr(vals) + \", \" + str(target) + \") == \" + str(idx) + \"\\n\"\n             + \"assert binary_search(\" + repr(vals) + \", \" + str(missing) + \") == -1\")\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.maxsubarray",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "maximum subarray (Kadane)",
+    "kind": "write",
+    "mapsTo": "LC 53 · Maximum Subarray",
+    "prompt": "Implement `max_subarray(a)` returning the largest sum of any contiguous non-empty run of elements. Values can be negative. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.randint(-9, 9) for _ in range(random.randint(4, 8))]\n    starter = \"\"\"def max_subarray(a):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def max_subarray(a):\n    best = a[0]\n    cur = a[0]\n    for x in a[1:]:\n        cur = max(x, cur + x)\n        best = max(best, cur)\n    return best\"\"\"\n    best = a[0]\n    cur = a[0]\n    for x in a[1:]:\n        cur = max(x, cur + x)\n        best = max(best, cur)\n    tests = \"assert max_subarray(\" + repr(a) + \") == \" + str(best)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.movezeroes",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "move zeroes to the end",
+    "kind": "write",
+    "mapsTo": "LC 283 · Move Zeroes",
+    "prompt": "Implement `move_zeroes(a)` returning a list with every 0 moved to the end while the non-zero values keep their order. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.choice([0, 0, random.randint(1, 9)]) for _ in range(random.randint(5, 9))]\n    starter = \"\"\"def move_zeroes(a):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def move_zeroes(a):\n    out = [x for x in a if x != 0]\n    out += [0] * (len(a) - len(out))\n    return out\"\"\"\n    nonzero = [x for x in a if x != 0]\n    expected = nonzero + [0] * (len(a) - len(nonzero))\n    tests = \"assert move_zeroes(\" + repr(a) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.validparens",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "valid parentheses",
+    "kind": "write",
+    "mapsTo": "LC 20 · Valid Parentheses",
+    "prompt": "Implement `valid_parens(s)` returning True if every bracket in a string of ()[]{} is closed by the matching type in the right order. Fresh data every time.",
+    "generator": "import random\ndef make():\n    close = {\"(\": \")\", \"[\": \"]\", \"{\": \"}\"}\n    def gen_balanced(pairs):\n        res = []\n        stack = []\n        opened = 0\n        while len(res) < 2 * pairs:\n            if opened < pairs and (not stack or random.random() < 0.5):\n                b = random.choice(\"([{\")\n                res.append(b)\n                stack.append(close[b])\n                opened += 1\n            else:\n                res.append(stack.pop())\n        return \"\".join(res)\n    if random.random() < 0.5:\n        s = gen_balanced(random.randint(1, 4))\n    else:\n        s = \"\".join(random.choice(\"()[]{}\") for _ in range(random.randint(2, 8)))\n    def ref(s):\n        pairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\n        stack = []\n        for ch in s:\n            if ch in \"([{\":\n                stack.append(ch)\n            else:\n                if not stack or stack.pop() != pairs[ch]:\n                    return False\n        return not stack\n    expected = ref(s)\n    starter = \"\"\"def valid_parens(s):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def valid_parens(s):\n    pairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\n    stack = []\n    for ch in s:\n        if ch in \"([{\":\n            stack.append(ch)\n        else:\n            if not stack or stack.pop() != pairs[ch]:\n                return False\n    return not stack\"\"\"\n    tests = \"assert valid_parens(\" + repr(s) + \") == \" + repr(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
+  },
+  {
+    "id": "py.fluency.maxwindow",
+    "track": "python",
+    "group": "Fluency interview reps",
+    "concept": "fixed-window maximum sum",
+    "kind": "write",
+    "mapsTo": "LC 643 · Maximum Average Subarray (fixed window)",
+    "prompt": "Implement `max_window_sum(a, k)` returning the largest sum of any k consecutive elements. Fresh data every time.",
+    "generator": "import random\ndef make():\n    n = random.randint(5, 9)\n    a = [random.randint(1, 20) for _ in range(n)]\n    k = random.randint(2, min(4, n))\n    starter = \"\"\"def max_window_sum(a, k):\n    # your code here\n    pass\"\"\"\n    solution = \"\"\"def max_window_sum(a, k):\n    best = sum(a[:k])\n    cur = best\n    for i in range(k, len(a)):\n        cur += a[i] - a[i - k]\n        best = max(best, cur)\n    return best\"\"\"\n    expected = max(sum(a[i:i + k]) for i in range(len(a) - k + 1))\n    tests = \"assert max_window_sum(\" + repr(a) + \", \" + str(k) + \") == \" + str(expected)\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests}"
   }
 ]

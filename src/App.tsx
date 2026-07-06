@@ -980,6 +980,11 @@ function FluencyDrill({
       <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
         <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>
           Fluency · {ex.concept}
+          {ex.mapsTo && (
+            <span style={{ ...styles.pill, marginLeft: 8, color: theme.accent, borderColor: theme.accent }}>
+              {ex.mapsTo}
+            </span>
+          )}
         </span>
         <button style={styles.btnGhost} onClick={onExit}>
           ← Patterns
