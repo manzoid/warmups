@@ -145,6 +145,19 @@ export default function App() {
     if (ids.length) skip(ids);
   }, [exercises, skip]);
 
+  // Skip past the opening predict/trivia cluster to the next hands-on write.
+  const skipToFirstWrite = useCallback(() => {
+    const ids: string[] = [];
+    let started = false;
+    for (const ex of exercises) {
+      if (hasAttempted(progress.current, ex.id)) continue;
+      if (started && ex.kind === 'write') break; // land on the next write
+      ids.push(ex.id);
+      started = true;
+    }
+    if (ids.length) skip(ids);
+  }, [exercises, skip]);
+
   const advancePractice = useCallback(() => {
     if (!queue) return;
     const ni = qIndex + 1;
@@ -300,6 +313,7 @@ export default function App() {
                       : undefined
                   }
                   onSkip={() => skip([pick.exercise.id])}
+                  onSkipToFirstWrite={skipToFirstWrite}
                   onSkipToProblems={skipToProblems}
                   onSkipUnit={() =>
                     skip(
@@ -671,6 +685,7 @@ function ExerciseView({
   onNext,
   timing,
   onSkip,
+  onSkipToFirstWrite,
   onSkipToProblems,
   onSkipUnit,
   subtitle,
@@ -687,6 +702,7 @@ function ExerciseView({
   onNext: () => void;
   timing?: { ms: number; bestMs: number | null };
   onSkip?: () => void;
+  onSkipToFirstWrite?: () => void;
   onSkipToProblems?: () => void;
   onSkipUnit?: () => void;
   subtitle?: string;
@@ -736,8 +752,8 @@ function ExerciseView({
           />
           <p style={{ ...styles.tagline, margin: '0.35rem 0 0', fontSize: '0.78rem', color: theme.muted }}>
             {ex.track === 'python'
-              ? "Match how Python prints it (strings in quotes, e.g. 'abc'). Spacing and dict/set order are ignored."
-              : 'Match how JS prints it (a top-level string can be bare; objects like {a: 1}, Maps like Map(2) {"a" => 1}). Spacing is ignored.'}
+              ? "Type a Python expression for the value (strings in quotes, e.g. 'abc'). Spacing and dict/set order don't matter."
+              : "Type a JS expression for the value (strings in quotes, e.g. 'abc'; objects like {a: 1}; Maps/Sets like new Map([['a', 1]])). Spacing and Map/Set order don't matter."}
           </p>
         </>
       )}
@@ -764,6 +780,15 @@ function ExerciseView({
         {!graded && onSkip && (
           <button style={styles.btnGhost} onClick={onSkip} title="I know this — skip it">
             Skip
+          </button>
+        )}
+        {!graded && onSkipToFirstWrite && (
+          <button
+            style={styles.btnGhost}
+            onClick={onSkipToFirstWrite}
+            title="Skip the opening predicts and go straight to the next hands-on write"
+          >
+            Skip to first write →
           </button>
         )}
         {!graded && onSkipToProblems && (
