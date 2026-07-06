@@ -842,6 +842,9 @@ function FluencyDrill({
   const [lastMs, setLastMs] = useState<number | null>(null);
   const [lastFast, setLastFast] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  // Post-miss aids (only shown after a wrong answer, never during a live rep).
+  const [showViz, setShowViz] = useState(false);
+  const [showSol, setShowSol] = useState(false);
 
   const startedAt = useRef(0);
   const advTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -852,6 +855,8 @@ function FluencyDrill({
     setLoading(true);
     setResult(null);
     setInput('');
+    setShowViz(false);
+    setShowSol(false);
     try {
       const runner = RUNNERS[track];
       const gi = runner.generate ? await runner.generate(ex) : {};
@@ -1108,6 +1113,28 @@ function FluencyDrill({
                     <p style={{ ...styles.tagline, margin: '0.3rem 0 0' }}>
                       Answer: <code>{inst.expected}</code>
                     </p>
+                  )}
+                  <div style={{ ...styles.row, gap: 8, marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                    <button style={styles.btnGhost} onClick={() => setShowViz((v) => !v)}>
+                      {showViz ? 'Hide run' : 'See it run'}
+                    </button>
+                    {inst.kind === 'write' && inst.solution && (
+                      <button style={styles.btnGhost} onClick={() => setShowSol((s) => !s)}>
+                        {showSol ? 'Hide solution' : 'Show solution'}
+                      </button>
+                    )}
+                  </div>
+                  {showViz && (
+                    <div style={{ marginTop: '0.6rem' }}>
+                      <Visualizer
+                        track={track}
+                        code={vizCode(inst, input, result.failingCase)}
+                        title={inst.concept}
+                      />
+                    </div>
+                  )}
+                  {showSol && inst.solution && (
+                    <pre style={{ ...styles.code, marginTop: '0.6rem' }}>{inst.solution}</pre>
                   )}
                 </>
               )}
