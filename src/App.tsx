@@ -8,6 +8,7 @@ import {
   recordAttempt,
   bumpLastAttemptRung,
   lastAttempt,
+  bestTimeMs,
   hasAttempted,
   resetProgress,
   type ProgressState,
@@ -76,6 +77,10 @@ export default function App() {
   // Deepest hint-ladder rung reached for the current exercise (0 = unaided,
   // 1 cue, 2 syntax, 3 visualize, 4 walkthrough, 5 reveal). Recorded per attempt.
   const [maxRung, setMaxRung] = useState(0);
+  // Timing: when the current exercise appeared, and the ms of the latest clean
+  // solve (for the "solved in Xs · best Ys" fluency readout).
+  const startedAt = useRef<number>(0);
+  const [solveMs, setSolveMs] = useState<number | null>(null);
 
   // Practice queue: an explicit set the learner chose to drill (from a group or
   // a history filter). Null = no active practice set (show the picker).
@@ -92,6 +97,8 @@ export default function App() {
     setResult(null);
     setRunning(false);
     setMaxRung(0);
+    setSolveMs(null);
+    startedAt.current = Date.now();
     setInput(ex.kind === 'write' ? ex.starter ?? '' : '');
     setPick({ exercise: ex, isNew });
   }, []);
@@ -187,12 +194,13 @@ export default function App() {
 
   // Record one graded attempt to the append-only log (no SRS scheduling).
   const grade = useCallback(
-    (exId: string, passed: boolean, rung: number) => {
+    (exId: string, passed: boolean, rung: number, ms?: number) => {
       recordAttempt(progress.current, {
         id: exId,
         at: Date.now(),
         passed,
         rung,
+        ms,
       });
       persist();
       bump();
@@ -210,7 +218,9 @@ export default function App() {
     } catch (err) {
       res = { passed: false, error: err instanceof Error ? err.message : String(err) };
     }
-    grade(ex.id, res.passed, maxRung);
+    const ms = Date.now() - startedAt.current;
+    grade(ex.id, res.passed, maxRung, ms);
+    setSolveMs(res.passed && maxRung === 0 ? ms : null);
     setResult(res);
     setRunning(false);
   }, [track, pick, input, maxRung, grade]);
@@ -284,6 +294,11 @@ export default function App() {
                   onUseHint={useHint}
                   onSubmit={submit}
                   onNext={advanceLearn}
+                  timing={
+                    solveMs != null
+                      ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
+                      : undefined
+                  }
                   onSkip={() => skip([pick.exercise.id])}
                   onSkipToProblems={skipToProblems}
                   onSkipUnit={() =>
@@ -313,6 +328,11 @@ export default function App() {
                   onUseHint={useHint}
                   onSubmit={submit}
                   onNext={advancePractice}
+                  timing={
+                    solveMs != null
+                      ? { ms: solveMs, bestMs: bestTimeMs(progress.current, pick.exercise.id) }
+                      : undefined
+                  }
                   subtitle={`Practice · ${queueLabel} · ${qIndex + 1} / ${queue.length}`}
                   onExit={() => {
                     setQueue(null);
@@ -649,6 +669,7 @@ function ExerciseView({
   onUseHint,
   onSubmit,
   onNext,
+  timing,
   onSkip,
   onSkipToProblems,
   onSkipUnit,
@@ -664,6 +685,7 @@ function ExerciseView({
   onUseHint: (rung: number) => void;
   onSubmit: () => void;
   onNext: () => void;
+  timing?: { ms: number; bestMs: number | null };
   onSkip?: () => void;
   onSkipToProblems?: () => void;
   onSkipUnit?: () => void;
@@ -765,7 +787,7 @@ function ExerciseView({
         )}
       </div>
 
-      {result && <ResultView result={result} maxRung={maxRung} />}
+      {result && <ResultView result={result} maxRung={maxRung} timing={timing} />}
 
       {graded && (ex.note || ex.mapsTo) && (
         <div style={{ marginTop: '0.85rem' }}>
@@ -908,7 +930,15 @@ function WalkthroughBox({ prompt }: { prompt: string }) {
   );
 }
 
-function ResultView({ result, maxRung }: { result: RunResult; maxRung: number }) {
+function ResultView({
+  result,
+  maxRung,
+  timing,
+}: {
+  result: RunResult;
+  maxRung: number;
+  timing?: { ms: number; bestMs: number | null };
+}) {
   let color: string;
   let label: string;
   if (!result.passed) {
@@ -927,6 +957,14 @@ function ResultView({ result, maxRung }: { result: RunResult; maxRung: number })
   return (
     <div style={{ marginTop: '1rem' }}>
       <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>{label}</p>
+      {timing && result.passed && (
+        <p style={{ ...styles.tagline, margin: '0 0 0.4rem', fontSize: '0.8rem', color: theme.muted }}>
+          ⏱ solved in {(timing.ms / 1000).toFixed(1)}s
+          {timing.bestMs != null && timing.bestMs < timing.ms
+            ? ` · best ${(timing.bestMs / 1000).toFixed(1)}s`
+            : ''}
+        </p>
+      )}
       {result.error && (
         <pre style={{ ...styles.code, borderColor: theme.bad }}>{result.error}</pre>
       )}

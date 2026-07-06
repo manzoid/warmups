@@ -19,6 +19,7 @@ export interface Attempt {
   passed: boolean;
   rung: number; // deepest hint-ladder rung used (0 = unaided, 1 cue … 5 reveal)
   skipped?: boolean; // learner tested out / skipped it (counts as "seen", not passed)
+  ms?: number; // wall-clock time from when the exercise appeared to submit (fluency signal)
 }
 
 export interface ProgressState {
@@ -200,6 +201,17 @@ export function hasPassed(state: ProgressState, id: string): boolean {
 export function hasAttempted(state: ProgressState, id: string): boolean {
   for (const a of state.attempts) if (a.id === id) return true;
   return false;
+}
+
+/** Fastest unaided passing time (ms) for `id`, or null if never cleanly cleared. */
+export function bestTimeMs(state: ProgressState, id: string): number | null {
+  let best: number | null = null;
+  for (const a of state.attempts) {
+    if (a.id === id && a.passed && !a.skipped && a.rung === 0 && typeof a.ms === 'number') {
+      if (best === null || a.ms < best) best = a.ms;
+    }
+  }
+  return best;
 }
 
 /** The most recent attempt at `id`, or undefined. */
