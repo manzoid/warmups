@@ -171,7 +171,10 @@ try:
     __wu_user = eval(${JSON.stringify(userAnswer)}, {})
     __wu_passed = bool(__wu_user == __wu_actual)
 except Exception:
-    __wu_passed = False
+    # Bare-token fallback: if the value is a string and the learner typed an
+    # unquoted token (e.g. bcd instead of 'bcd'), eval raises NameError. Accept
+    # the raw text as the string so a right value isn't failed on quoting.
+    __wu_passed = isinstance(__wu_actual, str) and ${JSON.stringify(userAnswer)}.strip() == __wu_actual
 __wu_json.dumps({"passed": __wu_passed, "actual": repr(__wu_actual)})
 `;
     const out = await py.runPythonAsync(src, { globals: ns });

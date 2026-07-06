@@ -29,6 +29,10 @@ export const ExerciseSchema = z.object({
   // fluency generator (trusted source producing fresh instances)
   generator: z.string().optional(),
 }).superRefine((ex, ctx) => {
+  // A fluency `generator` produces snippet/expected (predict) or
+  // starter/tests/solution (write) fresh per instance, so those fields are
+  // absent on the static exercise — skip the static-field requirements for it.
+  if (ex.generator !== undefined) return;
   if (ex.kind === 'predict' && ex.expected === undefined) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

@@ -13,7 +13,7 @@ import {
   resetProgress,
   type ProgressState,
 } from './core/storage';
-import { exercisesForTrack } from './ui/content';
+import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
@@ -25,7 +25,7 @@ const TRACK_LABELS: Record<Track, string> = {
   javascript: 'JavaScript',
 };
 
-type View = 'learn' | 'practice' | 'history';
+type View = 'learn' | 'practice' | 'fluency' | 'history';
 
 export default function App() {
   // Progress lives in a ref (arrays/maps mutate in place); `tick` forces a
@@ -92,6 +92,12 @@ export default function App() {
     () => (track ? exercisesForTrack(track) : []),
     [track],
   );
+  const generators = useMemo(
+    () => (track ? generatorsForTrack(track) : []),
+    [track],
+  );
+  // The fluency pattern currently being drilled (null = show the picker).
+  const [fluencyEx, setFluencyEx] = useState<Exercise | null>(null);
 
   const startExercise = useCallback((ex: Exercise, isNew: boolean) => {
     setResult(null);
@@ -189,6 +195,7 @@ export default function App() {
     setTrack(t);
     setView('learn');
     setQueue(null);
+    setFluencyEx(null);
     const next = pickNextLearn(exercisesForTrack(t), progress.current);
     if (next) startExercise(next.exercise, next.isNew);
     else setPick(null);
@@ -198,12 +205,29 @@ export default function App() {
     setView(v);
     if (v === 'learn') advanceLearn();
     else {
-      // practice shows its picker until a set is chosen; history is a list.
+      // practice/fluency show a picker until a set is chosen; history is a list.
       setQueue(null);
       setPick(null);
       setResult(null);
+      setFluencyEx(null);
     }
   };
+
+  // Record one cleared fluency pattern to the log (passed, unaided, best time).
+  const recordFluencyClear = useCallback(
+    (exId: string, bestMs: number) => {
+      recordAttempt(progress.current, {
+        id: exId,
+        at: Date.now(),
+        passed: true,
+        rung: 0,
+        ms: bestMs,
+      });
+      persist();
+      bump();
+    },
+    [persist, bump],
+  );
 
   // Record one graded attempt to the append-only log (no SRS scheduling).
   const grade = useCallback(
@@ -286,6 +310,7 @@ export default function App() {
               track={track}
               view={view}
               counts={counts}
+              hasFluency={generators.length > 0}
               onView={switchView}
               onChangeTrack={() => {
                 setTrack(null);
@@ -364,6 +389,20 @@ export default function App() {
                 />
               ))}
 
+            {view === 'fluency' &&
+              (fluencyEx == null ? (
+                <FluencyPicker generators={generators} onPick={setFluencyEx} />
+              ) : (
+                <FluencyDrill
+                  key={fluencyEx.id}
+                  track={track}
+                  ex={fluencyEx}
+                  best={bestTimeMs(progress.current, fluencyEx.id)}
+                  onCleared={(ms) => recordFluencyClear(fluencyEx.id, ms)}
+                  onExit={() => setFluencyEx(null)}
+                />
+              ))}
+
             {view === 'history' && (
               <HistoryView
                 exercises={exercises}
@@ -405,12 +444,14 @@ function Nav({
   track,
   view,
   counts,
+  hasFluency,
   onView,
   onChangeTrack,
 }: {
   track: Track;
   view: View;
   counts: { done: number; total: number };
+  hasFluency: boolean;
   onView: (v: View) => void;
   onChangeTrack: () => void;
 }) {
@@ -431,6 +472,7 @@ function Nav({
         <strong style={{ fontSize: '0.95rem' }}>{TRACK_LABELS[track]}</strong>
         {tab('learn', 'Learn')}
         {tab('practice', 'Practice')}
+        {hasFluency && tab('fluency', 'Fluency')}
         {tab('history', 'History')}
       </div>
       <div style={styles.row}>
@@ -512,6 +554,338 @@ function PracticeDone({
           Pick another set
         </button>
       </div>
+    </div>
+  );
+}
+
+// --- Fluency mode (Kumon-style speed drilling) ------------------------------
+// Each pattern generates a fresh random instance every rep. You first do a few
+// to set your own baseline pace (SCT, Standard Completion Time in Kumon terms),
+// then "clear" the pattern by answering a streak of them correctly AND under
+// that pace — speed, not just correctness, is the mastery signal.
+
+const FLU_CALIBRATION = 3; // correct reps used to set your baseline pace
+const FLU_GOAL = 5; // consecutive correct-and-fast reps to clear
+const FLU_GRACE = 1.15; // target = 1.15 × your median baseline (a little slack)
+const FLU_SPEEDUP = 0.85; // "speed up" round tightens the target by 15%
+
+function median(xs: number[]): number {
+  if (xs.length === 0) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+function FluencyPicker({
+  generators,
+  onPick,
+}: {
+  generators: Exercise[];
+  onPick: (ex: Exercise) => void;
+}) {
+  return (
+    <div style={styles.panel}>
+      <p style={styles.label}>Fluency — pick a pattern and drill it fast</p>
+      <p style={{ ...styles.tagline, margin: '0 0 0.8rem' }}>
+        Fresh random numbers every rep (Kumon-style). Do a few to set your pace,
+        then clear the pattern with a streak of correct-and-fast answers. Speed is
+        the goal: you want these automatic.
+      </p>
+      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+        {generators.map((ex) => (
+          <button key={ex.id} style={styles.btnGhost} onClick={() => onPick(ex)}>
+            {ex.concept}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FluencyDrill({
+  track,
+  ex,
+  best,
+  onCleared,
+  onExit,
+}: {
+  track: Track;
+  ex: Exercise;
+  best: number | null;
+  onCleared: (bestMs: number) => void;
+  onExit: () => void;
+}) {
+  const [inst, setInst] = useState<Exercise | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [input, setInput] = useState('');
+  const [result, setResult] = useState<RunResult | null>(null);
+  const [running, setRunning] = useState(false);
+
+  const [times, setTimes] = useState<number[]>([]); // correct-rep times this session
+  const [streak, setStreak] = useState(0);
+  const [reps, setReps] = useState(0); // correct reps this session
+  const [targetMs, setTargetMs] = useState<number | null>(null);
+  const [cleared, setCleared] = useState(false);
+  const [lastMs, setLastMs] = useState<number | null>(null);
+  const [lastFast, setLastFast] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+
+  const startedAt = useRef(0);
+  const advTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const alive = useRef(true);
+
+  const genNext = useCallback(async () => {
+    if (advTimer.current) clearTimeout(advTimer.current);
+    setLoading(true);
+    setResult(null);
+    setInput('');
+    try {
+      const runner = RUNNERS[track];
+      const gi = runner.generate ? await runner.generate(ex) : {};
+      if (!alive.current) return;
+      const trial = { ...ex, ...gi } as Exercise;
+      setInst(trial);
+      setInput(trial.kind === 'write' ? trial.starter ?? '' : '');
+      startedAt.current = Date.now();
+      setElapsed(0);
+      setGenError(null);
+    } catch (err) {
+      if (!alive.current) return;
+      setGenError(err instanceof Error ? err.message : String(err));
+      setInst(null);
+    } finally {
+      if (alive.current) setLoading(false);
+    }
+  }, [track, ex]);
+
+  // Kick off the first instance; tear down timers on unmount.
+  useEffect(() => {
+    alive.current = true;
+    void genNext();
+    return () => {
+      alive.current = false;
+      if (advTimer.current) clearTimeout(advTimer.current);
+    };
+  }, [genNext]);
+
+  // Live stopwatch while an unsolved instance is on screen.
+  useEffect(() => {
+    if (!inst || result || cleared || loading) return;
+    const t = setInterval(() => setElapsed(Date.now() - startedAt.current), 100);
+    return () => clearInterval(t);
+  }, [inst, result, cleared, loading]);
+
+  const scheduleAdvance = () => {
+    if (advTimer.current) clearTimeout(advTimer.current);
+    advTimer.current = setTimeout(() => void genNext(), 850);
+  };
+
+  const submit = async () => {
+    if (!inst || result || running) return;
+    const ms = Date.now() - startedAt.current;
+    setRunning(true);
+    let res: RunResult;
+    try {
+      res = await RUNNERS[track].run(input, inst);
+    } catch (err) {
+      res = { passed: false, error: err instanceof Error ? err.message : String(err) };
+    }
+    if (!alive.current) return;
+    setRunning(false);
+    setResult(res);
+    setLastMs(ms);
+
+    if (!res.passed) {
+      setLastFast(false);
+      setStreak(0); // a miss breaks the streak; absorb the answer, advance manually
+      return;
+    }
+
+    const newTimes = [...times, ms];
+    setTimes(newTimes);
+    setReps((r) => r + 1);
+
+    let tgt = targetMs;
+    if (tgt === null && newTimes.length >= FLU_CALIBRATION) {
+      tgt = Math.round(median(newTimes) * FLU_GRACE);
+      setTargetMs(tgt);
+    }
+
+    const fast = tgt !== null && ms <= tgt;
+    setLastFast(fast);
+
+    let willClear = false;
+    if (tgt !== null) {
+      if (fast) {
+        const s = streak + 1;
+        setStreak(s);
+        if (s >= FLU_GOAL) {
+          willClear = true;
+          setCleared(true);
+          onCleared(Math.min(...newTimes));
+        }
+      } else {
+        setStreak(0);
+      }
+    }
+    if (!willClear) scheduleAdvance(); // keep the flow moving on a correct rep
+  };
+
+  const secs = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
+
+  // --- cleared card ---------------------------------------------------------
+  if (cleared) {
+    const bestMs = times.length ? Math.min(...times) : 0;
+    const avgMs = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+    const speedUp = () => {
+      setTargetMs((t) => (t ? Math.round(t * FLU_SPEEDUP) : t));
+      setStreak(0);
+      setCleared(false);
+      void genNext();
+    };
+    return (
+      <div style={styles.panel}>
+        <h2 style={{ fontSize: '1.15rem', margin: '0 0 0.4rem', color: theme.good }}>
+          Cleared “{ex.concept}” 🎉
+        </h2>
+        <p style={{ ...styles.tagline, margin: '0 0 0.9rem' }}>
+          {FLU_GOAL} in a row, correct and under {targetMs ? secs(targetMs) : ''}.
+          Best {secs(bestMs)} · avg {secs(avgMs)} over {reps} solved.
+        </p>
+        <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+          <button style={styles.btn} onClick={speedUp}>
+            Speed up (target {targetMs ? secs(Math.round(targetMs * FLU_SPEEDUP)) : ''}) →
+          </button>
+          <button style={styles.btnGhost} onClick={onExit}>
+            Pick another pattern
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const graded = result !== null;
+  const dots = '●'.repeat(streak) + '○'.repeat(Math.max(0, FLU_GOAL - streak));
+
+  return (
+    <div style={styles.panel}>
+      <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>
+          Fluency · {ex.concept}
+        </span>
+        <button style={styles.btnGhost} onClick={onExit}>
+          ← Patterns
+        </button>
+      </div>
+
+      {/* HUD: pace target, streak, live/last time */}
+      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginBottom: '0.75rem' }}>
+        {targetMs == null ? (
+          <span style={styles.pill}>
+            Warming up {Math.min(times.length, FLU_CALIBRATION)}/{FLU_CALIBRATION} — setting your pace
+          </span>
+        ) : (
+          <span style={styles.pill}>Target ≤ {secs(targetMs)}</span>
+        )}
+        {targetMs != null && (
+          <span
+            style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
+            title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
+          >
+            {dots} {streak}/{FLU_GOAL}
+          </span>
+        )}
+        <span style={styles.pill}>
+          ⏱ {graded && lastMs != null ? secs(lastMs) : secs(elapsed)}
+        </span>
+        {best != null && <span style={styles.pill}>best {secs(best)}</span>}
+      </div>
+
+      <p style={{ margin: '0 0 1rem', color: theme.text }}>{ex.prompt}</p>
+
+      {loading ? (
+        <p style={{ ...styles.tagline, margin: 0 }}>Generating a fresh one…</p>
+      ) : genError ? (
+        <pre style={{ ...styles.code, borderColor: theme.bad }}>{genError}</pre>
+      ) : inst ? (
+        <>
+          {inst.kind === 'predict' && inst.snippet && (
+            <>
+              <pre style={{ ...styles.code, marginBottom: '1rem' }}>{inst.snippet}</pre>
+              <input
+                style={{ ...styles.editor, fontFamily: theme.mono }}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="value it evaluates to"
+                spellCheck={false}
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  if (graded) void genNext();
+                  else void submit();
+                }}
+              />
+            </>
+          )}
+          {inst.kind === 'write' && (
+            <CodeEditor
+              language={track}
+              value={input}
+              onChange={setInput}
+              onSubmit={!graded ? () => void submit() : undefined}
+              autoFocus
+            />
+          )}
+
+          <div style={{ ...styles.row, marginTop: '1rem' }}>
+            {!graded && (
+              <button style={styles.btn} onClick={() => void submit()} disabled={running}>
+                {running ? 'Checking…' : 'Check'}
+              </button>
+            )}
+            {graded && (
+              <button style={styles.btn} onClick={() => void genNext()} autoFocus>
+                Next →
+              </button>
+            )}
+          </div>
+
+          {graded && result && (
+            <div style={{ marginTop: '0.9rem' }}>
+              {result.passed ? (
+                <p
+                  style={{
+                    ...styles.label,
+                    margin: 0,
+                    color: lastFast || targetMs == null ? theme.good : theme.accent,
+                  }}
+                >
+                  {targetMs == null
+                    ? `✓ ${lastMs != null ? secs(lastMs) : ''} — pace set after ${FLU_CALIBRATION}`
+                    : lastFast
+                      ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
+                      : `✓ Correct but over ${secs(targetMs)} — streak reset, speed it up`}
+                </p>
+              ) : (
+                <>
+                  <p style={{ ...styles.label, margin: '0 0 0.4rem', color: theme.bad }}>
+                    ✗ Not quite
+                  </p>
+                  {result.error && (
+                    <pre style={{ ...styles.code, borderColor: theme.bad }}>{result.error}</pre>
+                  )}
+                  {inst.kind === 'predict' && inst.expected && (
+                    <p style={{ ...styles.tagline, margin: '0.3rem 0 0' }}>
+                      Answer: <code>{inst.expected}</code>
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }

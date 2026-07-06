@@ -38,6 +38,13 @@ function loadAll(): Exercise[] {
 
 export const ALL_EXERCISES: Exercise[] = loadAll();
 
+// The Learn / Practice / History sequence is the static curriculum only —
+// fluency generators (which have no fixed instance) live in their own mode.
 export function exercisesForTrack(track: Track): Exercise[] {
-  return ALL_EXERCISES.filter((ex) => ex.track === track);
+  return ALL_EXERCISES.filter((ex) => ex.track === track && !ex.generator);
+}
+
+/** Fluency-drill generator exercises for a track (Kumon-style speed practice). */
+export function generatorsForTrack(track: Track): Exercise[] {
+  return ALL_EXERCISES.filter((ex) => ex.track === track && !!ex.generator);
 }

@@ -129,7 +129,11 @@ export async function runExercise(ex: Exercise, userCode: string): Promise<RunRe
       const userValue = (0, eval)('(' + userCode + ')');
       passed = deepEqual(userValue, actualValue);
     } catch {
-      passed = false;
+      // Bare-token fallback: when the value is a string and the learner typed an
+      // unquoted token (e.g. `bcd` instead of `'bcd'`), the eval throws a
+      // ReferenceError. Accept the raw text as the string so a correct value is
+      // never marked wrong on a quoting technicality.
+      passed = typeof actualValue === 'string' && userCode.trim() === actualValue;
     }
     return { passed, actual: stringifyValue(actualValue) };
   }

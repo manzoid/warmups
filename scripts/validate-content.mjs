@@ -123,6 +123,61 @@ else:
   return null;
 }
 
+// --- fluency generators -----------------------------------------------------
+// A generator exercise has no static snippet/expected/tests; its `make()`
+// produces a fresh instance each call. Validate by generating several instances
+// and running each one through the normal per-track validator, so a generator
+// that can emit an ungradable instance fails loudly.
+
+const GEN_SAMPLES = 8;
+
+function genJsInstances(ex, k) {
+  const js = transform(`${ex.generator}\nreturn make();`, {
+    transforms: ['typescript'],
+    disableESTransforms: true,
+  }).code;
+  const fn = new Function(js);
+  return Array.from({ length: k }, () => fn());
+}
+
+function genPyInstances(ex, k) {
+  const driver = `
+import os, json
+${ex.generator}
+print(json.dumps([make() for _ in range(int(os.environ['WU_K']))]))
+`;
+  const out = execFileSync('python3', ['-c', driver], {
+    env: { ...process.env, WU_K: String(k) },
+    encoding: 'utf8',
+  });
+  return JSON.parse(out);
+}
+
+async function validateGenerator(ex) {
+  const instances =
+    ex.track === 'python'
+      ? genPyInstances(ex, GEN_SAMPLES)
+      : genJsInstances(ex, GEN_SAMPLES);
+  for (let i = 0; i < instances.length; i++) {
+    const inst = instances[i];
+    // Build the concrete exercise the runner would see for this instance.
+    const trial = { ...ex, ...inst, generator: undefined };
+    // A write instance's own solution must not trip its per-instance ban list.
+    if (trial.kind === 'write' && Array.isArray(trial.banned)) {
+      const sol = typeof trial.solution === 'string' ? trial.solution : '';
+      for (const b of trial.banned) {
+        if (b && sol.includes(b)) {
+          return `instance ${i} solution contains its own banned token "${b}"`;
+        }
+      }
+    }
+    const err =
+      ex.track === 'python' ? validatePy(trial) : await validateJs(trial);
+    if (err) return `instance ${i}: ${err}`;
+  }
+  return null;
+}
+
 // --- main -------------------------------------------------------------------
 
 async function main() {
@@ -206,7 +261,8 @@ async function main() {
     const where = `${ex.id} (${relative(ROOT, file)})`;
     try {
       let err = null;
-      if (ex.track === 'python') err = validatePy(ex);
+      if (ex.generator !== undefined) err = await validateGenerator(ex);
+      else if (ex.track === 'python') err = validatePy(ex);
       else if (ex.track === 'javascript') err = await validateJs(ex);
       else err = `unknown track "${ex.track}"`;
       if (err) failures.push(`${where}: ${err}`);

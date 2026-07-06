@@ -1,0 +1,57 @@
+[
+  {
+    "id": "js.fluency.sum",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "sum a short array",
+    "kind": "predict",
+    "prompt": "Predict the value. Fresh numbers every time — go for speed and automaticity.",
+    "generator": "function make() {\n  const n = 3 + Math.floor(Math.random() * 4);\n  const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 9));\n  const sum = a.reduce((s, x) => s + x, 0);\n  return { snippet: `[${a.join(', ')}].reduce((s, x) => s + x, 0)`, expected: String(sum) };\n}"
+  },
+  {
+    "id": "js.fluency.mod",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "modulo of two integers",
+    "kind": "predict",
+    "prompt": "Predict the remainder. Fresh numbers every time — go for speed and automaticity.",
+    "generator": "function make() {\n  const n = 20 + Math.floor(Math.random() * 80);\n  const k = 2 + Math.floor(Math.random() * 8);\n  return { snippet: `${n} % ${k}`, expected: String(n % k) };\n}"
+  },
+  {
+    "id": "js.fluency.index",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "positive and negative indexing with at()",
+    "kind": "predict",
+    "prompt": "Predict the element. Watch for negative indices (arr.at). Fresh data every time.",
+    "generator": "function make() {\n  const n = 5 + Math.floor(Math.random() * 4);\n  const a = Array.from({ length: n }, () => Math.floor(Math.random() * 10));\n  const i = -n + Math.floor(Math.random() * (2 * n));\n  return { snippet: `[${a.join(', ')}].at(${i})`, expected: String(a.at(i)) };\n}"
+  },
+  {
+    "id": "js.fluency.slice",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "string slicing",
+    "kind": "predict",
+    "prompt": "Predict the slice (in quotes). Fresh bounds every time — build slicing into muscle memory.",
+    "generator": "function make() {\n  const s = 'abcdefgh';\n  const i = Math.floor(Math.random() * 5);\n  const j = i + 1 + Math.floor(Math.random() * (8 - i - 1 + 1));\n  return { snippet: `'${s}'.slice(${i}, ${j})`, expected: JSON.stringify(s.slice(i, j)) };\n}"
+  },
+  {
+    "id": "js.fluency.evens",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "filter-and-map chain",
+    "kind": "predict",
+    "prompt": "Predict the array: doubles of the even values. Fresh data every time.",
+    "generator": "function make() {\n  const n = 4 + Math.floor(Math.random() * 3);\n  const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 9));\n  const out = a.filter((x) => x % 2 === 0).map((x) => x * 2);\n  return { snippet: `[${a.join(', ')}].filter((x) => x % 2 === 0).map((x) => x * 2)`, expected: JSON.stringify(out) };\n}"
+  },
+  {
+    "id": "js.fluency.biggest",
+    "track": "javascript",
+    "group": "Fluency drills",
+    "concept": "max of an array by hand",
+    "kind": "write",
+    "prompt": "Implement `biggest(a)` returning the largest element — by hand, no `Math.max`. Fresh data every time.",
+    "banned": ["Math.max"],
+    "generator": "function make() {\n  const n = 4 + Math.floor(Math.random() * 4);\n  const a = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 50));\n  const m = Math.max(...a);\n  const starter = 'function biggest(a) {\\n  // your code here\\n}';\n  const solution = 'function biggest(a) {\\n  let m = a[0];\\n  for (let i = 1; i < a.length; i++) {\\n    if (a[i] > m) m = a[i];\\n  }\\n  return m;\\n}';\n  const tests = `if (biggest([${a.join(', ')}]) !== ${m}) throw new Error('expected ${m}');`;\n  return { starter, solution, tests, banned: ['Math.max'] };\n}"
+  }
+]

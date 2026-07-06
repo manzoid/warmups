@@ -1,0 +1,66 @@
+[
+  {
+    "id": "py.fluency.sum",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "sum a short list",
+    "kind": "predict",
+    "prompt": "Predict the value. Fresh numbers every time — go for speed and automaticity.",
+    "generator": "import random\ndef make():\n    a = [random.randint(1, 9) for _ in range(random.randint(3, 6))]\n    return {\"snippet\": \"a = \" + repr(a) + \"\\nsum(a)\", \"expected\": repr(sum(a))}"
+  },
+  {
+    "id": "py.fluency.mod",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "modulo of two integers",
+    "kind": "predict",
+    "prompt": "Predict the remainder. Fresh numbers every time — go for speed and automaticity.",
+    "generator": "import random\ndef make():\n    n = random.randint(20, 99)\n    k = random.randint(2, 9)\n    return {\"snippet\": str(n) + \" % \" + str(k), \"expected\": repr(n % k)}"
+  },
+  {
+    "id": "py.fluency.index",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "positive and negative indexing",
+    "kind": "predict",
+    "prompt": "Predict the element. Watch for negative indices. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.randint(0, 9) for _ in range(random.randint(5, 8))]\n    i = random.randint(-len(a), len(a) - 1)\n    return {\"snippet\": \"a = \" + repr(a) + \"\\na[\" + str(i) + \"]\", \"expected\": repr(a[i])}"
+  },
+  {
+    "id": "py.fluency.slice",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "string slicing",
+    "kind": "predict",
+    "prompt": "Predict the slice. Fresh bounds every time — build slicing into muscle memory.",
+    "generator": "import random\ndef make():\n    s = \"abcdefgh\"\n    i = random.randint(0, 4)\n    j = random.randint(i + 1, 8)\n    return {\"snippet\": repr(s) + \"[\" + str(i) + \":\" + str(j) + \"]\", \"expected\": repr(s[i:j])}"
+  },
+  {
+    "id": "py.fluency.count",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "frequency lookup in a Counter",
+    "kind": "predict",
+    "prompt": "Predict the count of the queried letter. Fresh data every time.",
+    "generator": "import random\nfrom collections import Counter\ndef make():\n    data = [random.choice(\"abc\") for _ in range(random.randint(6, 10))]\n    q = random.choice(\"abc\")\n    snippet = \"from collections import Counter\\nc = Counter(\" + repr(data) + \")\\nc[\" + repr(q) + \"]\"\n    return {\"snippet\": snippet, \"expected\": repr(Counter(data)[q])}"
+  },
+  {
+    "id": "py.fluency.evens",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "filter-and-map comprehension",
+    "kind": "predict",
+    "prompt": "Predict the list: doubles of the even values. Fresh data every time.",
+    "generator": "import random\ndef make():\n    a = [random.randint(1, 9) for _ in range(random.randint(4, 6))]\n    return {\"snippet\": \"a = \" + repr(a) + \"\\n[x * 2 for x in a if x % 2 == 0]\", \"expected\": repr([x * 2 for x in a if x % 2 == 0])}"
+  },
+  {
+    "id": "py.fluency.biggest",
+    "track": "python",
+    "group": "Fluency drills",
+    "concept": "max of a list by hand",
+    "kind": "write",
+    "prompt": "Implement `biggest(a)` returning the largest element — by hand, no `max()`. Fresh data every time.",
+    "banned": ["max("],
+    "generator": "import random\ndef make():\n    a = [random.randint(1, 50) for _ in range(random.randint(4, 7))]\n    starter = \"def biggest(a):\\n    # your code here\\n    pass\"\n    solution = \"def biggest(a):\\n    m = a[0]\\n    for i in range(1, len(a)):\\n        if a[i] > m:\\n            m = a[i]\\n    return m\"\n    tests = \"assert biggest(\" + repr(a) + \") == \" + repr(max(a))\n    return {\"starter\": starter, \"solution\": solution, \"tests\": tests, \"banned\": [\"max(\"]}"
+  }
+]
