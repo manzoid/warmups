@@ -1,16 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Exercise, RunResult, Track } from './core/types';
-import { newCard, review, gradeFor, type Card } from './core/srs';
 import {
   load,
   save,
-  getCard,
-  putCard,
-  markIntroduced,
+  recordAttempt,
+  bumpLastAttemptRung,
+  lastAttempt,
   type ProgressState,
 } from './core/storage';
 import { exercisesForTrack } from './ui/content';
-import { pickNext, computeCounts, RUNNERS, type NextPick } from './ui/session';
+import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
 import { Visualizer } from './ui/Visualizer';
@@ -21,83 +20,115 @@ const TRACK_LABELS: Record<Track, string> = {
   javascript: 'JavaScript',
 };
 
+type View = 'learn' | 'practice' | 'history';
+
 export default function App() {
-  // Progress lives in a ref (Maps/Sets mutate in place); `tick` forces renders
-  // after we persist a change.
+  // Progress lives in a ref (arrays/maps mutate in place); `tick` forces a
+  // render after we persist a change.
   const progress = useRef<ProgressState>(load());
   const [, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
 
   const [track, setTrack] = useState<Track | null>(null);
+  const [view, setView] = useState<View>('learn');
   const [pick, setPick] = useState<NextPick | null>(null);
   const [input, setInput] = useState('');
   const [result, setResult] = useState<RunResult | null>(null);
   const [running, setRunning] = useState(false);
-  // The deepest hint-ladder rung the learner reached for the current exercise
-  // (0 = attempt-only, 1 = cue, 2 = syntax, 3 = visualize, 4 = walkthrough,
-  // 5 = reveal). Feeds the fine-grained grade in grade()/submit().
+  // Deepest hint-ladder rung reached for the current exercise (0 = unaided,
+  // 1 cue, 2 syntax, 3 visualize, 4 walkthrough, 5 reveal). Recorded per attempt.
   const [maxRung, setMaxRung] = useState(0);
-  // The card as it stood when the current exercise was picked. Grading always
-  // derives from this base so re-grading (e.g. after a deeper hint changes the
-  // rung) replaces the schedule instead of compounding it.
-  const baseCard = useRef<Card | null>(null);
+
+  // Practice queue: an explicit set the learner chose to drill (from a group or
+  // a history filter). Null = no active practice set (show the picker).
+  const [queue, setQueue] = useState<Exercise[] | null>(null);
+  const [qIndex, setQIndex] = useState(0);
+  const [queueLabel, setQueueLabel] = useState('');
 
   const exercises = useMemo(
     () => (track ? exercisesForTrack(track) : []),
     [track],
   );
 
-  const persist = useCallback(() => {
-    save(progress.current);
-    bump();
-  }, [bump]);
-
-  const seedInput = (ex: Exercise) =>
+  const startExercise = useCallback((ex: Exercise, isNew: boolean) => {
+    setResult(null);
+    setRunning(false);
+    setMaxRung(0);
     setInput(ex.kind === 'write' ? ex.starter ?? '' : '');
+    setPick({ exercise: ex, isNew });
+  }, []);
 
-  // Advance to the next exercise, introducing (and creating a card for) a new
-  // one when needed.
-  const advance = useCallback(
-    (exs: Exercise[]) => {
-      const now = new Date();
-      const next = pickNext(exs, progress.current, now);
+  const advanceLearn = useCallback(() => {
+    const next = pickNextLearn(exercises, progress.current);
+    if (next) startExercise(next.exercise, next.isNew);
+    else {
+      setPick(null);
       setResult(null);
-      setRunning(false);
       setMaxRung(0);
-      if (next) {
-        if (next.isNew) {
-          markIntroduced(progress.current, next.exercise.id);
-          putCard(progress.current, next.exercise.id, newCard(now));
-          save(progress.current);
-        }
-        baseCard.current = getCard(progress.current, next.exercise.id) ?? newCard(now);
-        seedInput(next.exercise);
-      } else {
-        baseCard.current = null;
-      }
-      setPick(next);
+    }
+    bump();
+  }, [exercises, startExercise, bump]);
+
+  const advancePractice = useCallback(() => {
+    if (!queue) return;
+    const ni = qIndex + 1;
+    if (ni < queue.length) {
+      setQIndex(ni);
+      startExercise(queue[ni], false);
+    } else {
+      setPick(null);
+      setResult(null);
+      setMaxRung(0);
+    }
+    bump();
+  }, [queue, qIndex, startExercise, bump]);
+
+  const startPractice = useCallback(
+    (exs: Exercise[], label: string) => {
+      setView('practice');
+      setQueue(exs);
+      setQIndex(0);
+      setQueueLabel(label);
+      if (exs.length) startExercise(exs[0], false);
+      else setPick(null);
       bump();
     },
-    [bump],
+    [startExercise, bump],
   );
 
   const chooseTrack = (t: Track) => {
     setTrack(t);
-    advance(exercisesForTrack(t));
+    setView('learn');
+    setQueue(null);
+    const next = pickNextLearn(exercisesForTrack(t), progress.current);
+    if (next) startExercise(next.exercise, next.isNew);
+    else setPick(null);
   };
 
-  // Schedule the current card from its base state. The grade is derived from
-  // how far the learner descended the hint ladder: attempt-only pass → 'good',
-  // cue/syntax → 'hard', anything deeper (or a fail) → 'again' (a lapse).
+  const switchView = (v: View) => {
+    setView(v);
+    if (v === 'learn') advanceLearn();
+    else {
+      // practice shows its picker until a set is chosen; history is a list.
+      setQueue(null);
+      setPick(null);
+      setResult(null);
+    }
+  };
+
+  // Record one graded attempt to the append-only log (no SRS scheduling).
   const grade = useCallback(
-    (exId: string, passed: boolean, deepestRung: number) => {
-      const now = new Date();
-      const base = baseCard.current ?? getCard(progress.current, exId) ?? newCard(now);
-      const rating = gradeFor({ passed, deepestRung });
-      putCard(progress.current, exId, review(base, rating, now));
-      persist();
+    (exId: string, passed: boolean, rung: number) => {
+      recordAttempt(progress.current, {
+        id: exId,
+        at: Date.now(),
+        passed,
+        rung,
+      });
+      save(progress.current);
+      bump();
     },
-    [persist],
+    [bump],
   );
 
   const submit = useCallback(async () => {
@@ -115,68 +146,107 @@ export default function App() {
     setRunning(false);
   }, [track, pick, input, maxRung, grade]);
 
-  // Opening a hint rung records it as the deepest reached and (if already
-  // graded) re-schedules from the base card at the new depth. Only a rung
-  // deeper than the current max changes anything; shallower rungs no-op.
+  // Opening a hint rung records it as the deepest reached. If the exercise was
+  // already graded, raise the rung on that recorded attempt (one attempt per
+  // sitting, but the rung reflects the most help taken).
   const useHint = useCallback(
     (rung: number) => {
       if (!pick) return;
       const next = Math.max(maxRung, rung);
       if (next === maxRung) return;
       setMaxRung(next);
-      if (result) grade(pick.exercise.id, result.passed, next);
+      if (result) {
+        bumpLastAttemptRung(progress.current, pick.exercise.id, next);
+        save(progress.current);
+        bump();
+      }
     },
-    [maxRung, pick, result, grade],
+    [maxRung, pick, result, bump],
   );
 
-  const counts = useMemo(
-    () => (track ? computeCounts(exercises, progress.current, new Date()) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [track, exercises, result, pick],
-  );
+  const counts = track ? learnCounts(exercises, progress.current) : null;
 
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
         <h1 style={styles.h1}>warmups</h1>
         <p style={styles.tagline}>
-          Local-first spaced-repetition drills for language fluency and
-          problem-solving primitives.
+          Local-first coding drills for language fluency and problem-solving
+          primitives — you choose what to practice.
         </p>
 
         {!track && <TrackPicker onPick={chooseTrack} />}
 
-        {track && (
+        {track && counts && (
           <>
-            <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '1rem' }}>
-              {counts && <ProgressBar label={TRACK_LABELS[track]} counts={counts} />}
-              <button
-                style={styles.btnGhost}
-                onClick={() => {
-                  setTrack(null);
-                  setPick(null);
-                  setResult(null);
-                }}
-              >
-                Change track
-              </button>
-            </div>
+            <Nav
+              track={track}
+              view={view}
+              counts={counts}
+              onView={switchView}
+              onChangeTrack={() => {
+                setTrack(null);
+                setPick(null);
+                setQueue(null);
+              }}
+            />
 
-            {pick ? (
-              <ExerciseView
-                key={pick.exercise.id}
-                pick={pick}
-                input={input}
-                onInput={setInput}
-                running={running}
-                result={result}
-                maxRung={maxRung}
-                onUseHint={useHint}
-                onSubmit={submit}
-                onNext={() => advance(exercises)}
+            {view === 'learn' &&
+              (pick ? (
+                <ExerciseView
+                  key={pick.exercise.id}
+                  pick={pick}
+                  input={input}
+                  onInput={setInput}
+                  running={running}
+                  result={result}
+                  maxRung={maxRung}
+                  onUseHint={useHint}
+                  onSubmit={submit}
+                  onNext={advanceLearn}
+                />
+              ) : (
+                <AllPassed />
+              ))}
+
+            {view === 'practice' &&
+              (queue == null ? (
+                <PracticePicker exercises={exercises} onStart={startPractice} />
+              ) : pick ? (
+                <ExerciseView
+                  key={pick.exercise.id}
+                  pick={pick}
+                  input={input}
+                  onInput={setInput}
+                  running={running}
+                  result={result}
+                  maxRung={maxRung}
+                  onUseHint={useHint}
+                  onSubmit={submit}
+                  onNext={advancePractice}
+                  subtitle={`Practice · ${queueLabel} · ${qIndex + 1} / ${queue.length}`}
+                  onExit={() => {
+                    setQueue(null);
+                    setPick(null);
+                  }}
+                />
+              ) : (
+                <PracticeDone
+                  label={queueLabel}
+                  onAgain={() => startPractice(queue, queueLabel)}
+                  onPick={() => {
+                    setQueue(null);
+                    setPick(null);
+                  }}
+                />
+              ))}
+
+            {view === 'history' && (
+              <HistoryView
+                exercises={exercises}
+                state={progress.current}
+                onPractice={startPractice}
               />
-            ) : (
-              <CaughtUp />
             )}
           </>
         )}
@@ -207,21 +277,240 @@ function TrackPicker({ onPick }: { onPick: (t: Track) => void }) {
   );
 }
 
-function ProgressBar({
-  label,
+function Nav({
+  track,
+  view,
   counts,
+  onView,
+  onChangeTrack,
+}: {
+  track: Track;
+  view: View;
+  counts: { done: number; total: number };
+  onView: (v: View) => void;
+  onChangeTrack: () => void;
+}) {
+  const tab = (v: View, label: string) => (
+    <button
+      style={{
+        ...styles.btnGhost,
+        ...(view === v ? { borderColor: theme.accent, color: theme.accent } : {}),
+      }}
+      onClick={() => onView(v)}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: 8 }}>
+      <div style={styles.row}>
+        <strong style={{ fontSize: '0.95rem' }}>{TRACK_LABELS[track]}</strong>
+        {tab('learn', 'Learn')}
+        {tab('practice', 'Practice')}
+        {tab('history', 'History')}
+      </div>
+      <div style={styles.row}>
+        <span style={styles.pill}>
+          {counts.done} / {counts.total} passed
+        </span>
+        <button style={styles.btnGhost} onClick={onChangeTrack}>
+          Change track
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PracticePicker({
+  exercises,
+  onStart,
+}: {
+  exercises: Exercise[];
+  onStart: (exs: Exercise[], label: string) => void;
+}) {
+  const groups = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const ex of exercises) m.set(ex.group, (m.get(ex.group) ?? 0) + 1);
+    return [...m.entries()];
+  }, [exercises]);
+  return (
+    <div style={styles.panel}>
+      <p style={styles.label}>Practice — pick a set and just drill (no scheduling)</p>
+      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginBottom: '0.6rem' }}>
+        <button style={styles.btn} onClick={() => onStart(exercises, 'Everything')}>
+          Everything ({exercises.length})
+        </button>
+      </div>
+      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+        {groups.map(([g, n]) => (
+          <button
+            key={g}
+            style={styles.btnGhost}
+            onClick={() => onStart(exercises.filter((e) => e.group === g), g)}
+          >
+            {g} ({n})
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PracticeDone({
+  label,
+  onAgain,
+  onPick,
 }: {
   label: string;
-  counts: { due: number; new: number; learned: number; total: number };
+  onAgain: () => void;
+  onPick: () => void;
 }) {
   return (
-    <div style={styles.row}>
-      <strong style={{ fontSize: '0.95rem' }}>{label}</strong>
-      <span style={styles.pill}>{counts.due} due</span>
-      <span style={styles.pill}>{counts.new} new</span>
-      <span style={styles.pill}>
-        {counts.learned} / {counts.total} learned
-      </span>
+    <div style={styles.panel}>
+      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>
+        Practiced all of “{label}” 🎉
+      </h2>
+      <div style={styles.row}>
+        <button style={styles.btn} onClick={onAgain}>
+          Again
+        </button>
+        <button style={styles.btnGhost} onClick={onPick}>
+          Pick another set
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type Filter = 'all' | 'failed' | 'hinted' | 'clean';
+
+function filterLabel(f: Filter): string {
+  return f === 'all'
+    ? 'All'
+    : f === 'failed'
+      ? 'Failed'
+      : f === 'hinted'
+        ? 'Used a hint'
+        : 'Clean pass';
+}
+
+function rungLabel(rung: number): string {
+  return rung >= 5
+    ? 'revealed'
+    : rung >= 4
+      ? 'walkthrough'
+      : rung >= 3
+        ? 'visualized'
+        : rung >= 2
+          ? 'syntax'
+          : 'cue';
+}
+
+function HistoryView({
+  exercises,
+  state,
+  onPractice,
+}: {
+  exercises: Exercise[];
+  state: ProgressState;
+  onPractice: (exs: Exercise[], label: string) => void;
+}) {
+  const [filter, setFilter] = useState<Filter>('all');
+
+  const rows = useMemo(() => {
+    const out: { ex: Exercise; passed: boolean; rung: number; at: number }[] = [];
+    for (const ex of exercises) {
+      const la = lastAttempt(state, ex.id);
+      if (!la) continue;
+      out.push({ ex, passed: la.passed, rung: la.rung, at: la.at });
+    }
+    out.sort((a, b) => b.at - a.at);
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercises, state]);
+
+  const match = (r: { passed: boolean; rung: number }) =>
+    filter === 'all'
+      ? true
+      : filter === 'failed'
+        ? !r.passed
+        : filter === 'hinted'
+          ? r.rung >= 1
+          : r.passed && r.rung === 0;
+
+  const shown = rows.filter(match);
+  const filteredExercises = shown.map((r) => r.ex);
+
+  return (
+    <div style={styles.panel}>
+      <div style={{ ...styles.row, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+        <p style={{ ...styles.label, margin: 0 }}>
+          History — {rows.length} attempted
+        </p>
+        <button
+          style={styles.btn}
+          disabled={filteredExercises.length === 0}
+          onClick={() => onPractice(filteredExercises, `${filterLabel(filter)} (${filteredExercises.length})`)}
+        >
+          Practice these ({filteredExercises.length})
+        </button>
+      </div>
+
+      <div style={{ ...styles.row, marginTop: '0.6rem', flexWrap: 'wrap', gap: 8 }}>
+        {(['all', 'failed', 'hinted', 'clean'] as Filter[]).map((f) => (
+          <button
+            key={f}
+            style={{
+              ...styles.btnGhost,
+              ...(filter === f ? { borderColor: theme.accent, color: theme.accent } : {}),
+            }}
+            onClick={() => setFilter(f)}
+          >
+            {filterLabel(f)}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ marginTop: '0.8rem' }}>
+        {shown.length === 0 ? (
+          <p style={{ ...styles.tagline, margin: 0 }}>
+            {rows.length === 0
+              ? 'Nothing here yet — attempts show up as you do exercises.'
+              : 'No exercises match this filter.'}
+          </p>
+        ) : (
+          shown.map(({ ex, passed, rung }) => (
+            <div
+              key={ex.id}
+              style={{
+                ...styles.row,
+                justifyContent: 'space-between',
+                padding: '6px 0',
+                borderBottom: `1px solid ${theme.border}`,
+                gap: 8,
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <span style={{ color: passed ? theme.good : theme.bad, marginRight: 8 }}>
+                  {passed ? '✓' : '✗'}
+                </span>
+                <span>{ex.concept}</span>
+                <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.group}</span>
+              </div>
+              <div style={styles.row}>
+                {rung >= 1 && (
+                  <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
+                    {rungLabel(rung)}
+                  </span>
+                )}
+                <button style={styles.btnGhost} onClick={() => onPractice([ex], ex.concept)}>
+                  Redo
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -236,6 +525,8 @@ function ExerciseView({
   onUseHint,
   onSubmit,
   onNext,
+  subtitle,
+  onExit,
 }: {
   pick: NextPick;
   input: string;
@@ -246,11 +537,23 @@ function ExerciseView({
   onUseHint: (rung: number) => void;
   onSubmit: () => void;
   onNext: () => void;
+  subtitle?: string;
+  onExit?: () => void;
 }) {
   const ex = pick.exercise;
   const graded = result !== null;
   return (
     <div style={styles.panel}>
+      {(subtitle || onExit) && (
+        <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>{subtitle}</span>
+          {onExit && (
+            <button style={styles.btnGhost} onClick={onExit}>
+              ← Sets
+            </button>
+          )}
+        </div>
+      )}
       <div style={{ ...styles.row, marginBottom: '0.5rem' }}>
         <span style={styles.pill}>{ex.group}</span>
         <span style={styles.pill}>{ex.kind}</span>
@@ -317,9 +620,9 @@ function ExerciseView({
   );
 }
 
-// Hint-ladder rung levels, ascending in help and scheduling cost. Cue/syntax
-// (1-2) are light nudges graded 'hard'; visualize/walkthrough/reveal (3-5)
-// count as a lapse. See docs/scaffolding.md.
+// Hint-ladder rung levels, ascending in help. Cue/syntax (1-2) are light nudges;
+// visualize/walkthrough/reveal (3-5) are heavier. The rung reached is recorded
+// on the attempt (see docs/scaffolding.md).
 const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as const;
 
 function HintLadder({
@@ -346,8 +649,7 @@ function HintLadder({
     setOpen((o) => ({ ...o, [key]: willOpen }));
   };
 
-  const answer =
-    ex.kind === 'predict' ? ex.expected : ex.solution;
+  const answer = ex.kind === 'predict' ? ex.expected : ex.solution;
 
   return (
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
@@ -355,15 +657,15 @@ function HintLadder({
         <p style={{ ...styles.label, margin: 0 }}>Need a hand?</p>
         {maxRung >= RUNG.visualize ? (
           <span style={{ ...styles.pill, color: theme.bad, borderColor: theme.bad }}>
-            assisted — counts as a lapse
+            used help
           </span>
         ) : maxRung >= RUNG.cue ? (
           <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
-            hinted — repeats sooner
+            used a hint
           </span>
         ) : null}
       </div>
-      <div style={{ ...styles.row, marginTop: '0.6rem' }}>
+      <div style={{ ...styles.row, marginTop: '0.6rem', flexWrap: 'wrap', gap: 8 }}>
         {ex.cue && (
           <button style={styles.btnGhost} onClick={() => toggle('cue', RUNG.cue)}>
             {open.cue ? 'Hide cue' : 'Cue'}
@@ -460,8 +762,6 @@ function WalkthroughBox({ prompt }: { prompt: string }) {
 }
 
 function ResultView({ result, maxRung }: { result: RunResult; maxRung: number }) {
-  // Mirror gradeFor: unassisted pass → good, cue/syntax pass → hard,
-  // deeper pass or any fail → again (a lapse).
   let color: string;
   let label: string;
   if (!result.passed) {
@@ -479,9 +779,7 @@ function ResultView({ result, maxRung }: { result: RunResult; maxRung: number })
   }
   return (
     <div style={{ marginTop: '1rem' }}>
-      <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>
-        {label}
-      </p>
+      <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>{label}</p>
       {result.error && (
         <pre style={{ ...styles.code, borderColor: theme.bad }}>{result.error}</pre>
       )}
@@ -495,13 +793,15 @@ function ResultView({ result, maxRung }: { result: RunResult; maxRung: number })
   );
 }
 
-function CaughtUp() {
+function AllPassed() {
   return (
     <div style={styles.panel}>
-      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>All caught up 🎉</h2>
+      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>
+        You've been through everything here 🎉
+      </h2>
       <p style={{ ...styles.tagline, margin: 0 }}>
-        Nothing is due right now and there are no new exercises left in this
-        track. Come back later — reviews will reappear as they fall due.
+        Switch to <strong>Practice</strong> to keep drilling any set, or{' '}
+        <strong>History</strong> to redo the ones you failed or needed a hint on.
       </p>
     </div>
   );
