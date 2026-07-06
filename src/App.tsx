@@ -1494,6 +1494,23 @@ function ExerciseView({
 // on the attempt (see docs/scaffolding.md).
 const RUNG = { cue: 1, syntax: 2, visualize: 3, walkthrough: 4, reveal: 5 } as const;
 
+// Build the code to hand to the visualizer. For a `predict`, that's the snippet.
+// For a `write`, the learner's code is just a function DEFINITION — tracing it
+// alone shows nothing execute (no call, no frames, no objects). Drive it with
+// the exercise's own tests, which call the function with real inputs (including
+// the failing case), so codeviz steps through an actual run and the bug is
+// visible where it happens.
+function vizCode(ex: Exercise, input: string): string {
+  if (ex.kind !== 'write') return ex.snippet ?? input;
+  const driver = ex.tests?.trim();
+  if (!driver) return input;
+  const sep =
+    ex.track === 'python'
+      ? '\n\n# --- running the exercise tests to drive your code ---\n'
+      : '\n\n// --- running the exercise tests to drive your code ---\n';
+  return `${input}${sep}${driver}`;
+}
+
 function HintLadder({
   ex,
   input,
@@ -1572,7 +1589,7 @@ function HintLadder({
           {step.key === 'visualize' && (
             <Visualizer
               track={ex.track}
-              code={ex.kind === 'write' ? input : ex.snippet ?? input}
+              code={vizCode(ex, input)}
               title={ex.concept}
             />
           )}
