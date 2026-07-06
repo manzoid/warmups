@@ -6,6 +6,7 @@ import {
   recordAttempt,
   bumpLastAttemptRung,
   lastAttempt,
+  resetProgress,
   type ProgressState,
 } from './core/storage';
 import { exercisesForTrack } from './ui/content';
@@ -164,6 +165,17 @@ export default function App() {
     [maxRung, pick, result, bump],
   );
 
+  const resetHistory = useCallback(() => {
+    resetProgress(progress.current);
+    save(progress.current);
+    setQueue(null);
+    setView('learn');
+    const next = pickNextLearn(exercises, progress.current);
+    if (next) startExercise(next.exercise, next.isNew);
+    else setPick(null);
+    bump();
+  }, [exercises, startExercise, bump]);
+
   const counts = track ? learnCounts(exercises, progress.current) : null;
 
   return (
@@ -246,6 +258,7 @@ export default function App() {
                 exercises={exercises}
                 state={progress.current}
                 onPractice={startPractice}
+                onReset={resetHistory}
               />
             )}
           </>
@@ -410,10 +423,12 @@ function HistoryView({
   exercises,
   state,
   onPractice,
+  onReset,
 }: {
   exercises: Exercise[];
   state: ProgressState;
   onPractice: (exs: Exercise[], label: string) => void;
+  onReset: () => void;
 }) {
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -447,13 +462,29 @@ function HistoryView({
         <p style={{ ...styles.label, margin: 0 }}>
           History — {rows.length} attempted
         </p>
-        <button
-          style={styles.btn}
-          disabled={filteredExercises.length === 0}
-          onClick={() => onPractice(filteredExercises, `${filterLabel(filter)} (${filteredExercises.length})`)}
-        >
-          Practice these ({filteredExercises.length})
-        </button>
+        <div style={{ ...styles.row, gap: 8 }}>
+          <button
+            style={styles.btn}
+            disabled={filteredExercises.length === 0}
+            onClick={() => onPractice(filteredExercises, `${filterLabel(filter)} (${filteredExercises.length})`)}
+          >
+            Practice these ({filteredExercises.length})
+          </button>
+          <button
+            style={{ ...styles.btnGhost, color: theme.bad, borderColor: theme.bad }}
+            disabled={rows.length === 0}
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Reset all history? This clears every recorded attempt and cannot be undone.',
+                )
+              )
+                onReset();
+            }}
+          >
+            Reset history
+          </button>
+        </div>
       </div>
 
       <div style={{ ...styles.row, marginTop: '0.6rem', flexWrap: 'wrap', gap: 8 }}>

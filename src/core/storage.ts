@@ -148,6 +148,13 @@ export function recordAttempt(state: ProgressState, attempt: Attempt): void {
   state.attempts.push(attempt);
 }
 
+/** Wipe all progress (the attempt log + legacy SRS state), in place. */
+export function resetProgress(state: ProgressState): void {
+  state.attempts.length = 0;
+  state.cards.clear();
+  state.introduced.clear();
+}
+
 /** True if the learner has ever passed this exercise. */
 export function hasPassed(state: ProgressState, id: string): boolean {
   for (const a of state.attempts) if (a.id === id && a.passed) return true;
