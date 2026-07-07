@@ -15,7 +15,7 @@ import {
 } from './core/storage';
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
-import { INTERVIEW_FEATURES, TRAINER_MODE } from './core/features';
+import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
 import {
   resolvedTargetMs,
   readPersonalPace,
@@ -83,6 +83,7 @@ export default function App() {
 
   const [track, setTrack] = useState<Track | null>(null);
   const [view, setView] = useState<View>('learn');
+  const [showSettings, setShowSettings] = useState(false);
   const [pick, setPick] = useState<NextPick | null>(null);
   const [input, setInput] = useState('');
   const [result, setResult] = useState<RunResult | null>(null);
@@ -397,11 +398,22 @@ export default function App() {
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
-        <h1 style={styles.h1}>warmups</h1>
+        <div style={{ ...styles.row, justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <h1 style={styles.h1}>warmups</h1>
+          <button
+            style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.8rem' }}
+            onClick={() => setShowSettings((s) => !s)}
+            title="Feature flags and settings"
+          >
+            ⚙ Settings
+          </button>
+        </div>
         <p style={styles.tagline}>
           Local-first coding drills for language fluency and problem-solving
           primitives — you choose what to practice.
         </p>
+
+        {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
 
         {!track && <TrackPicker onPick={chooseTrack} />}
 
@@ -534,6 +546,55 @@ export default function App() {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+// Feature-flag management. Reads the central registry (FLAG_DEFS) and the
+// resolved values (FLAGS); toggling writes a managed override and reloads so the
+// change takes effect. No poking storage keys by hand.
+function SettingsPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div style={styles.panel}>
+      <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+        <p style={{ ...styles.label, margin: 0 }}>Feature flags</p>
+        <button style={styles.btnGhost} onClick={onClose}>
+          Close
+        </button>
+      </div>
+      <p style={{ ...styles.tagline, margin: '0 0 0.8rem', fontSize: '0.8rem', color: theme.muted }}>
+        Toggling applies on reload. You can also set them at build time
+        (VITE_FLAG_TRAINER=true) or via a URL param (?flags=trainer,interview).
+      </p>
+      {FLAG_DEFS.map((def) => (
+        <label
+          key={def.key}
+          style={{
+            display: 'flex',
+            gap: 8,
+            alignItems: 'flex-start',
+            padding: '8px 0',
+            borderTop: `1px solid ${theme.border}`,
+            cursor: 'pointer',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={FLAGS[def.key]}
+            onChange={(e) => {
+              setFlagOverride(def.key, e.target.checked);
+              window.location.reload();
+            }}
+            style={{ marginTop: 3 }}
+          />
+          <span>
+            <strong>{def.label}</strong>
+            <span style={{ ...styles.tagline, display: 'block', margin: '2px 0 0', fontSize: '0.8rem', color: theme.muted }}>
+              {def.description}
+            </span>
+          </span>
+        </label>
+      ))}
     </div>
   );
 }
