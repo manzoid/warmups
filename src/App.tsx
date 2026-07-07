@@ -767,20 +767,33 @@ function PracticeDone({
 }
 
 // --- Fluency mode (Kumon-style speed drilling) ------------------------------
-// Each pattern generates a fresh random instance every rep. You "clear" it by
-// answering a few in a row correctly AND under a reasonable pace target — speed,
-// not just correctness, is the mastery signal. The target starts at a sensible
-// default for the kind (no averaging your first attempts); "speed up" tightens
-// it. A miss steps you back one, it doesn't wipe your run.
+// Three phases per pattern: STUDY (familiarize with the problem + the reference
+// solution, no timer), then SET YOUR PACE (solve one fresh instance timed — that
+// real solve time becomes your target), then DRILL (fresh instances; clear by
+// matching your own pace 3 in a row). The pace is a genuine human solve, not a
+// guess, and it's saved per pattern. "Speed up" tightens it; a miss steps you
+// back one, it doesn't wipe your run.
 
+type FluPhase = 'study' | 'pace' | 'drill';
 const FLU_GOAL = 3; // correct-and-fast reps to clear a pattern
 const FLU_SPEEDUP = 0.85; // "speed up" round tightens the target by 15%
-// Reasonable upfront pace targets by exercise kind (ms). Not derived from the
-// learner's own reps; just a sane starting bar they race against from rep one.
-const FLU_DEFAULT_MS = { predict: 10000, write: 60000 } as const;
 
-function defaultTargetMs(kind: Exercise['kind']): number {
-  return kind === 'write' ? FLU_DEFAULT_MS.write : FLU_DEFAULT_MS.predict;
+// Persisted per-pattern pace (your captured benchmark solve time, ms).
+function readPace(id: string): number | null {
+  try {
+    const v = typeof window !== 'undefined' ? window.localStorage.getItem('warmups.pace.' + id) : null;
+    const n = v ? Number(v) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
+function savePace(id: string, ms: number): void {
+  try {
+    window.localStorage.setItem('warmups.pace.' + id, String(ms));
+  } catch {
+    // best-effort
+  }
 }
 
 function FluencyPicker({
@@ -877,7 +890,10 @@ function FluencyDrill({
   const [times, setTimes] = useState<number[]>([]); // correct-rep times this session
   const [streak, setStreak] = useState(0);
   const [reps, setReps] = useState(0); // correct reps this session
-  const [targetMs, setTargetMs] = useState<number>(() => defaultTargetMs(ex.kind));
+  // Your captured benchmark pace (ms), or null until you set it. Persisted per
+  // pattern, so a saved pace skips study and goes straight to drilling.
+  const [targetMs, setTargetMs] = useState<number | null>(() => readPace(ex.id));
+  const [phase, setPhase] = useState<FluPhase>(() => (readPace(ex.id) != null ? 'drill' : 'study'));
   const [cleared, setCleared] = useState(false);
   const [lastMs, setLastMs] = useState<number | null>(null);
   const [lastFast, setLastFast] = useState(false);
@@ -953,6 +969,18 @@ function FluencyDrill({
     setResult(res);
     setLastMs(ms);
 
+    // "Set your pace" phase: a correct solve captures YOUR real time as the
+    // target and moves to drilling. A miss just lets you try again.
+    if (phase === 'pace') {
+      if (res.passed) {
+        setTargetMs(ms);
+        savePace(ex.id, ms);
+        setPhase('drill');
+        setStreak(0);
+      }
+      return; // no auto-advance; you read the result, then hit Next to drill
+    }
+
     if (!res.passed) {
       setLastFast(false);
       // A miss steps the streak back by one, it does NOT wipe your whole run.
@@ -964,7 +992,7 @@ function FluencyDrill({
     setTimes(newTimes);
     setReps((r) => r + 1);
 
-    const fast = ms <= targetMs;
+    const fast = targetMs != null && ms <= targetMs;
     setLastFast(fast);
 
     let willClear = false;
@@ -986,10 +1014,11 @@ function FluencyDrill({
 
   // --- cleared card ---------------------------------------------------------
   if (cleared) {
+    const tgt = targetMs ?? 0;
     const bestMs = times.length ? Math.min(...times) : 0;
     const avgMs = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
     const speedUp = () => {
-      setTargetMs((t) => Math.round(t * FLU_SPEEDUP));
+      setTargetMs((t) => (t != null ? Math.round(t * FLU_SPEEDUP) : t));
       setStreak(0);
       setCleared(false);
       void genNext();
@@ -1000,12 +1029,12 @@ function FluencyDrill({
           Cleared “{ex.concept}” 🎉
         </h2>
         <p style={{ ...styles.tagline, margin: '0 0 0.9rem' }}>
-          {FLU_GOAL} in a row, correct and under {secs(targetMs)}.
+          {FLU_GOAL} in a row, correct and under {secs(tgt)}.
           {times.length ? ` Best ${secs(bestMs)} · avg ${secs(avgMs)} over ${reps} solved.` : ''}
         </p>
         <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
           <button style={styles.btn} onClick={speedUp}>
-            Speed up (target {secs(Math.round(targetMs * FLU_SPEEDUP))}) →
+            Speed up (target {secs(Math.round(tgt * FLU_SPEEDUP))}) →
           </button>
           <button style={styles.btnGhost} onClick={onExit}>
             Pick another pattern
@@ -1015,48 +1044,126 @@ function FluencyDrill({
     );
   }
 
+  const header = (
+    <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+      <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>
+        Fluency · {ex.concept}
+        {INTERVIEW_FEATURES && ex.mapsTo && (
+          <span style={{ ...styles.pill, marginLeft: 8, color: theme.accent, borderColor: theme.accent }}>
+            {ex.mapsTo}
+          </span>
+        )}
+      </span>
+      <button style={styles.btnGhost} onClick={onExit}>
+        ← Patterns
+      </button>
+    </div>
+  );
+
+  // --- study phase: familiarize with the problem + the reference answer -------
+  if (phase === 'study') {
+    const studyCode = inst
+      ? inst.kind === 'write'
+        ? inst.solution ?? ''
+        : inst.snippet ?? ''
+      : '';
+    return (
+      <div style={styles.panel}>
+        {header}
+        <span style={styles.pill}>Step 1 of 2 · study</span>
+        <p style={{ margin: '0.6rem 0 1rem', color: theme.text }}>{ex.prompt}</p>
+        {loading || !inst ? (
+          <p style={{ ...styles.tagline, margin: 0 }}>Loading an example…</p>
+        ) : (
+          <>
+            {inst.kind === 'predict' && inst.snippet && (
+              <>
+                <p style={styles.label}>Example</p>
+                <pre style={{ ...styles.code, marginBottom: '0.6rem' }}>{inst.snippet}</pre>
+                <p style={{ ...styles.tagline, margin: '0 0 0.8rem' }}>
+                  Value: <code>{inst.expected}</code>
+                </p>
+              </>
+            )}
+            {inst.kind === 'write' && inst.solution && (
+              <>
+                <p style={styles.label}>Reference solution</p>
+                <pre style={{ ...styles.code, marginBottom: '0.6rem' }}>{inst.solution}</pre>
+              </>
+            )}
+            {inst.note && (
+              <p style={{ ...styles.tagline, margin: '0 0 0.8rem', color: theme.muted }}>{inst.note}</p>
+            )}
+            <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
+              <button
+                style={styles.btn}
+                onClick={() => {
+                  setPhase('pace');
+                  void genNext();
+                }}
+              >
+                I'm familiar — time me on a fresh one →
+              </button>
+              <button style={styles.btnGhost} onClick={() => setShowViz((v) => !v)}>
+                {showViz ? 'Hide run' : 'See it run'}
+              </button>
+              <button style={styles.btnGhost} onClick={onGotThis} title="Skip this pattern; we record that you rated it mastered.">
+                I've got this →
+              </button>
+            </div>
+            {showViz && (
+              <div style={{ marginTop: '0.6rem' }}>
+                <Visualizer track={track} code={vizCode(inst, studyCode, undefined)} title={inst.concept} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
   const graded = result !== null;
+  const paceSetJustNow = phase === 'drill' && graded && result?.passed && streak === 0 && times.length === 0;
   const dots = '●'.repeat(streak) + '○'.repeat(Math.max(0, FLU_GOAL - streak));
 
   return (
     <div style={styles.panel}>
-      <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-        <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem' }}>
-          Fluency · {ex.concept}
-          {INTERVIEW_FEATURES && ex.mapsTo && (
-            <span style={{ ...styles.pill, marginLeft: 8, color: theme.accent, borderColor: theme.accent }}>
-              {ex.mapsTo}
-            </span>
-          )}
-        </span>
-        <button style={styles.btnGhost} onClick={onExit}>
-          ← Patterns
-        </button>
-      </div>
+      {header}
 
       {/* HUD: pace target, streak, live/last time */}
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginBottom: '0.75rem' }}>
-        <span style={styles.pill}>Target ≤ {secs(targetMs)}</span>
-        <span
-          style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
-          title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
-        >
-          {dots} {streak}/{FLU_GOAL}
-        </span>
+        {phase === 'pace' ? (
+          <span style={styles.pill}>Step 2 of 2 · set your pace — solve one, timed</span>
+        ) : (
+          <>
+            <span style={styles.pill}>Target ≤ {secs(targetMs ?? 0)}</span>
+            <span
+              style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
+              title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
+            >
+              {dots} {streak}/{FLU_GOAL}
+            </span>
+          </>
+        )}
         <span style={styles.pill}>
           ⏱ {graded && lastMs != null ? secs(lastMs) : secs(elapsed)}
         </span>
         {best != null && <span style={styles.pill}>best {secs(best)}</span>}
-        <button
-          style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
-          title="Loosen the pace target back to the default"
-          onClick={() => {
-            setTargetMs(defaultTargetMs(ex.kind));
-            setStreak(0);
-          }}
-        >
-          Re-pace
-        </button>
+        {phase === 'drill' && (
+          <button
+            style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
+            title="Re-set your pace: study and time yourself again"
+            onClick={() => {
+              setTargetMs(null);
+              setStreak(0);
+              setTimes([]);
+              setPhase('study');
+              void genNext();
+            }}
+          >
+            Re-pace
+          </button>
+        )}
       </div>
 
       <p style={{ margin: '0 0 1rem', color: theme.text }}>{ex.prompt}</p>
@@ -1141,12 +1248,14 @@ function FluencyDrill({
                   style={{
                     ...styles.label,
                     margin: 0,
-                    color: lastFast ? theme.good : theme.accent,
+                    color: lastFast || paceSetJustNow ? theme.good : theme.accent,
                   }}
                 >
-                  {lastFast
-                    ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
-                    : `✓ Correct, just over ${secs(targetMs)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
+                  {paceSetJustNow
+                    ? `✓ Pace set: ${lastMs != null ? secs(lastMs) : ''}. Now match it — ${FLU_GOAL} in a row under that. Next →`
+                    : lastFast
+                      ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
+                      : `✓ Correct, just over ${secs(targetMs ?? 0)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
                 </p>
               ) : (
                 <>
