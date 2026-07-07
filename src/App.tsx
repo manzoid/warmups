@@ -24,6 +24,7 @@ import {
   exportPaceConfig,
   patternHash,
   configStatus,
+  configPaceMs,
   median,
   PERSONAL_MODIFIER,
   type PaceStatus,
@@ -84,6 +85,9 @@ export default function App() {
   const [track, setTrack] = useState<Track | null>(null);
   const [view, setView] = useState<View>('learn');
   const [showSettings, setShowSettings] = useState(false);
+  const [showTraining, setShowTraining] = useState(false);
+  // When the training dashboard launches a pattern for pacing, force setpace.
+  const [fluencyStart, setFluencyStart] = useState<'setpace' | undefined>(undefined);
   const [pick, setPick] = useState<NextPick | null>(null);
   const [input, setInput] = useState('');
   const [result, setResult] = useState<RunResult | null>(null);
@@ -275,6 +279,18 @@ export default function App() {
     else setPick(null);
   };
 
+  // From the training dashboard: jump to a specific pattern's pacing flow.
+  const pacePattern = (target: Exercise) => {
+    setTrack(target.track);
+    setView('fluency');
+    setQueue(null);
+    setProblemBrowse(false);
+    setPick(null);
+    setFluencyStart('setpace');
+    setFluencyEx(target);
+    setShowTraining(false);
+  };
+
   const switchView = (v: View) => {
     setView(v);
     if (v === 'learn') advanceLearn();
@@ -400,13 +416,29 @@ export default function App() {
       <div style={styles.shell}>
         <div style={{ ...styles.row, justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <h1 style={styles.h1}>warmups</h1>
-          <button
-            style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.8rem' }}
-            onClick={() => setShowSettings((s) => !s)}
-            title="Feature flags and settings"
-          >
-            ⚙ Settings
-          </button>
+          <div style={{ ...styles.row, gap: 8 }}>
+            {TRAINER_MODE && (
+              <button
+                style={{
+                  ...styles.btnGhost,
+                  padding: '2px 8px',
+                  fontSize: '0.8rem',
+                  ...(showTraining ? { borderColor: theme.accent, color: theme.accent } : {}),
+                }}
+                onClick={() => setShowTraining((s) => !s)}
+                title="Time-trainer dashboard: pace coverage across all patterns"
+              >
+                Training
+              </button>
+            )}
+            <button
+              style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.8rem' }}
+              onClick={() => setShowSettings((s) => !s)}
+              title="Feature flags and settings"
+            >
+              ⚙ Settings
+            </button>
+          </div>
         </div>
         <p style={styles.tagline}>
           Local-first coding drills for language fluency and problem-solving
@@ -415,9 +447,13 @@ export default function App() {
 
         {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
 
-        {!track && <TrackPicker onPick={chooseTrack} />}
+        {TRAINER_MODE && showTraining && (
+          <TrainingDashboard onPace={pacePattern} onClose={() => setShowTraining(false)} />
+        )}
 
-        {track && counts && (
+        {!(TRAINER_MODE && showTraining) && !track && <TrackPicker onPick={chooseTrack} />}
+
+        {!(TRAINER_MODE && showTraining) && track && counts && (
           <>
             <Nav
               track={track}
@@ -522,13 +558,20 @@ export default function App() {
 
             {view === 'fluency' &&
               (fluencyEx == null ? (
-                <FluencyPicker generators={generators} onPick={setFluencyEx} />
+                <FluencyPicker
+                  generators={generators}
+                  onPick={(g) => {
+                    setFluencyStart(undefined);
+                    setFluencyEx(g);
+                  }}
+                />
               ) : (
                 <FluencyDrill
                   key={fluencyEx.id}
                   track={track}
                   ex={fluencyEx}
                   best={bestTimeMs(progress.current, fluencyEx.id)}
+                  initialPhase={fluencyStart}
                   onCleared={(ms) => recordFluencyClear(fluencyEx.id, ms)}
                   onGotThis={() => recordGotThis(fluencyEx.id)}
                   onExit={() => setFluencyEx(null)}
@@ -863,6 +906,136 @@ function PaceStatusPill({ status }: { status: PaceStatus }) {
   );
 }
 
+// Time-trainer dashboard: a cross-track bird's-eye of pace coverage — which
+// patterns are paced (fresh), dirty (edited since paced), or unpaced — with a
+// jump-to-pace action and the config export in one place.
+function TrainingDashboard({
+  onPace,
+  onClose,
+}: {
+  onPace: (ex: Exercise) => void;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const secs = (ms: number | null) => (ms == null ? '—' : `${(ms / 1000).toFixed(1)}s`);
+  const rank: Record<PaceStatus, number> = { missing: 0, dirty: 1, fresh: 2 };
+
+  const rows = useMemo(() => {
+    const gens = [...generatorsForTrack('python'), ...generatorsForTrack('javascript')];
+    return gens
+      .map((ex) => {
+        const h = patternHash(ex);
+        return {
+          ex,
+          status: configStatus(ex),
+          config: configPaceMs(ex.id, h),
+          personal: readPersonalPace(ex.id, h),
+        };
+      })
+      .sort((a, b) =>
+        rank[a.status] !== rank[b.status]
+          ? rank[a.status] - rank[b.status]
+          : a.ex.track < b.ex.track
+            ? -1
+            : a.ex.track > b.ex.track
+              ? 1
+              : a.ex.id < b.ex.id
+                ? -1
+                : 1,
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const tally = (t?: Track) => {
+    const r = t ? rows.filter((x) => x.ex.track === t) : rows;
+    return {
+      total: r.length,
+      fresh: r.filter((x) => x.status === 'fresh').length,
+      dirty: r.filter((x) => x.status === 'dirty').length,
+      missing: r.filter((x) => x.status === 'missing').length,
+    };
+  };
+  const copyConfig = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(exportPaceConfig(), null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const summaryLine = (label: string, t?: Track) => {
+    const s = tally(t);
+    return (
+      <span style={{ ...styles.pill }}>
+        {label}: {s.fresh} paced · {s.dirty} dirty · {s.missing} unpaced ({s.total})
+      </span>
+    );
+  };
+
+  return (
+    <div style={styles.panel}>
+      <div style={{ ...styles.row, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+        <p style={{ ...styles.label, margin: 0 }}>Training dashboard — pace coverage</p>
+        <div style={{ ...styles.row, gap: 8 }}>
+          <button style={styles.btn} onClick={copyConfig} title="Copy the full pace config to paste into src/data/pace-targets.json">
+            {copied ? 'Copied' : 'Copy pace config (JSON)'}
+          </button>
+          <button style={styles.btnGhost} onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+      <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginTop: '0.6rem' }}>
+        {summaryLine('All')}
+        {summaryLine('Python', 'python')}
+        {summaryLine('JavaScript', 'javascript')}
+      </div>
+
+      <div style={{ marginTop: '0.9rem' }}>
+        {rows.map(({ ex, status, config, personal }) => (
+          <div
+            key={ex.id}
+            style={{
+              ...styles.row,
+              justifyContent: 'space-between',
+              padding: '6px 0',
+              borderBottom: `1px solid ${theme.border}`,
+              gap: 8,
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <span
+                style={{
+                  ...styles.pill,
+                  marginRight: 8,
+                  color: status === 'fresh' ? theme.good : status === 'dirty' ? theme.bad : theme.accent,
+                  borderColor: status === 'fresh' ? theme.good : status === 'dirty' ? theme.bad : theme.accent,
+                }}
+              >
+                {status === 'fresh' ? 'paced' : status === 'dirty' ? 'dirty' : 'unpaced'}
+              </span>
+              <span>{ex.concept}</span>
+              <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.track === 'python' ? 'py' : 'js'}</span>
+              <span style={{ ...styles.pill, marginLeft: 4 }}>{ex.kind}</span>
+            </div>
+            <div style={{ ...styles.row, gap: 8 }}>
+              <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+                cfg {secs(config)}
+                {personal != null ? ` · you ${secs(personal)}` : ''}
+              </span>
+              <button style={styles.btnGhost} onClick={() => onPace(ex)}>
+                {status === 'fresh' ? 'Re-pace →' : 'Pace →'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FluencyPicker({
   generators,
   onPick,
@@ -937,6 +1110,7 @@ function FluencyDrill({
   track,
   ex,
   best,
+  initialPhase,
   onCleared,
   onGotThis,
   onExit,
@@ -944,6 +1118,7 @@ function FluencyDrill({
   track: Track;
   ex: Exercise;
   best: number | null;
+  initialPhase?: FluPhase;
   onCleared: (bestMs: number) => void;
   onGotThis: () => void;
   onExit: () => void;
@@ -967,7 +1142,9 @@ function FluencyDrill({
   // Study first; skip straight to drilling only once you've drilled this exact
   // pattern before (a personal pace whose hash still matches). Editing the
   // problem invalidates that, so you re-study.
-  const [phase, setPhase] = useState<FluPhase>(() => (readPersonalPace(ex.id, hash) != null ? 'drill' : 'study'));
+  const [phase, setPhase] = useState<FluPhase>(
+    () => initialPhase ?? (readPersonalPace(ex.id, hash) != null ? 'drill' : 'study'),
+  );
   const [runs, setRuns] = useState<number[]>([]); // "set the pace": candidate solve times
   const [copiedConfig, setCopiedConfig] = useState(false);
   const [cleared, setCleared] = useState(false);
@@ -1107,22 +1284,17 @@ function FluencyDrill({
 
   // --- cleared card ---------------------------------------------------------
   if (cleared) {
-    const tgt = targetMs;
+    // Everything here derives from YOUR times, not the (possibly placeholder)
+    // target you happened to clear. "Your pace" = median (robust to one slow
+    // solve) + a little slack, shown as one number. "Push tighter" is a stretch
+    // relative to that pace, not the old target.
     const bestMs = times.length ? Math.min(...times) : 0;
-    const avgMs = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
-    const speedUp = () => {
-      setTargetMs((t) => Math.round(t * FLU_SPEEDUP));
-      setStreak(0);
-      setCleared(false);
-      void genNext();
-    };
-    // Override the target with the learner's OWN pace: median of this session's
-    // times × a modifier. Personalizes the shipped default to how they actually
-    // solve it.
-    const tunedMs = times.length ? Math.round(median(times) * PERSONAL_MODIFIER) : tgt;
-    const tuneToMyPace = () => {
-      savePersonalPace(ex.id, tunedMs, hash);
-      setTargetMs(tunedMs);
+    const med = times.length ? median(times) : targetMs;
+    const paceMs = Math.round(med * PERSONAL_MODIFIER);
+    const pushMs = Math.round(paceMs * FLU_SPEEDUP);
+    const setPace = (ms: number) => {
+      savePersonalPace(ex.id, ms, hash);
+      setTargetMs(ms);
       setStreak(0);
       setCleared(false);
       void genNext();
@@ -1132,23 +1304,23 @@ function FluencyDrill({
         <h2 style={{ fontSize: '1.15rem', margin: '0 0 0.4rem', color: theme.good }}>
           Cleared “{ex.concept}” 🎉
         </h2>
-        <p style={{ ...styles.tagline, margin: '0 0 0.9rem' }}>
-          {FLU_GOAL} in a row, correct and under {secs(tgt)}.
-          {times.length ? ` Best ${secs(bestMs)} · avg ${secs(avgMs)} over ${reps} solved.` : ''}
+        <p style={{ ...styles.tagline, margin: '0 0 0.3rem' }}>
+          {FLU_GOAL} in a row · {reps} solved · best {secs(bestMs)}.
+        </p>
+        <p style={{ ...styles.tagline, margin: '0 0 0.9rem', color: theme.muted, fontSize: '0.85rem' }}>
+          Your pace here is about {secs(paceMs)} (your typical solve, {secs(med)}, plus a little slack).
         </p>
         <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
-          <button style={styles.btn} onClick={speedUp}>
-            Speed up (target {secs(Math.round(tgt * FLU_SPEEDUP))}) →
+          <button style={styles.btn} onClick={() => setPace(paceMs)}>
+            Set that as my target ({secs(paceMs)}) →
           </button>
-          {times.length > 0 && tunedMs !== tgt && (
-            <button
-              style={styles.btnGhost}
-              onClick={tuneToMyPace}
-              title="Set your target from your own solve times, so it fits how you actually work."
-            >
-              Tune target to my pace ({secs(tunedMs)})
-            </button>
-          )}
+          <button
+            style={styles.btnGhost}
+            onClick={() => setPace(pushMs)}
+            title="A tighter stretch than your pace, to keep getting faster."
+          >
+            Push tighter ({secs(pushMs)}) →
+          </button>
           <button style={styles.btnGhost} onClick={onExit}>
             Pick another pattern
           </button>
