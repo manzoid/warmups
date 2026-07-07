@@ -1937,6 +1937,22 @@ function ExerciseView({
 
       {ex.kind === 'write' && (
         <>
+          {(() => {
+            // Surface the first couple of test cases as a worked example — most
+            // write prompts describe the function abstractly, and a concrete
+            // input -> output makes it click. Cases already exist, so this is
+            // always correct and never drifts.
+            const examples = (ex.cases ?? []).filter((c) => c.expect !== undefined).slice(0, 2);
+            if (examples.length === 0) return null;
+            return (
+              <>
+                <p style={styles.label}>Example{examples.length > 1 ? 's' : ''}</p>
+                <pre style={{ ...styles.code, marginBottom: '1rem' }}>
+                  {examples.map((c) => `${c.call}  →  ${c.expect}`).join('\n')}
+                </pre>
+              </>
+            );
+          })()}
           <p style={styles.label}>Your code</p>
           <CodeEditor
             language={ex.track}
