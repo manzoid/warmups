@@ -23,7 +23,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = new Array(100);\nlet top = 0;\na[top++] = 5;\na[top++] = 9;\na[top++] = 7;\ntop - 1;",
     "expected": "2",
-    "prereqs": ["js.u10.stack.next-free"]
+    "prereqs": [
+      "js.u10.stack.next-free"
+    ]
   },
   {
     "id": "js.u10.stack.peek-raw",
@@ -36,7 +38,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = new Array(100);\nlet top = 0;\nconst src = [1, 2, 3];\nfor (let i = 0; i < src.length; i++) a[top++] = src[i];\na[top - 1];",
     "expected": "3",
-    "prereqs": ["js.u10.stack.top-index"]
+    "prereqs": [
+      "js.u10.stack.top-index"
+    ]
   },
   {
     "id": "js.u10.stack.pop-raw",
@@ -49,7 +53,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = new Array(100);\nlet top = 0;\nconst src = [1, 2, 3];\nfor (let i = 0; i < src.length; i++) a[top++] = src[i];\nconst v = a[--top];\n[v, top];",
     "expected": "[3, 2]",
-    "prereqs": ["js.u10.stack.peek-raw"]
+    "prereqs": [
+      "js.u10.stack.peek-raw"
+    ]
   },
   {
     "id": "js.u10.stack.pop-offbyone",
@@ -62,7 +68,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "let top = 3;\nconst readIndex = top - 1;\nconst fusedIndex = --top;\n[readIndex, fusedIndex];",
     "expected": "[2, 2]",
-    "prereqs": ["js.u10.stack.pop-raw"]
+    "prereqs": [
+      "js.u10.stack.pop-raw"
+    ]
   },
   {
     "id": "js.u10.build.push",
@@ -76,7 +84,9 @@
     "starter": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    // your code here\n  }\n}",
     "solution": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n}",
     "tests": "const s = new Stack();\ns.push(1);\ns.push(2);\ns.push(3);\nif (s.top !== 3) throw new Error('top should be 3, got ' + s.top);\nif (s.a[0] !== 1 || s.a[1] !== 2 || s.a[2] !== 3) throw new Error('buffer contents wrong');",
-    "prereqs": ["js.u10.stack.pop-offbyone"]
+    "prereqs": [
+      "js.u10.stack.pop-offbyone"
+    ]
   },
   {
     "id": "js.u10.build.peek",
@@ -90,7 +100,9 @@
     "starter": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    // your code here\n  }\n}",
     "solution": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n}",
     "tests": "const s = new Stack();\ns.push(10);\ns.push(20);\nif (s.peek() !== 20) throw new Error('peek should be 20');\nif (s.top !== 2) throw new Error('peek must not change top');",
-    "prereqs": ["js.u10.build.push"]
+    "prereqs": [
+      "js.u10.build.push"
+    ]
   },
   {
     "id": "js.u10.build.pop",
@@ -104,7 +116,9 @@
     "starter": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    // your code here\n  }\n}",
     "solution": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    return this.a[--this.top];\n  }\n}",
     "tests": "const s = new Stack();\ns.push(1);\ns.push(2);\ns.push(3);\nif (s.pop() !== 3) throw new Error('pop should return 3');\nif (s.top !== 2) throw new Error('top should be 2 after pop');\nif (s.pop() !== 2) throw new Error('next pop should be 2');\nif (s.top !== 1) throw new Error('top should be 1');",
-    "prereqs": ["js.u10.build.peek"]
+    "prereqs": [
+      "js.u10.build.peek"
+    ]
   },
   {
     "id": "js.u10.build.pop-guard",
@@ -118,7 +132,9 @@
     "starter": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    // your code here\n  }\n}",
     "solution": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    this.a[this.top++] = x;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    if (this.top === 0) return undefined;\n    return this.a[--this.top];\n  }\n}",
     "tests": "const s = new Stack();\nif (s.pop() !== undefined) throw new Error('pop on empty should be undefined');\nif (s.top !== 0) throw new Error('top must stay 0, not go negative');\ns.push(5);\nif (s.pop() !== 5) throw new Error('normal pop should still return 5');\nif (s.pop() !== undefined) throw new Error('empty again should be undefined');",
-    "prereqs": ["js.u10.build.pop"]
+    "prereqs": [
+      "js.u10.build.pop"
+    ]
   },
   {
     "id": "js.u10.build.push-guard",
@@ -132,7 +148,9 @@
     "starter": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    // your code here\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    if (this.top === 0) return undefined;\n    return this.a[--this.top];\n  }\n}",
     "solution": "class Stack {\n  constructor(cap = 100) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.top = 0;\n  }\n  push(x) {\n    if (this.top === this.cap) return false;\n    this.a[this.top++] = x;\n    return true;\n  }\n  peek() {\n    return this.a[this.top - 1];\n  }\n  pop() {\n    if (this.top === 0) return undefined;\n    return this.a[--this.top];\n  }\n}",
     "tests": "const s = new Stack(2);\nif (s.push(1) !== true) throw new Error('push should return true when space');\nif (s.push(2) !== true) throw new Error('second push should be true');\nif (s.push(3) !== false) throw new Error('push should return false when full');\nif (s.top !== 2) throw new Error('top must not exceed capacity');",
-    "prereqs": ["js.u10.build.pop-guard"]
+    "prereqs": [
+      "js.u10.build.pop-guard"
+    ]
   },
   {
     "id": "js.u10.stack.peek-js",
@@ -145,7 +163,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const st = [5, 8, 2];\nst[st.length - 1];",
     "expected": "2",
-    "prereqs": ["js.u10.build.push"]
+    "prereqs": [
+      "js.u10.build.push"
+    ]
   },
   {
     "id": "js.u10.stack.pop-empty-js",
@@ -158,7 +178,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const st = [];\nst.pop();",
     "expected": "undefined",
-    "prereqs": ["js.u10.build.pop"]
+    "prereqs": [
+      "js.u10.build.pop"
+    ]
   },
   {
     "id": "js.u10.valid-parens",
@@ -171,11 +193,42 @@
     "note": "The stack height is the current nesting depth; a closer must match whatever opener is on top.",
     "kind": "write",
     "prompt": "Write `valid(s)` that returns `true` if the brackets in `s` (`()`, `[]`, `{}`) are balanced and correctly nested, else `false`. Use an array as a stack.",
-    "banned": ["replace", "replaceAll"],
+    "banned": [
+      "replace",
+      "replaceAll"
+    ],
     "starter": "function valid(s) {\n  // your code here\n}",
     "solution": "function valid(s) {\n  const pairs = { ')': '(', ']': '[', '}': '{' };\n  const st = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c in pairs) {\n      if (st.pop() !== pairs[c]) return false;\n    } else {\n      st.push(c);\n    }\n  }\n  return st.length === 0;\n}",
-    "tests": "if (valid('()[]{}') !== true) throw new Error('()[]{} should be true');\nif (valid('([)]') !== false) throw new Error('([)] should be false');\nif (valid('(') !== false) throw new Error('( should be false');\nif (valid('') !== true) throw new Error('empty should be true');\nif (valid(']') !== false) throw new Error('] should be false');\nif (valid('([{}])') !== true) throw new Error('([{}]) should be true');",
-    "prereqs": ["js.u10.build.pop", "js.u10.stack.pop-empty-js"]
+    "prereqs": [
+      "js.u10.build.pop",
+      "js.u10.stack.pop-empty-js"
+    ],
+    "cases": [
+      {
+        "call": "valid('()[]{}')",
+        "expect": "true"
+      },
+      {
+        "call": "valid('([)]')",
+        "expect": "false"
+      },
+      {
+        "call": "valid('(')",
+        "expect": "false"
+      },
+      {
+        "call": "valid('')",
+        "expect": "true"
+      },
+      {
+        "call": "valid(']')",
+        "expect": "false"
+      },
+      {
+        "call": "valid('([{}])')",
+        "expect": "true"
+      }
+    ]
   },
   {
     "id": "js.u10.nge",
@@ -190,8 +243,27 @@
     "prompt": "Write `nge(nums)` returning an array where position `i` holds the nearest later value greater than `nums[i]`, or `-1` if none. One pass.",
     "starter": "function nge(nums) {\n  // your code here\n}",
     "solution": "function nge(nums) {\n  const res = new Array(nums.length).fill(-1);\n  const st = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (st.length && nums[st[st.length - 1]] < nums[i]) res[st.pop()] = nums[i];\n    st.push(i);\n  }\n  return res;\n}",
-    "tests": "if (JSON.stringify(nge([2, 1, 2, 4, 3])) !== JSON.stringify([4, 2, 4, -1, -1])) throw new Error('case1');\nif (JSON.stringify(nge([1, 2, 3])) !== JSON.stringify([2, 3, -1])) throw new Error('case2');\nif (JSON.stringify(nge([3, 2, 1])) !== JSON.stringify([-1, -1, -1])) throw new Error('case3');\nif (JSON.stringify(nge([])) !== JSON.stringify([])) throw new Error('empty');",
-    "prereqs": ["js.u10.build.pop"]
+    "prereqs": [
+      "js.u10.build.pop"
+    ],
+    "cases": [
+      {
+        "call": "nge([2, 1, 2, 4, 3])",
+        "expect": "[4, 2, 4, -1, -1]"
+      },
+      {
+        "call": "nge([1, 2, 3])",
+        "expect": "[2, 3, -1]"
+      },
+      {
+        "call": "nge([3, 2, 1])",
+        "expect": "[-1, -1, -1]"
+      },
+      {
+        "call": "nge([])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u10.queue.count",
@@ -218,7 +290,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const cap = 4;\n[3 % cap, 4 % cap, 5 % cap, 8 % cap];",
     "expected": "[3, 0, 1, 0]",
-    "prereqs": ["js.u10.queue.count"]
+    "prereqs": [
+      "js.u10.queue.count"
+    ]
   },
   {
     "id": "js.u10.queue.wrap",
@@ -231,7 +305,10 @@
     "prompt": "What is the value of `writeIndex`?",
     "snippet": "const cap = 3;\nconst head = 2;\nconst size = 1;\nconst writeIndex = (head + size) % cap;\nwriteIndex;",
     "expected": "0",
-    "prereqs": ["js.u10.queue.count", "js.u10.mod.wrap"]
+    "prereqs": [
+      "js.u10.queue.count",
+      "js.u10.mod.wrap"
+    ]
   },
   {
     "id": "js.u10.build.enqueue",
@@ -246,7 +323,9 @@
     "starter": "class RingQueue {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  enqueue(x) {\n    // your code here\n  }\n}",
     "solution": "class RingQueue {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  enqueue(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n}",
     "tests": "const q = new RingQueue(3);\nq.enqueue(10);\nq.enqueue(20);\nif (q.size !== 2) throw new Error('size should be 2');\nif (q.a[0] !== 10 || q.a[1] !== 20) throw new Error('buffer wrong');\nconst q2 = new RingQueue(3);\nq2.head = 2;\nq2.enqueue(99);\nif (q2.a[2] !== 99) throw new Error('should write at head+size');\nq2.enqueue(88);\nif (q2.a[0] !== 88) throw new Error('should wrap to index 0');",
-    "prereqs": ["js.u10.queue.wrap"]
+    "prereqs": [
+      "js.u10.queue.wrap"
+    ]
   },
   {
     "id": "js.u10.build.dequeue",
@@ -261,7 +340,9 @@
     "starter": "class RingQueue {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  enqueue(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  dequeue() {\n    // your code here\n  }\n}",
     "solution": "class RingQueue {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  enqueue(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  dequeue() {\n    const v = this.a[this.head];\n    this.head = (this.head + 1) % this.cap;\n    this.size--;\n    return v;\n  }\n}",
     "tests": "const q = new RingQueue(3);\nq.enqueue(10);\nq.enqueue(20);\nif (q.dequeue() !== 10) throw new Error('first dequeue should be 10');\nif (q.head !== 1) throw new Error('head should advance to 1');\nif (q.size !== 1) throw new Error('size should be 1');\nif (q.dequeue() !== 20) throw new Error('second dequeue should be 20');\nconst q2 = new RingQueue(3);\nq2.enqueue('a');\nq2.enqueue('b');\nq2.enqueue('c');\nq2.dequeue();\nq2.dequeue();\nq2.enqueue('d');\nif (q2.dequeue() !== 'c') throw new Error('should dequeue c');\nif (q2.dequeue() !== 'd') throw new Error('should dequeue d after wrap');",
-    "prereqs": ["js.u10.build.enqueue"]
+    "prereqs": [
+      "js.u10.build.enqueue"
+    ]
   },
   {
     "id": "js.u10.queue.shift",
@@ -275,7 +356,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const q = [1, 2, 3];\nconst v = q.shift();\n[v, q];",
     "expected": "[1, [2, 3]]",
-    "prereqs": ["js.u10.queue.count"]
+    "prereqs": [
+      "js.u10.queue.count"
+    ]
   },
   {
     "id": "js.u10.queue.head-pointer",
@@ -288,7 +371,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const q = [10, 20, 30];\nlet head = 0;\nconst a = q[head++];\nconst b = q[head++];\n[a, b, head];",
     "expected": "[10, 20, 2]",
-    "prereqs": ["js.u10.queue.count"]
+    "prereqs": [
+      "js.u10.queue.count"
+    ]
   },
   {
     "id": "js.u10.bfs-order",
@@ -299,11 +384,16 @@
     "concept": "BFS visit order with a queue and seen set",
     "kind": "write",
     "prompt": "Write `bfsOrder(adj, start)` returning the breadth-first visit order over adjacency list `adj` (array of neighbor arrays) from node `start`. Mark nodes seen at enqueue time. Use an array with a head index as the queue (no `shift`).",
-    "banned": [".shift("],
+    "banned": [
+      ".shift("
+    ],
     "starter": "function bfsOrder(adj, start) {\n  // your code here\n}",
     "solution": "function bfsOrder(adj, start) {\n  const q = [start];\n  let head = 0;\n  const seen = new Set([start]);\n  const order = [];\n  while (head < q.length) {\n    const node = q[head++];\n    order.push(node);\n    const nbrs = adj[node];\n    for (let i = 0; i < nbrs.length; i++) {\n      const nb = nbrs[i];\n      if (!seen.has(nb)) {\n        seen.add(nb);\n        q.push(nb);\n      }\n    }\n  }\n  return order;\n}",
     "tests": "const adj = [[1, 2], [2], [0, 3], []];\nif (JSON.stringify(bfsOrder(adj, 0)) !== JSON.stringify([0, 1, 2, 3])) throw new Error('bfs from 0');\nconst line = [[1], [0, 2], [1, 3], [2]];\nif (JSON.stringify(bfsOrder(line, 0)) !== JSON.stringify([0, 1, 2, 3])) throw new Error('line bfs');\nif (JSON.stringify(bfsOrder(adj, 3)) !== JSON.stringify([3])) throw new Error('start with no neighbors');",
-    "prereqs": ["js.u10.build.dequeue", "js.u10.queue.head-pointer"]
+    "prereqs": [
+      "js.u10.build.dequeue",
+      "js.u10.queue.head-pointer"
+    ]
   },
   {
     "id": "js.u10.deque.front-push-index",
@@ -316,7 +406,9 @@
     "prompt": "What is the value of `head`?",
     "snippet": "const n = 5;\nlet head = 0;\nhead = (head - 1 + n) % n;\nhead;",
     "expected": "4",
-    "prereqs": ["js.u10.queue.wrap"]
+    "prereqs": [
+      "js.u10.queue.wrap"
+    ]
   },
   {
     "id": "js.u10.build.push-front",
@@ -330,7 +422,10 @@
     "starter": "class Deque {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  pushBack(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  popFront() {\n    const v = this.a[this.head];\n    this.head = (this.head + 1) % this.cap;\n    this.size--;\n    return v;\n  }\n  pushFront(x) {\n    // your code here\n  }\n}",
     "solution": "class Deque {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  pushBack(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  popFront() {\n    const v = this.a[this.head];\n    this.head = (this.head + 1) % this.cap;\n    this.size--;\n    return v;\n  }\n  pushFront(x) {\n    this.head = (this.head - 1 + this.cap) % this.cap;\n    this.a[this.head] = x;\n    this.size++;\n  }\n}",
     "tests": "const d = new Deque(4);\nd.pushBack(2);\nd.pushFront(1);\nif (d.size !== 2) throw new Error('size should be 2');\nif (d.popFront() !== 1) throw new Error('front should be 1');\nif (d.popFront() !== 2) throw new Error('then 2');",
-    "prereqs": ["js.u10.build.dequeue", "js.u10.deque.front-push-index"]
+    "prereqs": [
+      "js.u10.build.dequeue",
+      "js.u10.deque.front-push-index"
+    ]
   },
   {
     "id": "js.u10.build.pop-back",
@@ -345,7 +440,9 @@
     "starter": "class Deque {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  pushBack(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  popFront() {\n    const v = this.a[this.head];\n    this.head = (this.head + 1) % this.cap;\n    this.size--;\n    return v;\n  }\n  pushFront(x) {\n    this.head = (this.head - 1 + this.cap) % this.cap;\n    this.a[this.head] = x;\n    this.size++;\n  }\n  popBack() {\n    // your code here\n  }\n}",
     "solution": "class Deque {\n  constructor(cap) {\n    this.a = new Array(cap);\n    this.cap = cap;\n    this.head = 0;\n    this.size = 0;\n  }\n  pushBack(x) {\n    this.a[(this.head + this.size) % this.cap] = x;\n    this.size++;\n  }\n  popFront() {\n    const v = this.a[this.head];\n    this.head = (this.head + 1) % this.cap;\n    this.size--;\n    return v;\n  }\n  pushFront(x) {\n    this.head = (this.head - 1 + this.cap) % this.cap;\n    this.a[this.head] = x;\n    this.size++;\n  }\n  popBack() {\n    this.size--;\n    return this.a[(this.head + this.size) % this.cap];\n  }\n}",
     "tests": "const d = new Deque(4);\nd.pushBack(1);\nd.pushBack(2);\nd.pushBack(3);\nif (d.popBack() !== 3) throw new Error('popBack should be 3');\nif (d.size !== 2) throw new Error('size should be 2');\nif (d.popBack() !== 2) throw new Error('then 2');\nd.pushFront(0);\nif (d.popBack() !== 1) throw new Error('popBack should be 1');\nif (d.popBack() !== 0) throw new Error('then 0');",
-    "prereqs": ["js.u10.build.push-front"]
+    "prereqs": [
+      "js.u10.build.push-front"
+    ]
   },
   {
     "id": "js.u10.maxwin",
@@ -360,7 +457,27 @@
     "prompt": "Write `maxwin(nums, k)` returning the maximum of every length-`k` window of `nums`, in one pass.",
     "starter": "function maxwin(nums, k) {\n  // your code here\n}",
     "solution": "function maxwin(nums, k) {\n  const d = [];\n  const out = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (d.length && nums[d[d.length - 1]] <= nums[i]) d.pop();\n    d.push(i);\n    if (d[0] <= i - k) d.shift();\n    if (i >= k - 1) out.push(nums[d[0]]);\n  }\n  return out;\n}",
-    "tests": "if (JSON.stringify(maxwin([1, 3, -1, -3, 5, 3, 6, 7], 3)) !== JSON.stringify([3, 3, 5, 5, 6, 7])) throw new Error('case1');\nif (JSON.stringify(maxwin([1], 1)) !== JSON.stringify([1])) throw new Error('single');\nif (JSON.stringify(maxwin([9, 8, 7], 2)) !== JSON.stringify([9, 8])) throw new Error('decreasing');\nif (JSON.stringify(maxwin([1, 2, 3, 4], 2)) !== JSON.stringify([2, 3, 4])) throw new Error('increasing');",
-    "prereqs": ["js.u10.nge", "js.u10.build.pop-back"]
+    "prereqs": [
+      "js.u10.nge",
+      "js.u10.build.pop-back"
+    ],
+    "cases": [
+      {
+        "call": "maxwin([1, 3, -1, -3, 5, 3, 6, 7], 3)",
+        "expect": "[3, 3, 5, 5, 6, 7]"
+      },
+      {
+        "call": "maxwin([1], 1)",
+        "expect": "[1]"
+      },
+      {
+        "call": "maxwin([9, 8, 7], 2)",
+        "expect": "[9, 8]"
+      },
+      {
+        "call": "maxwin([1, 2, 3, 4], 2)",
+        "expect": "[2, 3, 4]"
+      }
+    ]
   }
 ]

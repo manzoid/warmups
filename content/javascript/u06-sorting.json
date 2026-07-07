@@ -55,10 +55,27 @@
       "Math.min("
     ],
     "solution": "function minIndex(a, i) {\n  let m = i;\n  for (let j = i + 1; j < a.length; j++) {\n    if (a[j] < a[m]) m = j;\n  }\n  return m;\n}",
-    "tests": "if (minIndex([5, 2, 4, 6], 0) !== 1) throw new Error('whole array');\nif (minIndex([5, 2, 4, 6], 2) !== 2) throw new Error('suffix from 2');\nif (minIndex([3, 1, 2], 0) !== 1) throw new Error('mid min');\nif (minIndex([7], 0) !== 0) throw new Error('single');",
     "prereqs": [],
     "cue": "Assume position i holds the min, then scan the suffix for anything smaller.",
-    "syntax": "a[j] < a[m] comparison"
+    "syntax": "a[j] < a[m] comparison",
+    "cases": [
+      {
+        "call": "minIndex([5, 2, 4, 6], 0)",
+        "expect": "1"
+      },
+      {
+        "call": "minIndex([5, 2, 4, 6], 2)",
+        "expect": "2"
+      },
+      {
+        "call": "minIndex([3, 1, 2], 0)",
+        "expect": "1"
+      },
+      {
+        "call": "minIndex([7], 0)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u06.selection",
@@ -72,13 +89,26 @@
       ".sort("
     ],
     "solution": "function selectionSort(a) {\n  for (let i = 0; i < a.length; i++) {\n    let m = i;\n    for (let j = i + 1; j < a.length; j++) {\n      if (a[j] < a[m]) m = j;\n    }\n    const t = a[i];\n    a[i] = a[m];\n    a[m] = t;\n  }\n  return a;\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(selectionSort([5, 2, 4, 6, 1]), [1, 2, 4, 5, 6])) throw new Error('basic');\nif (!eq(selectionSort([]), [])) throw new Error('empty');\nif (!eq(selectionSort([3, 3, 1]), [1, 3, 3])) throw new Error('dups');",
     "prereqs": [
       "js.u06.minindex",
       "js.u06.swap.temp"
     ],
     "cue": "Each pass finds the min of the unsorted suffix and swaps it into place.",
-    "syntax": "nested for-loops"
+    "syntax": "nested for-loops",
+    "cases": [
+      {
+        "call": "selectionSort([5, 2, 4, 6, 1])",
+        "expect": "[1, 2, 4, 5, 6]"
+      },
+      {
+        "call": "selectionSort([])",
+        "expect": "[]"
+      },
+      {
+        "call": "selectionSort([3, 3, 1])",
+        "expect": "[1, 3, 3]"
+      }
+    ]
   },
   {
     "id": "js.u06.insertion",
@@ -92,12 +122,25 @@
       ".sort("
     ],
     "solution": "function insertionSort(a) {\n  for (let i = 1; i < a.length; i++) {\n    const key = a[i];\n    let j = i - 1;\n    while (j >= 0 && a[j] > key) {\n      a[j + 1] = a[j];\n      j--;\n    }\n    a[j + 1] = key;\n  }\n  return a;\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(insertionSort([5, 2, 4, 6, 1]), [1, 2, 4, 5, 6])) throw new Error('basic');\nif (!eq(insertionSort([1, 2, 3]), [1, 2, 3])) throw new Error('already sorted');\nif (!eq(insertionSort([9]), [9])) throw new Error('single');",
     "prereqs": [
       "js.u06.swap.temp"
     ],
     "cue": "Grow a sorted prefix by shifting larger elements right to open a slot.",
-    "syntax": "while loop with a decreasing index"
+    "syntax": "while loop with a decreasing index",
+    "cases": [
+      {
+        "call": "insertionSort([5, 2, 4, 6, 1])",
+        "expect": "[1, 2, 4, 5, 6]"
+      },
+      {
+        "call": "insertionSort([1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "insertionSort([9])",
+        "expect": "[9]"
+      }
+    ]
   },
   {
     "id": "js.u06.merge.predict",
@@ -125,13 +168,30 @@
       ".sort("
     ],
     "solution": "function merge(L, R) {\n  const res = [];\n  let i = 0, j = 0;\n  while (i < L.length && j < R.length) {\n    if (L[i] <= R[j]) { res.push(L[i]); i++; }\n    else { res.push(R[j]); j++; }\n  }\n  while (i < L.length) { res.push(L[i]); i++; }\n  while (j < R.length) { res.push(R[j]); j++; }\n  return res;\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(merge([1, 4], [2, 3]), [1, 2, 3, 4])) throw new Error('interleave');\nif (!eq(merge([1, 2, 3], []), [1, 2, 3])) throw new Error('drain left');\nif (!eq(merge([], [5]), [5])) throw new Error('drain right');\nif (!eq(merge([1, 5, 9], [2, 3]), [1, 2, 3, 5, 9])) throw new Error('uneven');",
     "prereqs": [
       "js.u06.merge.predict"
     ],
     "cue": "Take the smaller of the two fronts, then drain whichever array is left.",
     "syntax": "arr.push(x)",
-    "mapsTo": "pattern behind LC 21 · Merge Two Sorted Lists"
+    "mapsTo": "pattern behind LC 21 · Merge Two Sorted Lists",
+    "cases": [
+      {
+        "call": "merge([1, 4], [2, 3])",
+        "expect": "[1, 2, 3, 4]"
+      },
+      {
+        "call": "merge([1, 2, 3], [])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "merge([], [5])",
+        "expect": "[5]"
+      },
+      {
+        "call": "merge([1, 5, 9], [2, 3])",
+        "expect": "[1, 2, 3, 5, 9]"
+      }
+    ]
   },
   {
     "id": "js.u06.recursion.combine",
@@ -212,7 +272,6 @@
       ".sort("
     ],
     "solution": "function quickSort(a) {\n  function partition(lo, hi) {\n    const pivot = a[hi];\n    let i = lo;\n    for (let j = lo; j < hi; j++) {\n      if (a[j] < pivot) {\n        const t = a[i];\n        a[i] = a[j];\n        a[j] = t;\n        i++;\n      }\n    }\n    const t = a[i];\n    a[i] = a[hi];\n    a[hi] = t;\n    return i;\n  }\n  function qs(lo, hi) {\n    if (lo >= hi) return;\n    const p = partition(lo, hi);\n    qs(lo, p - 1);\n    qs(p + 1, hi);\n  }\n  qs(0, a.length - 1);\n  return a;\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(quickSort([5, 2, 4, 6, 1, 3]), [1, 2, 3, 4, 5, 6])) throw new Error('basic');\nif (!eq(quickSort([1, 2, 3]), [1, 2, 3])) throw new Error('already sorted');\nif (!eq(quickSort([3, 3, 1, 2]), [1, 2, 3, 3])) throw new Error('dups');\nif (!eq(quickSort([]), [])) throw new Error('empty');",
     "prereqs": [
       "js.u06.partition",
       "js.u06.recursion.combine"
@@ -220,7 +279,25 @@
     "cue": "Partition around a pivot, then recurse on each side excluding the pivot.",
     "syntax": "recursion over lo/hi bounds",
     "note": "In place and O(n log n) on average, but O(n^2) when the pivot keeps landing at an end (e.g. already-sorted input). Not stable.",
-    "mapsTo": "LC 912 · Sort an Array"
+    "mapsTo": "LC 912 · Sort an Array",
+    "cases": [
+      {
+        "call": "quickSort([5, 2, 4, 6, 1, 3])",
+        "expect": "[1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "call": "quickSort([1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "quickSort([3, 3, 1, 2])",
+        "expect": "[1, 2, 3, 3]"
+      },
+      {
+        "call": "quickSort([])",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u06.comparator.numeric",
@@ -344,14 +421,27 @@
     "prompt": "Write `twoSumSorted(a, target)` that returns the pair `[x, y]` with `x <= y` of values from `a` that sum to `target`, or `null` if no pair exists.",
     "starter": "function twoSumSorted(a, target) {\n  // your code here\n}",
     "solution": "function twoSumSorted(a, target) {\n  const b = a.slice().sort((x, y) => x - y);\n  let i = 0, j = b.length - 1;\n  while (i < j) {\n    const s = b[i] + b[j];\n    if (s === target) return [b[i], b[j]];\n    else if (s < target) i++;\n    else j--;\n  }\n  return null;\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(twoSumSorted([8, 1, 3, 5], 8), [3, 5])) throw new Error('unsorted input');\nif (!eq(twoSumSorted([2, 7, 11, 15], 9), [2, 7])) throw new Error('ends');\nif (twoSumSorted([1, 2, 4], 8) !== null) throw new Error('no pair -> null');",
     "prereqs": [
       "js.u06.comparator.numeric"
     ],
     "cue": "Sort first, then converge one index from each end by the running sum.",
     "syntax": "two pointers from both ends",
     "note": "Once sorted, the sum's size tells you which end to move: too small, raise the low end; too big, lower the high end. O(n) after the sort.",
-    "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted"
+    "mapsTo": "LC 167 · Two Sum II - Input Array Is Sorted",
+    "cases": [
+      {
+        "call": "twoSumSorted([8, 1, 3, 5], 8)",
+        "expect": "[3, 5]"
+      },
+      {
+        "call": "twoSumSorted([2, 7, 11, 15], 9)",
+        "expect": "[2, 7]"
+      },
+      {
+        "call": "twoSumSorted([1, 2, 4], 8)",
+        "expect": "null"
+      }
+    ]
   },
   {
     "id": "js.u06.sortkey.bylen",
@@ -378,12 +468,21 @@
     "prompt": "Write `byAgeThenName(people)` where each element is `[name, age]`. Return a new array sorted by age ascending, breaking ties by name in alphabetical order. Do not mutate the input.",
     "starter": "function byAgeThenName(people) {\n  // your code here\n}",
     "solution": "function byAgeThenName(people) {\n  return people.slice().sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));\n}",
-    "tests": "const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);\nif (!eq(byAgeThenName([['bob', 30], ['al', 30], ['zoe', 25]]), [['zoe', 25], ['al', 30], ['bob', 30]])) throw new Error('age then name');\nif (!eq(byAgeThenName([['x', 1]]), [['x', 1]])) throw new Error('single');",
     "prereqs": [
       "js.u06.sort.tiebreak",
       "js.u06.sortkey.bylen"
     ],
     "cue": "Compare on the primary key, falling back to the secondary on ties.",
-    "syntax": "a.localeCompare(b) for strings"
+    "syntax": "a.localeCompare(b) for strings",
+    "cases": [
+      {
+        "call": "byAgeThenName([['bob', 30], ['al', 30], ['zoe', 25]])",
+        "expect": "[['zoe', 25], ['al', 30], ['bob', 30]]"
+      },
+      {
+        "call": "byAgeThenName([['x', 1]])",
+        "expect": "[['x', 1]]"
+      }
+    ]
   }
 ]

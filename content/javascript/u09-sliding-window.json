@@ -57,10 +57,27 @@
     ],
     "starter": "function maxSumK(nums, k) {\n  let s = 0;\n  // add up the first k elements into s\n  let best = s;\n  for (let i = k; i < nums.length; i++) {\n    // slide the window: update s, then best\n  }\n  return best;\n}",
     "solution": "function maxSumK(nums, k) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let best = s;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s > best) best = s;\n  }\n  return best;\n}",
-    "tests": "if (maxSumK([2, 1, 5, 1, 3, 2], 3) !== 9) throw new Error(maxSumK([2, 1, 5, 1, 3, 2], 3));\nif (maxSumK([1, 2, 3], 3) !== 6) throw new Error('full');\nif (maxSumK([5, -1, -1, 5], 2) !== 4) throw new Error('neg');\nif (maxSumK([4], 1) !== 4) throw new Error('single');",
     "note": "Recomputing every block from scratch is O(nk); the slide keeps it O(n) by carrying the sum forward.",
     "prereqs": [
       "js.u09.fixed.maxsum.predict"
+    ],
+    "cases": [
+      {
+        "call": "maxSumK([2, 1, 5, 1, 3, 2], 3)",
+        "expect": "9"
+      },
+      {
+        "call": "maxSumK([1, 2, 3], 3)",
+        "expect": "6"
+      },
+      {
+        "call": "maxSumK([5, -1, -1, 5], 2)",
+        "expect": "4"
+      },
+      {
+        "call": "maxSumK([4], 1)",
+        "expect": "4"
+      }
     ]
   },
   {
@@ -77,10 +94,23 @@
     ],
     "starter": "function maxAverageK(nums, k) {\n  // your code here\n}",
     "solution": "function maxAverageK(nums, k) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let best = s;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s > best) best = s;\n  }\n  return best / k;\n}",
-    "tests": "if (maxAverageK([1, 12, -5, -6, 50, 3], 4) !== 12.75) throw new Error(maxAverageK([1, 12, -5, -6, 50, 3], 4));\nif (maxAverageK([5], 1) !== 5) throw new Error('single');\nif (maxAverageK([0, 4, 0, 3, 2], 1) !== 4) throw new Error('k1');",
     "mapsTo": "LC 643 · Maximum Average Subarray I",
     "prereqs": [
       "js.u09.fixed.maxsum.write"
+    ],
+    "cases": [
+      {
+        "call": "maxAverageK([1, 12, -5, -6, 50, 3], 4)",
+        "expect": "12.75"
+      },
+      {
+        "call": "maxAverageK([5], 1)",
+        "expect": "5"
+      },
+      {
+        "call": "maxAverageK([0, 4, 0, 3, 2], 1)",
+        "expect": "4"
+      }
     ]
   },
   {
@@ -112,10 +142,27 @@
     ],
     "starter": "function countWindowsAtLeast(nums, k, threshold) {\n  // your code here\n}",
     "solution": "function countWindowsAtLeast(nums, k, threshold) {\n  let s = 0;\n  for (let i = 0; i < k; i++) s += nums[i];\n  let count = s >= threshold ? 1 : 0;\n  for (let i = k; i < nums.length; i++) {\n    s += nums[i] - nums[i - k];\n    if (s >= threshold) count++;\n  }\n  return count;\n}",
-    "tests": "if (countWindowsAtLeast([2, 1, 5, 1, 3, 2], 3, 8) !== 2) throw new Error(countWindowsAtLeast([2, 1, 5, 1, 3, 2], 3, 8));\nif (countWindowsAtLeast([1, 1, 1], 1, 1) !== 3) throw new Error('all');\nif (countWindowsAtLeast([1, 2, 3, 4], 2, 5) !== 2) throw new Error('k2');\nif (countWindowsAtLeast([1], 1, 5) !== 0) throw new Error('none');",
     "mapsTo": "pattern behind LC 1343 · Number of Sub-arrays of Size K and Average Greater Than or Equal to Threshold",
     "prereqs": [
       "js.u09.fixed.countge.predict"
+    ],
+    "cases": [
+      {
+        "call": "countWindowsAtLeast([2, 1, 5, 1, 3, 2], 3, 8)",
+        "expect": "2"
+      },
+      {
+        "call": "countWindowsAtLeast([1, 1, 1], 1, 1)",
+        "expect": "3"
+      },
+      {
+        "call": "countWindowsAtLeast([1, 2, 3, 4], 2, 5)",
+        "expect": "2"
+      },
+      {
+        "call": "countWindowsAtLeast([1], 1, 5)",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -207,9 +254,30 @@
     "prompt": "Write `longestAtMost(nums, target)` that returns the length of the longest contiguous subarray whose sum is at most `target`. All values in `nums` are non-negative. Use a sliding window.",
     "starter": "function longestAtMost(nums, target) {\n  // your code here\n}",
     "solution": "function longestAtMost(nums, target) {\n  let left = 0, s = 0, best = 0;\n  for (let right = 0; right < nums.length; right++) {\n    s += nums[right];\n    while (s > target) { s -= nums[left]; left++; }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
-    "tests": "if (longestAtMost([1, 2, 3, 4, 5], 6) !== 3) throw new Error(longestAtMost([1, 2, 3, 4, 5], 6));\nif (longestAtMost([1, 1, 1, 1], 2) !== 2) throw new Error('cap');\nif (longestAtMost([5, 6, 7], 4) !== 0) throw new Error('none');\nif (longestAtMost([], 5) !== 0) throw new Error('empty');\nif (longestAtMost([2, 2, 2], 6) !== 3) throw new Error('whole');",
     "prereqs": [
       "js.u09.var.longest.predict"
+    ],
+    "cases": [
+      {
+        "call": "longestAtMost([1, 2, 3, 4, 5], 6)",
+        "expect": "3"
+      },
+      {
+        "call": "longestAtMost([1, 1, 1, 1], 2)",
+        "expect": "2"
+      },
+      {
+        "call": "longestAtMost([5, 6, 7], 4)",
+        "expect": "0"
+      },
+      {
+        "call": "longestAtMost([], 5)",
+        "expect": "0"
+      },
+      {
+        "call": "longestAtMost([2, 2, 2], 6)",
+        "expect": "3"
+      }
     ]
   },
   {
@@ -238,10 +306,31 @@
     "prompt": "Write `minSubArrayLen(target, nums)` that returns the length of the shortest contiguous subarray whose sum is at least `target`, or `0` if none exists. All values in `nums` are non-negative. Use a sliding window.",
     "starter": "function minSubArrayLen(target, nums) {\n  // your code here\n}",
     "solution": "function minSubArrayLen(target, nums) {\n  let left = 0, s = 0, best = Infinity;\n  for (let right = 0; right < nums.length; right++) {\n    s += nums[right];\n    while (s >= target) {\n      best = Math.min(best, right - left + 1);\n      s -= nums[left];\n      left++;\n    }\n  }\n  return best === Infinity ? 0 : best;\n}",
-    "tests": "if (minSubArrayLen(7, [2, 3, 1, 2, 4, 3]) !== 2) throw new Error(minSubArrayLen(7, [2, 3, 1, 2, 4, 3]));\nif (minSubArrayLen(4, [1, 4, 4]) !== 1) throw new Error('one');\nif (minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1]) !== 0) throw new Error('none');\nif (minSubArrayLen(15, [1, 2, 3, 4, 5]) !== 5) throw new Error('whole');\nif (minSubArrayLen(3, [3]) !== 1) throw new Error('single');",
     "mapsTo": "LC 209 · Minimum Size Subarray Sum",
     "prereqs": [
       "js.u09.var.minlen.predict"
+    ],
+    "cases": [
+      {
+        "call": "minSubArrayLen(7, [2, 3, 1, 2, 4, 3])",
+        "expect": "2"
+      },
+      {
+        "call": "minSubArrayLen(4, [1, 4, 4])",
+        "expect": "1"
+      },
+      {
+        "call": "minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1])",
+        "expect": "0"
+      },
+      {
+        "call": "minSubArrayLen(15, [1, 2, 3, 4, 5])",
+        "expect": "5"
+      },
+      {
+        "call": "minSubArrayLen(3, [3])",
+        "expect": "1"
+      }
     ]
   },
   {
@@ -271,10 +360,35 @@
     "prompt": "Write `lengthOfLongestSubstring(s)` that returns the length of the longest substring of `s` with no repeated character. Use a sliding window.",
     "starter": "function lengthOfLongestSubstring(s) {\n  // your code here\n}",
     "solution": "function lengthOfLongestSubstring(s) {\n  let left = 0, best = 0;\n  const count = new Map();\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    count.set(c, (count.get(c) || 0) + 1);\n    while (count.get(c) > 1) {\n      count.set(s[left], count.get(s[left]) - 1);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
-    "tests": "if (lengthOfLongestSubstring('abcabcbb') !== 3) throw new Error(lengthOfLongestSubstring('abcabcbb'));\nif (lengthOfLongestSubstring('bbbbb') !== 1) throw new Error('same');\nif (lengthOfLongestSubstring('pwwkew') !== 3) throw new Error('pwwkew');\nif (lengthOfLongestSubstring('') !== 0) throw new Error('empty');\nif (lengthOfLongestSubstring('au') !== 2) throw new Error('au');\nif (lengthOfLongestSubstring('dvdf') !== 3) throw new Error('dvdf');",
     "mapsTo": "LC 3 · Longest Substring Without Repeating Characters",
     "prereqs": [
       "js.u09.norepeat.predict"
+    ],
+    "cases": [
+      {
+        "call": "lengthOfLongestSubstring('abcabcbb')",
+        "expect": "3"
+      },
+      {
+        "call": "lengthOfLongestSubstring('bbbbb')",
+        "expect": "1"
+      },
+      {
+        "call": "lengthOfLongestSubstring('pwwkew')",
+        "expect": "3"
+      },
+      {
+        "call": "lengthOfLongestSubstring('')",
+        "expect": "0"
+      },
+      {
+        "call": "lengthOfLongestSubstring('au')",
+        "expect": "2"
+      },
+      {
+        "call": "lengthOfLongestSubstring('dvdf')",
+        "expect": "3"
+      }
     ]
   },
   {
@@ -303,10 +417,27 @@
     "prompt": "Write `longestAtMostKDistinct(s, k)` that returns the length of the longest substring of `s` containing at most `k` distinct characters. Use a sliding window with a count-map.",
     "starter": "function longestAtMostKDistinct(s, k) {\n  // your code here\n}",
     "solution": "function longestAtMostKDistinct(s, k) {\n  let left = 0, best = 0;\n  const count = new Map();\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    count.set(c, (count.get(c) || 0) + 1);\n    while (count.size > k) {\n      const lc = s[left];\n      count.set(lc, count.get(lc) - 1);\n      if (count.get(lc) === 0) count.delete(lc);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
-    "tests": "if (longestAtMostKDistinct('eceba', 2) !== 3) throw new Error(longestAtMostKDistinct('eceba', 2));\nif (longestAtMostKDistinct('aa', 1) !== 2) throw new Error('aa');\nif (longestAtMostKDistinct('a', 0) !== 0) throw new Error('zero');\nif (longestAtMostKDistinct('ccaabbb', 2) !== 5) throw new Error('ccaabbb');",
     "mapsTo": "LC 340 · Longest Substring with At Most K Distinct Characters",
     "prereqs": [
       "js.u09.atmostk.predict"
+    ],
+    "cases": [
+      {
+        "call": "longestAtMostKDistinct('eceba', 2)",
+        "expect": "3"
+      },
+      {
+        "call": "longestAtMostKDistinct('aa', 1)",
+        "expect": "2"
+      },
+      {
+        "call": "longestAtMostKDistinct('a', 0)",
+        "expect": "0"
+      },
+      {
+        "call": "longestAtMostKDistinct('ccaabbb', 2)",
+        "expect": "5"
+      }
     ]
   },
   {
@@ -370,12 +501,29 @@
     "prompt": "Write `minWindow(s, t)` that returns the shortest substring of `s` containing every character of `t` including multiplicity, or `''` if none exists. Use a sliding window; keep each step O(1).",
     "starter": "function minWindow(s, t) {\n  // your code here\n}",
     "solution": "function minWindow(s, t) {\n  if (t.length === 0 || s.length < t.length) return '';\n  const need = new Map();\n  for (let i = 0; i < t.length; i++) need.set(t[i], (need.get(t[i]) || 0) + 1);\n  let missing = t.length;\n  let left = 0, bestL = 0, bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    if ((need.get(c) || 0) > 0) missing--;\n    need.set(c, (need.get(c) || 0) - 1);\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) { bestLen = right - left + 1; bestL = left; }\n      const lc = s[left];\n      need.set(lc, need.get(lc) + 1);\n      if (need.get(lc) > 0) missing++;\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestL, bestL + bestLen);\n}",
-    "tests": "if (minWindow('ADOBECODEBANC', 'ABC') !== 'BANC') throw new Error(minWindow('ADOBECODEBANC', 'ABC'));\nif (minWindow('a', 'a') !== 'a') throw new Error('single');\nif (minWindow('a', 'aa') !== '') throw new Error('none');\nif (minWindow('ab', 'b') !== 'b') throw new Error('tail');",
     "mapsTo": "LC 76 · Minimum Window Substring",
     "prereqs": [
       "js.u09.minwindow.missing.predict",
       "js.u09.atmostk.write",
       "js.u09.var.minlen.write"
+    ],
+    "cases": [
+      {
+        "call": "minWindow('ADOBECODEBANC', 'ABC')",
+        "expect": "'BANC'"
+      },
+      {
+        "call": "minWindow('a', 'a')",
+        "expect": "'a'"
+      },
+      {
+        "call": "minWindow('a', 'aa')",
+        "expect": "''"
+      },
+      {
+        "call": "minWindow('ab', 'b')",
+        "expect": "'b'"
+      }
     ]
   },
   {
@@ -405,10 +553,35 @@
     "prompt": "Write `subarraySum(nums, k)` that returns how many contiguous subarrays of `nums` sum to exactly `k`. Values may be negative, so a sliding window will not work; use running prefix sums and a count-map.",
     "starter": "function subarraySum(nums, k) {\n  // your code here\n}",
     "solution": "function subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0, count = 0;\n  for (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
-    "tests": "if (subarraySum([1, 1, 1], 2) !== 2) throw new Error(subarraySum([1, 1, 1], 2));\nif (subarraySum([1, 2, 3], 3) !== 2) throw new Error('123');\nif (subarraySum([1, -1, 0], 0) !== 3) throw new Error('neg');\nif (subarraySum([3], 3) !== 1) throw new Error('single');\nif (subarraySum([1], 2) !== 0) throw new Error('none');\nif (subarraySum([0, 0, 0], 0) !== 6) throw new Error('zeros');",
     "mapsTo": "LC 560 · Subarray Sum Equals K",
     "prereqs": [
       "js.u09.prefix.subarraysum.predict"
+    ],
+    "cases": [
+      {
+        "call": "subarraySum([1, 1, 1], 2)",
+        "expect": "2"
+      },
+      {
+        "call": "subarraySum([1, 2, 3], 3)",
+        "expect": "2"
+      },
+      {
+        "call": "subarraySum([1, -1, 0], 0)",
+        "expect": "3"
+      },
+      {
+        "call": "subarraySum([3], 3)",
+        "expect": "1"
+      },
+      {
+        "call": "subarraySum([1], 2)",
+        "expect": "0"
+      },
+      {
+        "call": "subarraySum([0, 0, 0], 0)",
+        "expect": "6"
+      }
     ]
   }
 ]

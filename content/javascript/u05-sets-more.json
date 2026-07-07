@@ -40,12 +40,31 @@
     "prompt": "Write `countJewels(jewels, stones)` returning how many characters of `stones` appear in `jewels`. Each character of `jewels` is distinct.",
     "starter": "function countJewels(jewels, stones) {\n  // your code here\n}",
     "solution": "function countJewels(jewels, stones) {\n  const set = new Set(jewels);\n  let count = 0;\n  for (let i = 0; i < stones.length; i++) if (set.has(stones[i])) count++;\n  return count;\n}",
-    "tests": "if (countJewels('aA', 'aAAbbbb') !== 3) throw new Error('mixed case');\nif (countJewels('z', 'ZZ') !== 0) throw new Error('case sensitive');\nif (countJewels('', 'abc') !== 0) throw new Error('no jewels');\nif (countJewels('xyz', '') !== 0) throw new Error('no stones');",
     "note": "Building the jewel Set once turns each stone lookup into O(1), so the whole scan is O(|stones|) instead of O(|jewels|*|stones|).",
-    "banned": [".filter("],
+    "banned": [
+      ".filter("
+    ],
     "mapsTo": "LC 771 · Jewels and Stones",
     "prereqs": [
       "js.u05.set.has"
+    ],
+    "cases": [
+      {
+        "call": "countJewels('aA', 'aAAbbbb')",
+        "expect": "3"
+      },
+      {
+        "call": "countJewels('z', 'ZZ')",
+        "expect": "0"
+      },
+      {
+        "call": "countJewels('', 'abc')",
+        "expect": "0"
+      },
+      {
+        "call": "countJewels('xyz', '')",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -59,10 +78,23 @@
     "prompt": "Write `symmetricDiff(a, b)` returning the distinct values that appear in exactly one array: those only in `a` (in `a`'s order) followed by those only in `b` (in `b`'s order).",
     "starter": "function symmetricDiff(a, b) {\n  // your code here\n}",
     "solution": "function symmetricDiff(a, b) {\n  const setA = new Set(a);\n  const setB = new Set(b);\n  const out = [];\n  for (const x of setA) if (!setB.has(x)) out.push(x);\n  for (const x of setB) if (!setA.has(x)) out.push(x);\n  return out;\n}",
-    "tests": "if (JSON.stringify(symmetricDiff([1, 2, 3], [2, 3, 4])) !== JSON.stringify([1, 4])) throw new Error('basic');\nif (JSON.stringify(symmetricDiff([1, 1], [1])) !== JSON.stringify([])) throw new Error('all shared');\nif (JSON.stringify(symmetricDiff([], [5])) !== JSON.stringify([5])) throw new Error('only b');",
     "mapsTo": "pattern behind LC 2215 · Find the Difference of Two Arrays",
     "prereqs": [
       "js.u05.set.difference"
+    ],
+    "cases": [
+      {
+        "call": "symmetricDiff([1, 2, 3], [2, 3, 4])",
+        "expect": "[1, 4]"
+      },
+      {
+        "call": "symmetricDiff([1, 1], [1])",
+        "expect": "[]"
+      },
+      {
+        "call": "symmetricDiff([], [5])",
+        "expect": "[5]"
+      }
     ]
   },
   {
@@ -76,10 +108,25 @@
     "prompt": "Write `distinctCount(lists)` taking an array of arrays and returning how many distinct values appear across all of them.",
     "starter": "function distinctCount(lists) {\n  // your code here\n}",
     "solution": "function distinctCount(lists) {\n  const all = new Set();\n  for (let i = 0; i < lists.length; i++) { const lst = lists[i]; for (let j = 0; j < lst.length; j++) all.add(lst[j]); }\n  return all.size;\n}",
-    "tests": "if (distinctCount([[1, 2], [2, 3], [3, 4]]) !== 4) throw new Error('overlap');\nif (distinctCount([]) !== 0) throw new Error('empty');\nif (distinctCount([[5, 5], [5]]) !== 1) throw new Error('all same');",
-    "banned": [".flat("],
+    "banned": [
+      ".flat("
+    ],
     "prereqs": [
       "js.u05.set.union"
+    ],
+    "cases": [
+      {
+        "call": "distinctCount([[1, 2], [2, 3], [3, 4]])",
+        "expect": "4"
+      },
+      {
+        "call": "distinctCount([])",
+        "expect": "0"
+      },
+      {
+        "call": "distinctCount([[5, 5], [5]])",
+        "expect": "1"
+      }
     ]
   }
 ]

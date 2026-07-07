@@ -8,12 +8,33 @@
     "prompt": "Write rotateLeft(a, k) that returns a new array equal to a rotated left by k positions. k may exceed the length. Do not use .slice.",
     "starter": "function rotateLeft(a, k) {\n  // your code here\n}",
     "solution": "function rotateLeft(a, k) {\n  const n = a.length;\n  if (n === 0) return [];\n  k %= n;\n  const out = [];\n  for (let i = 0; i < n; i++) out.push(a[(i + k) % n]);\n  return out;\n}",
-    "tests": "if (JSON.stringify(rotateLeft([1, 2, 3, 4, 5], 2)) !== JSON.stringify([3, 4, 5, 1, 2])) throw new Error('two');\nif (JSON.stringify(rotateLeft([1, 2, 3], 0)) !== JSON.stringify([1, 2, 3])) throw new Error('zero');\nif (JSON.stringify(rotateLeft([1, 2, 3], 4)) !== JSON.stringify([2, 3, 1])) throw new Error('wrap');\nif (JSON.stringify(rotateLeft([], 3)) !== JSON.stringify([])) throw new Error('empty');",
-    "banned": [".slice("],
-    "prereqs": ["js.u02.access.ring"],
+    "banned": [
+      ".slice("
+    ],
+    "prereqs": [
+      "js.u02.access.ring"
+    ],
     "cue": "Pull each output element from a wrapped source index.",
     "syntax": "(i + k) % a.length",
-    "mapsTo": "LC 189 · Rotate Array"
+    "mapsTo": "LC 189 · Rotate Array",
+    "cases": [
+      {
+        "call": "rotateLeft([1, 2, 3, 4, 5], 2)",
+        "expect": "[3, 4, 5, 1, 2]"
+      },
+      {
+        "call": "rotateLeft([1, 2, 3], 0)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "rotateLeft([1, 2, 3], 4)",
+        "expect": "[2, 3, 1]"
+      },
+      {
+        "call": "rotateLeft([], 3)",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u02.rotate.slice",
@@ -24,10 +45,30 @@
     "prompt": "Write rotateLeft(a, k) that returns a rotated left by k positions, using .slice. k may exceed the length.",
     "starter": "function rotateLeft(a, k) {\n  // your code here\n}",
     "solution": "function rotateLeft(a, k) {\n  if (a.length === 0) return [];\n  k %= a.length;\n  return a.slice(k).concat(a.slice(0, k));\n}",
-    "tests": "if (JSON.stringify(rotateLeft([1, 2, 3, 4, 5], 2)) !== JSON.stringify([3, 4, 5, 1, 2])) throw new Error('two');\nif (JSON.stringify(rotateLeft([1, 2, 3], 3)) !== JSON.stringify([1, 2, 3])) throw new Error('full');\nif (JSON.stringify(rotateLeft([1, 2, 3], 4)) !== JSON.stringify([2, 3, 1])) throw new Error('wrap');\nif (JSON.stringify(rotateLeft([], 2)) !== JSON.stringify([])) throw new Error('empty');",
-    "prereqs": ["js.u02.subrange.slice", "js.u02.rotate.raw"],
+    "prereqs": [
+      "js.u02.subrange.slice",
+      "js.u02.rotate.raw"
+    ],
     "cue": "Cut at the pivot and put the tail before the head.",
-    "syntax": "a.slice(k).concat(a.slice(0, k))"
+    "syntax": "a.slice(k).concat(a.slice(0, k))",
+    "cases": [
+      {
+        "call": "rotateLeft([1, 2, 3, 4, 5], 2)",
+        "expect": "[3, 4, 5, 1, 2]"
+      },
+      {
+        "call": "rotateLeft([1, 2, 3], 3)",
+        "expect": "[1, 2, 3]"
+      },
+      {
+        "call": "rotateLeft([1, 2, 3], 4)",
+        "expect": "[2, 3, 1]"
+      },
+      {
+        "call": "rotateLeft([], 2)",
+        "expect": "[]"
+      }
+    ]
   },
   {
     "id": "js.u02.at.first",
@@ -38,7 +79,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [10, 20, 30];\na.at(-a.length)",
     "expected": "10",
-    "prereqs": ["js.u02.access.at"],
+    "prereqs": [
+      "js.u02.access.at"
+    ],
     "cue": "Count backward by the full length.",
     "syntax": "arr.at(-arr.length)"
   },
@@ -51,7 +94,9 @@
     "prompt": "What is the value of `a`?",
     "snippet": "const a = [1, 2, 3];\na.splice(1, 0, 9);\na",
     "expected": "[1, 9, 2, 3]",
-    "prereqs": ["js.u02.splice.mutates"],
+    "prereqs": [
+      "js.u02.splice.mutates"
+    ],
     "cue": "A delete count of zero removes nothing; the extra arguments are inserted.",
     "syntax": "arr.splice(start, 0, item)"
   },
@@ -64,7 +109,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [1, 2, 3, 4];\na.slice(-2)",
     "expected": "[3, 4]",
-    "prereqs": ["js.u02.subrange.negative"],
+    "prereqs": [
+      "js.u02.subrange.negative"
+    ],
     "cue": "A negative start counts back from the end and runs to the finish.",
     "syntax": "arr.slice(-k)"
   },
@@ -77,7 +124,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [1, 2, 3, 4, 5];\na.slice(1, -1)",
     "expected": "[2, 3, 4]",
-    "prereqs": ["js.u02.subrange.negative"],
+    "prereqs": [
+      "js.u02.subrange.negative"
+    ],
     "cue": "Start after the first, stop one before the end.",
     "syntax": "arr.slice(1, -1)"
   },
@@ -90,7 +139,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [0, 1, 2, 3, 4, 5];\na.filter((_, i) => i % 2 === 1)",
     "expected": "[1, 3, 5]",
-    "prereqs": ["js.u02.stride.filter"],
+    "prereqs": [
+      "js.u02.stride.filter"
+    ],
     "cue": "Keep the positions whose index is odd.",
     "syntax": "arr.filter((x, i) => i % 2 === 1)"
   },
@@ -103,11 +154,30 @@
     "prompt": "Write middle(a) returning the center element of a, which always has odd length.",
     "starter": "function middle(a) {\n  // your code here\n}",
     "solution": "function middle(a) {\n  return a[Math.floor(a.length / 2)];\n}",
-    "tests": "if (middle([1, 2, 3]) !== 2) throw new Error('three');\nif (middle([7]) !== 7) throw new Error('one');\nif (middle([1, 2, 3, 4, 5]) !== 3) throw new Error('five');\nif (middle(['a', 'b', 'c']) !== 'b') throw new Error('str');",
-    "prereqs": ["js.u02.midpoint.raw"],
+    "prereqs": [
+      "js.u02.midpoint.raw"
+    ],
     "cue": "Halve the length to land on the center index.",
     "syntax": "Math.floor(a.length / 2)",
-    "mapsTo": "LC 876 · Middle of the Linked List (the center index on an array here)"
+    "mapsTo": "LC 876 · Middle of the Linked List (the center index on an array here)",
+    "cases": [
+      {
+        "call": "middle([1, 2, 3])",
+        "expect": "2"
+      },
+      {
+        "call": "middle([7])",
+        "expect": "7"
+      },
+      {
+        "call": "middle([1, 2, 3, 4, 5])",
+        "expect": "3"
+      },
+      {
+        "call": "middle(['a', 'b', 'c'])",
+        "expect": "'b'"
+      }
+    ]
   },
   {
     "id": "js.u02.forin.keys",
@@ -118,7 +188,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [10, 20, 30];\nconst out = [];\nfor (const i in a) out.push(i);\nout",
     "expected": "[\"0\", \"1\", \"2\"]",
-    "prereqs": ["js.u02.access.last.raw"],
+    "prereqs": [
+      "js.u02.access.last.raw"
+    ],
     "cue": "for...in walks an object's keys; an array's keys are its indices, and keys are strings.",
     "syntax": "for (const k in obj)"
   },
@@ -131,7 +203,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [10, 20, 30];\nlet sum = 0;\nfor (const x of a) sum += x;\nsum",
     "expected": "60",
-    "prereqs": ["js.u02.forin.keys"],
+    "prereqs": [
+      "js.u02.forin.keys"
+    ],
     "cue": "for...of hands you each element itself, not its index.",
     "syntax": "for (const x of arr)"
   },
@@ -145,8 +219,14 @@
     "starter": "function removeDuplicates(a) {\n  // your code here\n}",
     "solution": "function removeDuplicates(a) {\n  if (a.length === 0) return 0;\n  let w = 1;\n  for (let i = 1; i < a.length; i++) {\n    if (a[i] !== a[w - 1]) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  return w;\n}",
     "tests": "let a = [1, 1, 2];\nif (removeDuplicates(a) !== 2) throw new Error('m');\nif (JSON.stringify(a.slice(0, 2)) !== JSON.stringify([1, 2])) throw new Error('front');\nlet b = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];\nif (removeDuplicates(b) !== 5) throw new Error('m2');\nif (JSON.stringify(b.slice(0, 5)) !== JSON.stringify([0, 1, 2, 3, 4])) throw new Error('front2');\nif (removeDuplicates([7]) !== 1) throw new Error('single');\nif (removeDuplicates([]) !== 0) throw new Error('empty');",
-    "banned": ["Set", ".filter(", ".indexOf("],
-    "prereqs": ["js.u02.subrange.raw"],
+    "banned": [
+      "Set",
+      ".filter(",
+      ".indexOf("
+    ],
+    "prereqs": [
+      "js.u02.subrange.raw"
+    ],
     "cue": "Keep a write index for the next distinct slot; compare each element to the last value you kept.",
     "syntax": "a[w] = a[i]; w++",
     "mapsTo": "LC 26 · Remove Duplicates from Sorted Array"
@@ -161,8 +241,14 @@
     "starter": "function removeElement(a, val) {\n  // your code here\n}",
     "solution": "function removeElement(a, val) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] !== val) {\n      a[w] = a[i];\n      w++;\n    }\n  }\n  return w;\n}",
     "tests": "let a = [3, 2, 2, 3];\nif (removeElement(a, 3) !== 2) throw new Error('m');\nif (JSON.stringify(a.slice(0, 2)) !== JSON.stringify([2, 2])) throw new Error('front');\nlet b = [0, 1, 2, 2, 3, 0, 4, 2];\nif (removeElement(b, 2) !== 5) throw new Error('m2');\nif (JSON.stringify(b.slice(0, 5)) !== JSON.stringify([0, 1, 3, 0, 4])) throw new Error('front2');\nif (removeElement([], 1) !== 0) throw new Error('empty');\nif (removeElement([1, 1, 1], 1) !== 0) throw new Error('all');",
-    "banned": [".filter(", ".splice("],
-    "prereqs": ["js.u02.subrange.raw", "js.u02.compact.dedup"],
+    "banned": [
+      ".filter(",
+      ".splice("
+    ],
+    "prereqs": [
+      "js.u02.subrange.raw",
+      "js.u02.compact.dedup"
+    ],
     "cue": "Keep a write index; copy an element forward only when it is not the value being removed.",
     "syntax": "a[w] = a[i]; w++",
     "mapsTo": "LC 27 · Remove Element"

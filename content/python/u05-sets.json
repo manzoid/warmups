@@ -383,10 +383,27 @@
     "prompt": "Write `has_dup(a)` returning True if any element of list `a` appears more than once, else False. Stop as soon as a repeat is found.",
     "starter": "def has_dup(a):\n    # your code here\n    pass\n",
     "solution": "def has_dup(a):\n    seen = set()\n    for i in range(len(a)):\n        if a[i] in seen:\n            return True\n        seen.add(a[i])\n    return False\n",
-    "tests": "assert has_dup([1, 2, 1]) is True, [1, 2, 1]\nassert has_dup([1, 2, 3]) is False, [1, 2, 3]\nassert has_dup([]) is False\nassert has_dup([7]) is False\n",
     "mapsTo": "LC 217 · Contains Duplicate",
     "prereqs": [
       "py.u05.membership.set"
+    ],
+    "cases": [
+      {
+        "call": "has_dup([1, 2, 1])",
+        "expect": "True"
+      },
+      {
+        "call": "has_dup([1, 2, 3])",
+        "expect": "False"
+      },
+      {
+        "call": "has_dup([])",
+        "expect": "False"
+      },
+      {
+        "call": "has_dup([7])",
+        "expect": "False"
+      }
     ]
   },
   {

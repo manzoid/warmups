@@ -25,10 +25,23 @@
     "prompt": "Implement `runningMax(a)` returning an array whose element `i` is the largest value among `a[0..i]`. `runningMax([])` is `[]`.",
     "starter": "function runningMax(a) {\n  // your code here\n}",
     "solution": "function runningMax(a) {\n  const out = [];\n  let best = -Infinity;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] > best) best = a[i];\n    out.push(best);\n  }\n  return out;\n}",
-    "tests": "if (JSON.stringify(runningMax([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(runningMax([3, 1, 4, 1, 5, 9, 2])) !== JSON.stringify([3, 3, 4, 4, 5, 9, 9])) throw new Error('rmax');\nif (JSON.stringify(runningMax([-2, -5, -1])) !== JSON.stringify([-2, -2, -1])) throw new Error('neg');",
     "prereqs": [
       "js.u01.extreme.max.predict",
       "js.u01.accumulate.runningsum.predict"
+    ],
+    "cases": [
+      {
+        "call": "runningMax([])",
+        "expect": "[]"
+      },
+      {
+        "call": "runningMax([3, 1, 4, 1, 5, 9, 2])",
+        "expect": "[3, 3, 4, 4, 5, 9, 9]"
+      },
+      {
+        "call": "runningMax([-2, -5, -1])",
+        "expect": "[-2, -2, -1]"
+      }
     ]
   },
   {
@@ -42,9 +55,34 @@
     "prompt": "Implement `countVowels(s)` returning how many characters of string `s` are vowels (`a`, `e`, `i`, `o`, `u`), upper or lower case.",
     "starter": "function countVowels(s) {\n  // your code here\n}",
     "solution": "function countVowels(s) {\n  let c = 0;\n  for (let i = 0; i < s.length; i++) if ('aeiouAEIOU'.includes(s[i])) c++;\n  return c;\n}",
-    "tests": "if (countVowels('') !== 0) throw new Error('empty');\nif (countVowels('hello') !== 2) throw new Error('hello');\nif (countVowels('xyz') !== 0) throw new Error('none');\nif (countVowels('aeiou') !== 5) throw new Error('all');\nif (countVowels('HELLO') !== 2) throw new Error('upper');\nif (countVowels('AeIoU') !== 5) throw new Error('mixed case');",
     "prereqs": [
       "js.u01.count.predict"
+    ],
+    "cases": [
+      {
+        "call": "countVowels('')",
+        "expect": "0"
+      },
+      {
+        "call": "countVowels('hello')",
+        "expect": "2"
+      },
+      {
+        "call": "countVowels('xyz')",
+        "expect": "0"
+      },
+      {
+        "call": "countVowels('aeiou')",
+        "expect": "5"
+      },
+      {
+        "call": "countVowels('HELLO')",
+        "expect": "2"
+      },
+      {
+        "call": "countVowels('AeIoU')",
+        "expect": "5"
+      }
     ]
   },
   {
@@ -58,9 +96,22 @@
     "prompt": "Implement `closest(a, t)` returning the element of non-empty array `a` nearest to `t` (smallest `Math.abs(x - t)`); on ties keep the first.",
     "starter": "function closest(a, t) {\n  // your code here\n}",
     "solution": "function closest(a, t) {\n  let best = a[0];\n  for (let i = 1; i < a.length; i++) if (Math.abs(a[i] - t) < Math.abs(best - t)) best = a[i];\n  return best;\n}",
-    "tests": "if (closest([5], 0) !== 5) throw new Error('single');\nif (closest([10, 4, 7, 1], 5) !== 4) throw new Error('mix');\nif (closest([-3, -1, -8], -2) !== -3) throw new Error('neg tie-first');",
     "prereqs": [
       "js.u01.extreme.max.predict"
+    ],
+    "cases": [
+      {
+        "call": "closest([5], 0)",
+        "expect": "5"
+      },
+      {
+        "call": "closest([10, 4, 7, 1], 5)",
+        "expect": "4"
+      },
+      {
+        "call": "closest([-3, -1, -8], -2)",
+        "expect": "-3"
+      }
     ]
   },
   {
@@ -104,9 +155,26 @@
     "prompt": "Implement `maxRise(a)` returning the largest increase between consecutive elements (`a[i] - a[i-1]`), or 0 if it never increases. Empty and single-element arrays give 0.",
     "starter": "function maxRise(a) {\n  // your code here\n}",
     "solution": "function maxRise(a) {\n  let best = 0;\n  for (let i = 1; i < a.length; i++) {\n    const d = a[i] - a[i - 1];\n    if (d > best) best = d;\n  }\n  return best;\n}",
-    "tests": "if (maxRise([]) !== 0) throw new Error('empty');\nif (maxRise([5]) !== 0) throw new Error('single');\nif (maxRise([1, 5, 2, 10]) !== 8) throw new Error('rise');\nif (maxRise([5, 4, 3]) !== 0) throw new Error('descending');",
     "prereqs": [
       "js.u01.neighbor.rises.predict"
+    ],
+    "cases": [
+      {
+        "call": "maxRise([])",
+        "expect": "0"
+      },
+      {
+        "call": "maxRise([5])",
+        "expect": "0"
+      },
+      {
+        "call": "maxRise([1, 5, 2, 10])",
+        "expect": "8"
+      },
+      {
+        "call": "maxRise([5, 4, 3])",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -118,14 +186,34 @@
     "syntax": "lo < hi loop condition",
     "kind": "write",
     "prompt": "Implement `reverseInPlace(a)` that reverses array `a` in place and returns it. Do not build a new array or use `.reverse()` or spread.",
-    "banned": [".reverse", "..."],
+    "banned": [
+      ".reverse",
+      "..."
+    ],
     "starter": "function reverseInPlace(a) {\n  // your code here\n}",
     "solution": "function reverseInPlace(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    const t = a[lo];\n    a[lo] = a[hi];\n    a[hi] = t;\n    lo++;\n    hi--;\n  }\n  return a;\n}",
-    "tests": "if (JSON.stringify(reverseInPlace([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(reverseInPlace([7])) !== JSON.stringify([7])) throw new Error('single');\nif (JSON.stringify(reverseInPlace([1, 2, 3, 4])) !== JSON.stringify([4, 3, 2, 1])) throw new Error('even');\nif (JSON.stringify(reverseInPlace([1, 2, 3])) !== JSON.stringify([3, 2, 1])) throw new Error('odd');",
     "note": "In place uses O(1) extra space: swap the ends and walk inward, versus the spread copy which allocates a second array.",
     "mapsTo": "LC 344 · Reverse String",
     "prereqs": [
       "js.u01.reverse.predict"
+    ],
+    "cases": [
+      {
+        "call": "reverseInPlace([])",
+        "expect": "[]"
+      },
+      {
+        "call": "reverseInPlace([7])",
+        "expect": "[7]"
+      },
+      {
+        "call": "reverseInPlace([1, 2, 3, 4])",
+        "expect": "[4, 3, 2, 1]"
+      },
+      {
+        "call": "reverseInPlace([1, 2, 3])",
+        "expect": "[3, 2, 1]"
+      }
     ]
   },
   {
@@ -139,10 +227,23 @@
     "prompt": "Implement `runningSum(a)` returning an array whose element `i` is the sum of `a[0..i]`. `runningSum([])` is `[]`.",
     "starter": "function runningSum(a) {\n  // your code here\n}",
     "solution": "function runningSum(a) {\n  const out = [];\n  let run = 0;\n  for (let i = 0; i < a.length; i++) {\n    run += a[i];\n    out.push(run);\n  }\n  return out;\n}",
-    "tests": "if (JSON.stringify(runningSum([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(runningSum([1, 2, 3, 4])) !== JSON.stringify([1, 3, 6, 10])) throw new Error('rsum');\nif (JSON.stringify(runningSum([3, 1, 4, 1])) !== JSON.stringify([3, 4, 8, 9])) throw new Error('mixed');",
     "mapsTo": "LC 1480 · Running Sum of 1d Array",
     "prereqs": [
       "js.u01.accumulate.runningsum.predict"
+    ],
+    "cases": [
+      {
+        "call": "runningSum([])",
+        "expect": "[]"
+      },
+      {
+        "call": "runningSum([1, 2, 3, 4])",
+        "expect": "[1, 3, 6, 10]"
+      },
+      {
+        "call": "runningSum([3, 1, 4, 1])",
+        "expect": "[3, 4, 8, 9]"
+      }
     ]
   },
   {
@@ -156,11 +257,32 @@
     "prompt": "Implement `maxProfit(a)` returning the largest `a[j] - a[i]` for some `i < j`, or 0 if no later element is larger. Empty or single-element arrays give 0.",
     "starter": "function maxProfit(a) {\n  // your code here\n}",
     "solution": "function maxProfit(a) {\n  let best = 0;\n  let lo = Infinity;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] < lo) lo = a[i];\n    else if (a[i] - lo > best) best = a[i] - lo;\n  }\n  return best;\n}",
-    "tests": "if (maxProfit([]) !== 0) throw new Error('empty');\nif (maxProfit([5]) !== 0) throw new Error('single');\nif (maxProfit([7, 1, 5, 3, 6, 4]) !== 5) throw new Error('profit');\nif (maxProfit([7, 6, 4, 3, 1]) !== 0) throw new Error('descending');\nif (maxProfit([1, 2]) !== 1) throw new Error('rise');",
     "note": "The trick is a single min-so-far carried left to right, so it stays O(n) (work grows in step with the array length) instead of comparing every pair, which is O(n^2).",
     "mapsTo": "LC 121 · Best Time to Buy and Sell Stock",
     "prereqs": [
       "js.u01.extreme.runningmax"
+    ],
+    "cases": [
+      {
+        "call": "maxProfit([])",
+        "expect": "0"
+      },
+      {
+        "call": "maxProfit([5])",
+        "expect": "0"
+      },
+      {
+        "call": "maxProfit([7, 1, 5, 3, 6, 4])",
+        "expect": "5"
+      },
+      {
+        "call": "maxProfit([7, 6, 4, 3, 1])",
+        "expect": "0"
+      },
+      {
+        "call": "maxProfit([1, 2])",
+        "expect": "1"
+      }
     ]
   },
   {
@@ -174,11 +296,28 @@
     "prompt": "Implement `maxSubArray(a)` returning the largest sum of any non-empty contiguous subarray of `a`.",
     "starter": "function maxSubArray(a) {\n  // your code here\n}",
     "solution": "function maxSubArray(a) {\n  let best = a[0];\n  let cur = a[0];\n  for (let i = 1; i < a.length; i++) {\n    cur = Math.max(a[i], cur + a[i]);\n    if (cur > best) best = cur;\n  }\n  return best;\n}",
-    "tests": "if (maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) !== 6) throw new Error('classic');\nif (maxSubArray([1]) !== 1) throw new Error('single');\nif (maxSubArray([-3, -1, -2]) !== -1) throw new Error('all neg');\nif (maxSubArray([5, 4, -1, 7, 8]) !== 23) throw new Error('mostly pos');",
     "note": "cur is the best sum ending at i: either start fresh at a[i] or extend the running one, whichever is larger. Seeding best and cur at a[0] is why the all-negative case still returns the least-negative element. One pass, O(n).",
     "mapsTo": "LC 53 · Maximum Subarray",
     "prereqs": [
       "js.u01.extreme.maxprofit"
+    ],
+    "cases": [
+      {
+        "call": "maxSubArray([-2, 1, -3, 4, -1, 2, 1, -5, 4])",
+        "expect": "6"
+      },
+      {
+        "call": "maxSubArray([1])",
+        "expect": "1"
+      },
+      {
+        "call": "maxSubArray([-3, -1, -2])",
+        "expect": "-1"
+      },
+      {
+        "call": "maxSubArray([5, 4, -1, 7, 8])",
+        "expect": "23"
+      }
     ]
   },
   {

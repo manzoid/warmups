@@ -10,8 +10,27 @@
     "prompt": "Write `countHops(a)` where every element of `a` is at least 1. Starting at index 0, repeatedly add the current element to the index and count each jump; return how many jumps it takes to reach or pass the end.",
     "starter": "function countHops(a) {\n  // your code here\n}",
     "solution": "function countHops(a) {\n  let i = 0;\n  let hops = 0;\n  while (i < a.length) {\n    i += a[i];\n    hops++;\n  }\n  return hops;\n}",
-    "tests": "if (countHops([2, 3, 1, 1, 4]) !== 4) throw new Error('4: ' + countHops([2, 3, 1, 1, 4]));\nif (countHops([1, 1, 1]) !== 3) throw new Error('unit steps');\nif (countHops([5]) !== 1) throw new Error('single');\nif (countHops([1, 2, 3]) !== 2) throw new Error('mixed');",
-    "prereqs": ["js.u07.jump.predict"]
+    "prereqs": [
+      "js.u07.jump.predict"
+    ],
+    "cases": [
+      {
+        "call": "countHops([2, 3, 1, 1, 4])",
+        "expect": "4"
+      },
+      {
+        "call": "countHops([1, 1, 1])",
+        "expect": "3"
+      },
+      {
+        "call": "countHops([5])",
+        "expect": "1"
+      },
+      {
+        "call": "countHops([1, 2, 3])",
+        "expect": "2"
+      }
+    ]
   },
   {
     "id": "js.u07.skipsuffix.predict",
@@ -24,7 +43,9 @@
     "prompt": "What is the value of `i`?",
     "snippet": "const s = 'hi   ';\nlet i = s.length - 1;\nwhile (i >= 0 && s[i] === ' ') i--;\ni;",
     "expected": "1",
-    "prereqs": ["js.u07.skipprefix.predict"]
+    "prereqs": [
+      "js.u07.skipprefix.predict"
+    ]
   },
   {
     "id": "js.u07.skipsuffix.write",
@@ -37,9 +58,31 @@
     "prompt": "Write `lastNonZero(a)` that returns the index of the last non-zero element of `a`, or `-1` if every element is zero or `a` is empty. Scan backward from the end.",
     "starter": "function lastNonZero(a) {\n  // your code here\n}",
     "solution": "function lastNonZero(a) {\n  let i = a.length - 1;\n  while (i >= 0 && a[i] === 0) i--;\n  return i;\n}",
-    "tests": "if (lastNonZero([0, 5, 0, 0]) !== 1) throw new Error('1');\nif (lastNonZero([0, 0, 0]) !== -1) throw new Error('all zero');\nif (lastNonZero([]) !== -1) throw new Error('empty');\nif (lastNonZero([7]) !== 0) throw new Error('single');",
-    "banned": [".findLastIndex(", ".findLast("],
-    "prereqs": ["js.u07.skipsuffix.predict"]
+    "banned": [
+      ".findLastIndex(",
+      ".findLast("
+    ],
+    "prereqs": [
+      "js.u07.skipsuffix.predict"
+    ],
+    "cases": [
+      {
+        "call": "lastNonZero([0, 5, 0, 0])",
+        "expect": "1"
+      },
+      {
+        "call": "lastNonZero([0, 0, 0])",
+        "expect": "-1"
+      },
+      {
+        "call": "lastNonZero([])",
+        "expect": "-1"
+      },
+      {
+        "call": "lastNonZero([7])",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u07.partition.write",
@@ -53,10 +96,15 @@
     "starter": "function partitionEvenOdd(a) {\n  // your code here\n}",
     "solution": "function partitionEvenOdd(a) {\n  let w = 0;\n  for (let i = 0; i < a.length; i++) {\n    if (a[i] % 2 === 0) {\n      [a[w], a[i]] = [a[i], a[w]];\n      w++;\n    }\n  }\n  return a;\n}",
     "tests": "const sorted = (x) => [...x].sort((p, q) => p - q);\nconst multisetEq = (g, w) => JSON.stringify(sorted(g)) === JSON.stringify(sorted(w));\nconst partitioned = (r) => { let odd = false; for (const x of r) { if (x % 2 !== 0) odd = true; else if (odd) return false; } return true; };\nconst check = (input) => { const orig = [...input]; const r = partitionEvenOdd(input); if (!multisetEq(r, orig)) throw new Error('multiset: ' + r); if (!partitioned(r)) throw new Error('order: ' + r); };\ncheck([1, 2, 3, 4, 5]);\ncheck([2, 4]);\ncheck([1, 3, 5]);\ncheck([4, 1, 6, 3, 8]);\nif (JSON.stringify(partitionEvenOdd([])) !== JSON.stringify([])) throw new Error('empty');",
-    "banned": [".sort(", ".filter("],
+    "banned": [
+      ".sort(",
+      ".filter("
+    ],
     "note": "The predicate is the only thing that changed from move-zeros; swap-forward on any test partitions the array around it.",
     "mapsTo": "LC 905 · Sort Array By Parity",
-    "prereqs": ["js.u07.movezeros.write"]
+    "prereqs": [
+      "js.u07.movezeros.write"
+    ]
   },
   {
     "id": "js.u07.intersect.predict",
@@ -69,7 +117,9 @@
     "prompt": "What is the value of `out`?",
     "snippet": "const A = [1, 3, 5];\nconst B = [2, 3, 4, 5];\nlet i = 0, j = 0;\nconst out = [];\nwhile (i < A.length && j < B.length) {\n  if (A[i] === B[j]) { out.push(A[i]); i++; j++; }\n  else if (A[i] < B[j]) i++;\n  else j++;\n}\nout;",
     "expected": "[3, 5]",
-    "prereqs": ["js.u07.merge.write"]
+    "prereqs": [
+      "js.u07.merge.write"
+    ]
   },
   {
     "id": "js.u07.intersect.write",
@@ -83,15 +133,32 @@
     "starter": "function sortedIntersection(A, B) {\n  // your code here\n}",
     "solution": "function sortedIntersection(A, B) {\n  let i = 0, j = 0;\n  const out = [];\n  while (i < A.length && j < B.length) {\n    if (A[i] === B[j]) { out.push(A[i]); i++; j++; }\n    else if (A[i] < B[j]) i++;\n    else j++;\n  }\n  return out;\n}",
     "cases": [
-      { "call": "sortedIntersection([1, 2, 4, 5, 6], [2, 3, 5, 7])", "expect": "[2, 5]" },
-      { "call": "sortedIntersection([1, 2, 3], [4, 5, 6])", "expect": "[]" },
-      { "call": "sortedIntersection([], [1])", "expect": "[]" },
-      { "call": "sortedIntersection([1, 2, 3], [1, 2, 3])", "expect": "[1, 2, 3]" }
+      {
+        "call": "sortedIntersection([1, 2, 4, 5, 6], [2, 3, 5, 7])",
+        "expect": "[2, 5]"
+      },
+      {
+        "call": "sortedIntersection([1, 2, 3], [4, 5, 6])",
+        "expect": "[]"
+      },
+      {
+        "call": "sortedIntersection([], [1])",
+        "expect": "[]"
+      },
+      {
+        "call": "sortedIntersection([1, 2, 3], [1, 2, 3])",
+        "expect": "[1, 2, 3]"
+      }
     ],
-    "banned": [".filter(", ".includes("],
+    "banned": [
+      ".filter(",
+      ".includes("
+    ],
     "note": "Because both arrays are sorted, advancing only the cursor at the smaller head can never skip a shared value; this is O(n+m) with no extra set.",
     "mapsTo": "LC 349 · Intersection of Two Arrays",
-    "prereqs": ["js.u07.intersect.predict"]
+    "prereqs": [
+      "js.u07.intersect.predict"
+    ]
   },
   {
     "id": "js.u07.compress.write",
@@ -104,11 +171,36 @@
     "prompt": "Write `compress(s)` that walks `s` once and, for each maximal run of a character, appends the character followed by its count only when the count is greater than 1. `compress('aaabbc')` returns `'a3b2c'` and `compress('abc')` returns `'abc'`.",
     "starter": "function compress(s) {\n  // your code here\n}",
     "solution": "function compress(s) {\n  let i = 0;\n  let res = '';\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    res += s[i];\n    if (j - i > 1) res += (j - i);\n    i = j;\n  }\n  return res;\n}",
-    "tests": "if (compress('aaabbc') !== 'a3b2c') throw new Error(compress('aaabbc'));\nif (compress('') !== '') throw new Error('empty');\nif (compress('abc') !== 'abc') throw new Error('distinct');\nif (compress('aabb') !== 'a2b2') throw new Error('pairs');\nif (compress('a') !== 'a') throw new Error('single');",
-    "banned": [".match("],
+    "banned": [
+      ".match("
+    ],
     "note": "Omitting the count when it is 1 is the rule that makes this the classic string-compression variant rather than plain run-length encoding.",
     "mapsTo": "LC 443 · String Compression",
-    "prereqs": ["js.u07.rle.write"]
+    "prereqs": [
+      "js.u07.rle.write"
+    ],
+    "cases": [
+      {
+        "call": "compress('aaabbc')",
+        "expect": "'a3b2c'"
+      },
+      {
+        "call": "compress('')",
+        "expect": "''"
+      },
+      {
+        "call": "compress('abc')",
+        "expect": "'abc'"
+      },
+      {
+        "call": "compress('aabb')",
+        "expect": "'a2b2'"
+      },
+      {
+        "call": "compress('a')",
+        "expect": "'a'"
+      }
+    ]
   },
   {
     "id": "js.u07.stridesum.predict",
@@ -121,6 +213,8 @@
     "prompt": "What is the value of `s`?",
     "snippet": "const a = [10, 20, 30, 40, 50];\nlet i = 0;\nlet s = 0;\nwhile (i < a.length) {\n  s += a[i];\n  i += 2;\n}\ns;",
     "expected": "90",
-    "prereqs": ["js.u07.stride.predict"]
+    "prereqs": [
+      "js.u07.stride.predict"
+    ]
   }
 ]

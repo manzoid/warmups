@@ -23,7 +23,6 @@
     "prompt": "Write `sumAll(a)` that returns the sum of the numbers in `a`. Use a `while` loop with an index you increment yourself; do not use `for`, `reduce`, or other built-ins. They are banned so you practice driving the index pointer by hand.",
     "starter": "function sumAll(a) {\n  // your code here\n}",
     "solution": "function sumAll(a) {\n  let i = 0;\n  let s = 0;\n  while (i < a.length) {\n    s += a[i];\n    i++;\n  }\n  return s;\n}",
-    "tests": "if (sumAll([10, 20, 30]) !== 60) throw new Error('60: ' + sumAll([10, 20, 30]));\nif (sumAll([]) !== 0) throw new Error('empty must be 0');\nif (sumAll([5]) !== 5) throw new Error('single');\nif (sumAll([-1, 1, -2, 2]) !== 0) throw new Error('signs');",
     "banned": [
       "for (",
       "for(",
@@ -31,6 +30,24 @@
     ],
     "prereqs": [
       "js.u07.manual.sum"
+    ],
+    "cases": [
+      {
+        "call": "sumAll([10, 20, 30])",
+        "expect": "60"
+      },
+      {
+        "call": "sumAll([])",
+        "expect": "0"
+      },
+      {
+        "call": "sumAll([5])",
+        "expect": "5"
+      },
+      {
+        "call": "sumAll([-1, 1, -2, 2])",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -140,13 +157,30 @@
     "prompt": "Write `firstNonZero(a)` that returns the index of the first non-zero element of `a`, or `a.length` if every element is zero. Slide the index forward while the current element is zero.",
     "starter": "function firstNonZero(a) {\n  // your code here\n}",
     "solution": "function firstNonZero(a) {\n  let i = 0;\n  while (i < a.length && a[i] === 0) i++;\n  return i;\n}",
-    "tests": "if (firstNonZero([0, 0, 5, 0]) !== 2) throw new Error('2');\nif (firstNonZero([0, 0, 0]) !== 3) throw new Error('all zero');\nif (firstNonZero([]) !== 0) throw new Error('empty');\nif (firstNonZero([7]) !== 0) throw new Error('first');",
     "banned": [
       ".findIndex(",
       ".filter("
     ],
     "prereqs": [
       "js.u07.skipprefix.predict"
+    ],
+    "cases": [
+      {
+        "call": "firstNonZero([0, 0, 5, 0])",
+        "expect": "2"
+      },
+      {
+        "call": "firstNonZero([0, 0, 0])",
+        "expect": "3"
+      },
+      {
+        "call": "firstNonZero([])",
+        "expect": "0"
+      },
+      {
+        "call": "firstNonZero([7])",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -190,13 +224,30 @@
     "prompt": "Write `indexOfManual(a, target)` that returns the index of the first element equal to `target`, or `-1` if none. Scan with a `while` loop; do not use `indexOf` or `findIndex`.",
     "starter": "function indexOfManual(a, target) {\n  // your code here\n}",
     "solution": "function indexOfManual(a, target) {\n  let i = 0;\n  while (i < a.length && a[i] !== target) i++;\n  return i < a.length ? i : -1;\n}",
-    "tests": "if (indexOfManual([4, 5, 6, 5, 7], 5) !== 1) throw new Error('1');\nif (indexOfManual([4, 5, 6, 5, 7], 9) !== -1) throw new Error('absent');\nif (indexOfManual([], 1) !== -1) throw new Error('empty');\nif (indexOfManual([7], 7) !== 0) throw new Error('first');",
     "banned": [
       ".indexOf(",
       ".findIndex("
     ],
     "prereqs": [
       "js.u07.find.predict"
+    ],
+    "cases": [
+      {
+        "call": "indexOfManual([4, 5, 6, 5, 7], 5)",
+        "expect": "1"
+      },
+      {
+        "call": "indexOfManual([4, 5, 6, 5, 7], 9)",
+        "expect": "-1"
+      },
+      {
+        "call": "indexOfManual([], 1)",
+        "expect": "-1"
+      },
+      {
+        "call": "indexOfManual([7], 7)",
+        "expect": "0"
+      }
     ]
   },
   {
@@ -240,12 +291,33 @@
     "prompt": "Write `firstRunLength(a)` that returns the length of the maximal block of equal values starting at index 0, or 0 for an empty array.",
     "starter": "function firstRunLength(a) {\n  // your code here\n}",
     "solution": "function firstRunLength(a) {\n  if (a.length === 0) return 0;\n  let j = 0;\n  while (j < a.length && a[j] === a[0]) j++;\n  return j;\n}",
-    "tests": "if (firstRunLength([1, 1, 1, 2]) !== 3) throw new Error('3');\nif (firstRunLength([5]) !== 1) throw new Error('single');\nif (firstRunLength([]) !== 0) throw new Error('empty');\nif (firstRunLength([3, 3]) !== 2) throw new Error('two');\nif (firstRunLength([1, 2, 2]) !== 1) throw new Error('run of one');",
     "banned": [
       ".findIndex("
     ],
     "prereqs": [
       "js.u07.skiprun.predict"
+    ],
+    "cases": [
+      {
+        "call": "firstRunLength([1, 1, 1, 2])",
+        "expect": "3"
+      },
+      {
+        "call": "firstRunLength([5])",
+        "expect": "1"
+      },
+      {
+        "call": "firstRunLength([])",
+        "expect": "0"
+      },
+      {
+        "call": "firstRunLength([3, 3])",
+        "expect": "2"
+      },
+      {
+        "call": "firstRunLength([1, 2, 2])",
+        "expect": "1"
+      }
     ]
   },
   {
@@ -516,12 +588,33 @@
     "prompt": "Write `rle(s)` that returns the run-length encoding of `s`: for each maximal run of equal characters, append the character followed by its count. `rle('aaabbc')` returns `'a3b2c1'`, and `rle('')` returns `''`.",
     "starter": "function rle(s) {\n  // your code here\n}",
     "solution": "function rle(s) {\n  let i = 0;\n  let res = '';\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    res += s[i] + (j - i);\n    i = j;\n  }\n  return res;\n}",
-    "tests": "if (rle('aaabbc') !== 'a3b2c1') throw new Error(rle('aaabbc'));\nif (rle('') !== '') throw new Error('empty');\nif (rle('a') !== 'a1') throw new Error('single');\nif (rle('abc') !== 'a1b1c1') throw new Error('distinct');\nif (rle('aabbaa') !== 'a2b2a2') throw new Error('repeat block');",
     "banned": [
       ".match("
     ],
     "prereqs": [
       "js.u07.rle.predict"
+    ],
+    "cases": [
+      {
+        "call": "rle('aaabbc')",
+        "expect": "'a3b2c1'"
+      },
+      {
+        "call": "rle('')",
+        "expect": "''"
+      },
+      {
+        "call": "rle('a')",
+        "expect": "'a1'"
+      },
+      {
+        "call": "rle('abc')",
+        "expect": "'a1b1c1'"
+      },
+      {
+        "call": "rle('aabbaa')",
+        "expect": "'a2b2a2'"
+      }
     ]
   }
 ]

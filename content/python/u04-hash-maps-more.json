@@ -38,7 +38,6 @@
     "prompt": "Write `is_anagram(s, t)` that returns True if `t` is a rearrangement of the characters of `s`, else False. Compare character counts.",
     "starter": "def is_anagram(s, t):\n    # your code here\n    pass",
     "solution": "def is_anagram(s, t):\n    from collections import Counter\n    return Counter(s) == Counter(t)",
-    "tests": "assert is_anagram(\"anagram\", \"nagaram\") is True, is_anagram(\"anagram\", \"nagaram\")\nassert is_anagram(\"rat\", \"car\") is False, is_anagram(\"rat\", \"car\")\nassert is_anagram(\"\", \"\") is True, is_anagram(\"\", \"\")\nassert is_anagram(\"a\", \"ab\") is False, is_anagram(\"a\", \"ab\")",
     "prereqs": [
       "py.u04.freq.counter.mostcommon"
     ],
@@ -48,7 +47,25 @@
       "sorted(",
       ".sort("
     ],
-    "mapsTo": "LC 242 · Valid Anagram"
+    "mapsTo": "LC 242 · Valid Anagram",
+    "cases": [
+      {
+        "call": "is_anagram('anagram', 'nagaram')",
+        "expect": "True"
+      },
+      {
+        "call": "is_anagram('rat', 'car')",
+        "expect": "False"
+      },
+      {
+        "call": "is_anagram('', '')",
+        "expect": "True"
+      },
+      {
+        "call": "is_anagram('a', 'ab')",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u04.dict-zip.predict",

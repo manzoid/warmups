@@ -8,11 +8,34 @@
     "prompt": "Write `firstUnique(s)` returning the index of the first character in `s` that appears exactly once, or -1 if there is none.",
     "starter": "function firstUnique(s) {\n  // your code here\n}",
     "solution": "function firstUnique(s) {\n  const freq = {};\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    freq[c] = (freq[c] || 0) + 1;\n  }\n  for (let i = 0; i < s.length; i++) {\n    if (freq[s[i]] === 1) return i;\n  }\n  return -1;\n}",
-    "tests": "if (firstUnique(\"leetcode\") !== 0) throw new Error(\"leetcode\");\nif (firstUnique(\"loveleetcode\") !== 2) throw new Error(\"loveleetcode\");\nif (firstUnique(\"aabb\") !== -1) throw new Error(\"aabb\");\nif (firstUnique(\"\") !== -1) throw new Error(\"empty\");\nif (firstUnique(\"z\") !== 0) throw new Error(\"z\");",
-    "prereqs": ["js.u03.freq"],
+    "prereqs": [
+      "js.u03.freq"
+    ],
     "cue": "Count all characters first, then scan in order for the first count of one.",
     "syntax": "two passes over s",
-    "mapsTo": "LC 387 · First Unique Character in a String"
+    "mapsTo": "LC 387 · First Unique Character in a String",
+    "cases": [
+      {
+        "call": "firstUnique(\"leetcode\")",
+        "expect": "0"
+      },
+      {
+        "call": "firstUnique(\"loveleetcode\")",
+        "expect": "2"
+      },
+      {
+        "call": "firstUnique(\"aabb\")",
+        "expect": "-1"
+      },
+      {
+        "call": "firstUnique(\"\")",
+        "expect": "-1"
+      },
+      {
+        "call": "firstUnique(\"z\")",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u03.anagram",
@@ -23,12 +46,37 @@
     "prompt": "Write `isAnagram(a, b)` returning true if `b` is a rearrangement of the characters of `a`. Compare character counts; do not sort.",
     "starter": "function isAnagram(a, b) {\n  // your code here\n}",
     "solution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const freq = {};\n  for (let i = 0; i < a.length; i++) freq[a[i]] = (freq[a[i]] || 0) + 1;\n  for (let i = 0; i < b.length; i++) {\n    if (!freq[b[i]]) return false;\n    freq[b[i]]--;\n  }\n  return true;\n}",
-    "tests": "if (isAnagram(\"listen\", \"silent\") !== true) throw new Error(\"listen\");\nif (isAnagram(\"rat\", \"car\") !== false) throw new Error(\"rat\");\nif (isAnagram(\"\", \"\") !== true) throw new Error(\"empty\");\nif (isAnagram(\"aabb\", \"bbaa\") !== true) throw new Error(\"aabb\");\nif (isAnagram(\"a\", \"ab\") !== false) throw new Error(\"len\");",
-    "banned": [".sort("],
-    "prereqs": ["js.u03.freq"],
+    "banned": [
+      ".sort("
+    ],
+    "prereqs": [
+      "js.u03.freq"
+    ],
     "cue": "Count the chars in one string, then subtract one for each char in the other; every count should end at zero.",
     "syntax": "freq[c] = (freq[c] || 0) + 1",
-    "mapsTo": "LC 242 · Valid Anagram"
+    "mapsTo": "LC 242 · Valid Anagram",
+    "cases": [
+      {
+        "call": "isAnagram(\"listen\", \"silent\")",
+        "expect": "true"
+      },
+      {
+        "call": "isAnagram(\"rat\", \"car\")",
+        "expect": "false"
+      },
+      {
+        "call": "isAnagram(\"\", \"\")",
+        "expect": "true"
+      },
+      {
+        "call": "isAnagram(\"aabb\", \"bbaa\")",
+        "expect": "true"
+      },
+      {
+        "call": "isAnagram(\"a\", \"ab\")",
+        "expect": "false"
+      }
+    ]
   },
   {
     "id": "js.u03.whisper",
@@ -39,12 +87,38 @@
     "prompt": "Write `swapCase(s)` returning `s` with every lowercase letter made uppercase AND every uppercase letter made lowercase in a single pass, other characters unchanged. Convert with `charCodeAt`/`String.fromCharCode`; do not use `toLowerCase` or `toUpperCase`.",
     "starter": "function swapCase(s) {\n  // your code here\n}",
     "solution": "function swapCase(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (c >= \"a\" && c <= \"z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) - 32));\n    } else if (c >= \"A\" && c <= \"Z\") {\n      parts.push(String.fromCharCode(c.charCodeAt(0) + 32));\n    } else {\n      parts.push(c);\n    }\n  }\n  return parts.join(\"\");\n}",
-    "tests": "if (swapCase(\"Hi!\") !== \"hI!\") throw new Error(\"Hi!\");\nif (swapCase(\"aB3\") !== \"Ab3\") throw new Error(\"aB3\");\nif (swapCase(\"abcABC\") !== \"ABCabc\") throw new Error(\"mix\");\nif (swapCase(\"\") !== \"\") throw new Error(\"empty\");\nif (swapCase(\"123\") !== \"123\") throw new Error(\"digits\");",
-    "banned": ["toLowerCase", "toUpperCase"],
-    "prereqs": ["js.u03.shout"],
+    "banned": [
+      "toLowerCase",
+      "toUpperCase"
+    ],
+    "prereqs": [
+      "js.u03.shout"
+    ],
     "cue": "Branch on which case a letter is, then shift it the opposite way.",
     "syntax": "code - 32 for lower, code + 32 for upper",
-    "note": "One pass, two branches: the +32/-32 case gap runs both directions here."
+    "note": "One pass, two branches: the +32/-32 case gap runs both directions here.",
+    "cases": [
+      {
+        "call": "swapCase(\"Hi!\")",
+        "expect": "\"hI!\""
+      },
+      {
+        "call": "swapCase(\"aB3\")",
+        "expect": "\"Ab3\""
+      },
+      {
+        "call": "swapCase(\"abcABC\")",
+        "expect": "\"ABCabc\""
+      },
+      {
+        "call": "swapCase(\"\")",
+        "expect": "\"\""
+      },
+      {
+        "call": "swapCase(\"123\")",
+        "expect": "\"123\""
+      }
+    ]
   },
   {
     "id": "js.u03.reverse.words",
@@ -55,11 +129,31 @@
     "prompt": "Write `reverseWords(s)` returning `s` with the space-separated words in reverse order. Single spaces separate words and there are no leading or trailing spaces.",
     "starter": "function reverseWords(s) {\n  // your code here\n}",
     "solution": "function reverseWords(s) {\n  return s.split(\" \").reverse().join(\" \");\n}",
-    "tests": "if (reverseWords(\"the sky is blue\") !== \"blue is sky the\") throw new Error(\"sky\");\nif (reverseWords(\"hello\") !== \"hello\") throw new Error(\"one\");\nif (reverseWords(\"a b c\") !== \"c b a\") throw new Error(\"abc\");\nif (reverseWords(\"\") !== \"\") throw new Error(\"empty\");",
-    "prereqs": ["js.u03.split.native", "js.u03.reverse.sugar"],
+    "prereqs": [
+      "js.u03.split.native",
+      "js.u03.reverse.sugar"
+    ],
     "cue": "Split on spaces, reverse the array of words, then join with spaces.",
     "syntax": "str.split(' ') / arr.reverse() / arr.join(' ')",
-    "mapsTo": "LC 151 · Reverse Words in a String"
+    "mapsTo": "LC 151 · Reverse Words in a String",
+    "cases": [
+      {
+        "call": "reverseWords(\"the sky is blue\")",
+        "expect": "\"blue is sky the\""
+      },
+      {
+        "call": "reverseWords(\"hello\")",
+        "expect": "\"hello\""
+      },
+      {
+        "call": "reverseWords(\"a b c\")",
+        "expect": "\"c b a\""
+      },
+      {
+        "call": "reverseWords(\"\")",
+        "expect": "\"\""
+      }
+    ]
   },
   {
     "id": "js.u03.startswith",
@@ -70,11 +164,37 @@
     "prompt": "Write `startsWith(s, p)` returning true if `s` begins with the prefix `p`. Compare character by character; do not use `String.prototype.startsWith` or slicing.",
     "starter": "function startsWith(s, p) {\n  // your code here\n}",
     "solution": "function startsWith(s, p) {\n  if (p.length > s.length) return false;\n  for (let i = 0; i < p.length; i++) {\n    if (s[i] !== p[i]) return false;\n  }\n  return true;\n}",
-    "tests": "if (startsWith(\"hello\", \"he\") !== true) throw new Error(\"he\");\nif (startsWith(\"hello\", \"hello\") !== true) throw new Error(\"full\");\nif (startsWith(\"hello\", \"world\") !== false) throw new Error(\"world\");\nif (startsWith(\"hi\", \"hello\") !== false) throw new Error(\"long\");\nif (startsWith(\"abc\", \"\") !== true) throw new Error(\"empty\");",
-    "banned": [".startsWith(", ".slice("],
-    "prereqs": ["js.u03.my.indexof"],
+    "banned": [
+      ".startsWith(",
+      ".slice("
+    ],
+    "prereqs": [
+      "js.u03.my.indexof"
+    ],
     "cue": "Walk the prefix, comparing each char to the same position in the string.",
-    "syntax": "s[i] !== p[i] comparison"
+    "syntax": "s[i] !== p[i] comparison",
+    "cases": [
+      {
+        "call": "startsWith(\"hello\", \"he\")",
+        "expect": "true"
+      },
+      {
+        "call": "startsWith(\"hello\", \"hello\")",
+        "expect": "true"
+      },
+      {
+        "call": "startsWith(\"hello\", \"world\")",
+        "expect": "false"
+      },
+      {
+        "call": "startsWith(\"hi\", \"hello\")",
+        "expect": "false"
+      },
+      {
+        "call": "startsWith(\"abc\", \"\")",
+        "expect": "true"
+      }
+    ]
   },
   {
     "id": "js.u03.removevowels",
@@ -85,12 +205,34 @@
     "prompt": "Write `removeVowels(s)` returning a new string with every lowercase vowel (a, e, i, o, u) removed, keeping all other characters in order. Accumulate pieces in an array and join.",
     "starter": "function removeVowels(s) {\n  // your code here\n}",
     "solution": "function removeVowels(s) {\n  const parts = [];\n  for (let i = 0; i < s.length; i++) {\n    if (\"aeiou\".indexOf(s[i]) === -1) parts.push(s[i]);\n  }\n  return parts.join(\"\");\n}",
-    "tests": "if (removeVowels(\"banana\") !== \"bnn\") throw new Error(\"banana\");\nif (removeVowels(\"xyz\") !== \"xyz\") throw new Error(\"xyz\");\nif (removeVowels(\"aeiou\") !== \"\") throw new Error(\"vowels\");\nif (removeVowels(\"\") !== \"\") throw new Error(\"empty\");",
-    "banned": [".replace(", ".replaceAll("],
-    "prereqs": ["js.u03.keep.digits"],
+    "banned": [
+      ".replace(",
+      ".replaceAll("
+    ],
+    "prereqs": [
+      "js.u03.keep.digits"
+    ],
     "cue": "Keep the chars that are not vowels, then join.",
     "syntax": "'aeiou'.indexOf(c) === -1",
-    "mapsTo": "LC 1119 · Remove Vowels from a String"
+    "mapsTo": "LC 1119 · Remove Vowels from a String",
+    "cases": [
+      {
+        "call": "removeVowels(\"banana\")",
+        "expect": "\"bnn\""
+      },
+      {
+        "call": "removeVowels(\"xyz\")",
+        "expect": "\"xyz\""
+      },
+      {
+        "call": "removeVowels(\"aeiou\")",
+        "expect": "\"\""
+      },
+      {
+        "call": "removeVowels(\"\")",
+        "expect": "\"\""
+      }
+    ]
   },
   {
     "id": "js.u03.tochar",
@@ -101,7 +243,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const n = 4;\nString.fromCharCode(\"a\".charCodeAt(0) + n)",
     "expected": "'e'",
-    "prereqs": ["js.u03.fromcharcode"],
+    "prereqs": [
+      "js.u03.fromcharcode"
+    ],
     "cue": "Add the offset onto the base letter's code point, then convert back.",
     "syntax": "String.fromCharCode('a'.charCodeAt(0) + n)"
   },
@@ -114,7 +258,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "\"one two three four\".split(\" \").length",
     "expected": "4",
-    "prereqs": ["js.u03.split.native"],
+    "prereqs": [
+      "js.u03.split.native"
+    ],
     "cue": "Splitting on the separator yields one field per word.",
     "syntax": "str.split(sep).length"
   }

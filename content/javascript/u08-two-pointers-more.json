@@ -10,7 +10,9 @@
     "prompt": "What is the value of `count`?",
     "snippet": "const a = [1, 2, 3, 4];\nconst target = 5;\nlet lo = 0, hi = a.length - 1, count = 0;\nwhile (lo < hi) {\n  if (a[lo] + a[hi] < target) { count += hi - lo; lo++; }\n  else hi--;\n}\ncount;",
     "expected": "2",
-    "prereqs": ["js.u08.pairsum.write"]
+    "prereqs": [
+      "js.u08.pairsum.write"
+    ]
   },
   {
     "id": "js.u08.pairless.write",
@@ -23,10 +25,33 @@
     "prompt": "Write `countPairsLess(a, target)` where `a` is sorted ascending. Return the number of index pairs `(i, j)` with `i < j` whose values sum to strictly less than `target`. Use two pointers; do not use a nested loop.",
     "starter": "function countPairsLess(a, target) {\n  // your code here\n}",
     "solution": "function countPairsLess(a, target) {\n  let lo = 0, hi = a.length - 1, count = 0;\n  while (lo < hi) {\n    if (a[lo] + a[hi] < target) { count += hi - lo; lo++; }\n    else hi--;\n  }\n  return count;\n}",
-    "tests": "if (countPairsLess([1, 2, 3, 4], 5) !== 2) throw new Error('2: ' + countPairsLess([1, 2, 3, 4], 5));\nif (countPairsLess([1, 1, 1], 3) !== 3) throw new Error('all under');\nif (countPairsLess([5, 6, 7], 1) !== 0) throw new Error('none');\nif (countPairsLess([], 10) !== 0) throw new Error('empty');\nif (countPairsLess([1, 2], 4) !== 1) throw new Error('one');",
     "note": "When `a[lo] + a[hi] < target`, every partner strictly between lo and hi also qualifies, so you count a whole block at once instead of one pair.",
     "mapsTo": "LC 1099 · Two Sum Less Than K",
-    "prereqs": ["js.u08.pairless.predict"]
+    "prereqs": [
+      "js.u08.pairless.predict"
+    ],
+    "cases": [
+      {
+        "call": "countPairsLess([1, 2, 3, 4], 5)",
+        "expect": "2"
+      },
+      {
+        "call": "countPairsLess([1, 1, 1], 3)",
+        "expect": "3"
+      },
+      {
+        "call": "countPairsLess([5, 6, 7], 1)",
+        "expect": "0"
+      },
+      {
+        "call": "countPairsLess([], 10)",
+        "expect": "0"
+      },
+      {
+        "call": "countPairsLess([1, 2], 4)",
+        "expect": "1"
+      }
+    ]
   },
   {
     "id": "js.u08.palindrome.alnum.write",
@@ -39,10 +64,35 @@
     "prompt": "Write `isPalAlnum(s)` that returns `true` if `s` reads the same forward and backward when you ignore every non-alphanumeric character and treat upper and lower case as equal. Use two pointers from the ends.",
     "starter": "function isPalAlnum(s) {\n  // your code here\n}",
     "solution": "function isPalAlnum(s) {\n  const alnum = c => /[a-z0-9]/i.test(c);\n  let lo = 0, hi = s.length - 1;\n  while (lo < hi) {\n    while (lo < hi && !alnum(s[lo])) lo++;\n    while (lo < hi && !alnum(s[hi])) hi--;\n    if (s[lo].toLowerCase() !== s[hi].toLowerCase()) return false;\n    lo++;\n    hi--;\n  }\n  return true;\n}",
-    "tests": "if (isPalAlnum('A man, a plan, a canal: Panama') !== true) throw new Error('panama');\nif (isPalAlnum('race a car') !== false) throw new Error('racecar');\nif (isPalAlnum('') !== true) throw new Error('empty');\nif (isPalAlnum('.,') !== true) throw new Error('punct');\nif (isPalAlnum('0P') !== false) throw new Error('0P');",
-    "banned": [".reverse("],
+    "banned": [
+      ".reverse("
+    ],
     "mapsTo": "LC 125 · Valid Palindrome",
-    "prereqs": ["js.u08.palindrome.write"]
+    "prereqs": [
+      "js.u08.palindrome.write"
+    ],
+    "cases": [
+      {
+        "call": "isPalAlnum('A man, a plan, a canal: Panama')",
+        "expect": "true"
+      },
+      {
+        "call": "isPalAlnum('race a car')",
+        "expect": "false"
+      },
+      {
+        "call": "isPalAlnum('')",
+        "expect": "true"
+      },
+      {
+        "call": "isPalAlnum('.,')",
+        "expect": "true"
+      },
+      {
+        "call": "isPalAlnum('0P')",
+        "expect": "false"
+      }
+    ]
   },
   {
     "id": "js.u08.reversevowels.write",
@@ -55,10 +105,35 @@
     "prompt": "Write `reverseVowels(s)` that returns `s` with only its vowels reversed and every other character left in place. Vowels are `aeiou` in either case. Use two pointers from the ends.",
     "starter": "function reverseVowels(s) {\n  // your code here\n}",
     "solution": "function reverseVowels(s) {\n  const vowels = new Set('aeiouAEIOU');\n  const a = s.split('');\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (!vowels.has(a[lo])) lo++;\n    else if (!vowels.has(a[hi])) hi--;\n    else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  }\n  return a.join('');\n}",
-    "tests": "if (reverseVowels('hello') !== 'holle') throw new Error(reverseVowels('hello'));\nif (reverseVowels('leetcode') !== 'leotcede') throw new Error(reverseVowels('leetcode'));\nif (reverseVowels('abc') !== 'abc') throw new Error('single vowel');\nif (reverseVowels('') !== '') throw new Error('empty');\nif (reverseVowels('aA') !== 'Aa') throw new Error('case');",
-    "banned": [".reverse("],
+    "banned": [
+      ".reverse("
+    ],
     "mapsTo": "LC 345 · Reverse Vowels of a String",
-    "prereqs": ["js.u08.reverse.write"]
+    "prereqs": [
+      "js.u08.reverse.write"
+    ],
+    "cases": [
+      {
+        "call": "reverseVowels('hello')",
+        "expect": "'holle'"
+      },
+      {
+        "call": "reverseVowels('leetcode')",
+        "expect": "'leotcede'"
+      },
+      {
+        "call": "reverseVowels('abc')",
+        "expect": "'abc'"
+      },
+      {
+        "call": "reverseVowels('')",
+        "expect": "''"
+      },
+      {
+        "call": "reverseVowels('aA')",
+        "expect": "'Aa'"
+      }
+    ]
   },
   {
     "id": "js.u08.partition.sign.predict",
@@ -71,7 +146,9 @@
     "prompt": "What does this evaluate to?",
     "snippet": "const a = [1, -2, 3, -4, 5, -6];\nlet lo = 0, hi = a.length - 1;\nwhile (lo < hi) {\n  if (a[lo] < 0) lo++;\n  else if (a[hi] >= 0) hi--;\n  else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n}\na;",
     "expected": "[-6, -2, -4, 3, 5, 1]",
-    "prereqs": ["js.u08.reverse.write"]
+    "prereqs": [
+      "js.u08.reverse.write"
+    ]
   },
   {
     "id": "js.u08.partition.sign.write",
@@ -85,10 +162,14 @@
     "starter": "function partitionSign(a) {\n  // your code here\n}",
     "solution": "function partitionSign(a) {\n  let lo = 0, hi = a.length - 1;\n  while (lo < hi) {\n    if (a[lo] < 0) lo++;\n    else if (a[hi] >= 0) hi--;\n    else { [a[lo], a[hi]] = [a[hi], a[lo]]; lo++; hi--; }\n  }\n  return a;\n}",
     "tests": "const sortNum = x => [...x].sort((p, q) => p - q);\nconst isPart = (out, inp) => {\n  if (JSON.stringify(sortNum(out)) !== JSON.stringify(sortNum(inp))) throw new Error('not a permutation: ' + out);\n  let seenNonNeg = false;\n  for (const x of out) {\n    if (x >= 0) seenNonNeg = true;\n    else if (seenNonNeg) throw new Error('negative after non-negative: ' + out);\n  }\n};\nisPart(partitionSign([1, -2, 3, -4, 5, -6]), [1, -2, 3, -4, 5, -6]);\nisPart(partitionSign([-1, -2, -3]), [-1, -2, -3]);\nisPart(partitionSign([1, 2, 3]), [1, 2, 3]);\nisPart(partitionSign([]), []);\nisPart(partitionSign([3, -1, -2, 4, -5]), [3, -1, -2, 4, -5]);",
-    "banned": [".filter("],
+    "banned": [
+      ".filter("
+    ],
     "note": "Swapping a misplaced pair from the ends partitions in one pass with O(1) extra space; `.filter` twice would allocate two new arrays.",
     "mapsTo": "LC 905 · Sort Array By Parity (partition pattern)",
-    "prereqs": ["js.u08.partition.sign.predict"]
+    "prereqs": [
+      "js.u08.partition.sign.predict"
+    ]
   },
   {
     "id": "js.u08.dedup2.write",
@@ -104,7 +185,9 @@
     "tests": "const a = [1, 1, 1, 2, 2, 3];\nconst k = removeDupesTwo(a);\nif (k !== 5) throw new Error('k: ' + k);\nif (JSON.stringify(a.slice(0, k)) !== JSON.stringify([1, 1, 2, 2, 3])) throw new Error('prefix: ' + a.slice(0, k));\nconst b = [1, 1, 1, 1];\nif (removeDupesTwo(b) !== 2) throw new Error('four ones');\nif (removeDupesTwo([1]) !== 1) throw new Error('single');\nif (removeDupesTwo([]) !== 0) throw new Error('empty');\nif (removeDupesTwo([1, 2, 3]) !== 3) throw new Error('distinct');",
     "note": "Comparing against `a[w - 2]` instead of `a[w - 1]` is the whole trick: it lets each value survive twice before the third copy is skipped.",
     "mapsTo": "LC 80 · Remove Duplicates from Sorted Array II",
-    "prereqs": ["js.u08.removedupes.write"]
+    "prereqs": [
+      "js.u08.removedupes.write"
+    ]
   },
   {
     "id": "js.u08.threesum.closest.predict",
@@ -118,7 +201,9 @@
     "snippet": "function threeSumClosest(a, target) {\n  a.sort((x, y) => x - y);\n  const n = a.length;\n  let best = a[0] + a[1] + a[2];\n  for (let i = 0; i < n; i++) {\n    let lo = i + 1, hi = n - 1;\n    while (lo < hi) {\n      const s = a[i] + a[lo] + a[hi];\n      if (Math.abs(s - target) < Math.abs(best - target)) best = s;\n      if (s < target) lo++;\n      else if (s > target) hi--;\n      else return s;\n    }\n  }\n  return best;\n}\nthreeSumClosest([-1, 2, 1, -4], 1);",
     "expected": "2",
     "mapsTo": "LC 16 · 3Sum Closest",
-    "prereqs": ["js.u08.threesum.write"]
+    "prereqs": [
+      "js.u08.threesum.write"
+    ]
   },
   {
     "id": "js.u08.string.immutable.predict",
@@ -145,11 +230,36 @@
     "prompt": "Write `sortColors(a)` where every entry of `a` is 0, 1, or 2. Sort `a` in place in one pass so all 0s come first, then 1s, then 2s, and return it. Do not use the built-in sort; use three pointers.",
     "starter": "function sortColors(a) {\n  // your code here\n}",
     "solution": "function sortColors(a) {\n  let lo = 0, mid = 0, hi = a.length - 1;\n  while (mid <= hi) {\n    if (a[mid] === 0) { [a[lo], a[mid]] = [a[mid], a[lo]]; lo++; mid++; }\n    else if (a[mid] === 2) { [a[mid], a[hi]] = [a[hi], a[mid]]; hi--; }\n    else mid++;\n  }\n  return a;\n}",
-    "tests": "if (JSON.stringify(sortColors([2,0,2,1,1,0])) !== JSON.stringify([0,0,1,1,2,2])) throw new Error('a');\nif (JSON.stringify(sortColors([2,0,1])) !== JSON.stringify([0,1,2])) throw new Error('b');\nif (JSON.stringify(sortColors([0])) !== JSON.stringify([0])) throw new Error('single');\nif (JSON.stringify(sortColors([])) !== JSON.stringify([])) throw new Error('empty');\nif (JSON.stringify(sortColors([2,2,1,1,0,0])) !== JSON.stringify([0,0,1,1,2,2])) throw new Error('reversed');",
-    "banned": [".sort("],
+    "banned": [
+      ".sort("
+    ],
     "note": "After swapping a 2 to the back, `mid` does not advance because the value pulled in from `hi` has not been checked yet; a 0 swap comes from `lo`, which is already settled, so `mid` may move.",
     "mapsTo": "LC 75 · Sort Colors",
-    "prereqs": ["js.u08.partition.sign.write"]
+    "prereqs": [
+      "js.u08.partition.sign.write"
+    ],
+    "cases": [
+      {
+        "call": "sortColors([2,0,2,1,1,0])",
+        "expect": "[0,0,1,1,2,2]"
+      },
+      {
+        "call": "sortColors([2,0,1])",
+        "expect": "[0,1,2]"
+      },
+      {
+        "call": "sortColors([0])",
+        "expect": "[0]"
+      },
+      {
+        "call": "sortColors([])",
+        "expect": "[]"
+      },
+      {
+        "call": "sortColors([2,2,1,1,0,0])",
+        "expect": "[0,0,1,1,2,2]"
+      }
+    ]
   },
   {
     "id": "js.u08.trap.write",
@@ -162,10 +272,33 @@
     "prompt": "Write `trap(h)` where `h` is an array of non-negative wall heights. Return the total units of water trapped between the walls after rain. Use two pointers from the ends; do not scan all pairs or build a prefix array.",
     "starter": "function trap(h) {\n  // your code here\n}",
     "solution": "function trap(h) {\n  let lo = 0, hi = h.length - 1;\n  let leftMax = 0, rightMax = 0, water = 0;\n  while (lo < hi) {\n    if (h[lo] < h[hi]) {\n      leftMax = Math.max(leftMax, h[lo]);\n      water += leftMax - h[lo];\n      lo++;\n    } else {\n      rightMax = Math.max(rightMax, h[hi]);\n      water += rightMax - h[hi];\n      hi--;\n    }\n  }\n  return water;\n}",
-    "tests": "if (trap([0,1,0,2,1,0,1,3,2,1,2,1]) !== 6) throw new Error('a');\nif (trap([4,2,0,3,2,5]) !== 9) throw new Error('b');\nif (trap([]) !== 0) throw new Error('empty');\nif (trap([1,2,3]) !== 0) throw new Error('rising');\nif (trap([3,0,3]) !== 3) throw new Error('well');",
     "note": "Advancing the shorter side is safe: the water there is capped by that side's running max, since a wall at least as tall is guaranteed on the other side.",
     "mapsTo": "LC 42 · Trapping Rain Water",
-    "prereqs": ["js.u08.maxarea.write"]
+    "prereqs": [
+      "js.u08.maxarea.write"
+    ],
+    "cases": [
+      {
+        "call": "trap([0,1,0,2,1,0,1,3,2,1,2,1])",
+        "expect": "6"
+      },
+      {
+        "call": "trap([4,2,0,3,2,5])",
+        "expect": "9"
+      },
+      {
+        "call": "trap([])",
+        "expect": "0"
+      },
+      {
+        "call": "trap([1,2,3])",
+        "expect": "0"
+      },
+      {
+        "call": "trap([3,0,3])",
+        "expect": "3"
+      }
+    ]
   },
   {
     "id": "js.u08.removenth.gap.predict",
@@ -179,7 +312,9 @@
     "snippet": "const nxt = [1, 2, 3, 4, -1];\nlet fast = 0;\nfor (let i = 0; i < 2; i++) fast = nxt[fast];\nlet slow = 0;\nwhile (nxt[fast] !== -1) { fast = nxt[fast]; slow = nxt[slow]; }\nslow;",
     "expected": "2",
     "note": "With fast held n links ahead, stopping when fast hits the last node leaves slow on the node just before the nth-from-end.",
-    "prereqs": ["js.u08.middle.write"]
+    "prereqs": [
+      "js.u08.middle.write"
+    ]
   },
   {
     "id": "js.u08.removenth.write",
@@ -195,6 +330,9 @@
     "tests": "const collect = (nxt, s) => { const out = []; let c = s; while (c !== -1) { out.push(c); c = nxt[c]; } return out; };\nlet a = [1,2,3,4,-1]; let s = removeNth(a, 0, 2); if (JSON.stringify(collect(a, s)) !== JSON.stringify([0,1,2,4])) throw new Error('mid');\nlet b = [1,2,-1]; let s2 = removeNth(b, 0, 3); if (JSON.stringify(collect(b, s2)) !== JSON.stringify([1,2])) throw new Error('head');\nlet c = [-1]; let s3 = removeNth(c, 0, 1); if (collect(c, s3).length !== 0) throw new Error('single');\nlet d = [1,2,3,-1]; let s4 = removeNth(d, 0, 1); if (JSON.stringify(collect(d, s4)) !== JSON.stringify([0,1,2])) throw new Error('tail');",
     "note": "When fast falls off the end after exactly n hops, the node to remove is the head, so the new start is `nxt[start]`; otherwise slow stops on the predecessor and one relink drops the target.",
     "mapsTo": "LC 19 · Remove Nth Node From End of List",
-    "prereqs": ["js.u08.removenth.gap.predict", "js.u08.middle.write"]
+    "prereqs": [
+      "js.u08.removenth.gap.predict",
+      "js.u08.middle.write"
+    ]
   }
 ]

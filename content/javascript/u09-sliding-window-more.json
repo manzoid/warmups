@@ -6,14 +6,35 @@
     "concept": "most vowels in a size-k window",
     "kind": "write",
     "prompt": "Write `maxVowels(s, k)` that returns the largest number of vowels (from 'aeiou') in any substring of `s` of length exactly `k`. Slide a running count; do not recount each window.",
-    "banned": [".slice("],
+    "banned": [
+      ".slice("
+    ],
     "starter": "function maxVowels(s, k) {\n  // your code here\n}",
     "solution": "function maxVowels(s, k) {\n  const vowels = new Set(['a', 'e', 'i', 'o', 'u']);\n  let c = 0;\n  for (let i = 0; i < k; i++) if (vowels.has(s[i])) c++;\n  let best = c;\n  for (let i = k; i < s.length; i++) {\n    if (vowels.has(s[i])) c++;\n    if (vowels.has(s[i - k])) c--;\n    if (c > best) best = c;\n  }\n  return best;\n}",
-    "tests": "if (maxVowels('abciiidef', 3) !== 3) throw new Error(maxVowels('abciiidef', 3));\nif (maxVowels('aeiou', 2) !== 2) throw new Error('aeiou');\nif (maxVowels('leetcode', 3) !== 2) throw new Error('leetcode');\nif (maxVowels('b', 1) !== 0) throw new Error('b');",
     "cue": "The aggregate is a vowel count, not a sum: on each slide add one if the entering char is a vowel, drop one if the leaving char was.",
     "syntax": "vowels.has(ch)",
     "mapsTo": "LC 1456 · Maximum Number of Vowels in a Substring of Given Length",
-    "prereqs": ["js.u09.fixed.maxsum.write"]
+    "prereqs": [
+      "js.u09.fixed.maxsum.write"
+    ],
+    "cases": [
+      {
+        "call": "maxVowels('abciiidef', 3)",
+        "expect": "3"
+      },
+      {
+        "call": "maxVowels('aeiou', 2)",
+        "expect": "2"
+      },
+      {
+        "call": "maxVowels('leetcode', 3)",
+        "expect": "2"
+      },
+      {
+        "call": "maxVowels('b', 1)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u09.fixed.minsum.predict",
@@ -26,7 +47,9 @@
     "expected": "3",
     "cue": "Add up the first window, then slide and keep the smallest sum seen.",
     "syntax": "if (s < worst) worst = s",
-    "prereqs": ["js.u09.fixed.slide.predict"]
+    "prereqs": [
+      "js.u09.fixed.slide.predict"
+    ]
   },
   {
     "id": "js.u09.var.maxones.write",
@@ -37,11 +60,30 @@
     "prompt": "Write `longestOnes(nums, k)` where `nums` holds only 0s and 1s, returning the length of the longest contiguous run of 1s obtainable by flipping at most `k` zeros. Use a sliding window that tracks how many zeros it holds.",
     "starter": "function longestOnes(nums, k) {\n  // your code here\n}",
     "solution": "function longestOnes(nums, k) {\n  let left = 0, zeros = 0, best = 0;\n  for (let right = 0; right < nums.length; right++) {\n    if (nums[right] === 0) zeros++;\n    while (zeros > k) {\n      if (nums[left] === 0) zeros--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
-    "tests": "if (longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2) !== 6) throw new Error('a');\nif (longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3) !== 10) throw new Error('b');\nif (longestOnes([1, 1, 1], 0) !== 3) throw new Error('c');\nif (longestOnes([0, 0, 0], 0) !== 0) throw new Error('d');",
     "cue": "Grow right; the window is valid while it contains at most k zeros. Shrink left when a k+1'th zero enters.",
     "syntax": "while (zeros > k)",
     "mapsTo": "LC 1004 · Max Consecutive Ones III",
-    "prereqs": ["js.u09.var.longest.predict"]
+    "prereqs": [
+      "js.u09.var.longest.predict"
+    ],
+    "cases": [
+      {
+        "call": "longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2)",
+        "expect": "6"
+      },
+      {
+        "call": "longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3)",
+        "expect": "10"
+      },
+      {
+        "call": "longestOnes([1, 1, 1], 0)",
+        "expect": "3"
+      },
+      {
+        "call": "longestOnes([0, 0, 0], 0)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u09.var.charreplace.write",
@@ -52,11 +94,30 @@
     "prompt": "Write `characterReplacement(s, k)` returning the length of the longest substring of `s` you can make all one character by replacing at most `k` characters. Use a sliding window.",
     "starter": "function characterReplacement(s, k) {\n  // your code here\n}",
     "solution": "function characterReplacement(s, k) {\n  const count = new Map();\n  let left = 0, maxFreq = 0, best = 0;\n  for (let right = 0; right < s.length; right++) {\n    const c = s[right];\n    count.set(c, (count.get(c) || 0) + 1);\n    maxFreq = Math.max(maxFreq, count.get(c));\n    while ((right - left + 1) - maxFreq > k) {\n      count.set(s[left], count.get(s[left]) - 1);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
-    "tests": "if (characterReplacement('ABAB', 2) !== 4) throw new Error('ABAB');\nif (characterReplacement('AABABBA', 1) !== 4) throw new Error('AABABBA');\nif (characterReplacement('AAAA', 0) !== 4) throw new Error('AAAA');\nif (characterReplacement('', 2) !== 0) throw new Error('empty');",
     "cue": "The non-dominant characters are the ones you replace: a window is valid when its length minus its most frequent count is at most k.",
     "syntax": "(right - left + 1) - maxFreq",
     "mapsTo": "LC 424 · Longest Repeating Character Replacement",
-    "prereqs": ["js.u09.norepeat.write"]
+    "prereqs": [
+      "js.u09.norepeat.write"
+    ],
+    "cases": [
+      {
+        "call": "characterReplacement('ABAB', 2)",
+        "expect": "4"
+      },
+      {
+        "call": "characterReplacement('AABABBA', 1)",
+        "expect": "4"
+      },
+      {
+        "call": "characterReplacement('AAAA', 0)",
+        "expect": "4"
+      },
+      {
+        "call": "characterReplacement('', 2)",
+        "expect": "0"
+      }
+    ]
   },
   {
     "id": "js.u09.count.atmost.predict",
@@ -69,7 +130,9 @@
     "expected": "7",
     "cue": "At each right, every window ending there and starting at or after left is valid; there are right - left + 1 of them.",
     "syntax": "count += right - left + 1",
-    "prereqs": ["js.u09.var.longest.predict"]
+    "prereqs": [
+      "js.u09.var.longest.predict"
+    ]
   },
   {
     "id": "js.u09.count.product.write",
@@ -80,11 +143,26 @@
     "prompt": "Write `numSubarrayProductLessThanK(nums, k)` returning how many contiguous subarrays of the positive integers `nums` have a product strictly less than `k`. Use a sliding window.",
     "starter": "function numSubarrayProductLessThanK(nums, k) {\n  // your code here\n}",
     "solution": "function numSubarrayProductLessThanK(nums, k) {\n  if (k <= 1) return 0;\n  let prod = 1, left = 0, count = 0;\n  for (let right = 0; right < nums.length; right++) {\n    prod *= nums[right];\n    while (prod >= k) { prod /= nums[left]; left++; }\n    count += right - left + 1;\n  }\n  return count;\n}",
-    "tests": "if (numSubarrayProductLessThanK([10, 5, 2, 6], 100) !== 8) throw new Error('a');\nif (numSubarrayProductLessThanK([1, 2, 3], 0) !== 0) throw new Error('b');\nif (numSubarrayProductLessThanK([1, 1, 1], 2) !== 6) throw new Error('c');",
     "cue": "Same grow/shrink shape, but the aggregate is a product; at each step add `right - left + 1` windows instead of measuring one. Guard k <= 1 (no positive product is below it).",
     "syntax": "prod /= nums[left]",
     "mapsTo": "LC 713 · Subarray Product Less Than K",
-    "prereqs": ["js.u09.count.atmost.predict"]
+    "prereqs": [
+      "js.u09.count.atmost.predict"
+    ],
+    "cases": [
+      {
+        "call": "numSubarrayProductLessThanK([10, 5, 2, 6], 100)",
+        "expect": "8"
+      },
+      {
+        "call": "numSubarrayProductLessThanK([1, 2, 3], 0)",
+        "expect": "0"
+      },
+      {
+        "call": "numSubarrayProductLessThanK([1, 1, 1], 2)",
+        "expect": "6"
+      }
+    ]
   },
   {
     "id": "js.u09.permutation.write",
@@ -95,10 +173,29 @@
     "prompt": "Write `checkInclusion(s1, s2)` returning true if some substring of `s2` is a permutation of `s1`, else false. Slide a fixed window of length s1.length, comparing count-maps in O(1) per step.",
     "starter": "function checkInclusion(s1, s2) {\n  // your code here\n}",
     "solution": "function checkInclusion(s1, s2) {\n  const k = s1.length;\n  if (k > s2.length) return false;\n  const need = new Map();\n  for (let i = 0; i < s1.length; i++) need.set(s1[i], (need.get(s1[i]) || 0) + 1);\n  const win = new Map();\n  const eq = (a, b) => {\n    if (a.size !== b.size) return false;\n    for (const [key, v] of a) if (b.get(key) !== v) return false;\n    return true;\n  };\n  for (let right = 0; right < s2.length; right++) {\n    const c = s2[right];\n    win.set(c, (win.get(c) || 0) + 1);\n    if (right >= k) {\n      const lc = s2[right - k];\n      win.set(lc, win.get(lc) - 1);\n      if (win.get(lc) === 0) win.delete(lc);\n    }\n    if (right >= k - 1 && eq(win, need)) return true;\n  }\n  return false;\n}",
-    "tests": "if (checkInclusion('ab', 'eidbaooo') !== true) throw new Error('a');\nif (checkInclusion('ab', 'eidboaoo') !== false) throw new Error('b');\nif (checkInclusion('a', 'a') !== true) throw new Error('c');\nif (checkInclusion('abc', 'ab') !== false) throw new Error('d');",
     "cue": "This is the anagram scan returning a boolean: return the moment a window's counts equal s1's.",
     "syntax": "win.delete(key) on zero",
     "mapsTo": "LC 567 · Permutation in String",
-    "prereqs": ["js.u09.anagram.write"]
+    "prereqs": [
+      "js.u09.anagram.write"
+    ],
+    "cases": [
+      {
+        "call": "checkInclusion('ab', 'eidbaooo')",
+        "expect": "true"
+      },
+      {
+        "call": "checkInclusion('ab', 'eidboaoo')",
+        "expect": "false"
+      },
+      {
+        "call": "checkInclusion('a', 'a')",
+        "expect": "true"
+      },
+      {
+        "call": "checkInclusion('abc', 'ab')",
+        "expect": "false"
+      }
+    ]
   }
 ]

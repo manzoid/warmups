@@ -65,12 +65,23 @@
     "prompt": "Add `push(self, x)` to `Stack`, which stores `x` at index `self.top` in `self.a` and advances `self.top`.",
     "starter": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        # your code here\n        pass",
     "solution": "class Stack:\n    def __init__(self, capacity=100):\n        self.a = [None] * capacity\n        self.top = 0\n\n    def push(self, x):\n        self.a[self.top] = x\n        self.top += 1",
-    "tests": "s = Stack(5)\ns.push(1); s.push(2); s.push(3)\nassert s.top == 3, s.top\nassert s.a[0:3] == [1, 2, 3], s.a[0:3]",
     "prereqs": [
       "py.u10.stack.topindex.predict"
     ],
     "cue": "Store the value in the top slot, then advance the pointer.",
-    "syntax": "a[i] = x assignment"
+    "syntax": "a[i] = x assignment",
+    "cases": [
+      {
+        "setup": "s = Stack(5)\ns.push(1)\ns.push(2)\ns.push(3)",
+        "call": "None",
+        "check": "s.top == 3"
+      },
+      {
+        "setup": "s = Stack(5)\ns.push(1)\ns.push(2)\ns.push(3)",
+        "call": "None",
+        "check": "s.a[0:3] == [1, 2, 3]"
+      }
+    ]
   },
   {
     "id": "py.u10.stack.peek.predict",
@@ -238,13 +249,34 @@
     "prompt": "Write `valid(s)` that returns True when the brackets in `s` (`()[]{}`) are balanced and correctly nested, False otherwise. Use a stack.",
     "starter": "def valid(s):\n    # your code here\n    pass",
     "solution": "def valid(s):\n    pairs = {')': '(', ']': '[', '}': '{'}\n    st = []\n    for i in range(len(s)):\n        c = s[i]\n        if c in pairs:\n            if not st or st.pop() != pairs[c]:\n                return False\n        else:\n            st.append(c)\n    return not st",
-    "tests": "assert valid('()[]{}') is True\nassert valid('([)]') is False\nassert valid('(') is False\nassert valid('') is True\nassert valid(']') is False",
     "prereqs": [
       "py.u10.parens.predict"
     ],
     "cue": "Push openers; on each closer verify it matches the top.",
     "syntax": "c in dict membership",
-    "mapsTo": "LC 20 · Valid Parentheses"
+    "mapsTo": "LC 20 · Valid Parentheses",
+    "cases": [
+      {
+        "call": "valid('()[]{}')",
+        "expect": "True"
+      },
+      {
+        "call": "valid('([)]')",
+        "expect": "False"
+      },
+      {
+        "call": "valid('(')",
+        "expect": "False"
+      },
+      {
+        "call": "valid('')",
+        "expect": "True"
+      },
+      {
+        "call": "valid(']')",
+        "expect": "False"
+      }
+    ]
   },
   {
     "id": "py.u10.nge.predict",
@@ -362,12 +394,23 @@
     "prompt": "Add `enqueue(self, x)` to `Queue`, which writes `x` at index `(self.head + self.size) % self.n` and increments `self.size`.",
     "starter": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        # your code here\n        pass",
     "solution": "class Queue:\n    def __init__(self, capacity):\n        self.a = [None] * capacity\n        self.n = capacity\n        self.head = 0\n        self.size = 0\n\n    def enqueue(self, x):\n        self.a[(self.head + self.size) % self.n] = x\n        self.size += 1",
-    "tests": "q = Queue(3)\nq.enqueue(10); q.enqueue(20)\nassert q.size == 2, q.size\nassert q.a[0] == 10 and q.a[1] == 20",
     "prereqs": [
       "py.u10.queue.wrap.predict"
     ],
     "cue": "Write at the wrapped tail position, then grow the size.",
-    "syntax": "(head + size) % n modulo"
+    "syntax": "(head + size) % n modulo",
+    "cases": [
+      {
+        "setup": "q = Queue(3)\nq.enqueue(10)\nq.enqueue(20)",
+        "call": "None",
+        "check": "q.size == 2"
+      },
+      {
+        "setup": "q = Queue(3)\nq.enqueue(10)\nq.enqueue(20)",
+        "call": "None",
+        "check": "q.a[0] == 10 and q.a[1] == 20"
+      }
+    ]
   },
   {
     "id": "py.u10.queue.dequeue",
