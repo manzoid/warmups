@@ -60,19 +60,32 @@ export function Visualizer({
   if (state === 'error') {
     return <pre style={{ ...styles.code, borderColor: theme.bad }}>{error}</pre>;
   }
+  // codeviz has a 3-column layout (code · frames · objects) that needs more room
+  // than the 720px reading column. Break out to (most of) the viewport width so
+  // the right side isn't clipped, staying centered on the column.
   return (
-    <iframe
-      title={title}
-      srcDoc={srcdoc}
-      sandbox="allow-scripts"
+    <div
       style={{
-        width: '100%',
-        height: 460,
-        border: `1px solid ${theme.border}`,
-        borderRadius: 8,
-        background: '#fff',
+        position: 'relative',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'min(1200px, 94vw)',
       }}
-    />
+    >
+      <iframe
+        title={title}
+        srcDoc={srcdoc}
+        sandbox="allow-scripts"
+        style={{
+          display: 'block',
+          width: '100%',
+          height: 520,
+          border: `1px solid ${theme.border}`,
+          borderRadius: 8,
+          background: '#fff',
+        }}
+      />
+    </div>
   );
 }
 
