@@ -31,3 +31,30 @@ function interviewEnabled(): boolean {
 }
 
 export const INTERVIEW_FEATURES = interviewEnabled();
+
+// `TRAINER_MODE` gates the time-trainer tools in Fluency: the "Set the pace
+// yourself" run-and-lock flow, its "Copy pace config" export, and "Re-pace".
+// Off by default, so a regular learner never touches the shipped pace config;
+// their only pace control is the personal "Tune target to my pace" override.
+// Enable via VITE_TRAINER_MODE=true or localStorage 'warmups.trainer' = '1'.
+function trainerEnabled(): boolean {
+  try {
+    const env = (import.meta as unknown as { env?: Record<string, string | undefined> }).env;
+    if (env && env.VITE_TRAINER_MODE === 'true') return true;
+  } catch {
+    // ignore
+  }
+  try {
+    if (
+      typeof window !== 'undefined' &&
+      window.localStorage.getItem('warmups.trainer') === '1'
+    ) {
+      return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+export const TRAINER_MODE = trainerEnabled();

@@ -15,7 +15,7 @@ import {
 } from './core/storage';
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
-import { INTERVIEW_FEATURES } from './core/features';
+import { INTERVIEW_FEATURES, TRAINER_MODE } from './core/features';
 import {
   resolvedTargetMs,
   readPersonalPace,
@@ -1006,7 +1006,7 @@ function FluencyDrill({
   // trainer-locked benchmark (exportable to the shipped config), then drill.
   const lockPace = (ms: number) => {
     savePersonalPace(ex.id, ms);
-    saveTrainerPace(ex.id, ms);
+    if (TRAINER_MODE) saveTrainerPace(ex.id, ms); // only trainers feed the shipped config
     setTargetMs(ms);
     setStreak(0);
     setTimes([]);
@@ -1136,17 +1136,19 @@ function FluencyDrill({
               >
                 Start drilling (target {secs(targetMs)}) →
               </button>
-              <button
-                style={styles.btnGhost}
-                onClick={() => {
-                  setRuns([]);
-                  setPhase('setpace');
-                  void genNext();
-                }}
-                title="Do a few timed runs and pick the one to lock in as the target. Exportable as the default for everyone."
-              >
-                Set the pace yourself →
-              </button>
+              {TRAINER_MODE && (
+                <button
+                  style={styles.btnGhost}
+                  onClick={() => {
+                    setRuns([]);
+                    setPhase('setpace');
+                    void genNext();
+                  }}
+                  title="Do a few timed runs and pick the one to lock in as the target. Exportable as the default for everyone."
+                >
+                  Set the pace yourself →
+                </button>
+              )}
               <button style={styles.btnGhost} onClick={() => setShowViz((v) => !v)}>
                 {showViz ? 'Hide run' : 'See it run'}
               </button>
@@ -1191,7 +1193,7 @@ function FluencyDrill({
           ⏱ {graded && lastMs != null ? secs(lastMs) : secs(elapsed)}
         </span>
         {best != null && <span style={styles.pill}>best {secs(best)}</span>}
-        {phase === 'drill' && (
+        {phase === 'drill' && TRAINER_MODE && (
           <button
             style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
             title="Re-set your pace: do timed runs and lock one in again"
