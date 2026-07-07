@@ -21,6 +21,7 @@ export interface Attempt {
   skipped?: boolean; // learner tested out / skipped it (counts as "seen", not passed)
   ms?: number; // wall-clock time from when the exercise appeared to submit (fluency signal)
   selfDeclared?: boolean; // learner clicked "I've got this" (self-rated mastery; for tuning)
+  code?: string; // the exact source the learner submitted (so past solutions are revisitable)
 }
 
 export interface ProgressState {
@@ -232,6 +233,11 @@ export function bestTimeMs(state: ProgressState, id: string): number | null {
     }
   }
   return best;
+}
+
+/** Every attempt at `id`, most recent first (for reviewing past submissions). */
+export function attemptsFor(state: ProgressState, id: string): Attempt[] {
+  return state.attempts.filter((a) => a.id === id).sort((a, b) => b.at - a.at);
 }
 
 /** The most recent attempt at `id`, or undefined. */

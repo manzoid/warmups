@@ -44,8 +44,26 @@ db.exec(`
   );
 `);
 
-const selectAll = db.prepare('SELECT id, at, passed, rung FROM attempts ORDER BY at, rowid');
-const insertOne = db.prepare('INSERT INTO attempts (id, at, passed, rung) VALUES (?, ?, ?, ?)');
+// Migrate older DBs: the attempt log grew to carry the full signal (timing,
+// skip/self-declared flags) and the submitted source, so past solutions are
+// revisitable. Add any missing columns in place — SQLite keeps existing rows.
+const haveCols = new Set(db.prepare('PRAGMA table_info(attempts)').all().map((c) => c.name));
+for (const [col, type] of [
+  ['ms', 'INTEGER'],
+  ['skipped', 'INTEGER'],
+  ['self_declared', 'INTEGER'],
+  ['code', 'TEXT'],
+]) {
+  if (!haveCols.has(col)) db.exec(`ALTER TABLE attempts ADD COLUMN ${col} ${type}`);
+}
+
+const selectAll = db.prepare(
+  'SELECT id, at, passed, rung, ms, skipped, self_declared, code FROM attempts ORDER BY at, rowid',
+);
+const insertOne = db.prepare(
+  'INSERT INTO attempts (id, at, passed, rung, ms, skipped, self_declared, code) ' +
+    'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+);
 const deleteAll = db.prepare('DELETE FROM attempts');
 
 // Fluency pace timings (durable, origin-independent — replaces localStorage).
@@ -95,12 +113,14 @@ function readPrefs() {
 }
 
 function readProgress() {
-  const attempts = selectAll.all().map((r) => ({
-    id: r.id,
-    at: r.at,
-    passed: !!r.passed,
-    rung: r.rung,
-  }));
+  const attempts = selectAll.all().map((r) => {
+    const a = { id: r.id, at: r.at, passed: !!r.passed, rung: r.rung };
+    if (r.ms != null) a.ms = r.ms;
+    if (r.skipped) a.skipped = true;
+    if (r.self_declared) a.selfDeclared = true;
+    if (r.code != null) a.code = r.code;
+    return a;
+  });
   // cards/introduced are legacy (SRS demoted) — kept in the shape for the client.
   return { version: SCHEMA_VERSION, cards: {}, introduced: [], attempts };
 }
@@ -110,7 +130,16 @@ function replaceAttempts(attempts) {
   try {
     deleteAll.run();
     for (const a of attempts) {
-      insertOne.run(String(a.id), Number(a.at), a.passed ? 1 : 0, Number(a.rung ?? 0));
+      insertOne.run(
+        String(a.id),
+        Number(a.at),
+        a.passed ? 1 : 0,
+        Number(a.rung ?? 0),
+        a.ms == null ? null : Number(a.ms),
+        a.skipped ? 1 : 0,
+        a.selfDeclared ? 1 : 0,
+        typeof a.code === 'string' ? a.code : null,
+      );
     }
     db.exec('COMMIT');
   } catch (e) {

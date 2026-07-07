@@ -8,11 +8,13 @@ import {
   recordAttempt,
   bumpLastAttemptRung,
   lastAttempt,
+  attemptsFor,
   bestTimeMs,
   hasAttempted,
   resetProgress,
   savePaceConfig,
   type ProgressState,
+  type Attempt,
 } from './core/storage';
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
@@ -293,13 +295,14 @@ export default function App() {
 
   // Record one cleared fluency pattern to the log (passed, unaided, best time).
   const recordFluencyClear = useCallback(
-    (exId: string, bestMs: number) => {
+    (exId: string, bestMs: number, code?: string) => {
       recordAttempt(progress.current, {
         id: exId,
         at: Date.now(),
         passed: true,
         rung: 0,
         ms: bestMs,
+        code,
       });
       persist();
       bump();
@@ -326,15 +329,17 @@ export default function App() {
     [persist, bump],
   );
 
-  // Record one graded attempt to the append-only log (no SRS scheduling).
+  // Record one graded attempt to the append-only log (no SRS scheduling). We keep
+  // the submitted `code` so a learner can revisit how they solved it (History).
   const grade = useCallback(
-    (exId: string, passed: boolean, rung: number, ms?: number) => {
+    (exId: string, passed: boolean, rung: number, ms?: number, code?: string) => {
       recordAttempt(progress.current, {
         id: exId,
         at: Date.now(),
         passed,
         rung,
         ms,
+        code,
       });
       persist();
       bump();
@@ -361,7 +366,7 @@ export default function App() {
       res = { passed: false, error: err instanceof Error ? err.message : String(err) };
     }
     const ms = Date.now() - startedAt.current;
-    grade(ex.id, res.passed, maxRung, ms);
+    grade(ex.id, res.passed, maxRung, ms, input);
     setSolveMs(res.passed && maxRung === 0 ? ms : null);
     setResult(res);
     setRunning(false);
@@ -563,7 +568,7 @@ export default function App() {
                   ex={fluencyEx}
                   best={bestTimeMs(progress.current, fluencyEx.id)}
                   initialPhase={fluencyStart}
-                  onCleared={(ms) => recordFluencyClear(fluencyEx.id, ms)}
+                  onCleared={(ms, code) => recordFluencyClear(fluencyEx.id, ms, code)}
                   onGotThis={() => recordGotThis(fluencyEx.id)}
                   onExit={() => setFluencyEx(null)}
                 />
@@ -1122,7 +1127,7 @@ function FluencyDrill({
   ex: Exercise;
   best: number | null;
   initialPhase?: FluPhase;
-  onCleared: (bestMs: number) => void;
+  onCleared: (bestMs: number, code: string) => void;
   onGotThis: () => void;
   onExit: () => void;
 }) {
@@ -1255,7 +1260,7 @@ function FluencyDrill({
       if (s >= FLU_GOAL) {
         willClear = true;
         setCleared(true);
-        onCleared(Math.min(...newTimes));
+        onCleared(Math.min(...newTimes), input);
       }
     }
     if (!willClear) scheduleAdvance(); // keep the flow moving on a correct rep
@@ -1672,6 +1677,7 @@ function HistoryView({
   onReset: () => void;
 }) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const rows = useMemo(() => {
     const out: { ex: Exercise; passed: boolean; rung: number; at: number; skipped: boolean }[] = [];
@@ -1751,44 +1757,95 @@ function HistoryView({
               : 'No exercises match this filter.'}
           </p>
         ) : (
-          shown.map(({ ex, passed, rung, skipped }) => (
-            <div
-              key={ex.id}
-              style={{
-                ...styles.row,
-                justifyContent: 'space-between',
-                padding: '6px 0',
-                borderBottom: `1px solid ${theme.border}`,
-                gap: 8,
-              }}
-            >
-              <div style={{ minWidth: 0 }}>
-                <span
+          shown.map(({ ex, passed, rung, skipped }) => {
+            const solutions = attemptsFor(state, ex.id).filter((a) => a.code);
+            const open = openId === ex.id;
+            return (
+              <div key={ex.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                <div
                   style={{
-                    color: skipped ? theme.muted : passed ? theme.good : theme.bad,
-                    marginRight: 8,
+                    ...styles.row,
+                    justifyContent: 'space-between',
+                    padding: '6px 0',
+                    gap: 8,
                   }}
-                  title={skipped ? 'skipped' : passed ? 'passed' : 'failed'}
                 >
-                  {skipped ? '⤼' : passed ? '✓' : '✗'}
-                </span>
-                <span>{ex.concept}</span>
-                <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.group}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <span
+                      style={{
+                        color: skipped ? theme.muted : passed ? theme.good : theme.bad,
+                        marginRight: 8,
+                      }}
+                      title={skipped ? 'skipped' : passed ? 'passed' : 'failed'}
+                    >
+                      {skipped ? '⤼' : passed ? '✓' : '✗'}
+                    </span>
+                    <span>{ex.concept}</span>
+                    <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.group}</span>
+                  </div>
+                  <div style={styles.row}>
+                    {rung >= 1 && (
+                      <span
+                        style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
+                      >
+                        {rungLabel(rung)}
+                      </span>
+                    )}
+                    {solutions.length > 0 && (
+                      <button
+                        style={{
+                          ...styles.btnGhost,
+                          ...(open ? { borderColor: theme.accent, color: theme.accent } : {}),
+                        }}
+                        onClick={() => setOpenId(open ? null : ex.id)}
+                        title="Show the code you submitted"
+                      >
+                        {open ? 'Hide' : `Solutions (${solutions.length})`}
+                      </button>
+                    )}
+                    <button style={styles.btnGhost} onClick={() => onPractice([ex], ex.concept)}>
+                      Redo
+                    </button>
+                  </div>
+                </div>
+                {open && <PastSolutions attempts={solutions} />}
               </div>
-              <div style={styles.row}>
-                {rung >= 1 && (
-                  <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
-                    {rungLabel(rung)}
-                  </span>
-                )}
-                <button style={styles.btnGhost} onClick={() => onPractice([ex], ex.concept)}>
-                  Redo
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
+    </div>
+  );
+}
+
+// The learner's past submissions for one exercise, newest first — so they can
+// see how they actually solved it, and how the approach changed across reps.
+function PastSolutions({ attempts }: { attempts: Attempt[] }) {
+  const when = (at: number) => new Date(at).toLocaleString();
+  return (
+    <div style={{ padding: '0 0 10px 26px' }}>
+      {attempts.map((a) => (
+        <div key={a.at} style={{ marginBottom: 10 }}>
+          <div style={{ ...styles.row, gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+            <span
+              style={{ color: a.passed ? theme.good : theme.bad }}
+              title={a.passed ? 'passed' : 'failed'}
+            >
+              {a.passed ? '✓' : '✗'}
+            </span>
+            <span style={{ ...styles.tagline, margin: 0 }}>{when(a.at)}</span>
+            {typeof a.ms === 'number' && (
+              <span style={styles.pill}>{(a.ms / 1000).toFixed(1)}s</span>
+            )}
+            {a.rung >= 1 && (
+              <span style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}>
+                {rungLabel(a.rung)}
+              </span>
+            )}
+          </div>
+          <pre style={{ ...styles.code, margin: 0, whiteSpace: 'pre-wrap' }}>{a.code}</pre>
+        </div>
+      ))}
     </div>
   );
 }
