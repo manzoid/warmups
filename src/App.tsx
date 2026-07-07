@@ -2185,12 +2185,9 @@ function HintLadder({
       n += 1;
       s.push({ key: 'syntax', rung: RUNG.syntax, title: `Hint ${n}`, action: `Show hint ${n}` });
     }
-    // "See it run" is available BEFORE submitting on a WRITE exercise (it traces
-    // your own in-progress code and spoils nothing). On a PREDICT it waits until
-    // graded, since running the snippet would reveal the value you're predicting.
-    if (graded || ex.kind === 'write') {
-      s.push({ key: 'visualize', rung: RUNG.visualize, title: 'See it run', action: 'Visualize your run' });
-    }
+    // NOTE: "See it run" (visualize) is intentionally NOT in this linear ladder.
+    // It's offered as a direct button below, so you can jump straight to codeviz
+    // without first climbing through Hint 1 / Hint 2.
     if (graded) {
       s.push({ key: 'walkthrough', rung: RUNG.walkthrough, title: 'Talk it through', action: 'Get a walkthrough' });
       if (answer && answer.length > 0) {
@@ -2208,8 +2205,19 @@ function HintLadder({
   const [revealed, setRevealed] = useState(0);
   const next = steps[revealed];
 
-  // Nothing to offer yet (no cue/syntax and not graded) — render nothing.
-  if (steps.length === 0) return null;
+  // "See it run" is a direct launch, not a rung to climb to. It's available
+  // BEFORE submitting on a WRITE exercise (it traces your own in-progress code
+  // and spoils nothing); on a PREDICT it waits until graded, since running the
+  // snippet would reveal the value you're predicting.
+  const canVisualize = graded || ex.kind === 'write';
+  const [vizOpen, setVizOpen] = useState(false);
+  const toggleViz = () => {
+    if (!vizOpen) onUse(RUNG.visualize); // opening counts as a visualize (no-op once passed)
+    setVizOpen((v) => !v);
+  };
+
+  // Nothing to offer at all — render nothing.
+  if (steps.length === 0 && !canVisualize) return null;
 
   const revealNext = () => {
     if (!next) return;
@@ -2219,9 +2227,31 @@ function HintLadder({
 
   return (
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
+      {canVisualize && (
+        <div style={{ marginBottom: steps.length > 0 ? '1.1rem' : 0 }}>
+          <button
+            style={{ ...styles.btn, ...(vizOpen ? { background: theme.accent } : {}) }}
+            onClick={toggleViz}
+          >
+            {vizOpen ? 'Hide visualizer' : '▶ Visualize this run (codeviz)'}
+          </button>
+          {vizOpen && (
+            <div style={{ marginTop: '0.85rem' }}>
+              <Visualizer
+                track={ex.track}
+                code={vizCode(ex, input, failingCase)}
+                title={ex.concept}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {steps.length > 0 && (
       <p style={{ ...styles.label, margin: 0 }}>
         {graded ? 'Stuck? Reveal help one step at a time.' : 'Want a nudge before you answer?'}
       </p>
+      )}
 
       {steps.slice(0, revealed).map((step) => (
         <div key={step.key} style={{ marginTop: '0.85rem' }}>
@@ -2230,13 +2260,6 @@ function HintLadder({
             <p style={{ ...styles.tagline, margin: 0, color: theme.text }}>{ex.cue}</p>
           )}
           {step.key === 'syntax' && <pre style={styles.code}>{ex.syntax}</pre>}
-          {step.key === 'visualize' && (
-            <Visualizer
-              track={ex.track}
-              code={vizCode(ex, input, failingCase)}
-              title={ex.concept}
-            />
-          )}
           {step.key === 'walkthrough' && (
             <WalkthroughBox prompt={buildWalkthroughPrompt(ex, input)} />
           )}
