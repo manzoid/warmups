@@ -16,6 +16,15 @@ import {
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { INTERVIEW_FEATURES } from './core/features';
+import {
+  resolvedTargetMs,
+  readPersonalPace,
+  savePersonalPace,
+  saveTrainerPace,
+  exportPaceConfig,
+  median,
+  PERSONAL_MODIFIER,
+} from './core/pace';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
 import { Visualizer } from './ui/Visualizer';
@@ -774,27 +783,9 @@ function PracticeDone({
 // guess, and it's saved per pattern. "Speed up" tightens it; a miss steps you
 // back one, it doesn't wipe your run.
 
-type FluPhase = 'study' | 'pace' | 'drill';
+type FluPhase = 'study' | 'setpace' | 'drill';
 const FLU_GOAL = 3; // correct-and-fast reps to clear a pattern
 const FLU_SPEEDUP = 0.85; // "speed up" round tightens the target by 15%
-
-// Persisted per-pattern pace (your captured benchmark solve time, ms).
-function readPace(id: string): number | null {
-  try {
-    const v = typeof window !== 'undefined' ? window.localStorage.getItem('warmups.pace.' + id) : null;
-    const n = v ? Number(v) : NaN;
-    return Number.isFinite(n) ? n : null;
-  } catch {
-    return null;
-  }
-}
-function savePace(id: string, ms: number): void {
-  try {
-    window.localStorage.setItem('warmups.pace.' + id, String(ms));
-  } catch {
-    // best-effort
-  }
-}
 
 function FluencyPicker({
   generators,
@@ -890,10 +881,14 @@ function FluencyDrill({
   const [times, setTimes] = useState<number[]>([]); // correct-rep times this session
   const [streak, setStreak] = useState(0);
   const [reps, setReps] = useState(0); // correct reps this session
-  // Your captured benchmark pace (ms), or null until you set it. Persisted per
-  // pattern, so a saved pace skips study and goes straight to drilling.
-  const [targetMs, setTargetMs] = useState<number | null>(() => readPace(ex.id));
-  const [phase, setPhase] = useState<FluPhase>(() => (readPace(ex.id) != null ? 'drill' : 'study'));
+  // Drill target (ms): personal override > shipped config > kind default. A
+  // pattern with a real target skips study straight to drilling.
+  const [targetMs, setTargetMs] = useState<number>(() => resolvedTargetMs(ex.id, ex.kind));
+  // Study first; skip straight to drilling only once you've drilled this pattern
+  // before (a personal pace is saved). A shipped config time does not skip study.
+  const [phase, setPhase] = useState<FluPhase>(() => (readPersonalPace(ex.id) != null ? 'drill' : 'study'));
+  const [runs, setRuns] = useState<number[]>([]); // "set the pace": candidate solve times
+  const [copiedConfig, setCopiedConfig] = useState(false);
   const [cleared, setCleared] = useState(false);
   const [lastMs, setLastMs] = useState<number | null>(null);
   const [lastFast, setLastFast] = useState(false);
@@ -969,16 +964,11 @@ function FluencyDrill({
     setResult(res);
     setLastMs(ms);
 
-    // "Set your pace" phase: a correct solve captures YOUR real time as the
-    // target and moves to drilling. A miss just lets you try again.
-    if (phase === 'pace') {
-      if (res.passed) {
-        setTargetMs(ms);
-        savePace(ex.id, ms);
-        setPhase('drill');
-        setStreak(0);
-      }
-      return; // no auto-advance; you read the result, then hit Next to drill
+    // "Set the pace" phase: each correct solve is recorded as a candidate run.
+    // You choose which run to lock in as the target (below); a miss is ignored.
+    if (phase === 'setpace') {
+      if (res.passed) setRuns((r) => [...r, ms]);
+      return;
     }
 
     if (!res.passed) {
@@ -992,7 +982,7 @@ function FluencyDrill({
     setTimes(newTimes);
     setReps((r) => r + 1);
 
-    const fast = targetMs != null && ms <= targetMs;
+    const fast = ms <= targetMs;
     setLastFast(fast);
 
     let willClear = false;
@@ -1012,13 +1002,46 @@ function FluencyDrill({
 
   const secs = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 
+  // Lock a chosen run in as the target: it becomes your personal pace AND a
+  // trainer-locked benchmark (exportable to the shipped config), then drill.
+  const lockPace = (ms: number) => {
+    savePersonalPace(ex.id, ms);
+    saveTrainerPace(ex.id, ms);
+    setTargetMs(ms);
+    setStreak(0);
+    setTimes([]);
+    setResult(null);
+    setPhase('drill');
+    void genNext();
+  };
+  const copyConfig = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(exportPaceConfig(), null, 2));
+      setCopiedConfig(true);
+      setTimeout(() => setCopiedConfig(false), 1500);
+    } catch {
+      setCopiedConfig(false);
+    }
+  };
+
   // --- cleared card ---------------------------------------------------------
   if (cleared) {
-    const tgt = targetMs ?? 0;
+    const tgt = targetMs;
     const bestMs = times.length ? Math.min(...times) : 0;
     const avgMs = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
     const speedUp = () => {
-      setTargetMs((t) => (t != null ? Math.round(t * FLU_SPEEDUP) : t));
+      setTargetMs((t) => Math.round(t * FLU_SPEEDUP));
+      setStreak(0);
+      setCleared(false);
+      void genNext();
+    };
+    // Override the target with the learner's OWN pace: median of this session's
+    // times × a modifier. Personalizes the shipped default to how they actually
+    // solve it.
+    const tunedMs = times.length ? Math.round(median(times) * PERSONAL_MODIFIER) : tgt;
+    const tuneToMyPace = () => {
+      savePersonalPace(ex.id, tunedMs);
+      setTargetMs(tunedMs);
       setStreak(0);
       setCleared(false);
       void genNext();
@@ -1036,6 +1059,15 @@ function FluencyDrill({
           <button style={styles.btn} onClick={speedUp}>
             Speed up (target {secs(Math.round(tgt * FLU_SPEEDUP))}) →
           </button>
+          {times.length > 0 && tunedMs !== tgt && (
+            <button
+              style={styles.btnGhost}
+              onClick={tuneToMyPace}
+              title="Set your target from your own solve times, so it fits how you actually work."
+            >
+              Tune target to my pace ({secs(tunedMs)})
+            </button>
+          )}
           <button style={styles.btnGhost} onClick={onExit}>
             Pick another pattern
           </button>
@@ -1070,7 +1102,7 @@ function FluencyDrill({
     return (
       <div style={styles.panel}>
         {header}
-        <span style={styles.pill}>Step 1 of 2 · study</span>
+        <span style={styles.pill}>Study first</span>
         <p style={{ margin: '0.6rem 0 1rem', color: theme.text }}>{ex.prompt}</p>
         {loading || !inst ? (
           <p style={{ ...styles.tagline, margin: 0 }}>Loading an example…</p>
@@ -1098,11 +1130,22 @@ function FluencyDrill({
               <button
                 style={styles.btn}
                 onClick={() => {
-                  setPhase('pace');
+                  setPhase('drill');
                   void genNext();
                 }}
               >
-                I'm familiar — time me on a fresh one →
+                Start drilling (target {secs(targetMs)}) →
+              </button>
+              <button
+                style={styles.btnGhost}
+                onClick={() => {
+                  setRuns([]);
+                  setPhase('setpace');
+                  void genNext();
+                }}
+                title="Do a few timed runs and pick the one to lock in as the target. Exportable as the default for everyone."
+              >
+                Set the pace yourself →
               </button>
               <button style={styles.btnGhost} onClick={() => setShowViz((v) => !v)}>
                 {showViz ? 'Hide run' : 'See it run'}
@@ -1123,7 +1166,6 @@ function FluencyDrill({
   }
 
   const graded = result !== null;
-  const paceSetJustNow = phase === 'drill' && graded && result?.passed && streak === 0 && times.length === 0;
   const dots = '●'.repeat(streak) + '○'.repeat(Math.max(0, FLU_GOAL - streak));
 
   return (
@@ -1132,11 +1174,11 @@ function FluencyDrill({
 
       {/* HUD: pace target, streak, live/last time */}
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginBottom: '0.75rem' }}>
-        {phase === 'pace' ? (
-          <span style={styles.pill}>Step 2 of 2 · set your pace — solve one, timed</span>
+        {phase === 'setpace' ? (
+          <span style={styles.pill}>Set the pace — do timed runs, lock one in</span>
         ) : (
           <>
-            <span style={styles.pill}>Target ≤ {secs(targetMs ?? 0)}</span>
+            <span style={styles.pill}>Target ≤ {secs(targetMs)}</span>
             <span
               style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
               title={`${streak} of ${FLU_GOAL} correct-and-fast in a row`}
@@ -1152,12 +1194,13 @@ function FluencyDrill({
         {phase === 'drill' && (
           <button
             style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.75rem' }}
-            title="Re-set your pace: study and time yourself again"
+            title="Re-set your pace: do timed runs and lock one in again"
             onClick={() => {
-              setTargetMs(null);
               setStreak(0);
               setTimes([]);
-              setPhase('study');
+              setRuns([]);
+              setResult(null);
+              setPhase('setpace');
               void genNext();
             }}
           >
@@ -1210,7 +1253,7 @@ function FluencyDrill({
             )}
             {graded && (
               <button style={styles.btn} onClick={() => void genNext()} autoFocus>
-                Next →
+                {phase === 'setpace' ? 'Another run →' : 'Next →'}
               </button>
             )}
             <button
@@ -1248,14 +1291,14 @@ function FluencyDrill({
                   style={{
                     ...styles.label,
                     margin: 0,
-                    color: lastFast || paceSetJustNow ? theme.good : theme.accent,
+                    color: phase === 'setpace' || lastFast ? theme.good : theme.accent,
                   }}
                 >
-                  {paceSetJustNow
-                    ? `✓ Pace set: ${lastMs != null ? secs(lastMs) : ''}. Now match it — ${FLU_GOAL} in a row under that. Next →`
+                  {phase === 'setpace'
+                    ? `✓ Run recorded: ${lastMs != null ? secs(lastMs) : ''}. Lock one in below, or do another.`
                     : lastFast
                       ? `✓ Fast! ${lastMs != null ? secs(lastMs) : ''} · streak ${streak}/${FLU_GOAL}`
-                      : `✓ Correct, just over ${secs(targetMs ?? 0)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
+                      : `✓ Correct, just over ${secs(targetMs)} — streak holds at ${streak}/${FLU_GOAL}, speed up to advance`}
                 </p>
               ) : (
                 <>
@@ -1282,6 +1325,39 @@ function FluencyDrill({
                   )}
                 </>
               )}
+            </div>
+          )}
+
+          {phase === 'setpace' && runs.length > 0 && (
+            <div style={{ marginTop: '0.9rem', borderTop: `1px solid ${theme.border}`, paddingTop: '0.75rem' }}>
+              <p style={{ ...styles.label, margin: '0 0 0.4rem' }}>Your runs — pick one to lock in</p>
+              {runs.map((r, i) => (
+                <div
+                  key={i}
+                  style={{ ...styles.row, justifyContent: 'space-between', padding: '4px 0', gap: 8 }}
+                >
+                  <span>
+                    Run {i + 1}: <code>{secs(r)}</code>
+                  </span>
+                  <button style={styles.btnGhost} onClick={() => lockPace(r)}>
+                    Lock this in →
+                  </button>
+                </div>
+              ))}
+              <div style={{ ...styles.row, gap: 8, marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                {runs.length > 1 && (
+                  <button style={styles.btn} onClick={() => lockPace(Math.round(median(runs)))}>
+                    Lock median ({secs(Math.round(median(runs)))}) →
+                  </button>
+                )}
+                <button
+                  style={styles.btnGhost}
+                  onClick={copyConfig}
+                  title="Copy the full pace config JSON to paste into content/pace-targets.json"
+                >
+                  {copiedConfig ? 'Copied' : 'Copy pace config (JSON)'}
+                </button>
+              </div>
             </div>
           )}
         </>
