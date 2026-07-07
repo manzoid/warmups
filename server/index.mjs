@@ -17,9 +17,15 @@
 
 import { createServer } from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// The shipped pace config lives in the repo (this server runs from it), so a
+// trainer can save timings straight to the committed file instead of pasting.
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PACE_CONFIG_PATH = join(REPO_ROOT, 'src', 'data', 'pace-targets.json');
 
 const PORT = Number(process.env.WARMUPS_PORT) || 8931;
 const DB_PATH =
@@ -104,6 +110,22 @@ const server = createServer(async (req, res) => {
       replaceAttempts(attempts);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, count: attempts.length }));
+      return;
+    }
+    // Trainer: write the pace config straight to the committed source file.
+    if (req.method === 'PUT' && url.startsWith('/pace-config')) {
+      const parsed = JSON.parse(await readBody(req));
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('expected a JSON object of { id: { ms, hash } }');
+      }
+      if (!existsSync(dirname(PACE_CONFIG_PATH))) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'src/data not found (run the server from the repo)' }));
+        return;
+      }
+      writeFileSync(PACE_CONFIG_PATH, JSON.stringify(parsed, null, 2) + '\n');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, path: PACE_CONFIG_PATH, count: Object.keys(parsed).length }));
       return;
     }
     res.writeHead(404, { 'Content-Type': 'application/json' });

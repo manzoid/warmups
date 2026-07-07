@@ -146,6 +146,25 @@ export async function loadRemote(): Promise<{ state: ProgressState | null; up: b
   }
 }
 
+/**
+ * Write the pace config straight to the committed source file via the local
+ * data server (trainer-only). Returns true if it was written, false if the
+ * server isn't running (caller falls back to copy-to-clipboard).
+ */
+export async function savePaceConfig(config: Record<string, unknown>): Promise<boolean> {
+  try {
+    const res = await fetch(`${DATA_API_BASE}/pace-config`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+      signal: AbortSignal.timeout(2500),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Push progress to the local data server. Silent no-op if it isn't running. */
 export async function saveRemote(state: ProgressState): Promise<void> {
   try {

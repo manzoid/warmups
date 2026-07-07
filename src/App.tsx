@@ -11,6 +11,7 @@ import {
   bestTimeMs,
   hasAttempted,
   resetProgress,
+  savePaceConfig,
   type ProgressState,
 } from './core/storage';
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
@@ -916,7 +917,7 @@ function TrainingDashboard({
   onPace: (ex: Exercise) => void;
   onClose: () => void;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
   const secs = (ms: number | null) => (ms == null ? '—' : `${(ms / 1000).toFixed(1)}s`);
   const rank: Record<PaceStatus, number> = { missing: 0, dirty: 1, fresh: 2 };
 
@@ -955,14 +956,23 @@ function TrainingDashboard({
       missing: r.filter((x) => x.status === 'missing').length,
     };
   };
-  const copyConfig = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(exportPaceConfig(), null, 2));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
+  // Write the config straight to src/data/pace-targets.json via the local data
+  // server. If it isn't running, fall back to copying the JSON.
+  const saveConfig = async () => {
+    const cfg = exportPaceConfig();
+    setSaveMsg('Saving…');
+    const wrote = await savePaceConfig(cfg);
+    if (wrote) {
+      setSaveMsg('✓ Saved to src/data/pace-targets.json — commit it');
+    } else {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+        setSaveMsg('Data server not running — copied JSON to paste instead');
+      } catch {
+        setSaveMsg('Data server not running (start it with npm run dev)');
+      }
     }
+    setTimeout(() => setSaveMsg(''), 4000);
   };
 
   const summaryLine = (label: string, t?: Track) => {
@@ -978,9 +988,12 @@ function TrainingDashboard({
     <div style={styles.panel}>
       <div style={{ ...styles.row, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <p style={{ ...styles.label, margin: 0 }}>Training dashboard — pace coverage</p>
-        <div style={{ ...styles.row, gap: 8 }}>
-          <button style={styles.btn} onClick={copyConfig} title="Copy the full pace config to paste into src/data/pace-targets.json">
-            {copied ? 'Copied' : 'Copy pace config (JSON)'}
+        <div style={{ ...styles.row, gap: 8, alignItems: 'center' }}>
+          {saveMsg && (
+            <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>{saveMsg}</span>
+          )}
+          <button style={styles.btn} onClick={saveConfig} title="Write the pace config straight to src/data/pace-targets.json via the local data server">
+            Save pace config
           </button>
           <button style={styles.btnGhost} onClick={onClose}>
             Close
@@ -1146,7 +1159,7 @@ function FluencyDrill({
     () => initialPhase ?? (readPersonalPace(ex.id, hash) != null ? 'drill' : 'study'),
   );
   const [runs, setRuns] = useState<number[]>([]); // "set the pace": candidate solve times
-  const [copiedConfig, setCopiedConfig] = useState(false);
+  const [paceSaveMsg, setPaceSaveMsg] = useState('');
   const [cleared, setCleared] = useState(false);
   const [lastMs, setLastMs] = useState<number | null>(null);
   const [lastFast, setLastFast] = useState(false);
@@ -1272,14 +1285,21 @@ function FluencyDrill({
     setPhase('drill');
     void genNext();
   };
-  const copyConfig = async () => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(exportPaceConfig(), null, 2));
-      setCopiedConfig(true);
-      setTimeout(() => setCopiedConfig(false), 1500);
-    } catch {
-      setCopiedConfig(false);
+  const saveConfig = async () => {
+    const cfg = exportPaceConfig();
+    setPaceSaveMsg('Saving…');
+    const wrote = await savePaceConfig(cfg);
+    if (wrote) {
+      setPaceSaveMsg('✓ Saved to pace-targets.json');
+    } else {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+        setPaceSaveMsg('Server off — copied JSON instead');
+      } catch {
+        setPaceSaveMsg('Server off (npm run dev)');
+      }
     }
+    setTimeout(() => setPaceSaveMsg(''), 4000);
   };
 
   // --- cleared card ---------------------------------------------------------
@@ -1607,11 +1627,16 @@ function FluencyDrill({
                 )}
                 <button
                   style={styles.btnGhost}
-                  onClick={copyConfig}
-                  title="Copy the full pace config JSON to paste into content/pace-targets.json"
+                  onClick={saveConfig}
+                  title="Write the pace config straight to src/data/pace-targets.json via the local data server"
                 >
-                  {copiedConfig ? 'Copied' : 'Copy pace config (JSON)'}
+                  Save pace config
                 </button>
+                {paceSaveMsg && (
+                  <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+                    {paceSaveMsg}
+                  </span>
+                )}
               </div>
             </div>
           )}
