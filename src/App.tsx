@@ -22,8 +22,11 @@ import {
   savePersonalPace,
   saveTrainerPace,
   exportPaceConfig,
+  patternHash,
+  configStatus,
   median,
   PERSONAL_MODIFIER,
+  type PaceStatus,
 } from './core/pace';
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
@@ -787,6 +790,18 @@ type FluPhase = 'study' | 'setpace' | 'drill';
 const FLU_GOAL = 3; // correct-and-fast reps to clear a pattern
 const FLU_SPEEDUP = 0.85; // "speed up" round tightens the target by 15%
 
+// Trainer-only badge: which patterns need a (re)paced target. 'missing' = never
+// paced; 'dirty' = the problem changed since it was paced. 'fresh' shows nothing.
+function PaceStatusPill({ status }: { status: PaceStatus }) {
+  if (status === 'fresh') return null;
+  const color = status === 'dirty' ? theme.bad : theme.accent;
+  return (
+    <span style={{ ...styles.pill, marginLeft: 6, color, borderColor: color }}>
+      {status === 'dirty' ? 'dirty' : 'unpaced'}
+    </span>
+  );
+}
+
 function FluencyPicker({
   generators,
   onPick,
@@ -842,6 +857,7 @@ function FluencyPicker({
                       write
                     </span>
                   )}
+                  {TRAINER_MODE && <PaceStatusPill status={configStatus(ex)} />}
                 </button>
               ))}
             </div>
@@ -881,12 +897,16 @@ function FluencyDrill({
   const [times, setTimes] = useState<number[]>([]); // correct-rep times this session
   const [streak, setStreak] = useState(0);
   const [reps, setReps] = useState(0); // correct reps this session
+  // Content fingerprint of this pattern; every pace read/write is keyed to it,
+  // so editing the problem auto-invalidates a stale timing.
+  const hash = patternHash(ex);
   // Drill target (ms): personal override > shipped config > kind default. A
-  // pattern with a real target skips study straight to drilling.
-  const [targetMs, setTargetMs] = useState<number>(() => resolvedTargetMs(ex.id, ex.kind));
-  // Study first; skip straight to drilling only once you've drilled this pattern
-  // before (a personal pace is saved). A shipped config time does not skip study.
-  const [phase, setPhase] = useState<FluPhase>(() => (readPersonalPace(ex.id) != null ? 'drill' : 'study'));
+  // pattern with a real (hash-matching) target skips study straight to drilling.
+  const [targetMs, setTargetMs] = useState<number>(() => resolvedTargetMs(ex.id, ex.kind, hash));
+  // Study first; skip straight to drilling only once you've drilled this exact
+  // pattern before (a personal pace whose hash still matches). Editing the
+  // problem invalidates that, so you re-study.
+  const [phase, setPhase] = useState<FluPhase>(() => (readPersonalPace(ex.id, hash) != null ? 'drill' : 'study'));
   const [runs, setRuns] = useState<number[]>([]); // "set the pace": candidate solve times
   const [copiedConfig, setCopiedConfig] = useState(false);
   const [cleared, setCleared] = useState(false);
@@ -1005,8 +1025,8 @@ function FluencyDrill({
   // Lock a chosen run in as the target: it becomes your personal pace AND a
   // trainer-locked benchmark (exportable to the shipped config), then drill.
   const lockPace = (ms: number) => {
-    savePersonalPace(ex.id, ms);
-    if (TRAINER_MODE) saveTrainerPace(ex.id, ms); // only trainers feed the shipped config
+    savePersonalPace(ex.id, ms, hash);
+    if (TRAINER_MODE) saveTrainerPace(ex.id, ms, hash); // only trainers feed the shipped config
     setTargetMs(ms);
     setStreak(0);
     setTimes([]);
@@ -1040,7 +1060,7 @@ function FluencyDrill({
     // solve it.
     const tunedMs = times.length ? Math.round(median(times) * PERSONAL_MODIFIER) : tgt;
     const tuneToMyPace = () => {
-      savePersonalPace(ex.id, tunedMs);
+      savePersonalPace(ex.id, tunedMs, hash);
       setTargetMs(tunedMs);
       setStreak(0);
       setCleared(false);
