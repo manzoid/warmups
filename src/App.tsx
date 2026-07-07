@@ -18,6 +18,7 @@ import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
 import {
+  loadPaces,
   resolvedTargetMs,
   readPersonalPace,
   savePersonalPace,
@@ -62,6 +63,8 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      await loadPaces(); // hydrate Fluency pace cache from the server
+      if (cancelled) return;
       const { state: remote, up } = await loadRemote();
       if (cancelled) return;
       if (remote) {

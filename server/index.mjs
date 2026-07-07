@@ -48,6 +48,33 @@ const selectAll = db.prepare('SELECT id, at, passed, rung FROM attempts ORDER BY
 const insertOne = db.prepare('INSERT INTO attempts (id, at, passed, rung) VALUES (?, ?, ?, ?)');
 const deleteAll = db.prepare('DELETE FROM attempts');
 
+// Fluency pace timings (durable, origin-independent — replaces localStorage).
+// scope is 'personal' (a learner's own pace) or 'trainer' (an exportable
+// benchmark). hash pins the timing to the pattern content it was measured on.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS paces (
+    scope TEXT NOT NULL,
+    id    TEXT NOT NULL,
+    ms    INTEGER NOT NULL,
+    hash  TEXT NOT NULL,
+    PRIMARY KEY (scope, id)
+  );
+`);
+const selectPaces = db.prepare('SELECT scope, id, ms, hash FROM paces');
+const upsertPace = db.prepare(
+  'INSERT INTO paces (scope, id, ms, hash) VALUES (?, ?, ?, ?) ' +
+    'ON CONFLICT(scope, id) DO UPDATE SET ms = excluded.ms, hash = excluded.hash',
+);
+
+function readPaces() {
+  const out = { personal: {}, trainer: {} };
+  for (const r of selectPaces.all()) {
+    const bucket = r.scope === 'trainer' ? out.trainer : out.personal;
+    bucket[r.id] = { ms: r.ms, hash: r.hash };
+  }
+  return out;
+}
+
 function readProgress() {
   const attempts = selectAll.all().map((r) => ({
     id: r.id,
@@ -110,6 +137,23 @@ const server = createServer(async (req, res) => {
       replaceAttempts(attempts);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, count: attempts.length }));
+      return;
+    }
+    // Fluency paces (personal + trainer benchmarks).
+    if (req.method === 'GET' && url.startsWith('/pace') && !url.startsWith('/pace-config')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(readPaces()));
+      return;
+    }
+    if (req.method === 'PUT' && url.startsWith('/pace') && !url.startsWith('/pace-config')) {
+      const p = JSON.parse(await readBody(req));
+      const scope = p && p.scope === 'trainer' ? 'trainer' : 'personal';
+      if (!p || typeof p.id !== 'string' || typeof p.ms !== 'number' || typeof p.hash !== 'string') {
+        throw new Error('expected { scope, id, ms, hash }');
+      }
+      upsertPace.run(scope, p.id, Math.round(p.ms), p.hash);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
       return;
     }
     // Trainer: write the pace config straight to the committed source file.
