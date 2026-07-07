@@ -4,3 +4,7 @@ dist
 
 # workflow scratch scripts
 .wf-*.js
+
+# local env (e.g. trainer mode for pacing)
+.env.local
+*.local
