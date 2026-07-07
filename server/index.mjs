@@ -75,6 +75,25 @@ function readPaces() {
   return out;
 }
 
+// Small durable UI preferences (e.g. "experienced" mode) — server-backed so they
+// persist and don't depend on a per-origin localStorage.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS prefs (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+`);
+const selectPrefs = db.prepare('SELECT key, value FROM prefs');
+const upsertPref = db.prepare(
+  'INSERT INTO prefs (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+);
+
+function readPrefs() {
+  const out = {};
+  for (const r of selectPrefs.all()) out[r.key] = r.value;
+  return out;
+}
+
 function readProgress() {
   const attempts = selectAll.all().map((r) => ({
     id: r.id,
@@ -152,6 +171,22 @@ const server = createServer(async (req, res) => {
         throw new Error('expected { scope, id, ms, hash }');
       }
       upsertPace.run(scope, p.id, Math.round(p.ms), p.hash);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+      return;
+    }
+    // Durable UI preferences.
+    if (req.method === 'GET' && url.startsWith('/prefs')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(readPrefs()));
+      return;
+    }
+    if (req.method === 'PUT' && url.startsWith('/prefs')) {
+      const p = JSON.parse(await readBody(req));
+      if (!p || typeof p.key !== 'string' || typeof p.value !== 'string') {
+        throw new Error('expected { key, value }');
+      }
+      upsertPref.run(p.key, p.value);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       return;

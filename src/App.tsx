@@ -17,6 +17,7 @@ import {
 import { exercisesForTrack, generatorsForTrack } from './ui/content';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
+import { loadPrefs, getFlagPref, setPref } from './core/prefs';
 import {
   loadPaces,
   resolvedTargetMs,
@@ -64,7 +65,10 @@ export default function App() {
     let cancelled = false;
     void (async () => {
       await loadPaces(); // hydrate Fluency pace cache from the server
+      await loadPrefs(); // hydrate durable UI prefs from the server
       if (cancelled) return;
+      setExperienced(getFlagPref('experienced'));
+      setUsedSkipFirstWrite(getFlagPref('usedSkipFirstWrite'));
       const { state: remote, up } = await loadRemote();
       if (cancelled) return;
       if (remote) {
@@ -128,21 +132,12 @@ export default function App() {
   // fast-lane callout keeps appearing at the start of each new unit, not just on
   // the very first screen ever — so a returning learner doesn't re-meet the
   // remedial openers of every unit with no visible exit.
-  const [experienced, setExperienced] = useState<boolean>(() => {
-    try {
-      return typeof window !== 'undefined' && window.localStorage.getItem('warmups.experienced') === '1';
-    } catch {
-      return false;
-    }
-  });
+  // Hydrated from the server by loadPrefs() in the startup effect.
+  const [experienced, setExperienced] = useState(false);
   const toggleExperienced = useCallback(() => {
     setExperienced((prev) => {
       const next = !prev;
-      try {
-        window.localStorage.setItem('warmups.experienced', next ? '1' : '0');
-      } catch {
-        // best-effort
-      }
+      setPref('experienced', next ? '1' : '0');
       return next;
     });
   }, []);
@@ -216,16 +211,8 @@ export default function App() {
   // Skip past the opening predict/trivia cluster to the next hands-on write.
   // "Skip to first write" is a one-time onboarding shortcut; once used, we stop
   // offering it (persisted, so it stays gone across sessions).
-  const [usedSkipFirstWrite, setUsedSkipFirstWrite] = useState<boolean>(() => {
-    try {
-      return (
-        typeof window !== 'undefined' &&
-        window.localStorage.getItem('warmups.usedSkipFirstWrite') === '1'
-      );
-    } catch {
-      return false;
-    }
-  });
+  // Hydrated from the server by loadPrefs() in the startup effect.
+  const [usedSkipFirstWrite, setUsedSkipFirstWrite] = useState(false);
 
   const skipToFirstWrite = useCallback(() => {
     const ids: string[] = [];
@@ -237,11 +224,7 @@ export default function App() {
       started = true;
     }
     setUsedSkipFirstWrite(true);
-    try {
-      window.localStorage.setItem('warmups.usedSkipFirstWrite', '1');
-    } catch {
-      // best-effort
-    }
+    setPref('usedSkipFirstWrite', '1');
     if (ids.length) skip(ids);
   }, [exercises, skip]);
 
