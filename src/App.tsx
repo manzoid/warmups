@@ -373,6 +373,10 @@ export default function App() {
   const useHint = useCallback(
     (rung: number) => {
       if (!pick) return;
+      // A hint or the visualizer only counts if it was a crutch to SOLVE. Once
+      // you've already passed, opening it is review, not assistance — leave the
+      // clean pass alone.
+      if (result?.passed) return;
       const next = Math.max(maxRung, rung);
       if (next === maxRung) return;
       setMaxRung(next);
