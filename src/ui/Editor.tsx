@@ -7,6 +7,7 @@ import { keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { Prec } from '@codemirror/state';
 import type { Track } from '../core/types';
+import { theme } from './styles';
 
 /**
  * A real code editor for `write` exercises: syntax highlighting, auto-indent on
@@ -81,8 +82,8 @@ export function CodeEditor({
         completionKeymap: false,
         closeBrackets: false,
       }}
-      minHeight="200px"
-      style={{ fontSize: '0.9rem', borderRadius: 6, overflow: 'hidden', border: '1px solid #333' }}
+      minHeight="240px"
+      style={{ fontSize: '0.95rem', borderRadius: 6, overflow: 'hidden', border: `1px solid ${theme.border}` }}
     />
   );
 }

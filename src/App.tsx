@@ -37,6 +37,9 @@ import {
 import { styles, theme } from './ui/styles';
 import { CodeEditor } from './ui/Editor';
 import { Visualizer } from './ui/Visualizer';
+import { TopBar } from './ui/TopBar';
+import { SplitPane } from './ui/SplitPane';
+import { useMediaQuery, STACK_BELOW } from './ui/useMediaQuery';
 import { buildWalkthroughPrompt } from './ui/walkthroughPrompt';
 
 const TRACK_LABELS: Record<Track, string> = {
@@ -406,64 +409,59 @@ export default function App() {
   }, [exercises, startExercise, persist, bump]);
 
   const counts = track ? learnCounts(exercises, progress.current) : null;
+  // An ExerciseView is on screen exactly when `pick` is set (learn or practice);
+  // give it the wider shell so the problem | answer split has room. Every other
+  // surface (pickers, history, fluency) stays in the narrower reading column.
+  const wide = !!pick;
 
   return (
     <div style={styles.page}>
-      <div style={styles.shell}>
-        <div style={{ ...styles.row, justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <h1 style={styles.h1}>warmups</h1>
-          <div style={{ ...styles.row, gap: 8 }}>
-            {TRAINER_MODE && (
-              <button
-                style={{
-                  ...styles.btnGhost,
-                  padding: '2px 8px',
-                  fontSize: '0.8rem',
-                  ...(showTraining ? { borderColor: theme.accent, color: theme.accent } : {}),
-                }}
-                onClick={() => setShowTraining((s) => !s)}
-                title="Time-trainer dashboard: pace coverage across all patterns"
-              >
-                Training
-              </button>
-            )}
-            <button
-              style={{ ...styles.btnGhost, padding: '2px 8px', fontSize: '0.8rem' }}
-              onClick={() => setShowSettings((s) => !s)}
-              title="Feature flags and settings"
-            >
-              ⚙ Settings
-            </button>
+      <TopBar
+        track={track}
+        view={view}
+        counts={counts}
+        hasFluency={generators.length > 0}
+        tabsVisible={!!(track && counts && !(TRAINER_MODE && showTraining))}
+        trainerMode={TRAINER_MODE}
+        showTraining={showTraining}
+        onView={switchView}
+        onChangeTrack={() => {
+          setTrack(null);
+          setPick(null);
+          setQueue(null);
+        }}
+        onToggleSettings={() => setShowSettings((s) => !s)}
+        onToggleTraining={() => setShowTraining((s) => !s)}
+      />
+      <div
+        style={{
+          ...(wide ? styles.shellWide : styles.shell),
+          paddingTop: '1.5rem',
+          paddingBottom: '2.5rem',
+        }}
+      >
+        {showSettings && (
+          <div style={{ marginBottom: '1rem' }}>
+            <SettingsPanel onClose={() => setShowSettings(false)} />
           </div>
-        </div>
-        <p style={styles.tagline}>
-          Local-first coding drills for language fluency and problem-solving
-          primitives — you choose what to practice.
-        </p>
-
-        {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
+        )}
 
         {TRAINER_MODE && showTraining && (
           <TrainingDashboard onPace={pacePattern} onClose={() => setShowTraining(false)} />
         )}
 
-        {!(TRAINER_MODE && showTraining) && !track && <TrackPicker onPick={chooseTrack} />}
+        {!(TRAINER_MODE && showTraining) && !track && (
+          <>
+            <p style={{ ...styles.tagline, marginTop: 0 }}>
+              Local-first coding drills for language fluency and problem-solving
+              primitives — you choose what to practice.
+            </p>
+            <TrackPicker onPick={chooseTrack} />
+          </>
+        )}
 
         {!(TRAINER_MODE && showTraining) && track && counts && (
           <>
-            <Nav
-              track={track}
-              view={view}
-              counts={counts}
-              hasFluency={generators.length > 0}
-              onView={switchView}
-              onChangeTrack={() => {
-                setTrack(null);
-                setPick(null);
-                setQueue(null);
-              }}
-            />
-
             {view === 'learn' &&
               (pick ? (
                 <ExerciseView
@@ -562,16 +560,20 @@ export default function App() {
                   }}
                 />
               ) : (
-                <FluencyDrill
-                  key={fluencyEx.id}
-                  track={track}
-                  ex={fluencyEx}
-                  best={bestTimeMs(progress.current, fluencyEx.id)}
-                  initialPhase={fluencyStart}
-                  onCleared={(ms, code) => recordFluencyClear(fluencyEx.id, ms, code)}
-                  onGotThis={() => recordGotThis(fluencyEx.id)}
-                  onExit={() => setFluencyEx(null)}
-                />
+                // Fluency stays a single fast-reps column (never a split): a
+                // narrower measure keeps the eyes still between reps.
+                <div style={{ maxWidth: 900, margin: '0 auto' }}>
+                  <FluencyDrill
+                    key={fluencyEx.id}
+                    track={track}
+                    ex={fluencyEx}
+                    best={bestTimeMs(progress.current, fluencyEx.id)}
+                    initialPhase={fluencyStart}
+                    onCleared={(ms, code) => recordFluencyClear(fluencyEx.id, ms, code)}
+                    onGotThis={() => recordGotThis(fluencyEx.id)}
+                    onExit={() => setFluencyEx(null)}
+                  />
+                </div>
               ))}
 
             {view === 'history' && (
@@ -601,7 +603,7 @@ function SettingsPanel({ onClose }: { onClose: () => void }) {
           Close
         </button>
       </div>
-      <p style={{ ...styles.tagline, margin: '0 0 0.8rem', fontSize: '0.8rem', color: theme.muted }}>
+      <p style={{ ...styles.note, margin: '0 0 0.8rem' }}>
         Toggling applies on reload. You can also set them at build time
         (VITE_FLAG_TRAINER=true) or via a URL param (?flags=trainer,interview).
       </p>
@@ -628,7 +630,7 @@ function SettingsPanel({ onClose }: { onClose: () => void }) {
           />
           <span>
             <strong>{def.label}</strong>
-            <span style={{ ...styles.tagline, display: 'block', margin: '2px 0 0', fontSize: '0.8rem', color: theme.muted }}>
+            <span style={{ ...styles.note, display: 'block', margin: '2px 0 0' }}>
               {def.description}
             </span>
           </span>
@@ -656,53 +658,6 @@ function TrackPicker({ onPick }: { onPick: (t: Track) => void }) {
       <p style={{ ...styles.tagline, margin: '0.4rem 0 0', fontSize: '0.8rem' }}>
         TypeScript syntax is accepted, but types are not taught or checked yet.
       </p>
-    </div>
-  );
-}
-
-function Nav({
-  track,
-  view,
-  counts,
-  hasFluency,
-  onView,
-  onChangeTrack,
-}: {
-  track: Track;
-  view: View;
-  counts: { done: number; total: number };
-  hasFluency: boolean;
-  onView: (v: View) => void;
-  onChangeTrack: () => void;
-}) {
-  const tab = (v: View, label: string) => (
-    <button
-      style={{
-        ...styles.btnGhost,
-        ...(view === v ? { borderColor: theme.accent, color: theme.accent } : {}),
-      }}
-      onClick={() => onView(v)}
-    >
-      {label}
-    </button>
-  );
-  return (
-    <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: 8 }}>
-      <div style={styles.row}>
-        <strong style={{ fontSize: '0.95rem' }}>{TRACK_LABELS[track]}</strong>
-        {tab('learn', 'Learn')}
-        {tab('practice', 'Practice')}
-        {hasFluency && tab('fluency', 'Fluency')}
-        {tab('history', 'History')}
-      </div>
-      <div style={styles.row}>
-        <span style={styles.pill}>
-          {counts.done} / {counts.total} passed
-        </span>
-        <button style={styles.btnGhost} onClick={onChangeTrack}>
-          Change track
-        </button>
-      </div>
     </div>
   );
 }
@@ -863,7 +818,7 @@ function PracticeDone({
 }) {
   return (
     <div style={styles.panel}>
-      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>
+      <h2 style={styles.h2}>
         Practiced all of “{label}” 🎉
       </h2>
       <div style={styles.row}>
@@ -985,7 +940,7 @@ function TrainingDashboard({
         <p style={{ ...styles.label, margin: 0 }}>Training dashboard — pace coverage</p>
         <div style={{ ...styles.row, gap: 8, alignItems: 'center' }}>
           {saveMsg && (
-            <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>{saveMsg}</span>
+            <span style={styles.note}>{saveMsg}</span>
           )}
           <button style={styles.btn} onClick={saveConfig} title="Write the pace config straight to src/data/pace-targets.json via the local data server">
             Save pace config
@@ -1029,7 +984,7 @@ function TrainingDashboard({
               <span style={{ ...styles.pill, marginLeft: 4 }}>{ex.kind}</span>
             </div>
             <div style={{ ...styles.row, gap: 8 }}>
-              <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+              <span style={styles.note}>
                 cfg {secs(config)}
                 {personal != null ? ` · you ${secs(personal)}` : ''}
               </span>
@@ -1106,7 +1061,7 @@ function FluencyPicker({
           </div>
         ));
       })()}
-      <p style={{ ...styles.tagline, margin: '0.4rem 0 0', fontSize: '0.8rem', color: theme.muted }}>
+      <p style={{ ...styles.note, margin: '0.4rem 0 0' }}>
         Fluency is for getting fast at a mechanic you already know. Learn it first
         in Learn, then come here to make it automatic.
       </p>
@@ -1316,7 +1271,7 @@ function FluencyDrill({
     };
     return (
       <div style={styles.panel}>
-        <h2 style={{ fontSize: '1.15rem', margin: '0 0 0.4rem', color: theme.good }}>
+        <h2 style={{ ...styles.h2, margin: '0 0 0.4rem', color: theme.good }}>
           Cleared “{ex.concept}” 🎉
         </h2>
         <p style={{ ...styles.tagline, margin: '0 0 0.3rem' }}>
@@ -1628,7 +1583,7 @@ function FluencyDrill({
                   Save pace config
                 </button>
                 {paceSaveMsg && (
-                  <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+                  <span style={styles.note}>
                     {paceSaveMsg}
                   </span>
                 )}
@@ -1895,8 +1850,28 @@ function ExerciseView({
 }) {
   const ex = pick.exercise;
   const graded = result !== null;
-  return (
-    <div style={styles.panel}>
+
+  // Split into two panes only on wide viewports; below STACK_BELOW everything
+  // stacks in one column (problem → answer → hints).
+  const wide = useMediaQuery(`(min-width: ${STACK_BELOW}px)`);
+
+  // "See it run" is a direct launch, not a rung to climb to. It's available
+  // BEFORE submitting on a WRITE exercise (it traces your own in-progress code
+  // and spoils nothing); on a PREDICT it waits until graded, since running the
+  // snippet would reveal the value you're predicting. ExerciseView owns this
+  // state so the wide 3-column codeviz iframe can be hoisted below BOTH panes
+  // rather than trapped in the (left) hint pane.
+  const canVisualize = graded || ex.kind === 'write';
+  const [vizOpen, setVizOpen] = useState(false);
+  const toggleViz = () => {
+    if (!vizOpen) onUseHint(RUNG.visualize); // opening counts as a visualize (no-op once passed)
+    setVizOpen((v) => !v);
+  };
+
+  // Full-width header (above the split): the experienced-learner skip callout
+  // and the practice subtitle / exit row.
+  const header = (
+    <>
       {firstScreen && !graded && (onSkipToFirstWrite || onSkipToProblems) && (
         <div
           style={{
@@ -1946,6 +1921,13 @@ function ExerciseView({
           )}
         </div>
       )}
+    </>
+  );
+
+  // Block P — the problem: pills, concept, prompt, and the read-only stimulus
+  // (a predict's snippet, or a write's worked example). Goes in the left pane.
+  const problemBlock = (
+    <>
       <div style={{ ...styles.row, marginBottom: '0.5rem' }}>
         <span style={styles.pill}>{ex.group}</span>
         <span style={styles.pill}>{ex.kind}</span>
@@ -1955,13 +1937,42 @@ function ExerciseView({
           </span>
         )}
       </div>
-      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>{ex.concept}</h2>
+      <h2 style={styles.h2}>{ex.concept}</h2>
       <p style={{ margin: '0 0 1rem', color: theme.text }}>{ex.prompt}</p>
 
       {ex.kind === 'predict' && ex.snippet && (
         <>
           <p style={styles.label}>Snippet</p>
           <pre style={{ ...styles.code, marginBottom: '1rem' }}>{ex.snippet}</pre>
+        </>
+      )}
+
+      {ex.kind === 'write' &&
+        (() => {
+          // Surface the first couple of test cases as a worked example — most
+          // write prompts describe the function abstractly, and a concrete
+          // input -> output makes it click. Cases already exist, so this is
+          // always correct and never drifts.
+          const examples = (ex.cases ?? []).filter((c) => c.expect !== undefined).slice(0, 2);
+          if (examples.length === 0) return null;
+          return (
+            <>
+              <p style={styles.label}>Example{examples.length > 1 ? 's' : ''}</p>
+              <pre style={{ ...styles.code, marginBottom: '1rem' }}>
+                {examples.map((c) => `${c.call}  →  ${c.expect}`).join('\n')}
+              </pre>
+            </>
+          );
+        })()}
+    </>
+  );
+
+  // Block A — the answer: the input surface (predict field / code editor), the
+  // action buttons, the result, and the post-grade note / LC tag. Right pane.
+  const answerBlock = (
+    <>
+      {ex.kind === 'predict' && ex.snippet && (
+        <>
           <p style={styles.label}>Predict the value</p>
           <input
             style={{ ...styles.editor, fontFamily: theme.mono }}
@@ -1984,22 +1995,6 @@ function ExerciseView({
 
       {ex.kind === 'write' && (
         <>
-          {(() => {
-            // Surface the first couple of test cases as a worked example — most
-            // write prompts describe the function abstractly, and a concrete
-            // input -> output makes it click. Cases already exist, so this is
-            // always correct and never drifts.
-            const examples = (ex.cases ?? []).filter((c) => c.expect !== undefined).slice(0, 2);
-            if (examples.length === 0) return null;
-            return (
-              <>
-                <p style={styles.label}>Example{examples.length > 1 ? 's' : ''}</p>
-                <pre style={{ ...styles.code, marginBottom: '1rem' }}>
-                  {examples.map((c) => `${c.call}  →  ${c.expect}`).join('\n')}
-                </pre>
-              </>
-            );
-          })()}
           <p style={styles.label}>Your code</p>
           <CodeEditor
             language={ex.track}
@@ -2077,14 +2072,55 @@ function ExerciseView({
           )}
         </div>
       )}
+    </>
+  );
 
-      <HintLadder
-        ex={ex}
-        input={input}
-        graded={graded}
-        failingCase={result?.failingCase}
-        onUse={onUseHint}
-      />
+  // Block H — the hint ladder (draws the visualize button, but not the iframe).
+  const hintBlock = (
+    <HintLadder
+      ex={ex}
+      input={input}
+      graded={graded}
+      onUse={onUseHint}
+      vizOpen={vizOpen}
+      canVisualize={canVisualize}
+      onToggleViz={canVisualize ? toggleViz : undefined}
+    />
+  );
+
+  // The codeviz iframe, hoisted so it spans full width below the split (wide) or
+  // sits at the tail of the stacked column (narrow).
+  const vizPanel = vizOpen ? (
+    <div style={{ marginTop: '0.85rem' }}>
+      <Visualizer track={ex.track} code={vizCode(ex, input, result?.failingCase)} title={ex.concept} />
+    </div>
+  ) : null;
+
+  return (
+    <div style={styles.panel}>
+      {header}
+      {wide ? (
+        <>
+          <SplitPane
+            storageKey="warmups.split.exercise"
+            left={
+              <>
+                {problemBlock}
+                {hintBlock}
+              </>
+            }
+            right={answerBlock}
+          />
+          {vizPanel}
+        </>
+      ) : (
+        <>
+          {problemBlock}
+          {answerBlock}
+          {hintBlock}
+          {vizPanel}
+        </>
+      )}
     </div>
   );
 }
@@ -2152,14 +2188,20 @@ function HintLadder({
   ex,
   input,
   graded,
-  failingCase,
   onUse,
+  vizOpen,
+  canVisualize,
+  onToggleViz,
 }: {
   ex: Exercise;
   input: string;
   graded: boolean;
-  failingCase?: RunResult['failingCase'];
   onUse: (rung: number) => void;
+  // Visualizer state is owned by ExerciseView so the iframe can be hoisted out
+  // of the two panes and rendered full-width; the ladder only draws the button.
+  vizOpen: boolean;
+  canVisualize: boolean;
+  onToggleViz?: () => void;
 }) {
   const answer = ex.kind === 'predict' ? ex.expected : ex.solution;
 
@@ -2205,17 +2247,6 @@ function HintLadder({
   const [revealed, setRevealed] = useState(0);
   const next = steps[revealed];
 
-  // "See it run" is a direct launch, not a rung to climb to. It's available
-  // BEFORE submitting on a WRITE exercise (it traces your own in-progress code
-  // and spoils nothing); on a PREDICT it waits until graded, since running the
-  // snippet would reveal the value you're predicting.
-  const canVisualize = graded || ex.kind === 'write';
-  const [vizOpen, setVizOpen] = useState(false);
-  const toggleViz = () => {
-    if (!vizOpen) onUse(RUNG.visualize); // opening counts as a visualize (no-op once passed)
-    setVizOpen((v) => !v);
-  };
-
   // Nothing to offer at all — render nothing.
   if (steps.length === 0 && !canVisualize) return null;
 
@@ -2227,23 +2258,14 @@ function HintLadder({
 
   return (
     <div style={{ marginTop: '1.25rem', borderTop: `1px solid ${theme.border}`, paddingTop: '1rem' }}>
-      {canVisualize && (
+      {canVisualize && onToggleViz && (
         <div style={{ marginBottom: steps.length > 0 ? '1.1rem' : 0 }}>
           <button
             style={{ ...styles.btn, ...(vizOpen ? { background: theme.accent } : {}) }}
-            onClick={toggleViz}
+            onClick={onToggleViz}
           >
             {vizOpen ? 'Hide visualizer' : '▶ Visualize this run (codeviz)'}
           </button>
-          {vizOpen && (
-            <div style={{ marginTop: '0.85rem' }}>
-              <Visualizer
-                track={ex.track}
-                code={vizCode(ex, input, failingCase)}
-                title={ex.concept}
-              />
-            </div>
-          )}
         </div>
       )}
 
@@ -2333,7 +2355,7 @@ function ResultView({
     <div style={{ marginTop: '1rem' }}>
       <p style={{ ...styles.label, color, margin: '0 0 0.4rem' }}>{label}</p>
       {timing && result.passed && (
-        <p style={{ ...styles.tagline, margin: '0 0 0.4rem', fontSize: '0.8rem', color: theme.muted }}>
+        <p style={{ ...styles.note, margin: '0 0 0.4rem' }}>
           ⏱ solved in {(timing.ms / 1000).toFixed(1)}s
           {timing.bestMs != null && timing.bestMs < timing.ms
             ? ` · best ${(timing.bestMs / 1000).toFixed(1)}s`
@@ -2356,7 +2378,7 @@ function ResultView({
 function AllPassed() {
   return (
     <div style={styles.panel}>
-      <h2 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem' }}>
+      <h2 style={styles.h2}>
         You've been through everything here 🎉
       </h2>
       <p style={{ ...styles.tagline, margin: 0 }}>
