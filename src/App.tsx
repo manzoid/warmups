@@ -20,7 +20,15 @@ import {
 import { exercisesForTrack, generatorsForTrack, ALL_EXERCISES } from './ui/content';
 import { availableTracks } from './core/curriculum';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
-import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
+import {
+  INTERVIEW_FEATURES,
+  TRAINER_MODE,
+  FLUENCY_TAB,
+  LEARN_SRS,
+  FLAGS,
+  FLAG_DEFS,
+  setFlagOverride,
+} from './core/flags';
 import { loadPrefs, getFlagPref, setPref } from './core/prefs';
 import {
   loadPaces,
@@ -51,6 +59,10 @@ const TRACK_LABELS: Record<Track, string> = {
 const TRACKS: Track[] = availableTracks(ALL_EXERCISES);
 
 type View = 'learn' | 'practice' | 'fluency' | 'progress';
+
+// Where the app lands after picking a track (and after a history reset). The
+// SRS-guided Learn sequence is opt-in; without it, Practice is home.
+const HOME_VIEW: View = LEARN_SRS ? 'learn' : 'practice';
 
 export default function App() {
   // Progress lives in a ref (arrays/maps mutate in place); `tick` forces a
@@ -103,7 +115,7 @@ export default function App() {
   }, [bump]);
 
   const [track, setTrack] = useState<Track | null>(null);
-  const [view, setView] = useState<View>('learn');
+  const [view, setView] = useState<View>(HOME_VIEW);
   const [showSettings, setShowSettings] = useState(false);
   const [showTraining, setShowTraining] = useState(false);
   // When the training dashboard launches a pattern for pacing, force setpace.
@@ -283,12 +295,16 @@ export default function App() {
 
   const chooseTrack = (t: Track) => {
     setTrack(t);
-    setView('learn');
+    setView(HOME_VIEW);
     setQueue(null);
     setFluencyEx(null);
-    const next = pickNextLearn(exercisesForTrack(t), progress.current);
-    if (next) startExercise(next.exercise, next.isNew);
-    else setPick(null);
+    if (LEARN_SRS) {
+      const next = pickNextLearn(exercisesForTrack(t), progress.current);
+      if (next) startExercise(next.exercise, next.isNew);
+      else setPick(null);
+    } else {
+      setPick(null);
+    }
   };
 
   // From the training dashboard: jump to a specific pattern's pacing flow.
@@ -421,10 +437,14 @@ export default function App() {
     resetProgress(progress.current);
     persist();
     setQueue(null);
-    setView('learn');
-    const next = pickNextLearn(exercises, progress.current);
-    if (next) startExercise(next.exercise, next.isNew);
-    else setPick(null);
+    setView(HOME_VIEW);
+    if (LEARN_SRS) {
+      const next = pickNextLearn(exercises, progress.current);
+      if (next) startExercise(next.exercise, next.isNew);
+      else setPick(null);
+    } else {
+      setPick(null);
+    }
     bump();
   }, [exercises, startExercise, persist, bump]);
 
@@ -482,7 +502,7 @@ export default function App() {
               track={track}
               view={view}
               counts={counts}
-              hasFluency={generators.length > 0}
+              hasFluency={FLUENCY_TAB && generators.length > 0}
               onView={switchView}
               onChangeTrack={() => {
                 setTrack(null);
@@ -718,7 +738,7 @@ function Nav({
     <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: 8 }}>
       <div style={styles.row}>
         <strong style={{ fontSize: '0.95rem' }}>{TRACK_LABELS[track]}</strong>
-        {tab('learn', 'Learn')}
+        {LEARN_SRS && tab('learn', 'Learn (SRS)')}
         {tab('practice', 'Practice')}
         {hasFluency && tab('fluency', 'Fluency')}
         {tab('progress', 'Progress')}
