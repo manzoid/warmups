@@ -6,6 +6,7 @@
 
 import { validateExercises } from '../core/schema';
 import type { Exercise, Track } from '../core/types';
+import { inScope } from '../core/curriculum';
 
 const modules = import.meta.glob('../../content/**/*.json', {
   eager: true,
@@ -27,7 +28,13 @@ function loadAll(): Exercise[] {
   });
   for (const [path, mod] of entries) {
     try {
-      out.push(...validateExercises(mod));
+      const spiral = /-more\.json$/.test(path);
+      for (const ex of validateExercises(mod)) {
+        // Stamp source-derived metadata (unit + spiral tier) so the curriculum
+        // filter can hide content without it needing to live in the JSON.
+        const unit = /\.(u\d\d)\./.exec(ex.id)?.[1];
+        out.push({ ...ex, unit, spiral });
+      }
     } catch (err) {
       // Surface which file broke; skip it rather than crashing the whole app.
       console.error(`Invalid content in ${path}:`, err);
@@ -40,11 +47,13 @@ export const ALL_EXERCISES: Exercise[] = loadAll();
 
 // The Learn / Practice / History sequence is the static curriculum only —
 // fluency generators (which have no fixed instance) live in their own mode.
+// Both respect the curriculum scope (inScope): by default only the beginner
+// core is visible, unless "Show all content" is on.
 export function exercisesForTrack(track: Track): Exercise[] {
-  return ALL_EXERCISES.filter((ex) => ex.track === track && !ex.generator);
+  return ALL_EXERCISES.filter((ex) => ex.track === track && !ex.generator && inScope(ex));
 }
 
 /** Fluency-drill generator exercises for a track (Kumon-style speed practice). */
 export function generatorsForTrack(track: Track): Exercise[] {
-  return ALL_EXERCISES.filter((ex) => ex.track === track && !!ex.generator);
+  return ALL_EXERCISES.filter((ex) => ex.track === track && !!ex.generator && inScope(ex));
 }

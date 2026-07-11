@@ -16,7 +16,8 @@ import {
   type ProgressState,
   type Attempt,
 } from './core/storage';
-import { exercisesForTrack, generatorsForTrack } from './ui/content';
+import { exercisesForTrack, generatorsForTrack, ALL_EXERCISES } from './ui/content';
+import { availableTracks } from './core/curriculum';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
 import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
 import { loadPrefs, getFlagPref, setPref } from './core/prefs';
@@ -44,6 +45,10 @@ const TRACK_LABELS: Record<Track, string> = {
   javascript: 'JavaScript',
 };
 
+// Tracks with any in-scope content. In the default beginner core this is just
+// Python, so the picker offers one track and "Change track" is hidden.
+const TRACKS: Track[] = availableTracks(ALL_EXERCISES);
+
 type View = 'learn' | 'practice' | 'fluency' | 'history';
 
 export default function App() {
@@ -52,6 +57,9 @@ export default function App() {
   const progress = useRef<ProgressState>(load());
   const [, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
+  // True once the server hydration pass has run — the auto-track-pick waits on
+  // it so a returning learner resumes where they left off, not at exercise 1.
+  const [hydrated, setHydrated] = useState(false);
 
   // Persist to both the localStorage cache and the durable local data server.
   const persist = useCallback(() => {
@@ -86,6 +94,7 @@ export default function App() {
         void saveRemote(progress.current);
       }
       bump();
+      setHydrated(true);
     })();
     return () => {
       cancelled = true;
@@ -167,6 +176,19 @@ export default function App() {
     setInput(ex.kind === 'write' ? ex.starter ?? '' : '');
     setPick({ exercise: ex, isNew });
   }, []);
+
+  // When only one track is in scope (the default beginner core is Python-only),
+  // skip the track picker: select it and land on the next exercise. Runs once,
+  // after hydration, so we resume the learner's place rather than restarting.
+  const didAutoTrack = useRef(false);
+  useEffect(() => {
+    if (didAutoTrack.current || !hydrated || TRACKS.length !== 1) return;
+    didAutoTrack.current = true;
+    const t = TRACKS[0];
+    setTrack(t);
+    const next = pickNextLearn(exercisesForTrack(t), progress.current);
+    if (next) startExercise(next.exercise, next.isNew);
+  }, [hydrated, startExercise]);
 
   const advanceLearn = useCallback(() => {
     const next = pickNextLearn(exercises, progress.current);
@@ -407,13 +429,17 @@ export default function App() {
 
   const counts = track ? learnCounts(exercises, progress.current) : null;
 
+  // Trainer tooling only appears once a track is chosen — never on the
+  // track-picker screen.
+  const trainingOpen = TRAINER_MODE && track != null && showTraining;
+
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
         <div style={{ ...styles.row, justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <h1 style={styles.h1}>warmups</h1>
           <div style={{ ...styles.row, gap: 8 }}>
-            {TRAINER_MODE && (
+            {TRAINER_MODE && track != null && (
               <button
                 style={{
                   ...styles.btnGhost,
@@ -443,13 +469,13 @@ export default function App() {
 
         {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
 
-        {TRAINER_MODE && showTraining && (
+        {trainingOpen && (
           <TrainingDashboard onPace={pacePattern} onClose={() => setShowTraining(false)} />
         )}
 
-        {!(TRAINER_MODE && showTraining) && !track && <TrackPicker onPick={chooseTrack} />}
+        {!trainingOpen && !track && <TrackPicker onPick={chooseTrack} />}
 
-        {!(TRAINER_MODE && showTraining) && track && counts && (
+        {!trainingOpen && track && counts && (
           <>
             <Nav
               track={track}
@@ -461,6 +487,7 @@ export default function App() {
                 setTrack(null);
                 setPick(null);
                 setQueue(null);
+                setShowTraining(false);
               }}
             />
 
@@ -643,7 +670,7 @@ function TrackPicker({ onPick }: { onPick: (t: Track) => void }) {
     <div style={styles.panel}>
       <p style={styles.label}>Pick a track</p>
       <div style={styles.row}>
-        {(Object.keys(TRACK_LABELS) as Track[]).map((t) => (
+        {TRACKS.map((t) => (
           <button key={t} style={styles.btn} onClick={() => onPick(t)}>
             {TRACK_LABELS[t]}
           </button>
@@ -699,9 +726,11 @@ function Nav({
         <span style={styles.pill}>
           {counts.done} / {counts.total} passed
         </span>
-        <button style={styles.btnGhost} onClick={onChangeTrack}>
-          Change track
-        </button>
+        {TRACKS.length > 1 && (
+          <button style={styles.btnGhost} onClick={onChangeTrack}>
+            Change track
+          </button>
+        )}
       </div>
     </div>
   );
@@ -902,9 +931,11 @@ function PaceStatusPill({ status }: { status: PaceStatus }) {
   );
 }
 
-// Time-trainer dashboard: a cross-track bird's-eye of pace coverage — which
-// patterns are paced (fresh), dirty (edited since paced), or unpaced — with a
-// jump-to-pace action and the config export in one place.
+// Time-trainer dashboard: pace coverage over the PYTHON drills — which patterns
+// are paced (fresh), dirty (edited since paced), or unpaced — with a
+// jump-to-pace action and the config export in one place. Pacing is authored
+// against Python only; a JS drill borrows its Python counterpart's timing as a
+// default (see configPaceMs), tunable per-language later with a js.* entry.
 function TrainingDashboard({
   onPace,
   onClose,
@@ -917,8 +948,7 @@ function TrainingDashboard({
   const rank: Record<PaceStatus, number> = { missing: 0, dirty: 1, fresh: 2 };
 
   const rows = useMemo(() => {
-    const gens = [...generatorsForTrack('python'), ...generatorsForTrack('javascript')];
-    return gens
+    return generatorsForTrack('python')
       .map((ex) => {
         const h = patternHash(ex);
         return {
@@ -931,26 +961,19 @@ function TrainingDashboard({
       .sort((a, b) =>
         rank[a.status] !== rank[b.status]
           ? rank[a.status] - rank[b.status]
-          : a.ex.track < b.ex.track
+          : a.ex.id < b.ex.id
             ? -1
-            : a.ex.track > b.ex.track
-              ? 1
-              : a.ex.id < b.ex.id
-                ? -1
-                : 1,
+            : 1,
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const tally = (t?: Track) => {
-    const r = t ? rows.filter((x) => x.ex.track === t) : rows;
-    return {
-      total: r.length,
-      fresh: r.filter((x) => x.status === 'fresh').length,
-      dirty: r.filter((x) => x.status === 'dirty').length,
-      missing: r.filter((x) => x.status === 'missing').length,
-    };
-  };
+  const tally = () => ({
+    total: rows.length,
+    fresh: rows.filter((x) => x.status === 'fresh').length,
+    dirty: rows.filter((x) => x.status === 'dirty').length,
+    missing: rows.filter((x) => x.status === 'missing').length,
+  });
   // Write the config straight to src/data/pace-targets.json via the local data
   // server. If it isn't running, fall back to copying the JSON.
   const saveConfig = async () => {
@@ -970,11 +993,11 @@ function TrainingDashboard({
     setTimeout(() => setSaveMsg(''), 4000);
   };
 
-  const summaryLine = (label: string, t?: Track) => {
-    const s = tally(t);
+  const summaryLine = () => {
+    const s = tally();
     return (
       <span style={{ ...styles.pill }}>
-        {label}: {s.fresh} paced · {s.dirty} dirty · {s.missing} unpaced ({s.total})
+        Python: {s.fresh} paced · {s.dirty} dirty · {s.missing} unpaced ({s.total})
       </span>
     );
   };
@@ -996,9 +1019,10 @@ function TrainingDashboard({
         </div>
       </div>
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginTop: '0.6rem' }}>
-        {summaryLine('All')}
-        {summaryLine('Python', 'python')}
-        {summaryLine('JavaScript', 'javascript')}
+        {summaryLine()}
+        <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+          JS drills reuse their Python counterpart's pace as a default.
+        </span>
       </div>
 
       <div style={{ marginTop: '0.9rem' }}>
@@ -1099,7 +1123,9 @@ function FluencyPicker({
                       write
                     </span>
                   )}
-                  {TRAINER_MODE && <PaceStatusPill status={configStatus(ex)} />}
+                  {TRAINER_MODE && ex.track === 'python' && (
+                    <PaceStatusPill status={configStatus(ex)} />
+                  )}
                 </button>
               ))}
             </div>

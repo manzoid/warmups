@@ -14,7 +14,7 @@
 // Resolved once at load into FLAGS; the Settings panel writes an override and
 // reloads so the new value takes effect.
 
-export type FlagKey = 'interview' | 'trainer';
+export type FlagKey = 'interview' | 'trainer' | 'fullContent';
 
 export interface FlagDef {
   key: FlagKey;
@@ -36,6 +36,13 @@ export const FLAG_DEFS: readonly FlagDef[] = [
     label: 'Time-trainer tools',
     description:
       'Enable the Fluency pace tools: "set the pace yourself" run-and-lock, "copy pace config" export, "re-pace", and dirty/unpaced badges.',
+    default: false,
+  },
+  {
+    key: 'fullContent',
+    label: 'Show all content',
+    description:
+      'Off by default, the app shows only the beginner core (Python units 1-5, no spiral-review "-more" sets) — about three weeks of work. Turn this on to unlock every unit, both tracks, and all spiral review.',
     default: false,
   },
 ];
@@ -135,3 +142,4 @@ export function clearFlagOverrides(): void {
 // Convenience aliases for the current flags (keeps call sites readable).
 export const INTERVIEW_FEATURES = FLAGS.interview;
 export const TRAINER_MODE = FLAGS.trainer;
+export const FULL_CONTENT = FLAGS.fullContent;
