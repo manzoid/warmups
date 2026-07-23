@@ -105,13 +105,20 @@ export function SplitPane({
     (e: ReactKeyboardEvent<HTMLDivElement>) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
+      const rect = containerRef.current?.getBoundingClientRect();
       setRatio((r) => {
-        const next = clampRatio(r + (e.key === 'ArrowLeft' ? -KEY_STEP : KEY_STEP));
+        let next = r + (e.key === 'ArrowLeft' ? -KEY_STEP : KEY_STEP);
+        if (rect && rect.width > 0) {
+          const minR = minPx / rect.width;
+          const maxR = 1 - minPx / rect.width;
+          next = Math.min(maxR, Math.max(minR, next));
+        }
+        next = clampRatio(next);
         writeRatio(storageKey, next);
         return next;
       });
     },
-    [storageKey],
+    [storageKey, minPx],
   );
 
   return (
