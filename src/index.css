@@ -1,0 +1,46 @@
+/* Global reset and base only. Color is owned by the `theme` object in styles.ts
+   (the single source of truth); this file deliberately holds NO layout and no
+   component color. Its whole job is: drop the browser's default body margin,
+   pin the root font-size so rem units are predictable, paint the app background
+   before React's first render (so there's no white flash), and draw the
+   SplitPane divider (a wide transparent grab area whose visible 6px bar is a
+   ::before pseudo-element) plus its cursor / hover / focus affordances. The two
+   hex values below mirror theme.border / theme.accent and live here so the drag
+   handle can change color on :hover — an inline style can't be overridden by
+   :hover. */
+
+html,
+body {
+  margin: 0;
+}
+
+:root {
+  font-size: 16px;
+}
+
+body {
+  background: #0f1117; /* theme.bg — prevents a flash before the app paints */
+}
+
+.split-handle {
+  cursor: col-resize;
+}
+
+/* The visible bar: a 6px pill centered in the transparent hit area, stretched to
+   full height by the handle's flex `align-items: stretch`. */
+.split-handle::before {
+  content: '';
+  width: 6px;
+  border-radius: 999px;
+  background: #2a2f3a; /* theme.border */
+  transition: background 120ms ease;
+}
+
+.split-handle:hover::before,
+.split-handle:focus-visible::before {
+  background: #7aa2f7; /* theme.accent */
+}
+
+.split-handle:focus-visible {
+  outline: none;
+}
