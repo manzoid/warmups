@@ -14,7 +14,7 @@
 // Resolved once at load into FLAGS; the Settings panel writes an override and
 // reloads so the new value takes effect.
 
-export type FlagKey = 'interview' | 'trainer';
+export type FlagKey = 'interview' | 'trainer' | 'fullContent' | 'fluency' | 'srsLearn';
 
 export interface FlagDef {
   key: FlagKey;
@@ -36,6 +36,27 @@ export const FLAG_DEFS: readonly FlagDef[] = [
     label: 'Time-trainer tools',
     description:
       'Enable the Fluency pace tools: "set the pace yourself" run-and-lock, "copy pace config" export, "re-pace", and dirty/unpaced badges.',
+    default: false,
+  },
+  {
+    key: 'fullContent',
+    label: 'Show all content',
+    description:
+      'Off by default, the app shows only the beginner core (Python units 1-5, no spiral-review "-more" sets) — about three weeks of work. Turn this on to unlock every unit, both tracks, and all spiral review.',
+    default: false,
+  },
+  {
+    key: 'fluency',
+    label: 'Fluency drills',
+    description:
+      'Show the Fluency tab: timed speed drills on generated instances of a pattern. (The tab also appears when the time-trainer tools are on.)',
+    default: false,
+  },
+  {
+    key: 'srsLearn',
+    label: 'Learn via SRS',
+    description:
+      'Show the "Learn (SRS)" tab: the guided spaced-repetition sequence through the curriculum. Off, the app opens on Practice.',
     default: false,
   },
 ];
@@ -135,3 +156,7 @@ export function clearFlagOverrides(): void {
 // Convenience aliases for the current flags (keeps call sites readable).
 export const INTERVIEW_FEATURES = FLAGS.interview;
 export const TRAINER_MODE = FLAGS.trainer;
+export const FULL_CONTENT = FLAGS.fullContent;
+// The Fluency tab is learner-facing sugar, but a trainer needs it to pace.
+export const FLUENCY_TAB = FLAGS.fluency || FLAGS.trainer;
+export const LEARN_SRS = FLAGS.srsLearn;

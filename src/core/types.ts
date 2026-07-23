@@ -33,6 +33,10 @@ export interface Exercise {
   // instance ({snippet,expected} for predict; {starter,tests,solution} for write).
   // Ground truth is computed by executing, so instances are self-verifying.
   generator?: string;
+  // Stamped at load time from the source file (see ui/content.ts), used by the
+  // curriculum-scope filter to hide content without deleting it:
+  unit?: string;        // e.g. "u01" (derived from the id / file); undefined for fluency
+  spiral?: boolean;     // true if it came from a "-more" spiral-review file
 }
 /**
  * One structured test case for a `write` exercise. `setup` (optional) runs first

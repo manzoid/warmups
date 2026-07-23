@@ -1,4 +1,7 @@
 import type { Track } from '../core/types';
+import { LEARN_SRS } from '../core/flags';
+import { availableTracks } from '../core/curriculum';
+import { ALL_EXERCISES } from './content';
 import { styles, theme } from './styles';
 
 const TRACK_LABELS: Record<Track, string> = {
@@ -6,7 +9,11 @@ const TRACK_LABELS: Record<Track, string> = {
   javascript: 'JavaScript',
 };
 
-type View = 'learn' | 'practice' | 'fluency' | 'history';
+// Tracks with any in-scope content. In the default beginner core this is just
+// Python, so the picker offers one track and "Change track" is hidden.
+const TRACKS: Track[] = availableTracks(ALL_EXERCISES);
+
+type View = 'learn' | 'practice' | 'fluency' | 'progress';
 
 /**
  * The full-bleed top navigation bar.
@@ -17,7 +24,9 @@ type View = 'learn' | 'practice' | 'fluency' | 'history';
  * Change-track controls — everything that used to live in the old page header
  * and the per-view Nav. Before a track is chosen (or while the training
  * dashboard is open) the tab cluster is hidden via `tabsVisible`, collapsing the
- * bar to just the brand plus the always-available Training / Settings buttons.
+ * bar to just the brand plus the always-available Settings button. Training is
+ * gated on `trainerMode` and a chosen track; Change-track appears only when more
+ * than one track has in-scope content.
  */
 export function TopBar({
   track,
@@ -82,10 +91,10 @@ export function TopBar({
           {tabsVisible && track && (
             <>
               <span style={{ ...styles.pill, marginLeft: 2 }}>{TRACK_LABELS[track]}</span>
-              {tab('learn', 'Learn')}
+              {LEARN_SRS && tab('learn', 'Learn (SRS)')}
               {tab('practice', 'Practice')}
               {hasFluency && tab('fluency', 'Fluency')}
-              {tab('history', 'History')}
+              {tab('progress', 'Progress')}
             </>
           )}
         </div>
@@ -95,12 +104,12 @@ export function TopBar({
               {counts.done} / {counts.total} passed
             </span>
           )}
-          {tabsVisible && (
+          {tabsVisible && TRACKS.length > 1 && (
             <button style={styles.btnGhost} onClick={onChangeTrack}>
               Change track
             </button>
           )}
-          {trainerMode && (
+          {trainerMode && track != null && (
             <button
               style={{
                 ...styles.btnGhost,

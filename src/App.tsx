@@ -10,15 +10,25 @@ import {
   lastAttempt,
   attemptsFor,
   bestTimeMs,
+  hasPassed,
   hasAttempted,
   resetProgress,
   savePaceConfig,
   type ProgressState,
   type Attempt,
 } from './core/storage';
-import { exercisesForTrack, generatorsForTrack } from './ui/content';
+import { exercisesForTrack, generatorsForTrack, ALL_EXERCISES } from './ui/content';
+import { availableTracks } from './core/curriculum';
 import { pickNextLearn, learnCounts, RUNNERS, type NextPick } from './ui/session';
-import { INTERVIEW_FEATURES, TRAINER_MODE, FLAGS, FLAG_DEFS, setFlagOverride } from './core/flags';
+import {
+  INTERVIEW_FEATURES,
+  TRAINER_MODE,
+  FLUENCY_TAB,
+  LEARN_SRS,
+  FLAGS,
+  FLAG_DEFS,
+  setFlagOverride,
+} from './core/flags';
 import { loadPrefs, getFlagPref, setPref } from './core/prefs';
 import {
   loadPaces,
@@ -47,7 +57,15 @@ const TRACK_LABELS: Record<Track, string> = {
   javascript: 'JavaScript',
 };
 
-type View = 'learn' | 'practice' | 'fluency' | 'history';
+// Tracks with any in-scope content. In the default beginner core this is just
+// Python, so the picker offers one track and "Change track" is hidden.
+const TRACKS: Track[] = availableTracks(ALL_EXERCISES);
+
+type View = 'learn' | 'practice' | 'fluency' | 'progress';
+
+// Where the app lands after picking a track (and after a history reset). The
+// SRS-guided Learn sequence is opt-in; without it, Practice is home.
+const HOME_VIEW: View = LEARN_SRS ? 'learn' : 'practice';
 
 export default function App() {
   // Progress lives in a ref (arrays/maps mutate in place); `tick` forces a
@@ -55,6 +73,9 @@ export default function App() {
   const progress = useRef<ProgressState>(load());
   const [, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
+  // True once the server hydration pass has run — the auto-track-pick waits on
+  // it so a returning learner resumes where they left off, not at exercise 1.
+  const [hydrated, setHydrated] = useState(false);
 
   // Persist to both the localStorage cache and the durable local data server.
   const persist = useCallback(() => {
@@ -89,6 +110,7 @@ export default function App() {
         void saveRemote(progress.current);
       }
       bump();
+      setHydrated(true);
     })();
     return () => {
       cancelled = true;
@@ -96,7 +118,7 @@ export default function App() {
   }, [bump]);
 
   const [track, setTrack] = useState<Track | null>(null);
-  const [view, setView] = useState<View>('learn');
+  const [view, setView] = useState<View>(HOME_VIEW);
   const [showSettings, setShowSettings] = useState(false);
   const [showTraining, setShowTraining] = useState(false);
   // When the training dashboard launches a pattern for pacing, force setpace.
@@ -170,6 +192,19 @@ export default function App() {
     setInput(ex.kind === 'write' ? ex.starter ?? '' : '');
     setPick({ exercise: ex, isNew });
   }, []);
+
+  // When only one track is in scope (the default beginner core is Python-only),
+  // skip the track picker: select it and land on the next exercise. Runs once,
+  // after hydration, so we resume the learner's place rather than restarting.
+  const didAutoTrack = useRef(false);
+  useEffect(() => {
+    if (didAutoTrack.current || !hydrated || TRACKS.length !== 1) return;
+    didAutoTrack.current = true;
+    const t = TRACKS[0];
+    setTrack(t);
+    const next = pickNextLearn(exercisesForTrack(t), progress.current);
+    if (next) startExercise(next.exercise, next.isNew);
+  }, [hydrated, startExercise]);
 
   const advanceLearn = useCallback(() => {
     const next = pickNextLearn(exercises, progress.current);
@@ -263,12 +298,16 @@ export default function App() {
 
   const chooseTrack = (t: Track) => {
     setTrack(t);
-    setView('learn');
+    setView(HOME_VIEW);
     setQueue(null);
     setFluencyEx(null);
-    const next = pickNextLearn(exercisesForTrack(t), progress.current);
-    if (next) startExercise(next.exercise, next.isNew);
-    else setPick(null);
+    if (LEARN_SRS) {
+      const next = pickNextLearn(exercisesForTrack(t), progress.current);
+      if (next) startExercise(next.exercise, next.isNew);
+      else setPick(null);
+    } else {
+      setPick(null);
+    }
   };
 
   // From the training dashboard: jump to a specific pattern's pacing flow.
@@ -401,10 +440,14 @@ export default function App() {
     resetProgress(progress.current);
     persist();
     setQueue(null);
-    setView('learn');
-    const next = pickNextLearn(exercises, progress.current);
-    if (next) startExercise(next.exercise, next.isNew);
-    else setPick(null);
+    setView(HOME_VIEW);
+    if (LEARN_SRS) {
+      const next = pickNextLearn(exercises, progress.current);
+      if (next) startExercise(next.exercise, next.isNew);
+      else setPick(null);
+    } else {
+      setPick(null);
+    }
     bump();
   }, [exercises, startExercise, persist, bump]);
 
@@ -414,14 +457,18 @@ export default function App() {
   // surface (pickers, history, fluency) stays in the narrower reading column.
   const wide = !!pick;
 
+  // Trainer tooling only appears once a track is chosen — never on the
+  // track-picker screen.
+  const trainingOpen = TRAINER_MODE && track != null && showTraining;
+
   return (
     <div style={styles.page}>
       <TopBar
         track={track}
         view={view}
         counts={counts}
-        hasFluency={generators.length > 0}
-        tabsVisible={!!(track && counts && !(TRAINER_MODE && showTraining))}
+        hasFluency={FLUENCY_TAB && generators.length > 0}
+        tabsVisible={!!(track && counts && !trainingOpen)}
         trainerMode={TRAINER_MODE}
         showTraining={showTraining}
         onView={switchView}
@@ -429,6 +476,7 @@ export default function App() {
           setTrack(null);
           setPick(null);
           setQueue(null);
+          setShowTraining(false);
         }}
         onToggleSettings={() => setShowSettings((s) => !s)}
         onToggleTraining={() => setShowTraining((s) => !s)}
@@ -446,11 +494,11 @@ export default function App() {
           </div>
         )}
 
-        {TRAINER_MODE && showTraining && (
+        {trainingOpen && (
           <TrainingDashboard onPace={pacePattern} onClose={() => setShowTraining(false)} />
         )}
 
-        {!(TRAINER_MODE && showTraining) && !track && (
+        {!trainingOpen && !track && (
           <>
             <p style={{ ...styles.tagline, marginTop: 0 }}>
               Local-first coding drills for language fluency and problem-solving
@@ -460,7 +508,7 @@ export default function App() {
           </>
         )}
 
-        {!(TRAINER_MODE && showTraining) && track && counts && (
+        {!trainingOpen && track && counts && (
           <>
             {view === 'learn' &&
               (pick ? (
@@ -576,8 +624,8 @@ export default function App() {
                 </div>
               ))}
 
-            {view === 'history' && (
-              <HistoryView
+            {view === 'progress' && (
+              <ProgressView
                 exercises={exercises}
                 state={progress.current}
                 onPractice={startPractice}
@@ -645,7 +693,7 @@ function TrackPicker({ onPick }: { onPick: (t: Track) => void }) {
     <div style={styles.panel}>
       <p style={styles.label}>Pick a track</p>
       <div style={styles.row}>
-        {(Object.keys(TRACK_LABELS) as Track[]).map((t) => (
+        {TRACKS.map((t) => (
           <button key={t} style={styles.btn} onClick={() => onPick(t)}>
             {TRACK_LABELS[t]}
           </button>
@@ -857,9 +905,11 @@ function PaceStatusPill({ status }: { status: PaceStatus }) {
   );
 }
 
-// Time-trainer dashboard: a cross-track bird's-eye of pace coverage — which
-// patterns are paced (fresh), dirty (edited since paced), or unpaced — with a
-// jump-to-pace action and the config export in one place.
+// Time-trainer dashboard: pace coverage over the PYTHON drills — which patterns
+// are paced (fresh), dirty (edited since paced), or unpaced — with a
+// jump-to-pace action and the config export in one place. Pacing is authored
+// against Python only; a JS drill borrows its Python counterpart's timing as a
+// default (see configPaceMs), tunable per-language later with a js.* entry.
 function TrainingDashboard({
   onPace,
   onClose,
@@ -872,8 +922,7 @@ function TrainingDashboard({
   const rank: Record<PaceStatus, number> = { missing: 0, dirty: 1, fresh: 2 };
 
   const rows = useMemo(() => {
-    const gens = [...generatorsForTrack('python'), ...generatorsForTrack('javascript')];
-    return gens
+    return generatorsForTrack('python')
       .map((ex) => {
         const h = patternHash(ex);
         return {
@@ -886,26 +935,19 @@ function TrainingDashboard({
       .sort((a, b) =>
         rank[a.status] !== rank[b.status]
           ? rank[a.status] - rank[b.status]
-          : a.ex.track < b.ex.track
+          : a.ex.id < b.ex.id
             ? -1
-            : a.ex.track > b.ex.track
-              ? 1
-              : a.ex.id < b.ex.id
-                ? -1
-                : 1,
+            : 1,
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const tally = (t?: Track) => {
-    const r = t ? rows.filter((x) => x.ex.track === t) : rows;
-    return {
-      total: r.length,
-      fresh: r.filter((x) => x.status === 'fresh').length,
-      dirty: r.filter((x) => x.status === 'dirty').length,
-      missing: r.filter((x) => x.status === 'missing').length,
-    };
-  };
+  const tally = () => ({
+    total: rows.length,
+    fresh: rows.filter((x) => x.status === 'fresh').length,
+    dirty: rows.filter((x) => x.status === 'dirty').length,
+    missing: rows.filter((x) => x.status === 'missing').length,
+  });
   // Write the config straight to src/data/pace-targets.json via the local data
   // server. If it isn't running, fall back to copying the JSON.
   const saveConfig = async () => {
@@ -925,11 +967,11 @@ function TrainingDashboard({
     setTimeout(() => setSaveMsg(''), 4000);
   };
 
-  const summaryLine = (label: string, t?: Track) => {
-    const s = tally(t);
+  const summaryLine = () => {
+    const s = tally();
     return (
       <span style={{ ...styles.pill }}>
-        {label}: {s.fresh} paced · {s.dirty} dirty · {s.missing} unpaced ({s.total})
+        Python: {s.fresh} paced · {s.dirty} dirty · {s.missing} unpaced ({s.total})
       </span>
     );
   };
@@ -951,9 +993,10 @@ function TrainingDashboard({
         </div>
       </div>
       <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8, marginTop: '0.6rem' }}>
-        {summaryLine('All')}
-        {summaryLine('Python', 'python')}
-        {summaryLine('JavaScript', 'javascript')}
+        {summaryLine()}
+        <span style={{ ...styles.tagline, margin: 0, fontSize: '0.8rem', color: theme.muted }}>
+          JS drills reuse their Python counterpart's pace as a default.
+        </span>
       </div>
 
       <div style={{ marginTop: '0.9rem' }}>
@@ -1054,7 +1097,9 @@ function FluencyPicker({
                       write
                     </span>
                   )}
-                  {TRAINER_MODE && <PaceStatusPill status={configStatus(ex)} />}
+                  {TRAINER_MODE && ex.track === 'python' && (
+                    <PaceStatusPill status={configStatus(ex)} />
+                  )}
                 </button>
               ))}
             </div>
@@ -1596,16 +1641,41 @@ function FluencyDrill({
   );
 }
 
-type Filter = 'all' | 'failed' | 'hinted' | 'clean';
+type Filter = 'all' | 'todo' | 'failed' | 'hinted' | 'clean';
 
 function filterLabel(f: Filter): string {
   return f === 'all'
     ? 'All'
-    : f === 'failed'
-      ? 'Failed'
-      : f === 'hinted'
-        ? 'Used a hint'
-        : 'Clean pass';
+    : f === 'todo'
+      ? 'To do'
+      : f === 'failed'
+        ? 'Failed'
+        : f === 'hinted'
+          ? 'Used a hint'
+          : 'Clean pass';
+}
+
+// Where a learner stands on one exercise, for the ordered syllabus/progress view.
+type ExStatus = 'clean' | 'help' | 'failed' | 'skipped' | 'todo';
+function statusOf(la: Attempt | undefined): ExStatus {
+  if (!la) return 'todo';
+  if (la.skipped) return 'skipped';
+  if (!la.passed) return 'failed';
+  return la.rung >= 1 ? 'help' : 'clean';
+}
+function statusGlyph(st: ExStatus): { ch: string; color: string; title: string } {
+  switch (st) {
+    case 'clean':
+      return { ch: '✓', color: theme.good, title: 'passed' };
+    case 'help':
+      return { ch: '✓', color: theme.accent, title: 'passed with help' };
+    case 'failed':
+      return { ch: '✗', color: theme.bad, title: 'failed' };
+    case 'skipped':
+      return { ch: '⤼', color: theme.muted, title: 'skipped' };
+    default:
+      return { ch: '·', color: theme.muted, title: 'not yet reached' };
+  }
 }
 
 function rungLabel(rung: number): string {
@@ -1620,7 +1690,12 @@ function rungLabel(rung: number): string {
           : 'cue';
 }
 
-function HistoryView({
+// The unified syllabus + performance view. Shows every in-scope exercise in
+// curriculum order, grouped by unit: done items carry their pass/fail/hint
+// badges (the old History), items ahead show as not-yet-reached, and the very
+// next one the Learn flow would serve is marked "up next". One place for both
+// the road ahead and how you did.
+function ProgressView({
   exercises,
   state,
   onPractice,
@@ -1634,63 +1709,81 @@ function HistoryView({
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const rows = useMemo(() => {
-    const out: { ex: Exercise; passed: boolean; rung: number; at: number; skipped: boolean }[] = [];
+  const upNextId = useMemo(
+    () => pickNextLearn(exercises, state)?.exercise.id ?? null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [exercises, state],
+  );
+
+  // Every exercise in curriculum order, tagged with its status, grouped by unit.
+  const groups = useMemo(() => {
+    const order: string[] = [];
+    const byGroup = new Map<string, { ex: Exercise; la?: Attempt; st: ExStatus }[]>();
     for (const ex of exercises) {
       const la = lastAttempt(state, ex.id);
-      if (!la) continue;
-      out.push({ ex, passed: la.passed, rung: la.rung, at: la.at, skipped: !!la.skipped });
+      if (!byGroup.has(ex.group)) {
+        byGroup.set(ex.group, []);
+        order.push(ex.group);
+      }
+      byGroup.get(ex.group)!.push({ ex, la, st: statusOf(la) });
     }
-    out.sort((a, b) => b.at - a.at);
-    return out;
+    return order.map((g) => ({ group: g, items: byGroup.get(g)! }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercises, state]);
 
-  const match = (r: { passed: boolean; rung: number; skipped: boolean }) =>
+  const passedCount = useMemo(
+    () => exercises.reduce((n, ex) => n + (hasPassed(state, ex.id) ? 1 : 0), 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [exercises, state],
+  );
+
+  const matches = (st: ExStatus) =>
     filter === 'all'
       ? true
-      : filter === 'failed'
-        ? !r.passed && !r.skipped
-        : filter === 'hinted'
-          ? r.rung >= 1
-          : r.passed && r.rung === 0;
+      : filter === 'todo'
+        ? st === 'todo' || st === 'failed'
+        : filter === 'failed'
+          ? st === 'failed'
+          : filter === 'hinted'
+            ? st === 'help'
+            : st === 'clean';
 
-  const shown = rows.filter(match);
-  const filteredExercises = shown.map((r) => r.ex);
+  const filteredExercises = groups.flatMap((g) => g.items.filter((it) => matches(it.st)).map((it) => it.ex));
+  const anyShown = filteredExercises.length > 0;
 
   return (
     <div style={styles.panel}>
       <div style={{ ...styles.row, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <p style={{ ...styles.label, margin: 0 }}>
-          History — {rows.length} attempted
+          Progress — {passedCount} / {exercises.length} passed
         </p>
         <div style={{ ...styles.row, gap: 8 }}>
           <button
             style={styles.btn}
-            disabled={filteredExercises.length === 0}
+            disabled={!anyShown}
             onClick={() => onPractice(filteredExercises, `${filterLabel(filter)} (${filteredExercises.length})`)}
           >
             Practice these ({filteredExercises.length})
           </button>
           <button
             style={{ ...styles.btnGhost, color: theme.bad, borderColor: theme.bad }}
-            disabled={rows.length === 0}
+            disabled={passedCount === 0 && !exercises.some((ex) => hasAttempted(state, ex.id))}
             onClick={() => {
               if (
                 window.confirm(
-                  'Reset all history? This clears every recorded attempt and cannot be undone.',
+                  'Reset all progress? This clears every recorded attempt and cannot be undone.',
                 )
               )
                 onReset();
             }}
           >
-            Reset history
+            Reset progress
           </button>
         </div>
       </div>
 
       <div style={{ ...styles.row, marginTop: '0.6rem', flexWrap: 'wrap', gap: 8 }}>
-        {(['all', 'failed', 'hinted', 'clean'] as Filter[]).map((f) => (
+        {(['all', 'todo', 'failed', 'hinted', 'clean'] as Filter[]).map((f) => (
           <button
             key={f}
             style={{
@@ -1705,65 +1798,84 @@ function HistoryView({
       </div>
 
       <div style={{ marginTop: '0.8rem' }}>
-        {shown.length === 0 ? (
-          <p style={{ ...styles.tagline, margin: 0 }}>
-            {rows.length === 0
-              ? 'Nothing here yet — attempts show up as you do exercises.'
-              : 'No exercises match this filter.'}
-          </p>
+        {!anyShown ? (
+          <p style={{ ...styles.tagline, margin: 0 }}>No exercises match this filter.</p>
         ) : (
-          shown.map(({ ex, passed, rung, skipped }) => {
-            const solutions = attemptsFor(state, ex.id).filter((a) => a.code);
-            const open = openId === ex.id;
+          groups.map((g) => {
+            const items = g.items.filter((it) => matches(it.st));
+            if (items.length === 0) return null;
+            const gDone = g.items.reduce((n, it) => n + (it.st === 'clean' || it.st === 'help' ? 1 : 0), 0);
             return (
-              <div key={ex.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
-                <div
-                  style={{
-                    ...styles.row,
-                    justifyContent: 'space-between',
-                    padding: '6px 0',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <span
-                      style={{
-                        color: skipped ? theme.muted : passed ? theme.good : theme.bad,
-                        marginRight: 8,
-                      }}
-                      title={skipped ? 'skipped' : passed ? 'passed' : 'failed'}
-                    >
-                      {skipped ? '⤼' : passed ? '✓' : '✗'}
-                    </span>
-                    <span>{ex.concept}</span>
-                    <span style={{ ...styles.pill, marginLeft: 8 }}>{ex.group}</span>
-                  </div>
-                  <div style={styles.row}>
-                    {rung >= 1 && (
-                      <span
-                        style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
-                      >
-                        {rungLabel(rung)}
-                      </span>
-                    )}
-                    {solutions.length > 0 && (
-                      <button
-                        style={{
-                          ...styles.btnGhost,
-                          ...(open ? { borderColor: theme.accent, color: theme.accent } : {}),
-                        }}
-                        onClick={() => setOpenId(open ? null : ex.id)}
-                        title="Show the code you submitted"
-                      >
-                        {open ? 'Hide' : `Solutions (${solutions.length})`}
-                      </button>
-                    )}
-                    <button style={styles.btnGhost} onClick={() => onPractice([ex], ex.concept)}>
-                      Redo
-                    </button>
-                  </div>
+              <div key={g.group} style={{ marginTop: '1rem' }}>
+                <div style={{ ...styles.row, justifyContent: 'space-between', marginBottom: 4 }}>
+                  <p style={{ ...styles.label, margin: 0 }}>{g.group}</p>
+                  <span style={styles.pill}>
+                    {gDone} / {g.items.length}
+                  </span>
                 </div>
-                {open && <PastSolutions attempts={solutions} />}
+                {items.map(({ ex, st }) => {
+                  const solutions = attemptsFor(state, ex.id).filter((a) => a.code);
+                  const open = openId === ex.id;
+                  const upNext = ex.id === upNextId;
+                  const glyph = statusGlyph(st);
+                  const la = lastAttempt(state, ex.id);
+                  return (
+                    <div key={ex.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                      <div
+                        style={{
+                          ...styles.row,
+                          justifyContent: 'space-between',
+                          padding: '6px 0',
+                          gap: 8,
+                        }}
+                      >
+                        <div style={{ minWidth: 0 }}>
+                          <span
+                            style={{ color: upNext ? theme.accent : glyph.color, marginRight: 8 }}
+                            title={upNext ? 'up next' : glyph.title}
+                          >
+                            {upNext ? '▶' : glyph.ch}
+                          </span>
+                          <span style={{ color: st === 'todo' ? theme.muted : theme.text }}>
+                            {ex.concept}
+                          </span>
+                          {upNext && (
+                            <span
+                              style={{ ...styles.pill, marginLeft: 8, color: theme.accent, borderColor: theme.accent }}
+                            >
+                              up next
+                            </span>
+                          )}
+                        </div>
+                        <div style={styles.row}>
+                          {la && la.rung >= 1 && (
+                            <span
+                              style={{ ...styles.pill, color: theme.accent, borderColor: theme.accent }}
+                            >
+                              {rungLabel(la.rung)}
+                            </span>
+                          )}
+                          {solutions.length > 0 && (
+                            <button
+                              style={{
+                                ...styles.btnGhost,
+                                ...(open ? { borderColor: theme.accent, color: theme.accent } : {}),
+                              }}
+                              onClick={() => setOpenId(open ? null : ex.id)}
+                              title="Show the code you submitted"
+                            >
+                              {open ? 'Hide' : `Solutions (${solutions.length})`}
+                            </button>
+                          )}
+                          <button style={styles.btnGhost} onClick={() => onPractice([ex], ex.concept)}>
+                            {la ? 'Redo' : 'Start'}
+                          </button>
+                        </div>
+                      </div>
+                      {open && <PastSolutions attempts={solutions} />}
+                    </div>
+                  );
+                })}
               </div>
             );
           })
@@ -1887,7 +1999,7 @@ function ExerciseView({
           </p>
           <p style={{ ...styles.tagline, margin: '0 0 0.55rem', fontSize: '0.82rem' }}>
             These open on warm-up atoms. Jump straight ahead any time — skipped
-            items stay redoable from History.
+            items stay redoable from Progress.
           </p>
           <div style={{ ...styles.row, flexWrap: 'wrap', gap: 8 }}>
             {onSkipToFirstWrite && (
@@ -2383,7 +2495,7 @@ function AllPassed() {
       </h2>
       <p style={{ ...styles.tagline, margin: 0 }}>
         Switch to <strong>Practice</strong> to keep drilling any set, or{' '}
-        <strong>History</strong> to redo the ones you failed or needed a hint on.
+        <strong>Progress</strong> to redo the ones you failed or needed a hint on.
       </p>
     </div>
   );

@@ -1,6 +1,8 @@
 // Fluency pace targets, resolved in three tiers (highest priority first):
 //   1. the learner's PERSONAL override (adapted from their own performance),
-//   2. the shipped CONFIG (src/data/pace-targets.json) a time-trainer exports,
+//   2. the shipped CONFIG (src/data/pace-targets.json) a time-trainer exports —
+//      authored against the PYTHON drills; a JS drill with no entry of its own
+//      borrows its Python counterpart's timing as a default,
 //   3. a kind-based FALLBACK so there is always a target.
 //
 // Personal + trainer paces are DURABLE user data, persisted on the local data
@@ -102,10 +104,26 @@ export function saveTrainerPace(id: string, ms: number, hash: string): void {
   putPace('trainer', id, ms, hash);
 }
 
+/** The Python counterpart of a JS drill id (pacing is authored against Python). */
+function pyCounterpartId(id: string): string | null {
+  return id.startsWith('js.') ? `py.${id.slice(3)}` : null;
+}
+
 /** Shipped config pace, but only if its hash still matches the pattern. */
 export function configPaceMs(id: string, hash: string): number | null {
   const e = CONFIG[id];
-  return e && typeof e.ms === 'number' && e.hash === hash ? e.ms : null;
+  if (e && typeof e.ms === 'number' && e.hash === hash) return e.ms;
+  // Cross-language default: paces are authored against the Python drills, and a
+  // JS drill with no entry of its own borrows its Python counterpart's timing
+  // (the patterns are semantically equivalent). The stored hash is the Python
+  // generator's, so it can't be checked against this exercise — this tier is a
+  // default, not a verified pace. Add a js.* entry to tune per-language.
+  const pyId = pyCounterpartId(id);
+  if (pyId) {
+    const c = CONFIG[pyId];
+    if (c && typeof c.ms === 'number') return c.ms;
+  }
+  return null;
 }
 
 /** Resolved drill target: personal override > shipped config > kind default. */
